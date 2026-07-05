@@ -19,5 +19,11 @@ struct PostJobCtx {
     Component& comp_;
 };
 
-void postJob(const int id, PostJobCtx ctx, const Component& comp);
+void postJob(
+    const int                                    id,
+    const bool                                   isSold,
+    tbb::concurrent_vector<world::LaborRequest>& requestBox,
+    PostJobCtx                                   ctx,
+    Component&                                   comp
+);
 }  // namespace labor_demander
