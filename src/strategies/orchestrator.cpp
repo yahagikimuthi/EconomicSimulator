@@ -36,4 +36,8 @@ void postGoods(
     const double sumWage{laborDemander.getSumWage()};
     goods_supplier::postGoods({goodsSupplier}, sumWage, entryBox, goodsSupplier);
 }
+
+void trade(goods_supplier::Component& goodsSupplier) {
+    goods_supplier::trade({goodsSupplier}, goodsSupplier);
+}
 }  // namespace orchestrator

@@ -33,10 +33,9 @@ struct GoodsRequest {
 
 struct GoodsEntry {
     const double price_;
-    const double amount_;
 
     tbb::concurrent_vector<GoodsRequest> requestBox_;
 
-    GoodsEntry(const double price, const double amount) : price_{price}, amount_{amount} {}
+    GoodsEntry(const double price) : price_{price} {}
 };
 }  // namespace world

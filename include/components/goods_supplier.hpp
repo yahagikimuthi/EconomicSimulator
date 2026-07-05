@@ -10,7 +10,6 @@ struct Log {
     double price_;
     double supply_;
     double sales_;
-    double expectedDemand_;
     bool   isSold_;
 };
 struct Plan {
@@ -30,7 +29,6 @@ struct Production {
 struct Parameter {
     const double targetInventoryRatio_;
     const double markupAdjustmentVolatility_;
-    const double demandAdaptionRate_;
 };
 struct Component {
     Log        log_;

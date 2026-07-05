@@ -43,4 +43,21 @@ void postGoods(
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     Component&                                 comp
 );
+
+struct TradeCtx {
+    TradeCtx(Component& comp) : comp_{comp} {}
+
+    [[nodiscard]] auto getMyEntry() const -> tbb::concurrent_vector<world::GoodsEntry>::iterator {
+        return comp_.posting_.myEntry_;
+    }
+
+    [[nodiscard]] auto getSupply() const -> double { return comp_.plan_.supply_; }
+
+    void setInventory(double inventory) { comp_.production_.inventory_ = inventory; }
+
+  private:
+    Component& comp_;
+};
+
+void trade(TradeCtx ctx, Component& comp);
 }  // namespace goods_supplier
