@@ -32,5 +32,10 @@ struct PostGoodsCtx {
     Component& comp_;
 };
 
-void postGoods(PostGoodsCtx ctx, tbb::concurrent_vector<world::GoodsEntry>& entryBox);
+void postGoods(
+    PostGoodsCtx                               ctx,
+    const double                               totalCost,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
+    Component&                                 comp
+);
 }  // namespace goods_supplier

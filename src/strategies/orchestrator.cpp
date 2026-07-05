@@ -27,4 +27,13 @@ void registerMember(
     const double sumEmployeeProductPower{labor_demander::registerMember({laborDemander})};
     goodsSupplier.setSumEmployeeProductPower(sumEmployeeProductPower);
 }
+
+void postGoods(
+    goods_supplier::Component&                 goodsSupplier,
+    labor_demander::Component&                 laborDemander,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+) {
+    const double sumWage{laborDemander.getSumWage()};
+    goods_supplier::postGoods({goodsSupplier}, sumWage, entryBox, goodsSupplier);
+}
 }  // namespace orchestrator

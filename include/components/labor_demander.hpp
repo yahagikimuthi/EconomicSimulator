@@ -33,6 +33,9 @@ struct Component {
     Posting   posting_;
     HR        humanResources;
     Parameter parameter_;
+
     Component();
+
+    [[nodiscard]] auto getSumWage() const -> double { return humanResources.sumWage_; }
 };
 }  // namespace labor_demander
