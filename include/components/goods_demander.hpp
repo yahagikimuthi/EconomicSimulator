@@ -6,7 +6,7 @@
 
 namespace goods_demander {
 struct Posting {
-    tbb::concurrent_vector<world::GoodsRequest>::iterator myRequestIdx;
+    tbb::concurrent_vector<world::GoodsRequest>::iterator myRequest;
     bool                                                  isPosting_;
 };
 struct Purchasing {

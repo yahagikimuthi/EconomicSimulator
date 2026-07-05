@@ -18,7 +18,7 @@ struct Plan {
     double supply_;
 };
 struct Posting {
-    tbb::concurrent_vector<world::GoodsEntry>::iterator myBoxIdx_;
+    tbb::concurrent_vector<world::GoodsEntry>::iterator myEntry_;
     bool                                                isPosting_{false};
 };
 struct Production {

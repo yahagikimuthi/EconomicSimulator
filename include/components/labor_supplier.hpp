@@ -6,7 +6,7 @@
 
 namespace labor_supplier {
 struct Posting {
-    std::vector<world::LaborEntry> myEntryIdxs_;
+    std::vector<world::LaborEntry> myEntries_;
     bool                           isPosting_;
 };
 struct Contraction {
