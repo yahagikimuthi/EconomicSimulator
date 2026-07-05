@@ -1,5 +1,11 @@
 #pragma once
 
+namespace agent_index {
+struct Component {
+    const int id_;
+};
+};  // namespace agent_index
+
 namespace firm_finance {
 struct Component {
     double asset_;
