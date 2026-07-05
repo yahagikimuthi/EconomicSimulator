@@ -3,6 +3,7 @@
 #include <tuple>
 
 #include "components/labor_demander.hpp"
+#include "config/init_setup.hpp"
 
 namespace labor_demander {
 struct CalcNextWageCtx {
@@ -19,7 +20,9 @@ struct CalcNextWageCtx {
     Component& comp_;
 };
 
-[[nodiscard]] auto calcNextWage(const CalcNextWageCtx ctx, const double epsilonWage) -> double;
+[[nodiscard]] auto calcNextWage(
+    const CalcNextWageCtx ctx, const double epsilonWage = config::labor_demander::epsilonWage
+) -> double;
 
 struct CalcNextEmployCtx {
     CalcNextEmployCtx(Component& component) : comp_{component} {}
