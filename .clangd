@@ -1,0 +1,33 @@
+Index:
+  Background: Skip
+
+Diagnostics:
+  ClangTidy:
+    Add: [
+      bugprone-*,
+      concurrency-*,
+      boost-*,
+      cppcoreguidelines-*,
+      modernize-*,
+      performance-*,
+      readability-*,
+    ]
+    Remove: [readability-avoid-const-params-in-decls, readability-braces-around-statements, readability-identifier-length, boost-use-ranges, performance-enum-size, cppcoreguidelines-avoid-const-or-ref-data-members, bugprone-easily-swappable-parameters,cppcoreguidelines-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers,readability-simplify-boolean-expr, cppcoreguidelines-pro-type-reinterpret-cast,bugprone-forward-declaration-namespace,cppcoreguidelines-slicing]
+
+InlayHints:
+  Enabled: Yes        # InlayHintsスイッチ
+  Designators: No     # 位置指定子の表示
+  DeducedTypes: Yes   # 推論された型の表示
+  ParameterNames: No  # 引数名の表示
+  BlockEnd: Yes       # ブロック単位の終了を表示
+  TypeNameLimit: 24   # 型名長さの限度
+
+Hover:
+  ShowAKA: true
+
+Completion:
+  ArgumentLists: Delimiters
+
+CompileFlags:
+  CompilationDatabase: "build" # buildフォルダの中を探してね、という指定
+  Add: [-I/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include]

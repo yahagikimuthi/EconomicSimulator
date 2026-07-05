@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/cmake_install.cmake",
+		"/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/_deps/highfive-build/cmake_install.cmake",
+		"/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/_deps/highfive-build/src/examples/cmake_install.cmake",
+		"/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/_deps/highfive-build/doc/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

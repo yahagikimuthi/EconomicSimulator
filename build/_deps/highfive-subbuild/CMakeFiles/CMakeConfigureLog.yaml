@@ -1,0 +1,102 @@
+
+---
+events:
+  -
+    kind: "find-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:12 (find_program)"
+      - "CMakeLists.txt:16 (project)"
+    mode: "program"
+    variable: "CMAKE_UNAME"
+    description: "Path to a program."
+    settings:
+      SearchFramework: "NEVER"
+      SearchAppBundle: "NEVER"
+      CMAKE_FIND_USE_CMAKE_PATH: true
+      CMAKE_FIND_USE_CMAKE_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH: true
+      CMAKE_FIND_USE_CMAKE_SYSTEM_PATH: true
+      CMAKE_FIND_USE_INSTALL_PREFIX: true
+    names:
+      - "uname"
+    candidate_directories:
+      - "/home/yahagikimuthi/.vscode-server/bin/4fe60c8b1cdac1c4c174f2fb180d0d758272d713/bin/remote-cli/"
+      - "/usr/local/sbin/"
+      - "/usr/local/bin/"
+      - "/usr/sbin/"
+      - "/usr/bin/"
+      - "/sbin/"
+      - "/bin/"
+      - "/usr/games/"
+      - "/usr/local/games/"
+      - "/usr/lib/wsl/lib/"
+      - "/mnt/c/windows/system32/"
+      - "/mnt/c/windows/"
+      - "/mnt/c/windows/System32/Wbem/"
+      - "/mnt/c/windows/System32/WindowsPowerShell/v1.0/"
+      - "/mnt/c/windows/System32/OpenSSH/"
+      - "/mnt/c/Program Files/dotnet/"
+      - "/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+      - "/mnt/c/Program Files/Git/cmd/"
+      - "/mnt/c/Program Files/doxygen/bin/"
+      - "/mnt/c/msys64/ucrt64/bin/"
+      - "/mnt/c/Program Files/LLVM/bin/"
+      - "/mnt/c/msys64/clang64/bin/"
+      - "/mnt/c/msys64/mingw64/bin/"
+      - "/mnt/c/Users/yahag/AppData/Local/Programs/Python/Python313/Scripts/"
+      - "/mnt/c/Users/yahag/AppData/Local/Programs/Python/Python313/"
+      - "/mnt/c/Users/yahag/AppData/Local/Microsoft/WindowsApps/"
+      - "/mnt/c/Users/yahag/AppData/Local/Programs/Microsoft VS Code/bin/"
+      - "/mnt/c/Users/yahag/AppData/Local/Python/bin/"
+      - "/mnt/c/Program Files/Cppcheck/"
+      - "/mnt/c/Program Files/Graphviz/bin/"
+      - "/snap/bin/"
+    searched_directories:
+      - "/home/yahagikimuthi/.vscode-server/bin/4fe60c8b1cdac1c4c174f2fb180d0d758272d713/bin/remote-cli/uname"
+      - "/usr/local/sbin/uname"
+      - "/usr/local/bin/uname"
+      - "/usr/sbin/uname"
+    found: "/usr/bin/uname"
+    search_context:
+      ENV{PATH}:
+        - "/home/yahagikimuthi/.vscode-server/bin/4fe60c8b1cdac1c4c174f2fb180d0d758272d713/bin/remote-cli"
+        - "/usr/local/sbin"
+        - "/usr/local/bin"
+        - "/usr/sbin"
+        - "/usr/bin"
+        - "/sbin"
+        - "/bin"
+        - "/usr/games"
+        - "/usr/local/games"
+        - "/usr/lib/wsl/lib"
+        - "/mnt/c/windows/system32"
+        - "/mnt/c/windows"
+        - "/mnt/c/windows/System32/Wbem"
+        - "/mnt/c/windows/System32/WindowsPowerShell/v1.0/"
+        - "/mnt/c/windows/System32/OpenSSH/"
+        - "/mnt/c/Program Files/dotnet/"
+        - "/mnt/c/Program Files (x86)/Windows Kits/10/Windows Performance Toolkit/"
+        - "/mnt/c/Program Files/Git/cmd"
+        - "/mnt/c/Program Files/doxygen/bin"
+        - "/mnt/c/msys64/ucrt64/bin"
+        - "/mnt/c/Program Files/LLVM/bin"
+        - "/mnt/c/msys64/clang64/bin"
+        - "/mnt/c/msys64/mingw64/bin"
+        - "/mnt/c/Users/yahag/AppData/Local/Programs/Python/Python313/Scripts/"
+        - "/mnt/c/Users/yahag/AppData/Local/Programs/Python/Python313/"
+        - "/mnt/c/Users/yahag/AppData/Local/Microsoft/WindowsApps"
+        - "/mnt/c/Users/yahag/AppData/Local/Programs/Microsoft VS Code/bin"
+        - "/mnt/c/Users/yahag/AppData/Local/Python/bin"
+        - "/mnt/c/Program Files/Git/cmd"
+        - "/mnt/c/Program Files/Cppcheck"
+        - "/mnt/c/Program Files/Graphviz/bin"
+        - "/mnt/c/Program Files/doxygen/bin"
+        - "/snap/bin"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/CMakeDetermineSystem.cmake:212 (message)"
+      - "CMakeLists.txt:16 (project)"
+    message: |
+      The system is: Linux - 6.18.33.2-microsoft-standard-WSL2 - x86_64
+...

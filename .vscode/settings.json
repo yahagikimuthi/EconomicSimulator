@@ -1,0 +1,14 @@
+{
+    "cmake.configureArgs": [
+        "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+    ],
+    "clangd.arguments": [
+        "--compile-commands-dir=build",
+        "--query-driver=/usr/bin/*cc*,/usr/bin/*++*",
+        "--header-insertion=never",
+        "--background-index"
+    ],
+    // CMake Toolsでデバッガの種類を明示的に指定
+    "cmake.debuggerType": "lldb",
+    // 構成選択画面をスキップして、現在選択中のターゲットを優先する
+}
