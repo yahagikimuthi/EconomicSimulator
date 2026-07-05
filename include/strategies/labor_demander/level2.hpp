@@ -20,4 +20,18 @@ struct CalcNextWageCtx {
 };
 
 [[nodiscard]] auto calcNextWage(const CalcNextWageCtx ctx, const double epsilonWage) -> double;
+
+struct CalcNextEmployCtx {
+    CalcNextEmployCtx(Component& component) : comp_{component} {}
+
+    [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
+    [[nodiscard]] auto employAdjustVol() const -> double {
+        return comp_.parameter_.employAdjustmentVolatility_;
+    }
+
+  private:
+    Component& comp_;
+};
+
+[[nodiscard]] auto calcNextEmploy(const CalcNextEmployCtx ctx, const bool isSold) -> int;
 }  // namespace labor_demander

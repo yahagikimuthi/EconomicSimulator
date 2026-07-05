@@ -12,4 +12,12 @@ namespace labor_demander {
     const double nextWage{lastWage * ((occupancyRate >= 1.0) ? 1.0 - alpha : 1.0 + alpha)};
     return std::max(epsilonWage, nextWage);
 }
+
+[[nodiscard]] auto calcNextEmploy(const CalcNextEmployCtx ctx, const bool isSold) -> int {
+    const double alpha{std::abs(helper::randNormal(0.0, ctx.employAdjustVol(), -1.0, 1.0))};
+    const double nextEmploy{ctx.lastTargetEmploy() * (isSold ? 1.0 - alpha : 1.0 + alpha)};
+    const int    out{static_cast<int>(std::round(nextEmploy))};
+    return std::max(1, out);
+}
+
 }  // namespace labor_demander
