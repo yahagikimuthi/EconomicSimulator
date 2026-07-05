@@ -23,6 +23,7 @@ struct Posting {
 };
 struct Production {
     double firmProductPower_;
+    double sumEmployeeProductPower_;
     double inventory_;
 };
 struct Parameter {

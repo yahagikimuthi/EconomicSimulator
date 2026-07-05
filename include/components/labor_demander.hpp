@@ -17,7 +17,6 @@ struct Plan {
 };
 struct HR {
     double sumWage_;
-    double sumEmployeeProductPower_;
     int    employeeCnt;
 };
 struct Parameter {
