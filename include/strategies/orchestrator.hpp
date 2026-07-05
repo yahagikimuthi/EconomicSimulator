@@ -11,4 +11,6 @@ void postLaborRequest(
     labor_demander::Component&                   laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
-}
+
+void offer(labor_demander::Component& laborDemander);
+}  // namespace orchestrator

@@ -16,4 +16,8 @@ void postLaborRequest(
     const bool isSold{goods_supplier::isSold({goodsSupplier})};
     labor_demander::postJob(id, isSold, requestBox, {laborDemander}, laborDemander);
 }
+
+void offer(labor_demander::Component& laborDemander) {
+    labor_demander::offerApplicants({laborDemander});
+}
 }  // namespace orchestrator
