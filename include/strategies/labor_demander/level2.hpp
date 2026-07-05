@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <tuple>
 
 #include "components/labor_demander.hpp"
@@ -37,4 +38,10 @@ struct CalcNextEmployCtx {
 };
 
 [[nodiscard]] auto calcNextEmploy(const CalcNextEmployCtx ctx, const bool isSold) -> int;
+
+void sortApplicants(
+    const int                                        employ,
+    std::vector<std::size_t>&                        sortApplicantIdxs,
+    const tbb::concurrent_vector<world::LaborEntry>& entryBox
+);
 }  // namespace labor_demander
