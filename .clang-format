@@ -27,7 +27,7 @@ AlignConsecutiveAssignments: true    # 代入の「=」を縦に揃える
 # ------------------------
 
 # その他のモダンC++おすすめ調整
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: All
 BinPackArguments: false
 BinPackParameters: false
 BreakBeforeBraces: Attach
