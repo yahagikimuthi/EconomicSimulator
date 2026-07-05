@@ -21738,3 +21738,39 @@ events:
         gmake: *** [Makefile:134: cmTC_517f9/fast] Error 2
         
       exitCode: 2
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake-4.2/Modules/FindHDF5.cmake:455 (try_compile)"
+      - "/usr/share/cmake-4.2/Modules/FindHDF5.cmake:782 (_HDF5_test_regular_compiler_CXX)"
+      - "CMakeLists.txt:18 (find_package)"
+    directories:
+      source: "/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/CMakeScratch/TryCompile-AAs7P8"
+      binary: "/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/CMakeScratch/TryCompile-AAs7P8"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "HDF5_CXX_COMPILER_NO_INTERROGATE"
+      cached: true
+      stdout: |
+        Change Dir: '/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/CMakeScratch/TryCompile-AAs7P8'
+        
+        Run Build Command(s): /usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_2001a/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_2001a.dir/build.make CMakeFiles/cmTC_2001a.dir/build
+        gmake[1]: Entering directory '/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/CMakeScratch/TryCompile-AAs7P8'
+        Building CXX object CMakeFiles/cmTC_2001a.dir/cmake_hdf5_test.cxx.o
+        /usr/bin/g++   -std=c++23 -o CMakeFiles/cmTC_2001a.dir/cmake_hdf5_test.cxx.o -c /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/hdf5/cmake_hdf5_test.cxx
+        /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/hdf5/cmake_hdf5_test.cxx:1:10: fatal error: H5Cpp.h: No such file or directory
+            1 | #include <H5Cpp.h>
+              |          ^~~~~~~~~
+        compilation terminated.
+        gmake[1]: *** [CMakeFiles/cmTC_2001a.dir/build.make:81: CMakeFiles/cmTC_2001a.dir/cmake_hdf5_test.cxx.o] Error 1
+        gmake[1]: Leaving directory '/home/yahagikimuthi/EconomicSimulator/Simulator_cpp/build/CMakeFiles/CMakeScratch/TryCompile-AAs7P8'
+        gmake: *** [Makefile:134: cmTC_2001a/fast] Error 2
+        
+      exitCode: 2
