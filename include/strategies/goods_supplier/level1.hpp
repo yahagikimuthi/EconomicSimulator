@@ -1,6 +1,9 @@
 #pragma once
 
+#include <tbb/concurrent_vector.h>
+
 #include "components/goods_supplier.hpp"
+#include "core/forward.hpp"
 
 namespace goods_supplier {
 
@@ -18,4 +21,16 @@ struct IsSoldCtx {
 };
 
 [[nodiscard]] auto isSold(const IsSoldCtx& ctx) -> bool;
+
+struct PostGoodsCtx {
+    PostGoodsCtx(Component& comp) : comp_{comp} {}
+    void setMyEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
+        comp_.posting_.myEntry_ = it;
+    }
+
+  private:
+    Component& comp_;
+};
+
+void postGoods(PostGoodsCtx ctx, tbb::concurrent_vector<world::GoodsEntry>& entryBox);
 }  // namespace goods_supplier

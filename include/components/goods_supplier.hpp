@@ -11,6 +11,7 @@ struct Log {
     double supply_;
     double sales_;
     double expectedDemand_;
+    bool   isSold_;
 };
 struct Plan {
     double markup_;
@@ -43,5 +44,6 @@ struct Component {
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;
     }
+    [[nodiscard]] auto getIsSold() const -> bool { return log_.isSold_; }
 };
 }  // namespace goods_supplier
