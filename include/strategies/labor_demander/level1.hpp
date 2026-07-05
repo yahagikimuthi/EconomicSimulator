@@ -26,4 +26,22 @@ void postJob(
     PostJobCtx                                   ctx,
     Component&                                   comp
 );
+
+struct OfferApplicantsCtx {
+    OfferApplicantsCtx(Component& comp) : comp_{comp} {}
+
+    [[nodiscard]] auto getEmploy() const -> int { return comp_.plan_.employ_; }
+
+    [[nodiscard]] auto getMyRequest() const
+        -> tbb::concurrent_vector<world::LaborRequest>::iterator {
+        return comp_.posting_.myRequest_;
+    }
+
+    void clearOfferVec() { comp_.posting_.offerApplicants_.clear(); }
+
+  private:
+    Component& comp_;
+};
+
+void offerApplicants(OfferApplicantsCtx ctx);
 }  // namespace labor_demander
