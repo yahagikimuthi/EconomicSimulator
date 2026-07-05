@@ -48,7 +48,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include
 add_compile_definitions(HIGHFIVE_HAS_NO_EXCEPTIONS)
 # --- コンパイル・リンクオプション（警告） ---
 target_compile_options(EconomicSimulator PRIVATE
-    -O3
+    -O0
     -g
     -Wall
     -Werror
