@@ -3,6 +3,8 @@
 namespace agent_index {
 struct Component {
     const int id_;
+
+    [[nodiscard]] auto getId() const -> int { return id_; }
 };
 };  // namespace agent_index
 
