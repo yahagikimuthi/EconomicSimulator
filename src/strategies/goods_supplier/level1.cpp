@@ -21,5 +21,6 @@ void postGoods(
     const double markup{calcMarkup({comp})};
     const double price{judgePrice(markup, totalCost)};
     ctx.setMyEntry(entryBox.emplace_back(price, supply));
+    ctx.setPlan(price, supply, markup);
 }
 }  // namespace goods_supplier

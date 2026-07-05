@@ -28,6 +28,11 @@ struct PostGoodsCtx {
         comp_.posting_.myEntry_ = it;
     }
 
+    void setPlan(const double price, const double supply, const double markup) {
+        auto& plan  = comp_.plan_;
+        plan.price_ = price, plan.markup_ = markup, plan.supply_ = supply;
+    }
+
   private:
     Component& comp_;
 };
