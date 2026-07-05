@@ -31,6 +31,7 @@ void offerApplicants(OfferApplicantsCtx ctx) {
     for (const std::size_t i : sortApplicantIdxs) {
         if (offerNum >= employ) break;
         ACCESS(myRequest->entryBox_, i).isOffer_ = true;
+        ctx.recordOffer(ACCESS(myRequest->entryBox_, i));
         ++offerNum;
     }
 }

@@ -38,6 +38,9 @@ struct OfferApplicantsCtx {
     }
 
     void clearOfferVec() { comp_.posting_.offerApplicants_.clear(); }
+    void recordOffer(world::LaborEntry& entry) {
+        comp_.posting_.offerApplicants_.emplace_back(entry);
+    }
 
   private:
     Component& comp_;
