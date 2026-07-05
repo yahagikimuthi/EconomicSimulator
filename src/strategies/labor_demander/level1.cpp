@@ -35,4 +35,20 @@ void offerApplicants(OfferApplicantsCtx ctx) {
         ++offerNum;
     }
 }
+
+[[nodiscard]] auto registerMember(RegisterMemberCtx ctx) -> double {
+    const auto myRequest = ctx.getMyRequest();
+
+    double sumProductPower{};
+    int    employeeCnt{};
+    for (const auto entryRef : ctx.getOfferApplicants()) {
+        auto& entry = entryRef.get();
+        if (not entry.isAccept_) continue;
+        sumProductPower += entry.productPower_;
+        ++employeeCnt;
+    }
+
+    ctx.setLog(myRequest->wage_, ctx.getTargetEmploy(), employeeCnt);
+    return sumProductPower;
+}
 }  // namespace labor_demander
