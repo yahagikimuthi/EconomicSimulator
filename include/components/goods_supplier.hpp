@@ -39,5 +39,9 @@ struct Component {
     Parameter  parameter_;
 
     Component();
+
+    void setSumEmployeeProductPower(const double power) {
+        production_.sumEmployeeProductPower_ = power;
+    }
 };
 }  // namespace goods_supplier

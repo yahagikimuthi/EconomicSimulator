@@ -20,4 +20,11 @@ void postLaborRequest(
 void offer(labor_demander::Component& laborDemander) {
     labor_demander::offerApplicants({laborDemander});
 }
+
+void registerMember(
+    goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
+) {
+    const double sumEmployeeProductPower{labor_demander::registerMember({laborDemander})};
+    goodsSupplier.setSumEmployeeProductPower(sumEmployeeProductPower);
+}
 }  // namespace orchestrator

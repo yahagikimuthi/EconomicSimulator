@@ -13,4 +13,8 @@ void postLaborRequest(
 );
 
 void offer(labor_demander::Component& laborDemander);
+
+void registerMember(
+    goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
+);
 }  // namespace orchestrator
