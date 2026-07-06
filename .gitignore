@@ -1,3 +1,8 @@
 build/
 .VSCodeCounter/
+.vscode/
 .gitignore
+.clang-format
+compile_flags.txt
+.clangd
+CMakeLists.txt
