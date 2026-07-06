@@ -1,0 +1,67 @@
+Date : 2026-07-06 12:44:03
+Directory : /home/yahagikimuthi/EconomicSimulator/Simulator_cpp
+Total : 25 files,  807 codes, 1 comments, 180 blanks, all 988 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C++      |         24 |        755 |          1 |        170 |        926 |
+| CMake    |          1 |         52 |          0 |         10 |         62 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                             | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                |         25 |        807 |          1 |        180 |        988 |
+| . (Files)                                                                                        |          1 |         52 |          0 |         10 |         62 |
+| include                                                                                          |         17 |        516 |          1 |        129 |        646 |
+| include (Files)                                                                                  |          1 |         57 |          0 |         12 |         69 |
+| include/components                                                                               |          5 |        141 |          0 |         23 |        164 |
+| include/config                                                                                   |          3 |         55 |          1 |          9 |         65 |
+| include/core                                                                                     |          1 |          7 |          0 |          1 |          8 |
+| include/strategies                                                                               |          6 |        228 |          0 |         71 |        299 |
+| include/strategies (Files)                                                                       |          1 |         16 |          0 |          4 |         20 |
+| include/strategies/goods_supplier                                                                |          3 |        119 |          0 |         38 |        157 |
+| include/strategies/labor_demander                                                                |          2 |         93 |          0 |         29 |        122 |
+| include/world                                                                                    |          1 |         28 |          0 |         13 |         41 |
+| src                                                                                              |          7 |        239 |          0 |         41 |        280 |
+| src (Files)                                                                                      |          1 |          1 |          0 |          0 |          1 |
+| src/strategies                                                                                   |          6 |        238 |          0 |         41 |        279 |
+| src/strategies (Files)                                                                           |          1 |         36 |          0 |          7 |         43 |
+| src/strategies/goods_supplier                                                                    |          3 |        117 |          0 |         19 |        136 |
+| src/strategies/labor_demander                                                                    |          2 |         85 |          0 |         15 |        100 |
++--------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                         | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/CMakeLists.txt                               | CMake    |         52 |          0 |         10 |         62 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/components/common.hpp                | C++      |         19 |          0 |          4 |         23 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/components/goods_demander.hpp        | C++      |         22 |          0 |          4 |         26 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/components/goods_supplier.hpp        | C++      |         42 |          0 |          5 |         47 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/components/labor_demander.hpp        | C++      |         36 |          0 |          5 |         41 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/components/labor_supplier.hpp        | C++      |         22 |          0 |          5 |         27 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/config/contract.hpp                  | C++      |         35 |          1 |          6 |         42 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/config/init_setup.hpp                | C++      |         14 |          0 |          2 |         16 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/config/sim_vars.hpp                  | C++      |          6 |          0 |          1 |          7 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/core/forward.hpp                     | C++      |          7 |          0 |          1 |          8 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/helper.hpp                           | C++      |         57 |          0 |         12 |         69 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/strategies/goods_supplier/level1.hpp | C++      |         46 |          0 |         17 |         63 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/strategies/goods_supplier/level2.hpp | C++      |         62 |          0 |         18 |         80 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/strategies/goods_supplier/level3.hpp | C++      |         11 |          0 |          3 |         14 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/strategies/labor_demander/level1.hpp | C++      |         57 |          0 |         18 |         75 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/strategies/labor_demander/level2.hpp | C++      |         36 |          0 |         11 |         47 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/strategies/orchestrator.hpp          | C++      |         16 |          0 |          4 |         20 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/include/world/message.hpp                    | C++      |         28 |          0 |         13 |         41 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/main.cpp                                 | C++      |          1 |          0 |          0 |          1 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/strategies/goods_supplier/level1.cpp     | C++      |         34 |          0 |          5 |         39 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/strategies/goods_supplier/level2.cpp     | C++      |         69 |          0 |         12 |         81 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/strategies/goods_supplier/level3.cpp     | C++      |         14 |          0 |          2 |         16 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/strategies/labor_demander/level1.cpp     | C++      |         46 |          0 |          8 |         54 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/strategies/labor_demander/level2.cpp     | C++      |         39 |          0 |          7 |         46 |
+| /home/yahagikimuthi/EconomicSimulator/Simulator_cpp/src/strategies/orchestrator.cpp              | C++      |         36 |          0 |          7 |         43 |
+| Total                                                                                            |          |        807 |          1 |        180 |        988 |
++--------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
