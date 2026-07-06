@@ -34,6 +34,6 @@ void trade(TradeCtx ctx, Component& comp) {
                        : performFullTrade(requestBox)
     };
     ctx.setInventory(ctx.getSupply() - salesAmount);
-    updateLog({comp});
+    updateLog({comp}, salesAmount);
 }
 }  // namespace goods_supplier

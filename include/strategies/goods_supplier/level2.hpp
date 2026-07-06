@@ -76,5 +76,5 @@ struct UpdateLogCtx {
     Component& comp_;
 };
 
-void updateLog(UpdateLogCtx ctx);
+void updateLog(UpdateLogCtx ctx, const double salesAmount);
 }  // namespace goods_supplier
