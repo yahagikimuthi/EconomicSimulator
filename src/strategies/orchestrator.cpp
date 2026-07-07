@@ -31,6 +31,10 @@ void offer(labor_demander::Component& laborDemander) {
     labor_demander::offerApplicants({laborDemander});
 }
 
+void acceptOffer(labor_supplier::Component& laborSupplier) {
+    labor_supplier::acceptOffer({laborSupplier});
+}
+
 void registerMember(
     goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
 ) {

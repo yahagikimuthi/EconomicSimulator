@@ -1,13 +1,18 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <functional>
 
 #include "core/forward.hpp"
 
 namespace labor_supplier {
 struct Posting {
-    std::vector<tbb::concurrent_vector<world::LaborEntry>::iterator> myEntries_;
-    bool                                                             isPosting_;
+    using LaborMarketCoordinate = std::pair<
+        std::reference_wrapper<world::LaborRequest>,
+        tbb::concurrent_vector<world::LaborEntry>::iterator>;
+
+    std::vector<LaborMarketCoordinate> myEntries_;
+    bool                               isPosting_;
 };
 struct Contraction {
     int    firmID_;

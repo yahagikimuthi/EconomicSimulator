@@ -1,6 +1,11 @@
 #pragma once
 
+#include <tbb/concurrent_vector.h>
+#include <cstddef>
+#include <functional>
+
 #include "components/labor_supplier.hpp"
+#include "config/contract.hpp"
 #include "core/forward.hpp"
 
 namespace labor_supplier {
@@ -9,8 +14,12 @@ struct JobEntryView {
 
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 
-    void entry(const tbb::concurrent_vector<world::LaborEntry>::iterator it) {  // NOLINT
-        comp_.posting_.myEntries_.emplace_back(it);
+    void clearEntry() { comp_.posting_.myEntries_.clear(); }
+    void entry(
+        const std::reference_wrapper<world::LaborRequest>         requestIt,
+        const tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
+    ) {
+        comp_.posting_.myEntries_.emplace_back(requestIt, entryIt);
     }
 
     [[nodiscard]] auto productPower() const -> double { return comp_.parameter_.productPower_; }
@@ -21,4 +30,26 @@ struct JobEntryView {
 void jobEntry(
     JobEntryView view, const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
+
+struct AcceptOfferView {
+    using LaborMarketCoordinate = Posting::LaborMarketCoordinate;
+    AcceptOfferView(Component& comp) : comp_{comp} {}
+
+    [[nodiscard]] auto myEntryCnt() const -> std::size_t {
+        return comp_.posting_.myEntries_.size();
+    }
+
+    [[nodiscard]] auto getMyEntry(const std::size_t idx) -> LaborMarketCoordinate& {
+        return ACCESS(comp_.posting_.myEntries_, idx);
+    }
+
+    [[nodiscard]] auto setContraction(const int firmId, const double wage) {
+        comp_.contraction_.firmID_ = firmId, comp_.contraction_.wage_ = wage;
+    }
+
+  private:
+    Component& comp_;
+};
+
+void acceptOffer(AcceptOfferView view);
 }  // namespace labor_supplier

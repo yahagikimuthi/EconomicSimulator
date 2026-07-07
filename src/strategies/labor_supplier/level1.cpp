@@ -17,9 +17,21 @@ void jobEntry(
     sortSample(requestBox, pickSampleIdxs);
 
     const double productPower{view.productPower()};
+    view.clearEntry();
     for (std::size_t i : pickSampleIdxs) {
-        auto& entryBox = ACCESS(requestBox, i).entryBox_;
-        view.entry(entryBox.emplace_back(id, productPower));
+        auto& request  = ACCESS(requestBox, i);
+        auto& entryBox = request.entryBox_;
+        view.entry(request, entryBox.emplace_back(id, productPower));
+    }
+}
+
+void acceptOffer(AcceptOfferView view) {
+    for (std::size_t i{}; i < view.myEntryCnt(); ++i) {
+        auto& [requestRef, myEntry] = view.getMyEntry(i);
+        auto& request               = requestRef.get();
+        if (not myEntry->isAccept_) continue;
+        view.setContraction(request.firmID_, request.wage_);
+        return;
     }
 }
 }  // namespace labor_supplier
