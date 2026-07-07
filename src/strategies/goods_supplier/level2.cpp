@@ -1,6 +1,7 @@
 #include "strategies/goods_supplier/level2.hpp"
 
 #include <tbb/concurrent_vector.h>
+#include <cassert>
 #include <cmath>
 #include <numeric>
 
@@ -23,20 +24,24 @@ namespace goods_supplier {
 [[nodiscard]] auto judgePrice(
     const double markup, const double totalCost, const double epsilonPrice
 ) -> double {
+    assert(markup > 0.0 && "markup is required > 0");
+    assert(totalCost > 0.0 && "total cost is required > 0");
     const double price{totalCost * markup};
     return std::max(epsilonPrice, price);
 }
 
 [[nodiscard]] auto calcTotalDemand(const tbb::concurrent_vector<world::GoodsRequest>& requestBox)
     -> double {
-    return std::accumulate(
+    const double demand{std::accumulate(
         requestBox.begin(),
         requestBox.end(),
         0.0,
         [](const double sum, const world::GoodsRequest& request) -> double {
             return sum + request.amount_;
         }
-    );
+    )};
+    assert(demand >= 0.0 && "total demand is required >= 0");
+    return demand;
 }
 
 [[nodiscard]] auto performRationedTrade(
@@ -74,8 +79,11 @@ namespace goods_supplier {
 }
 
 void updateLog(UpdateLogView view, const double salesAmount) {
-    const bool   isSold{view.inventory() / view.supply() < view.getTargetInvRatio()};
+    const bool isSold{
+        (view.supply() != 0.0) ? view.inventory() / view.supply() < view.getTargetInvRatio() : false
+    };
     const double sales{salesAmount * view.price()};
+    assert(sales >= 0.0 && "sales is required >= 0");
     view.updateLog(view.price(), sales, isSold);
 }
 }  // namespace goods_supplier
