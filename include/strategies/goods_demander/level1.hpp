@@ -37,7 +37,7 @@ struct AfterTradeView {
     AfterTradeView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getMyRequest() const
-        -> const std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
+        -> std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
         auto& [entryRef, myRequest] = comp_.posting_.myRequest;
         return {entryRef.get(), *myRequest};
     }
