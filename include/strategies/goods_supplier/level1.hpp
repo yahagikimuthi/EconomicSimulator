@@ -61,13 +61,25 @@ struct TradeView {
         return comp_.posting_.myEntry_;
     }
 
-    [[nodiscard]] auto getSupply() const -> double { return comp_.plan_.supply_; }
+    [[nodiscard]] auto supply() const -> double { return comp_.plan_.supply_; }
 
-    void setInventory(double inventory) { comp_.production_.inventory_ = inventory; }
+    void               setInventory(double inventory) { comp_.production_.inventory_ = inventory; }
+    [[nodiscard]] auto getTargetInvRatio() const -> double {
+        return comp_.parameter_.targetInventoryRatio_;
+    }
+    [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
+    [[nodiscard]] auto price() const -> double { return comp_.plan_.price_; }
+
+    void updateLog(const double price, const double sales, const bool isSold) {
+        auto& log  = comp_.log_;
+        log.price_ = price, log.sales_ = sales, log.isSold_ = isSold;
+        auto& plan  = comp_.plan_;
+        log.markup_ = plan.markup_, log.supply_ = plan.supply_;
+    }
 
   private:
     Component& comp_;
 };
 
-void trade(TradeView view, Component& comp);
+void trade(TradeView view);
 }  // namespace goods_supplier

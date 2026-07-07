@@ -79,7 +79,7 @@ namespace goods_supplier {
     return salesAmount;
 }
 
-void updateLog(UpdateLogView view, const double salesAmount) {
+void updateLog(TradeView& view, const double salesAmount) {
     const bool isSold{
         (view.supply() != 0.0) ? view.inventory() / view.supply() < view.getTargetInvRatio() : false
     };

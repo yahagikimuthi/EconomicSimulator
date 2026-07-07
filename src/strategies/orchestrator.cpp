@@ -65,7 +65,5 @@ void purchase(
     goods_demander::purchase({goodsDemander}, asset + wage, entryBox);
 }
 
-void trade(goods_supplier::Component& goodsSupplier) {
-    goods_supplier::trade({goodsSupplier}, goodsSupplier);
-}
+void trade(goods_supplier::Component& goodsSupplier) { goods_supplier::trade({goodsSupplier}); }
 }  // namespace orchestrator

@@ -21,16 +21,16 @@ void postGoods(
     view.setPlan(price, supply, markup);
 }
 
-void trade(TradeView view, Component& comp) {
+void trade(TradeView view) {
     auto         myEntry{view.getMyEntry()};
     auto&        requestBox = myEntry->requestBox_;
     const double totalDemand{calcTotalDemand(requestBox)};
-    const bool   isExcessDemand{totalDemand >= view.getSupply()};
+    const bool   isExcessDemand{totalDemand >= view.supply()};
     const double salesAmount{
-        isExcessDemand ? performRationedTrade(view.getSupply(), requestBox)
+        isExcessDemand ? performRationedTrade(view.supply(), requestBox)
                        : performFullTrade(requestBox)
     };
-    view.setInventory(view.getSupply() - salesAmount);
-    updateLog({comp}, salesAmount);
+    view.setInventory(view.supply() - salesAmount);
+    updateLog(view, salesAmount);
 }
 }  // namespace goods_supplier
