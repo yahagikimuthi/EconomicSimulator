@@ -6,7 +6,7 @@
 
 namespace labor_demander {
 struct PostJobView {
-    PostJobView(Component& comp) : comp_{comp} {}
+    explicit PostJobView(Component& comp) : comp_{comp} {}
 
     void setPlan(const double wage, const int employ) {
         comp_.plan_.wage_ = wage, comp_.plan_.employ_ = employ;
@@ -28,7 +28,7 @@ void postJob(
 );
 
 struct OfferApplicantsView {
-    OfferApplicantsView(Component& comp) : comp_{comp} {}
+    explicit OfferApplicantsView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getEmploy() const -> int { return comp_.plan_.employ_; }
 
@@ -49,7 +49,7 @@ struct OfferApplicantsView {
 void offerApplicants(OfferApplicantsView view);
 
 struct RegisterMemberView {
-    RegisterMemberView(Component& comp) : comp_{comp} {};
+    explicit RegisterMemberView(Component& comp) : comp_{comp} {};
 
     [[nodiscard]] auto getMyRequest() const
         -> tbb::concurrent_vector<world::LaborRequest>::iterator {
