@@ -3,6 +3,9 @@
 #include <entt/entt.hpp>
 
 namespace core {
+struct HHoldTag {};
+struct FirmTag {};
+
 class Engine {
     entt::registry registry_;
     const int      totalStep_;
