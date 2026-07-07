@@ -19,5 +19,7 @@ namespace hhold_finance {
 struct Component {
     double asset_;
     Component();
+
+    [[nodiscard]] auto getAsset() const -> double { return asset_; }
 };
 }  // namespace hhold_finance

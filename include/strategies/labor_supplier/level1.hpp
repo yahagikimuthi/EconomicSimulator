@@ -16,10 +16,10 @@ struct JobEntryView {
 
     void clearEntry() { comp_.posting_.myEntries_.clear(); }
     void entry(
-        const std::reference_wrapper<world::LaborRequest>         requestIt,
+        const world::LaborRequest&                                request,
         const tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
     ) {
-        comp_.posting_.myEntries_.emplace_back(requestIt, entryIt);
+        comp_.posting_.myEntries_.emplace_back(std::cref(request), entryIt);
     }
 
     [[nodiscard]] auto productPower() const -> double { return comp_.parameter_.productPower_; }

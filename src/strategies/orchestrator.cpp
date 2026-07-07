@@ -2,6 +2,9 @@
 
 #include <tbb/concurrent_vector.h>
 
+#include "components/common.hpp"
+
+#include "strategies/goods_demander/level1.hpp"
 #include "strategies/goods_supplier/level1.hpp"
 #include "strategies/labor_demander/level1.hpp"
 #include "strategies/labor_supplier/level1.hpp"
@@ -49,6 +52,17 @@ void postGoods(
 ) {
     const double sumWage{laborDemander.getSumWage()};
     goods_supplier::postGoods({goodsSupplier}, sumWage, entryBox, goodsSupplier);
+}
+
+void purchase(
+    hhold_finance::Component&                  financeComponent,
+    goods_demander::Component&                 goodsDemander,
+    labor_supplier::Component&                 laborSupplier,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+) {
+    const double asset{financeComponent.getAsset()};
+    const double wage{laborSupplier.getWage()};
+    goods_demander::purchase({goodsDemander}, asset + wage, entryBox);
 }
 
 void trade(goods_supplier::Component& goodsSupplier) {

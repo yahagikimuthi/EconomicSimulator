@@ -20,7 +20,7 @@ void postGoods(
     const double supply{calcSupply({comp})};
     const double markup{calcMarkup({comp})};
     const double price{judgePrice(markup, totalCost)};
-    view.setMyEntry(entryBox.emplace_back(price));
+    view.setMyEntry(entryBox.emplace_back(price, supply));
     view.setPlan(price, supply, markup);
 }
 

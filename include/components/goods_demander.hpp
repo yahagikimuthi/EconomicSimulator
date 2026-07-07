@@ -1,13 +1,17 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <functional>
 
 #include "core/forward.hpp"
 
 namespace goods_demander {
 struct Posting {
-    tbb::concurrent_vector<world::GoodsRequest>::iterator myRequest;
-    bool                                                  isPosting_;
+    using GoodsMarketCoordinate = std::tuple<
+        std::reference_wrapper<const world::GoodsEntry>,
+        tbb::concurrent_vector<world::GoodsRequest>::iterator>;
+    GoodsMarketCoordinate myRequest;
+    bool                  isPosting_;
 };
 struct Purchasing {
     double purchase_;

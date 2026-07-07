@@ -2,9 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 
-#include "components/common.hpp"
-#include "components/goods_supplier.hpp"
-#include "components/labor_demander.hpp"
+#include "core/forward.hpp"
 
 namespace orchestrator {
 void postLaborRequest(
@@ -23,6 +21,13 @@ void registerMember(
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
     labor_demander::Component&                 laborDemander,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+);
+
+void purchase(
+    hhold_finance::Component&                  financeComponent,
+    goods_demander::Component&                 goodsDemander,
+    labor_supplier::Component&                 laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 );
 

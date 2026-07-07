@@ -1,7 +1,5 @@
 #pragma once
 
-namespace Config {
-struct SimVars {
-    static inline int currentStep{0};
-};
-}  // namespace Config
+namespace config::sim_vars {
+static inline int currentStep{0};  // NOLINT
+}  // namespace config::sim_vars

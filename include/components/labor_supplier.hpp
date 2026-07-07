@@ -8,7 +8,7 @@
 namespace labor_supplier {
 struct Posting {
     using LaborMarketCoordinate = std::pair<
-        std::reference_wrapper<world::LaborRequest>,
+        std::reference_wrapper<const world::LaborRequest>,
         tbb::concurrent_vector<world::LaborEntry>::iterator>;
 
     std::vector<LaborMarketCoordinate> myEntries_;
@@ -28,5 +28,7 @@ struct Component {
     Parameter   parameter_;
 
     Component();
+
+    [[nodiscard]] auto getWage() const -> double { return contraction_.wage_; }
 };
 }  // namespace labor_supplier
