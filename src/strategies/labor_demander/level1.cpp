@@ -11,11 +11,10 @@ void postJob(
     const int                                    id,
     const bool                                   isSold,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    PostJobView                                  view,
-    Component&                                   comp
+    PostJobView                                  view
 ) {
-    const double nextWage{calcNextWage({comp})};
-    const int    nextEmploy{calcNextEmploy({comp}, isSold)};
+    const double nextWage{calcNextWage(view)};
+    const int    nextEmploy{calcNextEmploy(view, isSold)};
     view.setPlan(nextWage, nextEmploy);
     view.setMyRequest(requestBox.emplace_back(id, nextWage));
 }

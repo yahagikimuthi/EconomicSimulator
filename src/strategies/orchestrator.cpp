@@ -18,7 +18,7 @@ void postLaborRequest(
 ) {
     const int  id{indexComp.getId()};
     const bool isSold{goodsSupplier.getIsSold()};
-    labor_demander::postJob(id, isSold, requestBox, {laborDemander}, laborDemander);
+    labor_demander::postJob(id, isSold, requestBox, {laborDemander});
 }
 
 void jobEntry(

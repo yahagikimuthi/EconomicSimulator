@@ -14,6 +14,17 @@ struct PostJobView {
     void setMyRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
         comp_.posting_.myRequest_ = it;
     }
+    [[nodiscard]] auto getLog() const -> std::tuple<double, double, double> {
+        const auto& log = comp_.log_;
+        return {log.wage_, log.targetEmploy_, log.actualEmploy_};
+    }
+    [[nodiscard]] auto wageAdjustVol() const -> double {
+        return comp_.parameter_.wageAdjustmentVolatility_;
+    }
+    [[nodiscard]] auto employAdjustVol() const -> double {
+        return comp_.parameter_.employAdjustmentVolatility_;
+    }
+    [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
 
   private:
     Component& comp_;
@@ -23,8 +34,7 @@ void postJob(
     const int                                    id,
     const bool                                   isSold,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    PostJobView                                  view,
-    Component&                                   comp
+    PostJobView                                  view
 );
 
 struct OfferApplicantsView {

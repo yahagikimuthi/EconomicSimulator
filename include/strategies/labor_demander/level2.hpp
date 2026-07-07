@@ -1,43 +1,17 @@
 #pragma once
 
+#include <tbb/concurrent_vector.h>
 #include <cstddef>
-#include <tuple>
 
-#include "components/labor_demander.hpp"
 #include "config/init_setup.hpp"
+#include "core/forward.hpp"
 
 namespace labor_demander {
-struct CalcNextWageView {
-    CalcNextWageView(Component& component) : comp_{component} {}
-
-    [[nodiscard]] auto getLog() const -> std::tuple<double, double, double> {
-        return {comp_.log_.wage_, comp_.log_.targetEmploy_, comp_.log_.actualEmploy_};
-    }
-    [[nodiscard]] auto wageAdjustVol() const -> double {
-        return comp_.parameter_.wageAdjustmentVolatility_;
-    }
-
-  private:
-    Component& comp_;
-};
-
+struct PostJobView;
 [[nodiscard]] auto calcNextWage(
-    const CalcNextWageView view, const double epsilonWage = config::labor_demander::epsilonWage
+    const PostJobView& view, const double epsilonWage = config::labor_demander::epsilonWage
 ) -> double;
-
-struct CalcNextEmployView {
-    CalcNextEmployView(Component& component) : comp_{component} {}
-
-    [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
-    [[nodiscard]] auto employAdjustVol() const -> double {
-        return comp_.parameter_.employAdjustmentVolatility_;
-    }
-
-  private:
-    Component& comp_;
-};
-
-[[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int;
+[[nodiscard]] auto calcNextEmploy(const PostJobView& view, const bool isSold) -> int;
 
 void sortApplicants(
     const int                                        employ,
