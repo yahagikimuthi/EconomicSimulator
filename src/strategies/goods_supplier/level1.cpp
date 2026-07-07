@@ -6,11 +6,6 @@
 #include "world/message.hpp"
 
 namespace goods_supplier {
-[[nodiscard]] auto isSold(const IsSoldView& view) -> bool {
-    if (view.lastSupply() == 0.0) return false;
-    return view.inventory() / view.lastSupply() < view.targetInvRatio();
-}
-
 void postGoods(
     PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {

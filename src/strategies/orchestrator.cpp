@@ -17,7 +17,7 @@ void postLaborRequest(
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     const int  id{indexComp.getId()};
-    const bool isSold{goods_supplier::isSold({goodsSupplier})};
+    const bool isSold{goodsSupplier.getIsSold()};
     labor_demander::postJob(id, isSold, requestBox, {laborDemander}, laborDemander);
 }
 
