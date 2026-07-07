@@ -8,6 +8,7 @@
 
 namespace goods_demander {
 [[nodiscard]] auto calcBudget(const PurchaseView& view, const double availableAsset) -> double {
+    // 使用可能資産×限界消費性向を家計が当期に使用する予算とする
     return availableAsset * view.mpc();
 }
 
