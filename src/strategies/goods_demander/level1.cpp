@@ -29,7 +29,7 @@ void purchase(
 }
 
 void afterTrade(AfterTradeView view) {
-    const auto& [entry, myRequest] = view.getMyRequest();
+    const auto [entry, myRequest] = view.getMyRequest();
     view.recordPurchase(entry.price_ * myRequest.tradeAmount_);
 }
 }  // namespace goods_demander
