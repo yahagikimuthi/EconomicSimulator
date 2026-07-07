@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.25)
 project(EconomicSimulator LANGUAGES CXX)
 
 if(POLICY CMP0167)
@@ -31,7 +31,6 @@ FetchContent_Declare(
     GIT_TAG        v2.10.0 # 安定版のタグを指定
 )
 FetchContent_MakeAvailable(HighFive)
-
 
 # --- ソースファイルの収集 ---
 file(GLOB_RECURSE SOURCES "src/*.cpp")
