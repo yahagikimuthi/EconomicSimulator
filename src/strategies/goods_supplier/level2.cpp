@@ -7,15 +7,16 @@
 
 #include "config/contract.hpp"
 #include "helper.hpp"
+#include "strategies/goods_supplier/level1.hpp"
 #include "strategies/goods_supplier/level3.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
-[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
+[[nodiscard]] auto calcSupply(const PostGoodsView& view) -> double {
     return (view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory();
 }
 
-[[nodiscard]] auto calcMarkup(const CalcMarkupView view, const double epsilonMarkup) -> double {
+[[nodiscard]] auto calcMarkup(const PostGoodsView& view, const double epsilonMarkup) -> double {
     const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol(), -1.0, 1.0))};
     const double nextMarkup{view.lastMarkup() * (view.isSold() ? 1.0 + alpha : 1.0 - alpha)};
     return std::max(epsilonMarkup, nextMarkup);

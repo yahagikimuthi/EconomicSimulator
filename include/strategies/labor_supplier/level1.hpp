@@ -7,6 +7,7 @@
 #include "components/labor_supplier.hpp"
 #include "config/contract.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace labor_supplier {
 struct JobEntryView {

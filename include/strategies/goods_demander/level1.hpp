@@ -3,6 +3,7 @@
 #include "components/goods_demander.hpp"
 #include "config/init_setup.hpp"
 #include "config/sim_vars.hpp"
+#include "world/message.hpp"
 
 namespace goods_demander {
 struct PurchaseView {

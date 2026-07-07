@@ -51,7 +51,7 @@ void postGoods(
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double sumWage{laborDemander.getSumWage()};
-    goods_supplier::postGoods({goodsSupplier}, sumWage, entryBox, goodsSupplier);
+    goods_supplier::postGoods({goodsSupplier}, sumWage, entryBox);
 }
 
 void purchase(

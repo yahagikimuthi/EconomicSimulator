@@ -33,15 +33,25 @@ struct PostGoodsView {
         plan.price_ = price, plan.markup_ = markup, plan.supply_ = supply;
     }
 
+    [[nodiscard]] auto firmProductPower() const -> double {
+        return comp_.production_.firmProductPower_;
+    }
+    [[nodiscard]] auto sumEmployeeProductPower() const -> double {
+        return comp_.production_.sumEmployeeProductPower_;
+    }
+    [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
+    [[nodiscard]] auto markupAdjustVol() const -> double {
+        return comp_.parameter_.markupAdjustmentVolatility_;
+    }
+    [[nodiscard]] auto lastMarkup() const -> double { return comp_.log_.markup_; }
+    [[nodiscard]] auto isSold() const -> bool { return comp_.log_.isSold_; }
+
   private:
     Component& comp_;
 };
 
 void postGoods(
-    PostGoodsView                              view,
-    const double                               totalCost,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    Component&                                 comp
+    PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 );
 
 struct TradeView {

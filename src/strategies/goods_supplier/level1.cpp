@@ -12,13 +12,10 @@ namespace goods_supplier {
 }
 
 void postGoods(
-    PostGoodsView                              view,
-    const double                               totalCost,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    Component&                                 comp
+    PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    const double supply{calcSupply({comp})};
-    const double markup{calcMarkup({comp})};
+    const double supply{calcSupply(view)};
+    const double markup{calcMarkup(view)};
     const double price{judgePrice(markup, totalCost)};
     view.setMyEntry(entryBox.emplace_back(price, supply));
     view.setPlan(price, supply, markup);

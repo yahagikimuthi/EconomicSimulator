@@ -6,36 +6,11 @@
 #include "config/init_setup.hpp"
 
 namespace goods_supplier {
-struct CalcSupplyView {
-    CalcSupplyView(Component& comp) : comp_{comp} {}
+struct PostGoodsView;
+[[nodiscard]] auto calcSupply(const PostGoodsView& view) -> double;
 
-    [[nodiscard]] auto firmProductPower() const -> double {
-        return comp_.production_.firmProductPower_;
-    }
-    [[nodiscard]] auto sumEmployeeProductPower() const -> double {
-        return comp_.production_.sumEmployeeProductPower_;
-    }
-    [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
-
-  private:
-    Component& comp_;
-};
-[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double;
-
-struct CalcMarkupView {
-    CalcMarkupView(Component& comp) : comp_{comp} {}
-
-    [[nodiscard]] auto markupAdjustVol() const -> double {
-        return comp_.parameter_.markupAdjustmentVolatility_;
-    }
-    [[nodiscard]] auto lastMarkup() const -> double { return comp_.log_.markup_; }
-    [[nodiscard]] auto isSold() const -> bool { return comp_.log_.isSold_; }
-
-  private:
-    Component& comp_;
-};
 [[nodiscard]] auto calcMarkup(
-    const CalcMarkupView view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
+    const PostGoodsView& view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
 ) -> double;
 
 [[nodiscard]] auto judgePrice(
