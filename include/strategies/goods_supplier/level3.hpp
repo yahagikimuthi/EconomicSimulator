@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <random>
+#include <vector>
 
 #include "helper.hpp"
 
