@@ -63,7 +63,7 @@ namespace goods_supplier {
         remainAmount -= requestAmount;
     }
 
-    ASSERT(false, "runtime error");
+    assert(false && "runtime error");
     return 1;
 }
 
@@ -75,7 +75,7 @@ namespace goods_supplier {
         salesAmount += request.amount_;
     }
 
-    ENSURE(salesAmount >= 0.0, "runtime error");
+    assert(salesAmount >= 0.0 && "runtime error");
     return salesAmount;
 }
 
