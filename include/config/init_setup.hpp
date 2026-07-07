@@ -22,3 +22,8 @@ namespace config::goods_demander {
 constexpr int maxPurchaseFrequency{7};
 constexpr int goodsSampleCnt{5};
 }  // namespace config::goods_demander
+
+namespace config::agent_count {
+constexpr int firm{10};
+constexpr int hhold{1000};
+}  // namespace config::agent_count

@@ -29,9 +29,9 @@ struct Posting {
 };
 struct Component {
     Log       log_;
-    Plan      plan_;
-    Posting   posting_;
-    HR        humanResources;
+    Plan      plan_{};
+    Posting   posting_{};
+    HR        humanResources{};
     Parameter parameter_;
 
     Component();

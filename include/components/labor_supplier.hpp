@@ -12,11 +12,11 @@ struct Posting {
         tbb::concurrent_vector<world::LaborEntry>::iterator>;
 
     std::vector<LaborMarketCoordinate> myEntries_;
-    bool                               isPosting_;
+    bool                               isPosting_{false};
 };
 struct Contraction {
-    int    firmID_;
-    double wage_;
+    int    firmID_{-1};
+    double wage_{};
 };
 struct Parameter {
     double productPower_;

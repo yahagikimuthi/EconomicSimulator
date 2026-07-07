@@ -19,7 +19,7 @@ struct PurchaseView {
         const world::GoodsEntry&                                    entry,
         const tbb::concurrent_vector<world::GoodsRequest>::iterator myRequest  // NOLINT
     ) {
-        comp_.posting_.myRequest = {std::cref(entry), myRequest};
+        comp_.posting_.myRequest_ = {&entry, myRequest};
     }
 
   private:
@@ -39,10 +39,12 @@ struct AfterTradeView {
 
     [[nodiscard]] auto getMyRequest() const
         -> std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
-        auto& [entryRef, myRequest] = comp_.posting_.myRequest;
-        return {entryRef.get(), *myRequest};
+        auto& [entry, myRequest] = comp_.posting_.myRequest_;
+        return {*entry, *myRequest};
     }
     void recordPurchase(const double purchase) { comp_.purchasing_.purchase_ = purchase; }
+
+    [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
 
   private:
     Component& comp_;

@@ -32,7 +32,7 @@ struct Parameter {
 };
 struct Component {
     Log        log_;
-    Plan       plan_;
+    Plan       plan_{};
     Posting    posting_;
     Production production_;
     Parameter  parameter_;

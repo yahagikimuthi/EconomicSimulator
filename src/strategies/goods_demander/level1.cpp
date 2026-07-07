@@ -23,12 +23,14 @@ void purchase(
         view.isPosting(false);
         return;
     }
+    view.isPosting(true);
     auto& pickedEntry = pickEntry(entryBox);
     assert(pickedEntry.price_ > 0.0 && "price is required > 0.0");
     view.entry(pickedEntry, pickedEntry.requestBox_.emplace_back(budget / pickedEntry.price_));
 }
 
 void afterTrade(AfterTradeView view) {
+    if (not view.isPosting()) return;
     const auto [entry, myRequest] = view.getMyRequest();
     view.recordPurchase(entry.price_ * myRequest.tradeAmount_);
 }
