@@ -39,8 +39,10 @@ struct AcceptOfferView {
         return comp_.posting_.myEntries_.size();
     }
 
-    [[nodiscard]] auto getMyEntry(const std::size_t idx) -> LaborMarketCoordinate& {
-        return ACCESS(comp_.posting_.myEntries_, idx);
+    [[nodiscard]] auto getMyEntry(const std::size_t idx)
+        -> std::pair<const world::LaborRequest&, const world::LaborEntry&> {
+        auto& [requestRef, myEntry]{ACCESS(comp_.posting_.myEntries_, idx)};
+        return {requestRef.get(), *myEntry};
     }
 
     [[nodiscard]] auto setContraction(const int firmId, const double wage) {

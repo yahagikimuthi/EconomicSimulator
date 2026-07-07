@@ -32,4 +32,20 @@ void purchase(
     const int  maxPurchaseFrequency = config::goods_demander::maxPurchaseFrequency,
     const int& step                 = config::sim_vars::currentStep
 );
+
+struct AfterTradeView {
+    AfterTradeView(Component& comp) : comp_{comp} {}
+
+    [[nodiscard]] auto getMyRequest() const
+        -> const std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
+        auto& [entryRef, myRequest] = comp_.posting_.myRequest;
+        return {entryRef.get(), *myRequest};
+    }
+    void recordPurchase(const double purchase) { comp_.purchasing_.purchase_ = purchase; }
+
+  private:
+    Component& comp_;
+};
+
+void afterTrade(AfterTradeView view);
 }  // namespace goods_demander

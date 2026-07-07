@@ -27,9 +27,8 @@ void jobEntry(
 
 void acceptOffer(AcceptOfferView view) {
     for (std::size_t i{}; i < view.myEntryCnt(); ++i) {
-        auto& [requestRef, myEntry] = view.getMyEntry(i);
-        auto& request               = requestRef.get();
-        if (not myEntry->isAccept_) continue;
+        auto [request, myEntry] = view.getMyEntry(i);
+        if (not myEntry.isAccept_) continue;
         view.setContraction(request.firmID_, request.wage_);
         return;
     }

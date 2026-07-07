@@ -27,4 +27,9 @@ void purchase(
     assert(pickedEntry.price_ > 0.0 && "price is required > 0.0");
     view.entry(pickedEntry, pickedEntry.requestBox_.emplace_back(budget / pickedEntry.price_));
 }
+
+void afterTrade(AfterTradeView view) {
+    const auto& [entry, myRequest] = view.getMyRequest();
+    view.recordPurchase(entry.price_ * myRequest.tradeAmount_);
+}
 }  // namespace goods_demander
