@@ -8,7 +8,7 @@
 namespace goods_supplier {
 
 struct IsSoldView {
-    explicit IsSoldView(Component& comp) : comp_{comp} {}
+    IsSoldView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
     [[nodiscard]] auto targetInvRatio() const -> double {
@@ -23,7 +23,7 @@ struct IsSoldView {
 [[nodiscard]] auto isSold(const IsSoldView& view) -> bool;
 
 struct PostGoodsView {
-    explicit PostGoodsView(Component& comp) : comp_{comp} {}
+    PostGoodsView(Component& comp) : comp_{comp} {}
     void setMyEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
         comp_.posting_.myEntry_ = it;
     }
@@ -45,7 +45,7 @@ void postGoods(
 );
 
 struct TradeView {
-    explicit TradeView(Component& comp) : comp_{comp} {}
+    TradeView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getMyEntry() const -> tbb::concurrent_vector<world::GoodsEntry>::iterator {
         return comp_.posting_.myEntry_;

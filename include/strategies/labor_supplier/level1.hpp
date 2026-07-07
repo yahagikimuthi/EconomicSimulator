@@ -10,7 +10,7 @@
 
 namespace labor_supplier {
 struct JobEntryView {
-    explicit JobEntryView(Component& comp) : comp_{comp} {}
+    JobEntryView(Component& comp) : comp_{comp} {}
 
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 
@@ -33,7 +33,7 @@ void jobEntry(
 
 struct AcceptOfferView {
     using LaborMarketCoordinate = Posting::LaborMarketCoordinate;
-    explicit AcceptOfferView(Component& comp) : comp_{comp} {}
+    AcceptOfferView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto myEntryCnt() const -> std::size_t {
         return comp_.posting_.myEntries_.size();
