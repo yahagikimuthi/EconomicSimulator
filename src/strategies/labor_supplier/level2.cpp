@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
+#include <cassert>
 #include <numeric>
 
 #include "config/contract.hpp"
@@ -14,6 +15,7 @@ void pickSample(
     std::vector<std::size_t>&                          sampleIdxs,
     const int                                          sampleCnt
 ) {
+    assert(sampleCnt > 0 && "sample count is required > 0");
     sampleIdxs.resize(static_cast<std::size_t>(sampleCnt));
     const int lastIdx{static_cast<int>(requestBox.size()) - 1};
 
@@ -34,6 +36,7 @@ void sortSample(
     std::vector<std::size_t>&                          sortIdxs,
     const int                                          entryCnt
 ) {
+    assert(entryCnt > 0 && "entry count is required > 0");
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortIdxs.size())};
     std::ranges::partial_sort(
         sortIdxs.begin(),

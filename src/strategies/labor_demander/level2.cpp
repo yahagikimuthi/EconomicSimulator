@@ -1,5 +1,6 @@
 #include "strategies/labor_demander/level2.hpp"
 
+#include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <numeric>
@@ -11,6 +12,9 @@
 namespace labor_demander {
 [[nodiscard]] auto calcNextWage(const CalcNextWageView view, const double epsilonWage) -> double {
     const auto [lastWage, lastTargetEmploy, lastActualEmploy]{view.getLog()};
+    assert(lastWage > 0.0 && "last wage is required > 0");
+    assert(lastTargetEmploy >= 0 && "last target employ is required >= 0");
+
     const double occupancyRate{(lastTargetEmploy != 0) ? lastActualEmploy / lastTargetEmploy : 0.0};
     const double alpha{std::abs(helper::randNormal(0.0, view.wageAdjustVol(), -1.0, 1.0))};
     const double nextWage{lastWage * ((occupancyRate >= 1.0) ? 1.0 - alpha : 1.0 + alpha)};
