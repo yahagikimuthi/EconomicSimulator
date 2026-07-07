@@ -6,13 +6,13 @@
 #include "world/message.hpp"
 
 namespace goods_supplier {
-[[nodiscard]] auto isSold(const IsSoldCtx& ctx) -> bool {
-    if (ctx.lastSupply() == 0.0) return false;
-    return ctx.inventory() / ctx.lastSupply() < ctx.targetInvRatio();
+[[nodiscard]] auto isSold(const IsSoldView& view) -> bool {
+    if (view.lastSupply() == 0.0) return false;
+    return view.inventory() / view.lastSupply() < view.targetInvRatio();
 }
 
 void postGoods(
-    PostGoodsCtx                               ctx,
+    PostGoodsView                              view,
     const double                               totalCost,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     Component&                                 comp
@@ -20,20 +20,20 @@ void postGoods(
     const double supply{calcSupply({comp})};
     const double markup{calcMarkup({comp})};
     const double price{judgePrice(markup, totalCost)};
-    ctx.setMyEntry(entryBox.emplace_back(price));
-    ctx.setPlan(price, supply, markup);
+    view.setMyEntry(entryBox.emplace_back(price));
+    view.setPlan(price, supply, markup);
 }
 
-void trade(TradeCtx ctx, Component& comp) {
-    auto         myEntry{ctx.getMyEntry()};
+void trade(TradeView view, Component& comp) {
+    auto         myEntry{view.getMyEntry()};
     auto&        requestBox = myEntry->requestBox_;
     const double totalDemand{calcTotalDemand(requestBox)};
-    const bool   isExcessDemand{totalDemand >= ctx.getSupply()};
+    const bool   isExcessDemand{totalDemand >= view.getSupply()};
     const double salesAmount{
-        isExcessDemand ? performRationedTrade(ctx.getSupply(), requestBox)
+        isExcessDemand ? performRationedTrade(view.getSupply(), requestBox)
                        : performFullTrade(requestBox)
     };
-    ctx.setInventory(ctx.getSupply() - salesAmount);
+    view.setInventory(view.getSupply() - salesAmount);
     updateLog({comp}, salesAmount);
 }
 }  // namespace goods_supplier

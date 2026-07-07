@@ -10,13 +10,13 @@
 #include "world/message.hpp"
 
 namespace goods_supplier {
-[[nodiscard]] auto calcSupply(const CalcSupplyCtx ctx) -> double {
-    return (ctx.firmProductPower() * ctx.sumEmployeeProductPower()) + ctx.inventory();
+[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
+    return (view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory();
 }
 
-[[nodiscard]] auto calcMarkup(const CalcMarkupCtx ctx, const double epsilonMarkup) -> double {
-    const double alpha{std::abs(helper::randNormal(0.0, ctx.markupAdjustVol(), -1.0, 1.0))};
-    const double nextMarkup{ctx.lastMarkup() * (ctx.isSold() ? 1.0 + alpha : 1.0 - alpha)};
+[[nodiscard]] auto calcMarkup(const CalcMarkupView view, const double epsilonMarkup) -> double {
+    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol(), -1.0, 1.0))};
+    const double nextMarkup{view.lastMarkup() * (view.isSold() ? 1.0 + alpha : 1.0 - alpha)};
     return std::max(epsilonMarkup, nextMarkup);
 }
 
@@ -73,9 +73,9 @@ namespace goods_supplier {
     return salesAmount;
 }
 
-void updateLog(UpdateLogCtx ctx, const double salesAmount) {
-    const bool   isSold{ctx.inventory() / ctx.supply() < ctx.getTargetInvRatio()};
-    const double sales{salesAmount * ctx.price()};
-    ctx.updateLog(ctx.price(), sales, isSold);
+void updateLog(UpdateLogView view, const double salesAmount) {
+    const bool   isSold{view.inventory() / view.supply() < view.getTargetInvRatio()};
+    const double sales{salesAmount * view.price()};
+    view.updateLog(view.price(), sales, isSold);
 }
 }  // namespace goods_supplier

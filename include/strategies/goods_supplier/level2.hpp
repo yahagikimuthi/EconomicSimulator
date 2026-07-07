@@ -6,8 +6,8 @@
 #include "config/init_setup.hpp"
 
 namespace goods_supplier {
-struct CalcSupplyCtx {
-    CalcSupplyCtx(Component& comp) : comp_{comp} {}
+struct CalcSupplyView {
+    CalcSupplyView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto firmProductPower() const -> double {
         return comp_.production_.firmProductPower_;
@@ -20,10 +20,10 @@ struct CalcSupplyCtx {
   private:
     Component& comp_;
 };
-[[nodiscard]] auto calcSupply(const CalcSupplyCtx ctx) -> double;
+[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double;
 
-struct CalcMarkupCtx {
-    CalcMarkupCtx(Component& comp) : comp_{comp} {}
+struct CalcMarkupView {
+    CalcMarkupView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto markupAdjustVol() const -> double {
         return comp_.parameter_.markupAdjustmentVolatility_;
@@ -35,7 +35,7 @@ struct CalcMarkupCtx {
     Component& comp_;
 };
 [[nodiscard]] auto calcMarkup(
-    const CalcMarkupCtx ctx, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
+    const CalcMarkupView view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
 ) -> double;
 
 [[nodiscard]] auto judgePrice(
@@ -54,8 +54,8 @@ struct CalcMarkupCtx {
 [[nodiscard]] auto performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox)
     -> double;
 
-struct UpdateLogCtx {
-    UpdateLogCtx(Component& comp) : comp_{comp} {}
+struct UpdateLogView {
+    UpdateLogView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getTargetInvRatio() const -> double {
         return comp_.parameter_.targetInventoryRatio_;
@@ -76,5 +76,5 @@ struct UpdateLogCtx {
     Component& comp_;
 };
 
-void updateLog(UpdateLogCtx ctx, const double salesAmount);
+void updateLog(UpdateLogView view, const double salesAmount);
 }  // namespace goods_supplier

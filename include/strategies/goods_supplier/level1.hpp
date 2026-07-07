@@ -7,8 +7,8 @@
 
 namespace goods_supplier {
 
-struct IsSoldCtx {
-    IsSoldCtx(Component& comp) : comp_{comp} {}
+struct IsSoldView {
+    IsSoldView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
     [[nodiscard]] auto targetInvRatio() const -> double {
@@ -20,10 +20,10 @@ struct IsSoldCtx {
     Component& comp_;
 };
 
-[[nodiscard]] auto isSold(const IsSoldCtx& ctx) -> bool;
+[[nodiscard]] auto isSold(const IsSoldView& view) -> bool;
 
-struct PostGoodsCtx {
-    PostGoodsCtx(Component& comp) : comp_{comp} {}
+struct PostGoodsView {
+    PostGoodsView(Component& comp) : comp_{comp} {}
     void setMyEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
         comp_.posting_.myEntry_ = it;
     }
@@ -38,14 +38,14 @@ struct PostGoodsCtx {
 };
 
 void postGoods(
-    PostGoodsCtx                               ctx,
+    PostGoodsView                              view,
     const double                               totalCost,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     Component&                                 comp
 );
 
-struct TradeCtx {
-    TradeCtx(Component& comp) : comp_{comp} {}
+struct TradeView {
+    TradeView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getMyEntry() const -> tbb::concurrent_vector<world::GoodsEntry>::iterator {
         return comp_.posting_.myEntry_;
@@ -59,5 +59,5 @@ struct TradeCtx {
     Component& comp_;
 };
 
-void trade(TradeCtx ctx, Component& comp);
+void trade(TradeView view, Component& comp);
 }  // namespace goods_supplier

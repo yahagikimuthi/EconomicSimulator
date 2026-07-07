@@ -5,8 +5,8 @@
 #include "components/labor_demander.hpp"
 
 namespace labor_demander {
-struct PostJobCtx {
-    PostJobCtx(Component& comp) : comp_{comp} {}
+struct PostJobView {
+    PostJobView(Component& comp) : comp_{comp} {}
 
     void setPlan(const double wage, const int employ) {
         comp_.plan_.wage_ = wage, comp_.plan_.employ_ = employ;
@@ -23,12 +23,12 @@ void postJob(
     const int                                    id,
     const bool                                   isSold,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    PostJobCtx                                   ctx,
+    PostJobView                                  view,
     Component&                                   comp
 );
 
-struct OfferApplicantsCtx {
-    OfferApplicantsCtx(Component& comp) : comp_{comp} {}
+struct OfferApplicantsView {
+    OfferApplicantsView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getEmploy() const -> int { return comp_.plan_.employ_; }
 
@@ -46,10 +46,10 @@ struct OfferApplicantsCtx {
     Component& comp_;
 };
 
-void offerApplicants(OfferApplicantsCtx ctx);
+void offerApplicants(OfferApplicantsView view);
 
-struct RegisterMemberCtx {
-    RegisterMemberCtx(Component& comp) : comp_{comp} {};
+struct RegisterMemberView {
+    RegisterMemberView(Component& comp) : comp_{comp} {};
 
     [[nodiscard]] auto getMyRequest() const
         -> tbb::concurrent_vector<world::LaborRequest>::iterator {
@@ -71,5 +71,5 @@ struct RegisterMemberCtx {
     Component& comp_;
 };
 
-[[nodiscard]] auto registerMember(RegisterMemberCtx ctx) -> double;
+[[nodiscard]] auto registerMember(RegisterMemberView view) -> double;
 }  // namespace labor_demander

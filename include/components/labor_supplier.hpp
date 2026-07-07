@@ -6,8 +6,8 @@
 
 namespace labor_supplier {
 struct Posting {
-    std::vector<world::LaborEntry> myEntries_;
-    bool                           isPosting_;
+    std::vector<tbb::concurrent_vector<world::LaborEntry>::iterator> myEntries_;
+    bool                                                             isPosting_;
 };
 struct Contraction {
     int    firmID_;
