@@ -1,0 +1,30 @@
+{
+    "name": "C++ Modern Dev Environment (GCC 14 + vcpkg)",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "cmake.generator": "Ninja",
+                "cmake.configureArgs": [
+                    "-DCMAKE_TOOLCHAIN_FILE=/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake"
+                ],
+                "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+                "clangd.arguments": [
+                    "--compile-commands-dir=${workspaceFolder}"
+                ]
+            },
+            "extensions": [
+                "llvm-vs-code-extensions.vscode-clangd",
+                "ms-vscode.cmake-tools"
+            ]
+        }
+    },
+    // コンテナ内の環境変数として GCC 14 を明示的に優先させる
+    "containerEnv": {
+        "CC": "/usr/bin/gcc-14",
+        "CXX": "/usr/bin/g++-14"
+    },
+    "remoteUser": "vscode"
+}
