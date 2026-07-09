@@ -23,7 +23,6 @@ struct Component {
     Parameter  parameter_;
 
     Component();
-    void reset();
 
   private:
     static inline int instanceCnt_{};

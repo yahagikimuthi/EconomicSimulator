@@ -73,4 +73,6 @@ struct RegisterMemberView {
 };
 
 [[nodiscard]] auto registerMember(RegisterMemberView view) -> double;
+
+void reset(Component& comp);
 }  // namespace labor_demander

@@ -1,6 +1,7 @@
 #include "strategies/orchestrator.hpp"
 
 #include <tbb/concurrent_vector.h>
+#include <components/goods_supplier.hpp>
 
 #include "components/common.hpp"
 
@@ -69,5 +70,17 @@ void purchase(
 
 void trade(goods_supplier::Component& goodsSupplier) {
     goods_supplier::trade(goods_supplier::TradeView{goodsSupplier});
+}
+
+void reset(
+    labor_demander::Component& laborDemander,
+    labor_supplier::Component& laborSupplier,
+    goods_demander::Component& goodsDemander,
+    goods_supplier::Component& goodsSupplier
+) {
+    labor_demander::reset(laborDemander);
+    labor_supplier::reset(laborSupplier);
+    goods_demander::reset(goodsDemander);
+    goods_supplier::reset(goodsSupplier);
 }
 }  // namespace orchestrator

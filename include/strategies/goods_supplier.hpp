@@ -60,4 +60,5 @@ struct TradeView {
 };
 
 void trade(TradeView view);
+void reset(Component& comp);
 }  // namespace goods_supplier

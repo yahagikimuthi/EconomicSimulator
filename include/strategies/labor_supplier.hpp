@@ -2,7 +2,6 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
-#include <functional>
 
 #include "components/labor_supplier.hpp"
 #include "config/contract.hpp"
@@ -19,7 +18,7 @@ struct JobEntryView {
         const world::LaborRequest&                                request,
         const tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
     ) {
-        comp_.posting_.myEntries_.emplace_back(std::cref(request), entryIt);
+        comp_.posting_.myEntries_.emplace_back(&request, &*entryIt);
     }
 
     [[nodiscard]] auto productPower() const -> double { return comp_.parameter_.productPower_; }
@@ -40,8 +39,8 @@ struct AcceptOfferView {
 
     [[nodiscard]] auto getMyEntry(const std::size_t idx)
         -> std::pair<const world::LaborRequest&, const world::LaborEntry&> {
-        auto& [requestRef, myEntry]{ACCESS(comp_.posting_.myEntries_, idx)};
-        return {requestRef.get(), *myEntry};
+        auto& [request, myEntry]{ACCESS(comp_.posting_.myEntries_, idx)};
+        return {*request, *myEntry};
     }
 
     [[nodiscard]] auto setContraction(const int firmId, const double wage) {
@@ -53,4 +52,5 @@ struct AcceptOfferView {
 };
 
 void acceptOffer(AcceptOfferView view);
+void reset(Component& comp);
 }  // namespace labor_supplier

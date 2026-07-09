@@ -18,6 +18,9 @@ struct HR {
     double sumWage_;
     int    employeeCnt;
 };
+struct EmploymentLedger {
+    int employing;
+};
 struct Parameter {
     const double wageAdjustmentVolatility_;
     const double employAdjustmentVolatility_;
@@ -28,11 +31,12 @@ struct Posting {
     bool                                                   isPosting_;
 };
 struct Component {
-    Log       log_;
-    Plan      plan_{};
-    Posting   posting_{};
-    HR        humanResources{};
-    Parameter parameter_;
+    Log              log_;
+    Plan             plan_{};
+    Posting          posting_{};
+    HR               humanResources{};
+    EmploymentLedger employmentLedger;
+    Parameter        parameter_;
 
     Component();
 

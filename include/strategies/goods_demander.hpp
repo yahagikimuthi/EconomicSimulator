@@ -57,4 +57,5 @@ struct AfterTradeView {
 };
 
 void afterTrade(AfterTradeView view);
+void reset(Component& comp);
 }  // namespace goods_demander

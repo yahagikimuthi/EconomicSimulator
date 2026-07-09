@@ -36,11 +36,6 @@ Component::Component()
           .mpc_     = rand(0.7, 0.9),
           .myPhase_ = instanceCnt_++ % config::goods_demander::maxPurchaseFrequency
       } {}
-void Component::reset() {
-    posting_.myRequest_   = {nullptr, nullptr};
-    posting_.isPosting_   = false;
-    purchasing_.purchase_ = 0.0;
-}
 }  // namespace goods_demander
 
 namespace goods_supplier {

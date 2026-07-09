@@ -43,8 +43,6 @@ struct Component {
     Parameter   parameter_;
 
     Component();
-    void reset();
-
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;
     }
