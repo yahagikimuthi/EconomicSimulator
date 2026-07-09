@@ -8,6 +8,7 @@
 
 #include "config/init_setup.hpp"
 #include "helper.hpp"
+#include "world/message.hpp"
 
 namespace labor_supplier {
 namespace {

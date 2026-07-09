@@ -7,6 +7,7 @@
 #include "config/init_setup.hpp"
 #include "config/sim_vars.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace goods_demander {
 struct PurchaseView {
