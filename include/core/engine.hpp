@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <core/forward.hpp>
 #include <entt/entt.hpp>
 
 #include "world/message.hpp"
