@@ -1,11 +1,13 @@
 #include "strategies/goods_supplier.hpp"
 
 #include <tbb/concurrent_vector.h>
+#include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <helper.hpp>
 #include <numeric>
 #include <random>
+#include <ranges>
 
 #include "config/contract.hpp"
 #include "world/message.hpp"
@@ -14,13 +16,10 @@ namespace goods_supplier {
 namespace {
 [[nodiscard]] auto calcTotalDemand(const tbb::concurrent_vector<world::GoodsRequest>& requestBox)
     -> double {
-    const double demand{std::accumulate(
-        requestBox.begin(),
-        requestBox.end(),
+    const double demand{std::ranges::fold_left(
+        requestBox | std::ranges::views::transform(&world::GoodsRequest::amount_),
         0.0,
-        [](const double sum, const world::GoodsRequest& request) -> double {
-            return sum + request.amount_;
-        }
+        std::plus<>()
     )};
     assert(demand >= 0.0 && "total demand is required >= 0");
     return demand;
@@ -36,9 +35,9 @@ void shuffleIdx(
     std::ranges::shuffle(shuffleVec, gen);
 }
 
-[[nodiscard]] auto performRationedTrade(
+void performRationedTrade(
     const double supply, tbb::concurrent_vector<world::GoodsRequest>& requestBox
-) -> double {
+) {
     static thread_local std::vector<std::size_t> consumerIdxs;
     shuffleIdx(requestBox.size(), consumerIdxs);
 
@@ -48,26 +47,19 @@ void shuffleIdx(
         const double requestAmount{request.amount_};
         if (remainAmount <= requestAmount) {
             request.tradeAmount_ = remainAmount;
-            return supply;
+            return;
         }
         request.tradeAmount_ = requestAmount;
         remainAmount -= requestAmount;
     }
 
     assert(false && "runtime error");
-    return 1;
 }
 
-[[nodiscard]] auto performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox)
-    -> double {
-    double salesAmount{};
+void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
     for (auto& request : requestBox) {
         request.tradeAmount_ = request.amount_;
-        salesAmount += request.amount_;
     }
-
-    assert(salesAmount >= 0.0 && "runtime error");
-    return salesAmount;
 }
 
 void updateLog(TradeView& view, const double salesAmount) {
@@ -84,10 +76,8 @@ void trade(TradeView view) {
     auto&        requestBox = myEntry->requestBox_;
     const double totalDemand{calcTotalDemand(requestBox)};
     const bool   isExcessDemand{totalDemand >= view.supply()};
-    const double salesAmount{
-        isExcessDemand ? performRationedTrade(view.supply(), requestBox)
-                       : performFullTrade(requestBox)
-    };
+    const double salesAmount{std::min(view.supply(), totalDemand)};
+    isExcessDemand ? performRationedTrade(view.supply(), requestBox) : performFullTrade(requestBox);
     view.setInventory(view.supply() - salesAmount);
     updateLog(view, salesAmount);
 }
