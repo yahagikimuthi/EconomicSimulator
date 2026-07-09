@@ -8,13 +8,14 @@
 namespace goods_supplier {
 struct PostGoodsView {
     explicit PostGoodsView(Component& comp) : comp_{comp} {}
-    void setMyEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
+    void myEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
         comp_.posting_.myEntry_ = &*it;
     }
 
-    void setPlan(const double price, const double supply, const double markup) {
+    void plan(const double price, const double supply, const double markup) {
         auto& plan  = comp_.plan_;
         plan.price_ = price, plan.markup_ = markup, plan.supply_ = supply;
+        comp_.salesLedger.inventory_ = supply;
     }
 
     [[nodiscard]] auto firmProductPower() const -> double {
@@ -45,21 +46,14 @@ struct TradeView {
 
     [[nodiscard]] auto myEntry() const -> world::GoodsEntry& { return *comp_.posting_.myEntry_; }
 
-    [[nodiscard]] auto supply() const -> double { return comp_.plan_.supply_; }
+    void inventoryMinus(double inventoryMinus) { comp_.salesLedger.inventory_ -= inventoryMinus; }
+    void salesPlus(const double salesPlus) { comp_.salesLedger.currentSales += salesPlus; }
 
-    void               inventory(double inventory) { comp_.production_.inventory_ = inventory; }
     [[nodiscard]] auto targetInvRatio() const -> double {
         return comp_.parameter_.targetInventoryRatio_;
     }
-    [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
+    [[nodiscard]] auto inventory() const -> double { return comp_.salesLedger.inventory_; }
     [[nodiscard]] auto price() const -> double { return comp_.plan_.price_; }
-
-    void updateLog(const double price, const double sales, const bool isSold) {
-        auto& log  = comp_.log_;
-        log.price_ = price, log.sales_ = sales, log.isSold_ = isSold;
-        auto& plan  = comp_.plan_;
-        log.markup_ = plan.markup_, log.supply_ = plan.supply_;
-    }
 
   private:
     Component& comp_;

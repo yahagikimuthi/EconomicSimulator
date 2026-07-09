@@ -17,6 +17,10 @@ struct Plan {
     double price_;
     double supply_;
 };
+struct SalesLedger {
+    double inventory_;
+    double currentSales;
+};
 struct Posting {
     world::GoodsEntry* myEntry_{nullptr};
     bool               isPosting_{false};
@@ -31,13 +35,15 @@ struct Parameter {
     const double markupAdjustmentVolatility_;
 };
 struct Component {
-    Log        log_;
-    Plan       plan_{};
-    Posting    posting_;
-    Production production_;
-    Parameter  parameter_;
+    Log         log_;
+    Plan        plan_{};
+    SalesLedger salesLedger{};
+    Posting     posting_;
+    Production  production_;
+    Parameter   parameter_;
 
     Component();
+    void reset();
 
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;

@@ -68,7 +68,7 @@ void postGoods(
     const double supply{calcSupply(CalcSupplyView{view})};
     const double markup{calcMarkup(CalcMarkupView{view})};
     const double price{judgePrice(markup, totalCost)};
-    view.setMyEntry(entryBox.emplace_back(price, supply));
-    view.setPlan(price, supply, markup);
+    view.myEntry(entryBox.emplace_back(price, supply));
+    view.plan(price, supply, markup);
 }
 }  // namespace goods_supplier

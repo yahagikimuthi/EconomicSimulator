@@ -61,25 +61,21 @@ void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
         request.tradeAmount_ = request.amount_;
     }
 }
-
-void updateLog(TradeView& view, const double salesAmount) {
-    const bool isSold{
-        (view.supply() != 0.0) ? view.inventory() / view.supply() < view.targetInvRatio() : false
-    };
-    const double sales{salesAmount * view.price()};
-    assert(sales >= 0.0 && "sales is required >= 0");
-    view.updateLog(view.price(), sales, isSold);
-}
 }  // namespace
 
 void trade(TradeView view) {
-    auto&        myEntry    = view.myEntry();
-    auto&        requestBox = myEntry.requestBox_;
+    auto& myEntry    = view.myEntry();
+    auto& requestBox = myEntry.requestBox_;
+
+    assert(myEntry.price_ == view.price() && "price is different");
+    assert(myEntry.supply_ <= view.inventory());
+
     const double totalDemand{calcTotalDemand(requestBox)};
-    const bool   isExcessDemand{totalDemand >= view.supply()};
-    const double salesAmount{std::min(view.supply(), totalDemand)};
-    isExcessDemand ? performRationedTrade(view.supply(), requestBox) : performFullTrade(requestBox);
-    view.inventory(view.supply() - salesAmount);
-    updateLog(view, salesAmount);
+    const bool   isExcessDemand{totalDemand >= view.inventory()};
+    const double salesAmount{std::min(view.inventory(), totalDemand)};
+    isExcessDemand ? performRationedTrade(view.inventory(), requestBox)
+                   : performFullTrade(requestBox);
+    view.inventoryMinus(salesAmount);
+    view.salesPlus(salesAmount + view.price());
 }
 }  // namespace goods_supplier
