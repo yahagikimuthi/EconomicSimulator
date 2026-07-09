@@ -23,7 +23,7 @@ struct PurchaseView {
         const world::GoodsEntry&                                    entry,
         const tbb::concurrent_vector<world::GoodsRequest>::iterator myRequest  // NOLINT
     ) {
-        comp_.posting_.myRequest_ = {&entry, myRequest};
+        comp_.posting_.myRequest_ = {&entry, &*myRequest};
     }
 
   private:

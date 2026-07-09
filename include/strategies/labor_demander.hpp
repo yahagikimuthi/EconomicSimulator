@@ -14,7 +14,7 @@ struct PostJobView {
         comp_.plan_.wage_ = wage, comp_.plan_.employ_ = employ;
     }
     void myRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
-        comp_.posting_.myRequest_ = it;
+        comp_.posting_.myRequest_ = &(*it);
     }
 
   private:
@@ -35,8 +35,8 @@ struct OfferApplicantsView {
 
     [[nodiscard]] auto employPlan() const -> int { return comp_.plan_.employ_; }
 
-    [[nodiscard]] auto myRequest() const -> tbb::concurrent_vector<world::LaborRequest>::iterator {
-        return comp_.posting_.myRequest_;
+    [[nodiscard]] auto myRequest() const -> world::LaborRequest& {
+        return *comp_.posting_.myRequest_;
     }
 
     void clearOfferVec() { comp_.posting_.offerApplicants_.clear(); }
@@ -53,16 +53,15 @@ void offerApplicants(OfferApplicantsView view);
 struct RegisterMemberView {
     explicit RegisterMemberView(Component& comp) : comp_{comp} {};
 
-    [[nodiscard]] auto getMyRequest() const
-        -> tbb::concurrent_vector<world::LaborRequest>::iterator {
-        return comp_.posting_.myRequest_;
+    [[nodiscard]] auto myRequest() const -> world::LaborRequest& {
+        return *comp_.posting_.myRequest_;
     }
-    [[nodiscard]] auto getOfferApplicants() const
+    [[nodiscard]] auto offerApplicants() const
         -> std::vector<std::reference_wrapper<world::LaborEntry>> {
         return comp_.posting_.offerApplicants_;
     }
 
-    [[nodiscard]] auto getTargetEmploy() const -> int { return comp_.plan_.employ_; }
+    [[nodiscard]] auto targetEmploy() const -> int { return comp_.plan_.employ_; }
 
     void setLog(const double wage, const int targetEmploy, const int actualEmploy) {
         auto& log = comp_.log_;

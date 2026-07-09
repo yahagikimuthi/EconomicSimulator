@@ -6,9 +6,8 @@
 
 namespace goods_demander {
 struct Posting {
-    using GoodsMarketCoordinate =
-        std::tuple<const world::GoodsEntry*, tbb::concurrent_vector<world::GoodsRequest>::iterator>;
-    GoodsMarketCoordinate myRequest_;
+    using GoodsMarketCoordinate = std::tuple<const world::GoodsEntry*, world::GoodsRequest*>;
+    GoodsMarketCoordinate myRequest_{nullptr, nullptr};
     bool                  isPosting_{false};
 };
 struct Purchasing {

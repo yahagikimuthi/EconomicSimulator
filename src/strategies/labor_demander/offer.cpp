@@ -31,18 +31,18 @@ void sortApplicants(
 }  // namespace
 
 void offerApplicants(OfferApplicantsView view) {
-    const int  employ{view.employPlan()};
-    const auto myRequest{view.myRequest()};
+    const int employ{view.employPlan()};
+    auto&     myRequest = view.myRequest();
 
     static thread_local std::vector<std::size_t> sortApplicantIdxs;
-    sortApplicants(employ, sortApplicantIdxs, myRequest->entryBox_);
+    sortApplicants(employ, sortApplicantIdxs, myRequest.entryBox_);
 
     int offerNum{};
     view.clearOfferVec();
     for (const std::size_t i : sortApplicantIdxs) {
         if (offerNum >= employ) break;
-        ACCESS(myRequest->entryBox_, i).isOffer_ = true;
-        view.recordOffer(ACCESS(myRequest->entryBox_, i));
+        ACCESS(myRequest.entryBox_, i).isOffer_ = true;
+        view.recordOffer(ACCESS(myRequest.entryBox_, i));
         ++offerNum;
     }
 }

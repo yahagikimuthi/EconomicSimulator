@@ -23,7 +23,7 @@ struct Parameter {
     const double employAdjustmentVolatility_;
 };
 struct Posting {
-    tbb::concurrent_vector<world::LaborRequest>::iterator  myRequest_;
+    world::LaborRequest*                                   myRequest_;
     std::vector<std::reference_wrapper<world::LaborEntry>> offerApplicants_;
     bool                                                   isPosting_;
 };
