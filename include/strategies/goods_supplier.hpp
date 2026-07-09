@@ -32,6 +32,8 @@ struct PostGoodsView {
 
   private:
     Component& comp_;
+    friend struct CalcSupplyView;
+    friend struct CalcMarkupView;
 };
 
 void postGoods(

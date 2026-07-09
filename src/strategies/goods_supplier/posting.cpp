@@ -9,13 +9,41 @@
 #include "world/message.hpp"
 
 namespace goods_supplier {
+struct CalcSupplyView {
+    CalcSupplyView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+
+    [[nodiscard]] auto firmProductPower() const -> double {
+        return comp_.production_.firmProductPower_;
+    }
+    [[nodiscard]] auto sumEmployeeProductPower() const -> double {
+        return comp_.production_.sumEmployeeProductPower_;
+    }
+    [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
+
+  private:
+    const Component& comp_;
+};
+
+struct CalcMarkupView {
+    CalcMarkupView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+
+    [[nodiscard]] auto markupAdjustVol() const -> double {
+        return comp_.parameter_.markupAdjustmentVolatility_;
+    }
+    [[nodiscard]] auto lastMarkup() const -> double { return comp_.log_.markup_; }
+    [[nodiscard]] auto isSold() const -> bool { return comp_.log_.isSold_; }
+
+  private:
+    Component& comp_;
+};
+
 namespace {
-[[nodiscard]] auto calcSupply(const PostGoodsView& view) -> double {
+[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
     return (view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory();
 }
 
 [[nodiscard]] auto calcMarkup(
-    const PostGoodsView& view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
+    const CalcMarkupView view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
 ) -> double {
     const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol(), -1.0, 1.0))};
     const double nextMarkup{view.lastMarkup() * (view.isSold() ? 1.0 + alpha : 1.0 - alpha)};

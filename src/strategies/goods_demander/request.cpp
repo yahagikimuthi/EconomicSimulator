@@ -10,11 +10,10 @@
 
 namespace goods_demander {
 namespace {
-[[nodiscard]] auto calcBudget(const PurchaseView& view, const double availableAsset) -> double {
+[[nodiscard]] auto calcBudget(const double mpc, const double availableAsset) -> double {
     // 使用可能資産×限界消費性向を家計が当期に使用する予算とする
-    const double mpc{view.mpc()};
     assert(0.0 < mpc && mpc < 1.0 && "mpc is different range");
-    return availableAsset * view.mpc();
+    return availableAsset * mpc;
 }
 
 [[nodiscard]] auto pickEntry(
@@ -46,7 +45,7 @@ void purchase(
         view.isPosting(false);
         return;
     }
-    const double budget{calcBudget(view, availableAsset)};
+    const double budget{calcBudget(view.mpc(), availableAsset)};
     if (budget <= 0.0) {
         view.isPosting(false);
         return;
