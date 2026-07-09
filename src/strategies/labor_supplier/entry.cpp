@@ -1,19 +1,14 @@
-#include "strategies/labor_supplier/level2.hpp"
+#include "strategies/labor_supplier.hpp"
 
-#include <tbb/concurrent_vector.h>
-#include <algorithm>
-#include <cassert>
-#include <numeric>
-
-#include "config/contract.hpp"
+#include "config/init_setup.hpp"
 #include "helper.hpp"
-#include "world/message.hpp"
 
 namespace labor_supplier {
+namespace {
 void pickSample(
     const tbb::concurrent_vector<world::LaborRequest>& requestBox,
     std::vector<std::size_t>&                          sampleIdxs,
-    const int                                          sampleCnt
+    const int sampleCnt = config::labor_supplier::jobSampleCnt
 ) {
     assert(sampleCnt > 0 && "sample count is required > 0");
     sampleIdxs.resize(static_cast<std::size_t>(sampleCnt));
@@ -34,7 +29,7 @@ void pickSample(
 void sortSample(
     const tbb::concurrent_vector<world::LaborRequest>& requestBox,
     std::vector<std::size_t>&                          sortIdxs,
-    const int                                          entryCnt
+    const int entryCnt = config::labor_supplier::jobEntryCnt
 ) {
     assert(entryCnt > 0 && "entry count is required > 0");
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortIdxs.size())};
@@ -45,5 +40,26 @@ void sortSample(
         std::greater<std::size_t>{},
         [&requestBox](const std::size_t idx) -> double { return ACCESS(requestBox, idx).wage_; }
     );
+}
+}  // namespace
+
+void jobEntry(
+    JobEntryView view, const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox
+) {
+    if (requestBox.empty()) {
+        view.isPosting(false);
+        return;
+    }
+    static thread_local std::vector<std::size_t> pickSampleIdxs;
+    pickSample(requestBox, pickSampleIdxs);
+    sortSample(requestBox, pickSampleIdxs);
+
+    const double productPower{view.productPower()};
+    view.clearEntry();
+    for (std::size_t i : pickSampleIdxs) {
+        auto& request  = ACCESS(requestBox, i);
+        auto& entryBox = request.entryBox_;
+        view.entry(request, entryBox.emplace_back(id, productPower));
+    }
 }
 }  // namespace labor_supplier
