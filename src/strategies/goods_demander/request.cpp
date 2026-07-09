@@ -2,9 +2,10 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cassert>
+#include <config/init_setup.hpp>
 
-#include "world/message.hpp"
 #include "helper.hpp"
+#include "world/message.hpp"
 
 namespace goods_demander {
 namespace {
@@ -16,7 +17,8 @@ namespace {
 }
 
 [[nodiscard]] auto pickEntry(
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox, const int sampleCnt
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
+    const int                                  sampleCnt = config::goods_demander::goodsSampleCnt
 ) -> world::GoodsEntry& {
     std::reference_wrapper<world::GoodsEntry> betterEntry =
         helper::discreteDistribution(entryBox, &world::GoodsEntry::supply_);
@@ -30,8 +32,7 @@ namespace {
     }
     return betterEntry.get();
 }
-}
-
+}  // namespace
 
 void purchase(
     PurchaseView                               view,

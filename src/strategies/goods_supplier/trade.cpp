@@ -1,36 +1,15 @@
-#include "strategies/goods_supplier/level2.hpp"
+#include "strategies/goods_supplier.hpp"
 
-#include <tbb/concurrent_vector.h>
 #include <cassert>
-#include <cmath>
+#include <helper.hpp>
 #include <numeric>
+#include <random>
 
 #include "config/contract.hpp"
-#include "helper.hpp"
-#include "strategies/goods_supplier/level1.hpp"
-#include "strategies/goods_supplier/level3.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
-[[nodiscard]] auto calcSupply(const PostGoodsView& view) -> double {
-    return (view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory();
-}
-
-[[nodiscard]] auto calcMarkup(const PostGoodsView& view, const double epsilonMarkup) -> double {
-    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol(), -1.0, 1.0))};
-    const double nextMarkup{view.lastMarkup() * (view.isSold() ? 1.0 + alpha : 1.0 - alpha)};
-    return std::max(epsilonMarkup, nextMarkup);
-}
-
-[[nodiscard]] auto judgePrice(
-    const double markup, const double totalCost, const double epsilonPrice
-) -> double {
-    assert(markup > 0.0 && "markup is required > 0");
-    assert(totalCost > 0.0 && "total cost is required > 0");
-    const double price{totalCost * markup};
-    return std::max(epsilonPrice, price);
-}
-
+namespace {
 [[nodiscard]] auto calcTotalDemand(const tbb::concurrent_vector<world::GoodsRequest>& requestBox)
     -> double {
     const double demand{std::accumulate(
@@ -43,6 +22,16 @@ namespace goods_supplier {
     )};
     assert(demand >= 0.0 && "total demand is required >= 0");
     return demand;
+}
+
+void shuffleIdx(
+    const std::size_t         resizeNum,
+    std::vector<std::size_t>& shuffleVec,
+    std::mt19937&             gen = helper::gen
+) {
+    shuffleVec.resize(resizeNum);
+    std::ranges::iota(shuffleVec, 0UZ);
+    std::ranges::shuffle(shuffleVec, gen);
 }
 
 [[nodiscard]] auto performRationedTrade(
@@ -86,5 +75,18 @@ void updateLog(TradeView& view, const double salesAmount) {
     const double sales{salesAmount * view.price()};
     assert(sales >= 0.0 && "sales is required >= 0");
     view.updateLog(view.price(), sales, isSold);
+}
+}  // namespace
+void trade(TradeView view) {
+    auto         myEntry{view.getMyEntry()};
+    auto&        requestBox = myEntry->requestBox_;
+    const double totalDemand{calcTotalDemand(requestBox)};
+    const bool   isExcessDemand{totalDemand >= view.supply()};
+    const double salesAmount{
+        isExcessDemand ? performRationedTrade(view.supply(), requestBox)
+                       : performFullTrade(requestBox)
+    };
+    view.setInventory(view.supply() - salesAmount);
+    updateLog(view, salesAmount);
 }
 }  // namespace goods_supplier
