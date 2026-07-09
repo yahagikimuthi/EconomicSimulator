@@ -1,6 +1,8 @@
 #include "strategies/goods_supplier.hpp"
 
+#include <tbb/concurrent_vector.h>
 #include <cassert>
+#include <cstddef>
 #include <helper.hpp>
 #include <numeric>
 #include <random>

@@ -2,8 +2,9 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cassert>
-#include <config/init_setup.hpp>
+#include <functional>
 
+#include "config/init_setup.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
@@ -54,11 +55,5 @@ void purchase(
     auto& pickedEntry = pickEntry(entryBox);
     assert(pickedEntry.price_ > 0.0 && "price is required > 0.0");
     view.entry(pickedEntry, pickedEntry.requestBox_.emplace_back(budget / pickedEntry.price_));
-}
-
-void afterTrade(AfterTradeView view) {
-    if (not view.isPosting()) return;
-    const auto [entry, myRequest] = view.getMyRequest();
-    view.recordPurchase(entry.price_ * myRequest.tradeAmount_);
 }
 }  // namespace goods_demander

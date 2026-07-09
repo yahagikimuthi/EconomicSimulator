@@ -1,5 +1,8 @@
 #include "strategies/labor_demander.hpp"
 
+#include <tbb/concurrent_vector.h>
+#include <algorithm>
+#include <cstddef>
 #include <numeric>
 
 #include "config/contract.hpp"

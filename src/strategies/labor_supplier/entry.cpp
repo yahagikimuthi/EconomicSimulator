@@ -1,5 +1,11 @@
 #include "strategies/labor_supplier.hpp"
 
+#include <tbb/concurrent_vector.h>
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <numeric>
+
 #include "config/init_setup.hpp"
 #include "helper.hpp"
 

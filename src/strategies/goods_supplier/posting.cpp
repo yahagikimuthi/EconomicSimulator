@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cassert>
+#include <cmath>
 #include <config/init_setup.hpp>
 
 #include "helper.hpp"
