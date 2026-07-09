@@ -37,7 +37,7 @@ void purchase(
     const double                               availableAsset,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     const int  maxPurchaseFrequency = config::goods_demander::maxPurchaseFrequency,
-    const int& step                 = config::sim_vars::currentStep
+    const int& step                 = config::currentStep
 );
 
 struct AfterTradeView {
