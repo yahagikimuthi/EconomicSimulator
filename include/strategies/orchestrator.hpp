@@ -12,6 +12,12 @@ void postLaborRequest(
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
 
+void jobEntry(
+    const agent_index::Component&                indexComp,
+    labor_supplier::Component&                   laborSupplier,
+    tbb::concurrent_vector<world::LaborRequest>& requestBox
+);
+
 void offer(labor_demander::Component& laborDemander);
 
 void acceptOffer(labor_supplier::Component& laborSupplier);
