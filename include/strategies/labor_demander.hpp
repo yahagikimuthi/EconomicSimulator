@@ -1,8 +1,10 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <functional>
 
 #include "components/labor_demander.hpp"
+#include "core/forward.hpp"
 
 namespace labor_demander {
 struct PostJobView {
