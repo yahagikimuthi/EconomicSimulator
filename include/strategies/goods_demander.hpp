@@ -41,7 +41,7 @@ void purchase(
 struct AfterTradeView {
     AfterTradeView(Component& comp) : comp_{comp} {}
 
-    [[nodiscard]] auto getMyRequest() const
+    [[nodiscard]] auto myRequest() const
         -> std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
         auto& [entry, myRequest] = comp_.posting_.myRequest_;
         return {*entry, *myRequest};
