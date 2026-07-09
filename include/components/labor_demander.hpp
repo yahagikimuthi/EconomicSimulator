@@ -35,7 +35,7 @@ struct Component {
     Plan             plan_{};
     Posting          posting_{};
     HR               humanResources{};
-    EmploymentLedger employmentLedger;
+    EmploymentLedger employmentLedger{};
     Parameter        parameter_;
 
     Component();
