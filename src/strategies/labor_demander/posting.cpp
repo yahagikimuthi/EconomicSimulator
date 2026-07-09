@@ -3,17 +3,45 @@
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <cmath>
+#include <components/labor_demander.hpp>
 
 #include "config/init_setup.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
+struct CalcNextWageView {
+    CalcNextWageView(const PostJobView& parentComp) : comp_{parentComp.comp_} {}
+
+    [[nodiscard]] auto log() const -> std::tuple<double, double, double> {
+        const auto& log = comp_.log_;
+        return {log.wage_, log.targetEmploy_, log.actualEmploy_};
+    }
+    [[nodiscard]] auto wageAdjustVol() const -> double {
+        return comp_.parameter_.wageAdjustmentVolatility_;
+    }
+
+  private:
+    Component& comp_;
+};
+
+struct CalcNextEmployView {
+    CalcNextEmployView(const PostJobView& parentComp_) : comp_{parentComp_.comp_} {}
+
+    [[nodiscard]] auto employAdjustVol() const -> double {
+        return comp_.parameter_.employAdjustmentVolatility_;
+    }
+    [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
+
+  private:
+    Component& comp_;
+};
+
 namespace {
 [[nodiscard]] auto calcNextWage(
-    const PostJobView& view, const double epsilonWage = config::labor_demander::epsilonWage
+    const CalcNextWageView view, const double epsilonWage = config::labor_demander::epsilonWage
 ) -> double {
-    const auto [lastWage, lastTargetEmploy, lastActualEmploy]{view.getLog()};
+    const auto [lastWage, lastTargetEmploy, lastActualEmploy]{view.log()};
     assert(lastWage > 0.0 && "last wage is required > 0");
     assert(lastTargetEmploy >= 0 && "last target employ is required >= 0");
 
@@ -23,7 +51,7 @@ namespace {
     return std::max(epsilonWage, nextWage);
 }
 
-[[nodiscard]] auto calcNextEmploy(const PostJobView& view, const bool isSold) -> int {
+[[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int {
     const double alpha{std::abs(helper::randNormal(0.0, view.employAdjustVol(), -1.0, 1.0))};
     const double nextEmploy{view.lastTargetEmploy() * (isSold ? 1.0 - alpha : 1.0 + alpha)};
     const int    out{static_cast<int>(std::round(nextEmploy))};
@@ -38,7 +66,7 @@ void postJob(
 ) {
     const double nextWage{calcNextWage(view)};
     const int    nextEmploy{calcNextEmploy(view, isSold)};
-    view.setPlan(nextWage, nextEmploy);
-    view.setMyRequest(requestBox.emplace_back(id, nextWage));
+    view.plan(nextWage, nextEmploy);
+    view.myRequest(requestBox.emplace_back(id, nextWage));
 }
 }  // namespace labor_demander

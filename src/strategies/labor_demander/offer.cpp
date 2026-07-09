@@ -31,8 +31,9 @@ void sortApplicants(
 }  // namespace
 
 void offerApplicants(OfferApplicantsView view) {
-    const int                                    employ{view.getEmploy()};
-    const auto                                   myRequest{view.getMyRequest()};
+    const int  employ{view.employPlan()};
+    const auto myRequest{view.myRequest()};
+
     static thread_local std::vector<std::size_t> sortApplicantIdxs;
     sortApplicants(employ, sortApplicantIdxs, myRequest->entryBox_);
 

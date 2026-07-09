@@ -10,26 +10,17 @@ namespace labor_demander {
 struct PostJobView {
     PostJobView(Component& comp) : comp_{comp} {}
 
-    void setPlan(const double wage, const int employ) {
+    void plan(const double wage, const int employ) {
         comp_.plan_.wage_ = wage, comp_.plan_.employ_ = employ;
     }
-    void setMyRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
+    void myRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
         comp_.posting_.myRequest_ = it;
     }
-    [[nodiscard]] auto getLog() const -> std::tuple<double, double, double> {
-        const auto& log = comp_.log_;
-        return {log.wage_, log.targetEmploy_, log.actualEmploy_};
-    }
-    [[nodiscard]] auto wageAdjustVol() const -> double {
-        return comp_.parameter_.wageAdjustmentVolatility_;
-    }
-    [[nodiscard]] auto employAdjustVol() const -> double {
-        return comp_.parameter_.employAdjustmentVolatility_;
-    }
-    [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
 
   private:
     Component& comp_;
+    friend struct CalcNextWageView;
+    friend struct CalcNextEmployView;
 };
 
 void postJob(
@@ -42,10 +33,9 @@ void postJob(
 struct OfferApplicantsView {
     OfferApplicantsView(Component& comp) : comp_{comp} {}
 
-    [[nodiscard]] auto getEmploy() const -> int { return comp_.plan_.employ_; }
+    [[nodiscard]] auto employPlan() const -> int { return comp_.plan_.employ_; }
 
-    [[nodiscard]] auto getMyRequest() const
-        -> tbb::concurrent_vector<world::LaborRequest>::iterator {
+    [[nodiscard]] auto myRequest() const -> tbb::concurrent_vector<world::LaborRequest>::iterator {
         return comp_.posting_.myRequest_;
     }
 
