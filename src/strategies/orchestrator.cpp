@@ -12,7 +12,7 @@
 namespace orchestrator {
 void postLaborRequest(
     const agent_index::Component&                indexComp,
-    goods_supplier::Component&                   goodsSupplier,
+    const goods_supplier::Component&             goodsSupplier,
     labor_demander::Component&                   laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
@@ -49,7 +49,7 @@ void registerMember(
 
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
-    labor_demander::Component&                 laborDemander,
+    const labor_demander::Component&           laborDemander,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double sumWage{laborDemander.getSumWage()};
@@ -57,9 +57,9 @@ void postGoods(
 }
 
 void purchase(
-    hhold_finance::Component&                  financeComponent,
+    const hhold_finance::Component&            financeComponent,
     goods_demander::Component&                 goodsDemander,
-    labor_supplier::Component&                 laborSupplier,
+    const labor_supplier::Component&           laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double asset{financeComponent.asset()};
