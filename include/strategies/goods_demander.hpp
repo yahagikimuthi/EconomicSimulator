@@ -17,6 +17,8 @@ struct PurchaseView {
 
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 
+    [[nodiscard]] auto purchasing() const -> double { return comp_.purchasing_.purchase_; }
+
     [[nodiscard]] auto mpc() const -> double { return comp_.parameter_.mpc_; }
 
     void entry(
@@ -46,7 +48,7 @@ struct AfterTradeView {
         auto& [entry, myRequest] = comp_.posting_.myRequest_;
         return {*entry, *myRequest};
     }
-    void recordPurchase(const double purchase) { comp_.purchasing_.purchase_ = purchase; }
+    void purchasePlus(const double plus) { comp_.purchasing_.purchase_ += plus; }
 
     [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
 

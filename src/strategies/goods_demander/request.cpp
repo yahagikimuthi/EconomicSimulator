@@ -45,7 +45,7 @@ void purchase(
         view.isPosting(false);
         return;
     }
-    const double budget{calcBudget(view.mpc(), availableAsset)};
+    const double budget{calcBudget(view.mpc(), availableAsset - view.purchasing())};
     if (budget <= 0.0) {
         view.isPosting(false);
         return;
