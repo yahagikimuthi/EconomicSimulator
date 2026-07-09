@@ -40,4 +40,11 @@ void purchase(
 );
 
 void trade(goods_supplier::Component& goodsSupplier);
+
+void reset(
+    labor_demander::Component& laborDemander,
+    labor_supplier::Component& laborSupplier,
+    goods_demander::Component& goodsDemander,
+    goods_supplier::Component& goodsSupplier
+);
 }  // namespace orchestrator
