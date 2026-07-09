@@ -4,10 +4,10 @@
 
 #include "components/common.hpp"
 
-#include "strategies/goods_demander/level1.hpp"
-#include "strategies/goods_supplier/level1.hpp"
-#include "strategies/labor_demander/level1.hpp"
-#include "strategies/labor_supplier/level1.hpp"
+#include "strategies/goods_demander.hpp"
+#include "strategies/goods_supplier.hpp"
+#include "strategies/labor_demander.hpp"
+#include "strategies/labor_supplier.hpp"
 
 namespace orchestrator {
 void postLaborRequest(
