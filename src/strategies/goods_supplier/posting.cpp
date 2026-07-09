@@ -10,7 +10,7 @@
 
 namespace goods_supplier {
 struct CalcSupplyView {
-    CalcSupplyView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+    explicit CalcSupplyView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
 
     [[nodiscard]] auto firmProductPower() const -> double {
         return comp_.production_.firmProductPower_;
@@ -25,7 +25,7 @@ struct CalcSupplyView {
 };
 
 struct CalcMarkupView {
-    CalcMarkupView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+    explicit CalcMarkupView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
 
     [[nodiscard]] auto markupAdjustVol() const -> double {
         return comp_.parameter_.markupAdjustmentVolatility_;
@@ -65,8 +65,8 @@ namespace {
 void postGoods(
     PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    const double supply{calcSupply(view)};
-    const double markup{calcMarkup(view)};
+    const double supply{calcSupply(CalcSupplyView{view})};
+    const double markup{calcMarkup(CalcMarkupView{view})};
     const double price{judgePrice(markup, totalCost)};
     view.setMyEntry(entryBox.emplace_back(price, supply));
     view.setPlan(price, supply, markup);

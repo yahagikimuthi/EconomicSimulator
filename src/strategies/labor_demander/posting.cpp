@@ -11,7 +11,7 @@
 
 namespace labor_demander {
 struct CalcNextWageView {
-    CalcNextWageView(const PostJobView& parentComp) : comp_{parentComp.comp_} {}
+    explicit CalcNextWageView(const PostJobView& parentComp) : comp_{parentComp.comp_} {}
 
     [[nodiscard]] auto log() const -> std::tuple<double, double, double> {
         const auto& log = comp_.log_;
@@ -26,7 +26,7 @@ struct CalcNextWageView {
 };
 
 struct CalcNextEmployView {
-    CalcNextEmployView(const PostJobView& parentComp_) : comp_{parentComp_.comp_} {}
+    explicit CalcNextEmployView(const PostJobView& parentComp_) : comp_{parentComp_.comp_} {}
 
     [[nodiscard]] auto employAdjustVol() const -> double {
         return comp_.parameter_.employAdjustmentVolatility_;
@@ -64,8 +64,8 @@ void postJob(
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view
 ) {
-    const double nextWage{calcNextWage(view)};
-    const int    nextEmploy{calcNextEmploy(view, isSold)};
+    const double nextWage{calcNextWage(CalcNextWageView{view})};
+    const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, isSold)};
     view.plan(nextWage, nextEmploy);
     view.myRequest(requestBox.emplace_back(id, nextWage));
 }

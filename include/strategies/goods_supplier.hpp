@@ -7,7 +7,7 @@
 
 namespace goods_supplier {
 struct PostGoodsView {
-    PostGoodsView(Component& comp) : comp_{comp} {}
+    explicit PostGoodsView(Component& comp) : comp_{comp} {}
     void setMyEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
         comp_.posting_.myEntry_ = it;
     }
@@ -41,7 +41,7 @@ void postGoods(
 );
 
 struct TradeView {
-    TradeView(Component& comp) : comp_{comp} {}
+    explicit TradeView(Component& comp) : comp_{comp} {}
 
     [[nodiscard]] auto getMyEntry() const -> tbb::concurrent_vector<world::GoodsEntry>::iterator {
         return comp_.posting_.myEntry_;
