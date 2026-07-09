@@ -14,6 +14,8 @@ void postLaborRequest(
 
 void offer(labor_demander::Component& laborDemander);
 
+void acceptOffer(labor_supplier::Component& laborSupplier);
+
 void registerMember(
     goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
 );
