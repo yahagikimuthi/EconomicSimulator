@@ -6,7 +6,7 @@ struct Component {
 
     Component(const int id) : id_{id} {}
 
-    [[nodiscard]] auto getId() const -> int { return id_; }
+    [[nodiscard]] auto id() const -> int { return id_; }
 };
 };  // namespace agent_index
 
@@ -22,6 +22,6 @@ struct Component {
     double asset_;
     Component();
 
-    [[nodiscard]] auto getAsset() const -> double { return asset_; }
+    [[nodiscard]] auto asset() const -> double { return asset_; }
 };
 }  // namespace hhold_finance

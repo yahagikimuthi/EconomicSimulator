@@ -16,8 +16,8 @@ void postLaborRequest(
     labor_demander::Component&                   laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
-    const int  id{indexComp.getId()};
-    const bool isSold{goodsSupplier.getIsSold()};
+    const int  id{indexComp.id()};
+    const bool isSold{goodsSupplier.isSold()};
     labor_demander::postJob(id, isSold, requestBox, labor_demander::PostJobView{laborDemander});
 }
 
@@ -26,7 +26,7 @@ void jobEntry(
     labor_supplier::Component&                   laborSupplier,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
-    const int id{indexComp.getId()};
+    const int id{indexComp.id()};
     labor_supplier::jobEntry(labor_supplier::JobEntryView{laborSupplier}, id, requestBox);
 }
 
@@ -62,7 +62,7 @@ void purchase(
     labor_supplier::Component&                 laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    const double asset{financeComponent.getAsset()};
+    const double asset{financeComponent.asset()};
     const double wage{laborSupplier.getWage()};
     goods_demander::purchase(goods_demander::PurchaseView{goodsDemander}, asset + wage, entryBox);
 }

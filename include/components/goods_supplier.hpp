@@ -42,6 +42,6 @@ struct Component {
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;
     }
-    [[nodiscard]] auto getIsSold() const -> bool { return log_.isSold_; }
+    [[nodiscard]] auto isSold() const -> bool { return log_.isSold_; }
 };
 }  // namespace goods_supplier
