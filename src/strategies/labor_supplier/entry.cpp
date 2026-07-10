@@ -4,8 +4,9 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <functional>
+#include <iterator>
 #include <random>
-#include <ranges>
 
 #include "config/init_setup.hpp"
 #include "helper.hpp"
@@ -14,57 +15,61 @@
 namespace labor_supplier {
 namespace {
 void pickSample(
-    tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    std::vector<world::LaborRequest*>&           sampleRequestPtrs,
-    const int                                    sampleCnt = config::labor_supplier::jobSampleCnt,
-    std::mt19937&                                gen       = helper::gen
+    tbb::concurrent_vector<world::LaborRequest>&              requestBox,
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
+    const int     sampleCnt = config::labor_supplier::jobSampleCnt,
+    std::mt19937& gen       = helper::gen
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
-    sampleRequestPtrs.resize(k);
+    sampleRequests.clear();
 
-    if (requestBox.size() > static_cast<std::size_t>(sampleCnt)) {
-        auto requestPtrs =
-            requestBox | std::views::transform([](world::LaborRequest& r) -> world::LaborRequest* {
-                return &r;
-            });
-        std::ranges::sample(requestPtrs, sampleRequestPtrs.begin(), static_cast<int>(k), gen);
+    if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
+        for (std::size_t i{}; i < k; ++i)
+            ACCESS(sampleRequests, i) = std::ref(ACCESS(requestBox, i));
         return;
     }
 
-    for (std::size_t i{}; i < k; ++i) ACCESS(sampleRequestPtrs, i) = &ACCESS(requestBox, i);
+    std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), gen);
 }
 
 void sortSample(
-    std::vector<world::LaborRequest*>& sortIdxs,
-    const int                          entryCnt = config::labor_supplier::jobEntryCnt
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sortIdxs,
+    const int entryCnt = config::labor_supplier::jobEntryCnt
 ) {
-    assert(entryCnt > 0 && "entry count is required > 0");
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortIdxs.size())};
     std::ranges::partial_sort(
         sortIdxs,
         sortIdxs.begin() + static_cast<int>(k),
         std::ranges::greater{},
-        [](const world::LaborRequest* requestPtr) -> double { return requestPtr->wage_; }
+        [](const std::reference_wrapper<world::LaborRequest>& requestRef) -> double {
+            return requestRef.get().wage_;
+        }
     );
 }
 }  // namespace
 
 void jobEntry(
-    JobEntryView view, const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox
+    JobEntryView                                 view,
+    const int                                    id,
+    tbb::concurrent_vector<world::LaborRequest>& requestBox,
+    const int                                    entryCnt
 ) {
     if (requestBox.empty()) {
         view.isPosting(false);
         return;
     }
-    static thread_local std::vector<world::LaborRequest*> sampleRequestPtrs;
-    pickSample(requestBox, sampleRequestPtrs);
-    sortSample(sampleRequestPtrs);
+    static thread_local std::vector<std::reference_wrapper<world::LaborRequest>> sampleRequests;
+    pickSample(requestBox, sampleRequests);
+    sortSample(sampleRequests);
 
     const double productPower{view.productPower()};
     view.clearEntry();
-    for (world::LaborRequest* request : sampleRequestPtrs) {
-        auto& entryBox = request->entryBox_;
-        view.entry(*request, entryBox.emplace_back(id, productPower));
+
+    for (std::size_t i{}; i < static_cast<std::size_t>(entryCnt); ++i) {
+        auto  requestRef = ACCESS(sampleRequests, i);
+        auto& request    = requestRef.get();
+        auto& entryBox   = request.entryBox_;
+        view.entry(request, entryBox.emplace_back(id, productPower));
     }
 }
 }  // namespace labor_supplier
