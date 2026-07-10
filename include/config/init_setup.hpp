@@ -25,5 +25,5 @@ constexpr int goodsSampleCnt{5};
 
 namespace config::agent_count {
 constexpr int firm{10};
-constexpr int hhold{1000};
+constexpr int hhold{100};
 }  // namespace config::agent_count

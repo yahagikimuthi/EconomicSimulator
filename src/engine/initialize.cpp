@@ -37,9 +37,10 @@ Engine::Engine(const int totalStep, const std::string& filename)
         assert(false && "can not create file");
     }
 
-    for (int i{}; i < config::agent_count::firm; ++i) {
-        firms_.emplace_back();
-    }
+    firms_.reserve(config::agent_count::firm);
+    for (int i{}; i < config::agent_count::firm; ++i) firms_.emplace_back();
+
+    hholds_.reserve(config::agent_count::hhold);
     for (int i{}; i < config::agent_count::hhold; ++i) hholds_.emplace_back();
 }
 

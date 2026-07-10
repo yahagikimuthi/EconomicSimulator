@@ -35,7 +35,7 @@ struct Parameter {
     const double markupAdjustmentVolatility_;
 };
 struct Component {
-    Log         log_;
+    Log         log_{};
     Plan        plan_{};
     SalesLedger salesLedger{};
     Posting     posting_;
@@ -47,6 +47,6 @@ struct Component {
         production_.sumEmployeeProductPower_ = power;
     }
     [[nodiscard]] auto isSold() const -> bool { return log_.isSold_; }
-    [[nodiscard]] auto sales() const -> double {return salesLedger.currentSales;}
+    [[nodiscard]] auto sales() const -> double { return salesLedger.currentSales; }
 };
 }  // namespace goods_supplier

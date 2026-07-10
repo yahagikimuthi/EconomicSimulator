@@ -5,6 +5,8 @@
 #include <cassert>
 #include <cstddef>
 #include <numeric>
+#include <random>
+#include <ranges>
 
 #include "config/init_setup.hpp"
 #include "helper.hpp"
@@ -13,24 +15,24 @@
 namespace labor_supplier {
 namespace {
 void pickSample(
-    const tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    std::vector<std::size_t>&                          sampleIdxs,
-    const int sampleCnt = config::labor_supplier::jobSampleCnt
+    tbb::concurrent_vector<world::LaborRequest>& requestBox,
+    std::vector<world::LaborRequest*>            sampleRequestPtrs,
+    const int                                    sampleCnt = config::labor_supplier::jobSampleCnt,
+    std::mt19937&                                gen       = helper::gen
 ) {
-    assert(sampleCnt > 0 && "sample count is required > 0");
-    sampleIdxs.resize(static_cast<std::size_t>(sampleCnt));
-    const int lastIdx{static_cast<int>(requestBox.size()) - 1};
+    const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
+    sampleRequestPtrs.resize(k);
 
-    // 求人数が探索数未満の場合、連番でインデックスを入れる
-    if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
-        std::ranges::iota(sampleIdxs, 0UZ);
+    if (requestBox.size() > static_cast<std::size_t>(sampleCnt)) {
+        auto requestPtrs =
+            requestBox | std::views::transform([](world::LaborRequest& r) -> world::LaborRequest* {
+                return &r;
+            });
+        std::ranges::sample(requestPtrs, sampleRequestPtrs.begin(), static_cast<int>(k), gen);
         return;
     }
 
-    // 探索数以上の場合は一様分布によりインデクスを入れる
-    for (size_t i{0}; i < static_cast<std::size_t>(sampleCnt); ++i) {
-        ACCESS(sampleIdxs, i) = static_cast<std::size_t>(helper::randInt(0, lastIdx));
-    }
+    for (std::size_t i{}; i < k; ++i) ACCESS(sampleRequestPtrs, i) = &ACCESS(requestBox, i);
 }
 
 void sortSample(
@@ -41,10 +43,9 @@ void sortSample(
     assert(entryCnt > 0 && "entry count is required > 0");
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortIdxs.size())};
     std::ranges::partial_sort(
-        sortIdxs.begin(),
+        sortIdxs,
         sortIdxs.begin() + static_cast<int>(k),
-        sortIdxs.end(),
-        std::greater<std::size_t>{},
+        std::ranges::greater{},
         [&requestBox](const std::size_t idx) -> double { return ACCESS(requestBox, idx).wage_; }
     );
 }
@@ -57,13 +58,13 @@ void jobEntry(
         view.isPosting(false);
         return;
     }
-    static thread_local std::vector<std::size_t> pickSampleIdxs;
-    pickSample(requestBox, pickSampleIdxs);
-    sortSample(requestBox, pickSampleIdxs);
+    static thread_local std::vector<world::LaborRequest*> sampleRequestPtrs;
+    pickSample(requestBox, sampleRequestPtrs);
+    sortSample(requestBox, sampleRequestPtrs);
 
     const double productPower{view.productPower()};
     view.clearEntry();
-    for (std::size_t i : pickSampleIdxs) {
+    for (std::size_t i : sampleRequestPtrs) {
         auto& request  = ACCESS(requestBox, i);
         auto& entryBox = request.entryBox_;
         view.entry(request, entryBox.emplace_back(id, productPower));

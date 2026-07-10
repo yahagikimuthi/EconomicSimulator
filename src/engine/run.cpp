@@ -21,33 +21,52 @@ void Engine::run() {
 }
 
 void Engine::runLabor() {
-    for (Firm& firm : firms_)
+    for (Firm& firm : firms_) {
         orchestrator::postLaborRequest(firm.index, firm.goods, firm.labor, laborRequestBox_);
+    }
 
-    for (HHold& hhold : hholds_) orchestrator::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
+    for (HHold& hhold : hholds_) {
+        orchestrator::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
+    }
 
-    for (Firm& firm : firms_) orchestrator::offer(firm.labor);
+    for (Firm& firm : firms_) {
+        orchestrator::offer(firm.labor);
+    }
 
-    for (HHold& hhold : hholds_) orchestrator::acceptOffer(hhold.labor);
+    for (HHold& hhold : hholds_) {
+        orchestrator::acceptOffer(hhold.labor);
+    }
 
-    for (Firm& firm : firms_) orchestrator::registerMember(firm.goods, firm.labor);
+    for (Firm& firm : firms_) {
+        orchestrator::registerMember(firm.goods, firm.labor);
+    }
 }
 
 void Engine::runGoods() {
-    for (Firm& firm : firms_) orchestrator::postGoods(firm.goods, firm.labor, goodsEntryBox_);
+    for (Firm& firm : firms_) {
+        orchestrator::postGoods(firm.goods, firm.labor, goodsEntryBox_);
+    }
 
-    for (HHold& hhold : hholds_)
+    for (HHold& hhold : hholds_) {
         orchestrator::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_);
+    }
 
-    for (Firm& firm : firms_) orchestrator::trade(firm.goods);
+    for (Firm& firm : firms_) {
+        orchestrator::trade(firm.goods);
+    }
 
-    for (HHold& hhold : hholds_) orchestrator::afterTrade(hhold.goods);
+    for (HHold& hhold : hholds_) {
+        orchestrator::afterTrade(hhold.goods);
+    }
 }
 
 void Engine::update() {
-    for (Firm& firm : firms_) orchestrator::updateAsset(firm.finance, firm.labor, firm.goods);
-
-    for (HHold& hhold : hholds_) orchestrator::updateAsset(hhold.finance, hhold.labor, hhold.goods);
+    for (Firm& firm : firms_) {
+        orchestrator::updateAsset(firm.finance, firm.labor, firm.goods);
+    }
+    for (HHold& hhold : hholds_) {
+        orchestrator::updateAsset(hhold.finance, hhold.labor, hhold.goods);
+    }
 }
 
 void Engine::logging() {

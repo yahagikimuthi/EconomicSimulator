@@ -19,8 +19,8 @@ namespace labor_demander {
 Component::Component()
     : log_{.wage_ = rand(0.6, 0.8), .targetEmploy_ = randInt(5, 15), .actualEmploy_ = randInt(4, 12)},
       parameter_{
-          .wageAdjustmentVolatility_   = rand(0.01, 0.05),
-          .employAdjustmentVolatility_ = rand(0.01, 0.05)
+          .wageAdjustmentVolatility_   = rand(0.01, 0.1),
+          .employAdjustmentVolatility_ = rand(0.74, 1.97)
       } {
     log_.actualEmploy_ = std::min(log_.actualEmploy_, log_.targetEmploy_);
 }
@@ -47,6 +47,11 @@ Component::Component()
           .inventory_               = rand(0.5, 2.0)
       },
       parameter_{
-          .targetInventoryRatio_ = rand(0.1, 0.2), .markupAdjustmentVolatility_ = rand(0.005, 0.02)
-      } {}
+          .targetInventoryRatio_ = rand(0.1, 0.2), .markupAdjustmentVolatility_ = rand(0.01, 0.02)
+      } {
+    log_.isSold_ =
+        log_.price_ * production_.inventory_ / log_.supply_ < parameter_.targetInventoryRatio_;
+    log_.supply_ = std::min(log_.supply_, production_.inventory_);
+    log_.sales_  = log_.price_ * (log_.supply_ - production_.inventory_);
+}
 }  // namespace goods_supplier
