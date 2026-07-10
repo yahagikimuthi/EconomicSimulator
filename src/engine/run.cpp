@@ -51,6 +51,7 @@ void Engine::update() {
 }
 
 void Engine::logging() {
+    dropBox_.clear();
     for (Firm& firm : firms_) {
         firm_finance::logging(dropBox_, firm.finance);
         labor_demander::logging(dropBox_, firm.labor);

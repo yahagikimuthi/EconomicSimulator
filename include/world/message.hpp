@@ -68,5 +68,18 @@ struct CensusDropBox {
         hholdAssets_.reserve(hholdCnt);
         wages_.reserve(hholdCnt);
     }
+
+    void clear() {
+        firmAssets_.clear();
+        postedEmployments_.clear();
+        employments_.clear();
+        prices_.clear();
+        supplies_.clear();
+        markups_.clear();
+        inventory_.clear();
+
+        hholdAssets_.clear();
+        wages_.clear();
+    }
 };
 }  // namespace world
