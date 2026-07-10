@@ -33,6 +33,8 @@ class Engine {
   private:
     void runLabor();
     void runGoods();
+    void update();
+    void logging();
     void reset();
 
     entt::registry registry_;

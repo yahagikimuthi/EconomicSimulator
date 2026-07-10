@@ -107,16 +107,4 @@ void logging(
     labor_supplier::logging(dropBox, laborSupplier);
     goods_supplier::logging(dropBox, goodsSupplier);
 }
-
-void reset(
-    labor_demander::Component& laborDemander,
-    labor_supplier::Component& laborSupplier,
-    goods_demander::Component& goodsDemander,
-    goods_supplier::Component& goodsSupplier
-) {
-    labor_demander::reset(laborDemander);
-    labor_supplier::reset(laborSupplier);
-    goods_demander::reset(goodsDemander);
-    goods_supplier::reset(goodsSupplier);
-}
 }  // namespace orchestrator

@@ -52,20 +52,4 @@ void updateAsset(
     const labor_supplier::Component& laborSupplier,
     const goods_demander::Component& goodsDemander
 );
-
-void logging(
-    world::CensusDropBox             dropBox,
-    const firm_finance::Component&   firmFinance,
-    const hhold_finance::Component&  hholdFinance,
-    const labor_demander::Component& laborDemander,
-    const labor_supplier::Component& laborSupplier,
-    const goods_supplier::Component& goodsSupplier
-);
-
-void reset(
-    labor_demander::Component& laborDemander,
-    labor_supplier::Component& laborSupplier,
-    goods_demander::Component& goodsDemander,
-    goods_supplier::Component& goodsSupplier
-);
 }  // namespace orchestrator
