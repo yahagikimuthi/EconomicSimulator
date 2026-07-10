@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <entt/entt.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <string>

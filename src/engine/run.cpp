@@ -40,6 +40,8 @@ void Engine::runGoods() {
         orchestrator::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_);
 
     for (Firm& firm : firms_) orchestrator::trade(firm.goods);
+
+    for (HHold& hhold : hholds_) orchestrator::afterTrade(hhold.goods);
 }
 
 void Engine::update() {

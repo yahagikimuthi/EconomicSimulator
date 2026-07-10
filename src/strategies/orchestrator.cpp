@@ -73,6 +73,10 @@ void trade(goods_supplier::Component& goodsSupplier) {
     goods_supplier::trade(goods_supplier::TradeView{goodsSupplier});
 }
 
+void afterTrade(goods_demander::Component& goodsDemander) {
+    goods_demander::afterTrade(goods_demander::AfterTradeView{goodsDemander});
+}
+
 void updateAsset(
     firm_finance::Component&         financeComponent,
     const labor_demander::Component& laborDemander,

@@ -41,6 +41,8 @@ void purchase(
 
 void trade(goods_supplier::Component& goodsSupplier);
 
+void afterTrade(goods_demander::Component& goodsDemander);
+
 void updateAsset(
     firm_finance::Component&         financeComponent,
     const labor_demander::Component& laborDemander,
