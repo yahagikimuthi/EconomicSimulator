@@ -38,7 +38,6 @@ void offerApplicants(OfferApplicantsView view) {
     sortApplicants(employ, sortApplicantIdxs, myRequest.entryBox_);
 
     int offerNum{};
-    view.clearOfferVec();
     for (const std::size_t i : sortApplicantIdxs) {
         if (offerNum >= employ) break;
         ACCESS(myRequest.entryBox_, i).isOffer_ = true;

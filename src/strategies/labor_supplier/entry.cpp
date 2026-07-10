@@ -63,7 +63,6 @@ void jobEntry(
     sortSample(sampleRequests);
 
     const double productPower{view.productPower()};
-    view.clearEntry();
 
     for (std::size_t i{}; i < static_cast<std::size_t>(entryCnt); ++i) {
         auto  requestRef = ACCESS(sampleRequests, i);

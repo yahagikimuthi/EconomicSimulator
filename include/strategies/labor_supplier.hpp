@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <config/init_setup.hpp>
 #include <cstddef>
 
 #include "components/labor_supplier.hpp"
@@ -13,7 +14,6 @@ struct JobEntryView {
 
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 
-    void clearEntry() { comp_.posting_.myEntries_.clear(); }
     void entry(
         const world::LaborRequest&                                request,
         const tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
@@ -27,7 +27,10 @@ struct JobEntryView {
     Component& comp_;
 };
 void jobEntry(
-    JobEntryView view, const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox
+    JobEntryView                                 view,
+    const int                                    id,
+    tbb::concurrent_vector<world::LaborRequest>& requestBox,
+    const int                                    entryCnt = config::labor_supplier::jobEntryCnt
 );
 
 struct AcceptOfferView {
