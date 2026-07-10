@@ -17,10 +17,7 @@ class Logger {
     explicit Logger(const std::string& filename);
     [[nodiscard]] auto isValid() const -> bool { return file_.isValid(); }
 
-    std::vector<double> prices_;
-
-    void setPrice();
-    void save(const int step);
+    void save(const world::CensusDropBox& dropBox, const int step);
 
   private:
     HighFive::File file_;
@@ -42,6 +39,8 @@ class Engine {
 
     tbb::concurrent_vector<world::LaborRequest> laborRequestBox_;
     tbb::concurrent_vector<world::GoodsEntry>   goodsEntryBox_;
+
+    world::CensusDropBox dropBox_;
 
     const int totalStep_;
     int       currentStep_{};

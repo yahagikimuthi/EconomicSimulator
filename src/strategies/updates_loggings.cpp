@@ -1,9 +1,27 @@
+#include "components/common.hpp"
+#include "strategies/common.hpp"
 #include "strategies/goods_demander.hpp"
 #include "strategies/goods_supplier.hpp"
 #include "strategies/labor_demander.hpp"
 #include "strategies/labor_supplier.hpp"
+#include "world/message.hpp"
+
+namespace firm_finance {
+void logging(world::CensusDropBox& dropBox, const Component& comp) {
+    dropBox.firmAssets_.emplace_back(comp.asset_);
+}
+}  // namespace firm_finance
+namespace hhold_finance {
+void logging(world::CensusDropBox& dropBox, const Component& comp) {
+    dropBox.hholdAssets_.emplace_back(comp.asset_);
+}
+}  // namespace hhold_finance
 
 namespace labor_demander {
+void logging(world::CensusDropBox& dropBox, const Component& comp) {
+    dropBox.postedEmployments_.emplace_back(comp.plan_.employ_);
+    dropBox.employments_.emplace_back(comp.humanResources.employeeCnt);
+}
 void reset(Component& comp) {
     comp.log_ = {
         .wage_         = comp.plan_.wage_,
@@ -20,6 +38,9 @@ void reset(Component& comp) {
 }  // namespace labor_demander
 
 namespace labor_supplier {
+void logging(world::CensusDropBox& dropBox, const Component& comp) {
+    dropBox.wages_.emplace_back(comp.contraction_.wage_);
+}
 void reset(Component& comp) {
     comp.posting_.myEntries_.clear();
     comp.posting_.isPosting_ = false;
@@ -35,6 +56,12 @@ void reset(Component& comp) {
 }  // namespace goods_demander
 
 namespace goods_supplier {
+void logging(world::CensusDropBox& dropBox, const Component& comp) {
+    dropBox.prices_.emplace_back(comp.plan_.price_);
+    dropBox.supplies_.emplace_back(comp.plan_.supply_);
+    dropBox.markups_.emplace_back(comp.plan_.supply_);
+    dropBox.inventory_.emplace_back(comp.production_.inventory_);
+}
 void reset(Component& comp) {
     comp.log_ = {
         .markup_ = comp.plan_.markup_,

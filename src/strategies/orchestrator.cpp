@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <components/goods_supplier.hpp>
+#include <strategies/common.hpp>
 
 #include "components/common.hpp"
 
@@ -73,7 +74,7 @@ void trade(goods_supplier::Component& goodsSupplier) {
 }
 
 void updateAsset(
-    firm_finance::Component& financeComponent,
+    firm_finance::Component&   financeComponent,
     labor_demander::Component& laborDemander,
     goods_supplier::Component& goodsSupplier
 ) {
@@ -83,13 +84,28 @@ void updateAsset(
 }
 
 void updateAsset(
-    hhold_finance::Component& financeComponent,
+    hhold_finance::Component&        financeComponent,
     const labor_supplier::Component& laborSupplier,
     const goods_demander::Component& goodsDemander
 ) {
     const double wage{laborSupplier.wage()};
     const double purchase{goodsDemander.purchase()};
     financeComponent.assetPlus(wage - purchase);
+}
+
+void logging(
+    world::CensusDropBox             dropBox,
+    const firm_finance::Component&   firmFinance,
+    const hhold_finance::Component&  hholdFinance,
+    const labor_demander::Component& laborDemander,
+    const labor_supplier::Component& laborSupplier,
+    const goods_supplier::Component& goodsSupplier
+) {
+    firm_finance::logging(dropBox, firmFinance);
+    hhold_finance::logging(dropBox, hholdFinance);
+    labor_demander::logging(dropBox, laborDemander);
+    labor_supplier::logging(dropBox, laborSupplier);
+    goods_supplier::logging(dropBox, goodsSupplier);
 }
 
 void reset(

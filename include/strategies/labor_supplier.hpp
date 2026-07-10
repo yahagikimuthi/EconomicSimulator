@@ -52,5 +52,6 @@ struct AcceptOfferView {
 };
 
 void acceptOffer(AcceptOfferView view);
+void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);
 }  // namespace labor_supplier

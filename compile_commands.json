@@ -71,7 +71,7 @@
 },
 {
   "directory": "/workspaces/Simulator_cpp/build",
-  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/updates.cpp.o -c /workspaces/Simulator_cpp/src/strategies/updates.cpp",
-  "file": "/workspaces/Simulator_cpp/src/strategies/updates.cpp"
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/updates_loggings.cpp.o -c /workspaces/Simulator_cpp/src/strategies/updates_loggings.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/updates_loggings.cpp"
 }
 ]

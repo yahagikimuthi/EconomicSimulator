@@ -1,10 +1,12 @@
 #pragma once
 
+#include <world/message.hpp>
 namespace world {
 struct LaborEntry;
 struct LaborRequest;
 struct GoodsRequest;
 struct GoodsEntry;
+struct CensusDropBox;
 }  // namespace world
 
 namespace agent_index {

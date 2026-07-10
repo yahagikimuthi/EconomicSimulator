@@ -42,15 +42,24 @@ void purchase(
 void trade(goods_supplier::Component& goodsSupplier);
 
 void updateAsset(
-    firm_finance::Component& financeComponent,
+    firm_finance::Component&         financeComponent,
     const labor_demander::Component& laborDemander,
     const goods_supplier::Component& goodsSupplier
 );
 
 void updateAsset(
-    hhold_finance::Component& financeComponent,
+    hhold_finance::Component&        financeComponent,
     const labor_supplier::Component& laborSupplier,
     const goods_demander::Component& goodsDemander
+);
+
+void logging(
+    world::CensusDropBox             dropBox,
+    const firm_finance::Component&   firmFinance,
+    const hhold_finance::Component&  hholdFinance,
+    const labor_demander::Component& laborDemander,
+    const labor_supplier::Component& laborSupplier,
+    const goods_supplier::Component& goodsSupplier
 );
 
 void reset(

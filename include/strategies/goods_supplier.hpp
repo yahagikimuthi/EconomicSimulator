@@ -60,5 +60,6 @@ struct TradeView {
 };
 
 void trade(TradeView view);
+void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);
 }  // namespace goods_supplier

@@ -1,7 +1,6 @@
 #include "core/engine.hpp"
 
 #include <entt/entt.hpp>
-#include <strategies/orchestrator.hpp>
 #include <string>
 
 #include "components/common.hpp"
@@ -10,6 +9,8 @@
 #include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
 #include "config/sim_vars.hpp"
+#include "strategies/orchestrator.hpp"
+#include "world/message.hpp"
 
 namespace core {
 void Engine::run() {}
@@ -105,10 +106,10 @@ void Engine::reset() {
     ++config::currentStep;
 }
 
-void Logger::save(const int step) {
+void Logger::save(const world::CensusDropBox& dropBox, const int step) {
     std::string     groupPath{"/step_" + std::to_string(step)};
     HighFive::Group group{file_.createGroup(groupPath)};
 
-    group.createDataSet("prices", prices_);
+    group.createDataSet("prices", dropBox.prices_);
 }
 }  // namespace core
