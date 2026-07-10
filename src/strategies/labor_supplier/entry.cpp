@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
-#include <numeric>
 #include <random>
 #include <ranges>
 
@@ -16,7 +15,7 @@ namespace labor_supplier {
 namespace {
 void pickSample(
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    std::vector<world::LaborRequest*>            sampleRequestPtrs,
+    std::vector<world::LaborRequest*>&           sampleRequestPtrs,
     const int                                    sampleCnt = config::labor_supplier::jobSampleCnt,
     std::mt19937&                                gen       = helper::gen
 ) {
@@ -36,9 +35,8 @@ void pickSample(
 }
 
 void sortSample(
-    const tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    std::vector<std::size_t>&                          sortIdxs,
-    const int entryCnt = config::labor_supplier::jobEntryCnt
+    std::vector<world::LaborRequest*>& sortIdxs,
+    const int                          entryCnt = config::labor_supplier::jobEntryCnt
 ) {
     assert(entryCnt > 0 && "entry count is required > 0");
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortIdxs.size())};
@@ -46,7 +44,7 @@ void sortSample(
         sortIdxs,
         sortIdxs.begin() + static_cast<int>(k),
         std::ranges::greater{},
-        [&requestBox](const std::size_t idx) -> double { return ACCESS(requestBox, idx).wage_; }
+        [](const world::LaborRequest* requestPtr) -> double { return requestPtr->wage_; }
     );
 }
 }  // namespace
@@ -60,14 +58,13 @@ void jobEntry(
     }
     static thread_local std::vector<world::LaborRequest*> sampleRequestPtrs;
     pickSample(requestBox, sampleRequestPtrs);
-    sortSample(requestBox, sampleRequestPtrs);
+    sortSample(sampleRequestPtrs);
 
     const double productPower{view.productPower()};
     view.clearEntry();
-    for (std::size_t i : sampleRequestPtrs) {
-        auto& request  = ACCESS(requestBox, i);
-        auto& entryBox = request.entryBox_;
-        view.entry(request, entryBox.emplace_back(id, productPower));
+    for (world::LaborRequest* request : sampleRequestPtrs) {
+        auto& entryBox = request->entryBox_;
+        view.entry(*request, entryBox.emplace_back(id, productPower));
     }
 }
 }  // namespace labor_supplier
