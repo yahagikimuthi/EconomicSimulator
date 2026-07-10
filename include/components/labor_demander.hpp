@@ -19,7 +19,8 @@ struct HR {
     int    employeeCnt;
 };
 struct EmploymentLedger {
-    int employing;
+    int    employing;
+    double sumWage;
 };
 struct Parameter {
     const double wageAdjustmentVolatility_;

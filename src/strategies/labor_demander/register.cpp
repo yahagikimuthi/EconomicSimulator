@@ -15,7 +15,8 @@ namespace labor_demander {
         ++employeeCnt;
     }
 
-    view.setLog(myRequest.wage_, view.targetEmploy(), employeeCnt);
+    //! logをここで書き換えるのはまずい
+    view.setLog(myRequest.wage_, employeeCnt);
     return sumProductPower;
 }
 }  // namespace labor_demander

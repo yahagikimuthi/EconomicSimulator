@@ -30,7 +30,7 @@ void reset(Component& comp) {
     };
     comp.plan_               = {.wage_ = 0.0, .employ_ = 0};
     comp.humanResources      = {.sumWage_ = 0.0, .employeeCnt = 0};
-    comp.employmentLedger    = {.employing = 0};
+    comp.employmentLedger    = {.employing = 0, .sumWage = 0.0};
     comp.posting_.myRequest_ = nullptr;
     comp.posting_.isPosting_ = false;
     comp.posting_.offerApplicants_.clear();
