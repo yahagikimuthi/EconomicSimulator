@@ -6,7 +6,7 @@ if(POLICY CMP0167)
 endif()
 
 # --- clangd / LSP 用の設定 ---
-# これによりビルドディレクトリに compile_commands.json が出力されます
+# これによりビルドディレクトリに compile_commands.json が出力
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # --- C++ 標準の設定 ---
