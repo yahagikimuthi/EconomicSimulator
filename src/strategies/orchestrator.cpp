@@ -74,9 +74,9 @@ void trade(goods_supplier::Component& goodsSupplier) {
 }
 
 void updateAsset(
-    firm_finance::Component&   financeComponent,
-    labor_demander::Component& laborDemander,
-    goods_supplier::Component& goodsSupplier
+    firm_finance::Component&         financeComponent,
+    const labor_demander::Component& laborDemander,
+    const goods_supplier::Component& goodsSupplier
 ) {
     const double wage{laborDemander.sumWage()};
     const double sales{goodsSupplier.sales()};
@@ -91,20 +91,5 @@ void updateAsset(
     const double wage{laborSupplier.wage()};
     const double purchase{goodsDemander.purchase()};
     financeComponent.assetPlus(wage - purchase);
-}
-
-void logging(
-    world::CensusDropBox             dropBox,
-    const firm_finance::Component&   firmFinance,
-    const hhold_finance::Component&  hholdFinance,
-    const labor_demander::Component& laborDemander,
-    const labor_supplier::Component& laborSupplier,
-    const goods_supplier::Component& goodsSupplier
-) {
-    firm_finance::logging(dropBox, firmFinance);
-    hhold_finance::logging(dropBox, hholdFinance);
-    labor_demander::logging(dropBox, laborDemander);
-    labor_supplier::logging(dropBox, laborSupplier);
-    goods_supplier::logging(dropBox, goodsSupplier);
 }
 }  // namespace orchestrator
