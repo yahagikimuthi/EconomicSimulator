@@ -6,9 +6,36 @@
 #include <highfive/H5File.hpp>
 #include <string>
 
+#include "components/common.hpp"
+#include "components/goods_demander.hpp"
+#include "components/goods_supplier.hpp"
+#include "components/labor_demander.hpp"
+#include "components/labor_supplier.hpp"
 #include "world/message.hpp"
 
 namespace core {
+struct Firm {
+    agent_index::Component    index;
+    firm_finance::Component   finance;
+    labor_demander::Component labor;
+    goods_supplier::Component goods;
+
+    Firm() : index{instanceCnt++} {}
+
+  private:
+    static inline int instanceCnt{};
+};
+struct HHold {
+    agent_index::Component    index;
+    hhold_finance::Component  finance;
+    labor_supplier::Component labor;
+    goods_demander::Component goods;
+
+    HHold() : index{instanceCnt++} {}
+
+  private:
+    static inline int instanceCnt{};
+};
 struct HHoldTag {};
 struct FirmTag {};
 
@@ -37,7 +64,9 @@ class Engine {
     void logging();
     void reset();
 
-    entt::registry registry_;
+    // entt::registry     registry_;
+    std::vector<Firm>  firms_;
+    std::vector<HHold> hholds_;
 
     tbb::concurrent_vector<world::LaborRequest> laborRequestBox_;
     tbb::concurrent_vector<world::GoodsEntry>   goodsEntryBox_;

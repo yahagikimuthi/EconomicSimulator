@@ -1,6 +1,5 @@
 #include "core/engine.hpp"
 
-#include <entt/entt.hpp>
 #include <strategies/common.hpp>
 #include <strategies/goods_demander.hpp>
 #include <strategies/goods_supplier.hpp>
@@ -8,165 +7,67 @@
 #include <strategies/labor_supplier.hpp>
 #include <string>
 
-#include "components/common.hpp"
-#include "components/goods_demander.hpp"
-#include "components/goods_supplier.hpp"
-#include "components/labor_demander.hpp"
-#include "components/labor_supplier.hpp"
 #include "config/sim_vars.hpp"
 #include "strategies/orchestrator.hpp"
 #include "world/message.hpp"
 
 namespace core {
-void Engine::run() {}
+void Engine::run() {
+    runLabor();
+    runGoods();
+    update();
+    logging();
+    reset();
+}
 
 void Engine::runLabor() {
-    auto firmView{registry_.view<
-        agent_index::Component,
-        goods_supplier::Component,
-        labor_demander::Component,
-        FirmTag>()};
-    auto hholdView{registry_.view<agent_index::Component, labor_supplier::Component, HHoldTag>()};
+    for (Firm& firm : firms_)
+        orchestrator::postLaborRequest(firm.index, firm.goods, firm.labor, laborRequestBox_);
 
-    for (auto firm : firmView) {
-        orchestrator::postLaborRequest(
-            firmView.get<agent_index::Component>(firm),
-            firmView.get<goods_supplier::Component>(firm),
-            firmView.get<labor_demander::Component>(firm),
-            laborRequestBox_
-        );
-    }
+    for (HHold& hhold : hholds_) orchestrator::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
 
-    for (auto hhold : hholdView) {
-        orchestrator::jobEntry(
-            hholdView.get<agent_index::Component>(hhold),
-            hholdView.get<labor_supplier::Component>(hhold),
-            laborRequestBox_
-        );
-    }
+    for (Firm& firm : firms_) orchestrator::offer(firm.labor);
 
-    for (auto firm : firmView) {
-        orchestrator::offer(firmView.get<labor_demander::Component>(firm));
-    }
+    for (HHold& hhold : hholds_) orchestrator::acceptOffer(hhold.labor);
 
-    for (auto hhold : hholdView) {
-        orchestrator::acceptOffer(hholdView.get<labor_supplier::Component>(hhold));
-    }
-
-    for (auto firm : firmView) {
-        orchestrator::registerMember(
-            firmView.get<goods_supplier::Component>(firm),
-            firmView.get<labor_demander::Component>(firm)
-        );
-    }
+    for (Firm& firm : firms_) orchestrator::registerMember(firm.goods, firm.labor);
 }
 
 void Engine::runGoods() {
-    auto firmView{registry_.view<labor_demander::Component, goods_supplier::Component, FirmTag>()};
-    auto hholdView{registry_.view<
-        hhold_finance::Component,
-        labor_supplier::Component,
-        goods_demander::Component,
-        HHoldTag>()};
+    for (Firm& firm : firms_) orchestrator::postGoods(firm.goods, firm.labor, goodsEntryBox_);
 
-    for (auto firm : firmView) {
-        orchestrator::postGoods(
-            firmView.get<goods_supplier::Component>(firm),
-            firmView.get<labor_demander::Component>(firm),
-            goodsEntryBox_
-        );
-    }
+    for (HHold& hhold : hholds_)
+        orchestrator::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_);
 
-    for (auto hhold : hholdView) {
-        orchestrator::purchase(
-            hholdView.get<hhold_finance::Component>(hhold),
-            hholdView.get<goods_demander::Component>(hhold),
-            hholdView.get<labor_supplier::Component>(hhold),
-            goodsEntryBox_
-        );
-    }
-
-    for (auto firm : firmView) {
-        orchestrator::trade(firmView.get<goods_supplier::Component>(firm));
-    }
+    for (Firm& firm : firms_) orchestrator::trade(firm.goods);
 }
 
 void Engine::update() {
-    auto firmView{registry_.view<
-        firm_finance::Component,
-        labor_demander::Component,
-        goods_supplier::Component,
-        FirmTag>()};
-    auto hholdView{registry_.view<
-        hhold_finance::Component,
-        labor_supplier::Component,
-        goods_demander::Component,
-        HHoldTag>()};
+    for (Firm& firm : firms_) orchestrator::updateAsset(firm.finance, firm.labor, firm.goods);
 
-    for (auto firm : firmView) {
-        orchestrator::updateAsset(
-            firmView.get<firm_finance::Component>(firm),
-            firmView.get<labor_demander::Component>(firm),
-            firmView.get<goods_supplier::Component>(firm)
-        );
-    }
-
-    for (auto hhold : hholdView) {
-        orchestrator::updateAsset(
-            hholdView.get<hhold_finance::Component>(hhold),
-            hholdView.get<labor_supplier::Component>(hhold),
-            hholdView.get<goods_demander::Component>(hhold)
-        );
-    }
+    for (HHold& hhold : hholds_) orchestrator::updateAsset(hhold.finance, hhold.labor, hhold.goods);
 }
 
 void Engine::logging() {
-    auto firmFinances{registry_.view<firm_finance::Component, FirmTag>()};
-    auto hholdFinances{registry_.view<hhold_finance::Component, HHoldTag>()};
-    auto laborDemanders{registry_.view<labor_demander::Component, FirmTag>()};
-    auto laborSuppliers{registry_.view<labor_supplier::Component, HHoldTag>()};
-    auto goodsSuppliers{registry_.view<goods_supplier::Component, FirmTag>()};
-
-    for (auto firmFinance : firmFinances) {
-        firm_finance::logging(dropBox_, firmFinances.get<firm_finance::Component>(firmFinance));
+    for (Firm& firm : firms_) {
+        firm_finance::logging(dropBox_, firm.finance);
+        labor_demander::logging(dropBox_, firm.labor);
+        goods_supplier::logging(dropBox_, firm.goods);
     }
-    for (auto hholdFinance : hholdFinances) {
-        hhold_finance::logging(dropBox_, hholdFinances.get<hhold_finance::Component>(hholdFinance));
-    }
-    for (auto laborDemander : laborDemanders) {
-        labor_demander::logging(
-            dropBox_, laborDemanders.get<labor_demander::Component>(laborDemander)
-        );
-    }
-    for (auto laborSupplier : laborSuppliers) {
-        labor_supplier::logging(
-            dropBox_, laborSuppliers.get<labor_supplier::Component>(laborSupplier)
-        );
-    }
-    for (auto goodsSupplier : goodsSuppliers) {
-        goods_supplier::logging(
-            dropBox_, goodsSuppliers.get<goods_supplier::Component>(goodsSupplier)
-        );
+    for (HHold& hhold : hholds_) {
+        hhold_finance::logging(dropBox_, hhold.finance);
+        labor_supplier::logging(dropBox_, hhold.labor);
     }
 }
 
 void Engine::reset() {
-    auto laborDemanders{registry_.view<labor_demander::Component>()};
-    auto laborSuppliers{registry_.view<labor_supplier::Component>()};
-    auto goodsDemanders{registry_.view<goods_demander::Component>()};
-    auto goodsSuppliers{registry_.view<goods_supplier::Component>()};
-
-    for (auto laborDemander : laborDemanders) {
-        labor_demander::reset(laborDemanders.get<labor_demander::Component>(laborDemander));
+    for (Firm& firm : firms_) {
+        labor_demander::reset(firm.labor);
+        goods_supplier::reset(firm.goods);
     }
-    for (auto laborSupplier : laborSuppliers) {
-        labor_supplier::reset(laborSuppliers.get<labor_supplier::Component>(laborSupplier));
-    }
-    for (auto goodsDemander : goodsDemanders) {
-        goods_demander::reset(goodsDemanders.get<goods_demander::Component>(goodsDemander));
-    }
-    for (auto goodsSupplier : goodsSuppliers) {
-        goods_supplier::reset(goodsSuppliers.get<goods_supplier::Component>(goodsSupplier));
+    for (HHold& hhold : hholds_) {
+        labor_supplier::reset(hhold.labor);
+        goods_demander::reset(hhold.goods);
     }
 
     laborRequestBox_.clear();

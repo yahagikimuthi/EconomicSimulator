@@ -7,15 +7,10 @@
 #include <highfive/H5PropertyList.hpp>
 #include <string>
 
-#include "components/common.hpp"
-#include "components/goods_demander.hpp"
-#include "components/goods_supplier.hpp"
-#include "components/labor_demander.hpp"
-#include "components/labor_supplier.hpp"
 #include "config/init_setup.hpp"
 
 namespace core {
-
+/*
 namespace {
 void createFirm(const int id, entt::registry& registry) {
     entt::entity firm{registry.create()};
@@ -35,15 +30,17 @@ void createHHold(const int id, entt::registry& registry) {
     registry.emplace<HHoldTag>(hhold);
 }
 }  // namespace
-
+*/
 Engine::Engine(const int totalStep, const std::string& filename)
     : logger{filename}, totalStep_{totalStep} {
     if (not logger.isValid()) {
         assert(false && "can not create file");
     }
 
-    for (int i{}; i < config::agent_count::firm; ++i) createFirm(i, registry_);
-    for (int i{}; i < config::agent_count::hhold; ++i) createHHold(i, registry_);
+    for (int i{}; i < config::agent_count::firm; ++i) {
+        firms_.emplace_back();
+    }
+    for (int i{}; i < config::agent_count::hhold; ++i) hholds_.emplace_back();
 }
 
 Logger::Logger(const std::string& filename)
