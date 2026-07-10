@@ -1,7 +1,6 @@
 #include "core/engine.hpp"
 
 #include <cassert>
-#include <cstddef>
 #include <entt/entt.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
