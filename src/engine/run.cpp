@@ -2,6 +2,7 @@
 
 #include <entt/entt.hpp>
 #include <strategies/orchestrator.hpp>
+#include <string>
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
@@ -102,5 +103,12 @@ void Engine::reset() {
     laborRequestBox_.clear();
     goodsEntryBox_.clear();
     ++config::currentStep;
+}
+
+void Logger::save(const int step) {
+    std::string     groupPath{"/step_" + std::to_string(step)};
+    HighFive::Group group{file_.createGroup(groupPath)};
+
+    group.createDataSet("prices", prices_);
 }
 }  // namespace core
