@@ -1,5 +1,5 @@
 {
-    "name": "C++ Modern Dev Environment (GCC 14 + vcpkg)",
+    "name": "C++ Environment",
     "build": {
         "dockerfile": "Dockerfile"
     },
