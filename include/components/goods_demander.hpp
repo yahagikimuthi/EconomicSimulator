@@ -23,6 +23,7 @@ struct Component {
     Parameter  parameter_;
 
     Component();
+    [[nodiscard]] auto purchase() const -> double {return purchasing_.purchase_;}
 
   private:
     static inline int instanceCnt_{};

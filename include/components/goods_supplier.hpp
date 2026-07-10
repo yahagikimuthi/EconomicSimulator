@@ -47,5 +47,6 @@ struct Component {
         production_.sumEmployeeProductPower_ = power;
     }
     [[nodiscard]] auto isSold() const -> bool { return log_.isSold_; }
+    [[nodiscard]] auto sales() const -> double {return salesLedger.currentSales;}
 };
 }  // namespace goods_supplier

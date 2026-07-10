@@ -40,6 +40,6 @@ struct Component {
 
     Component();
 
-    [[nodiscard]] auto getSumWage() const -> double { return humanResources.sumWage_; }
+    [[nodiscard]] auto sumWage() const -> double { return humanResources.sumWage_; }
 };
 }  // namespace labor_demander

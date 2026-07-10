@@ -24,6 +24,6 @@ struct Component {
 
     Component();
 
-    [[nodiscard]] auto getWage() const -> double { return contraction_.wage_; }
+    [[nodiscard]] auto wage() const -> double { return contraction_.wage_; }
 };
 }  // namespace labor_supplier

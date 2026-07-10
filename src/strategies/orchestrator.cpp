@@ -53,7 +53,7 @@ void postGoods(
     const labor_demander::Component&           laborDemander,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    const double sumWage{laborDemander.getSumWage()};
+    const double sumWage{laborDemander.sumWage()};
     goods_supplier::postGoods(goods_supplier::PostGoodsView{goodsSupplier}, sumWage, entryBox);
 }
 
@@ -64,12 +64,32 @@ void purchase(
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double asset{financeComponent.asset()};
-    const double wage{laborSupplier.getWage()};
+    const double wage{laborSupplier.wage()};
     goods_demander::purchase(goods_demander::PurchaseView{goodsDemander}, asset + wage, entryBox);
 }
 
 void trade(goods_supplier::Component& goodsSupplier) {
     goods_supplier::trade(goods_supplier::TradeView{goodsSupplier});
+}
+
+void updateAsset(
+    firm_finance::Component& financeComponent,
+    labor_demander::Component& laborDemander,
+    goods_supplier::Component& goodsSupplier
+) {
+    const double wage{laborDemander.sumWage()};
+    const double sales{goodsSupplier.sales()};
+    financeComponent.assetPlus(sales - wage);
+}
+
+void updateAsset(
+    hhold_finance::Component& financeComponent,
+    const labor_supplier::Component& laborSupplier,
+    const goods_demander::Component& goodsDemander
+) {
+    const double wage{laborSupplier.wage()};
+    const double purchase{goodsDemander.purchase()};
+    financeComponent.assetPlus(wage - purchase);
 }
 
 void reset(
