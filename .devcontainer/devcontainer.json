@@ -26,5 +26,10 @@
         "CC": "/usr/bin/gcc-14",
         "CXX": "/usr/bin/g++-14"
     },
-    "remoteUser": "vscode"
+    "remoteUser": "vscode",
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined"
+    ]
 }

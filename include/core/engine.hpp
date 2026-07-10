@@ -53,8 +53,7 @@ class Engine {
   public:
     explicit Engine(const int totalStep, const std::string& filename);
 
-    void   run();
-    Logger logger;
+    void run();
 
   private:
     void runLabor();
@@ -63,6 +62,7 @@ class Engine {
     void logging();
     void reset();
 
+    Logger logger;
     // entt::registry     registry_;
     std::vector<Firm>  firms_;
     std::vector<HHold> hholds_;

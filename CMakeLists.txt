@@ -44,3 +44,15 @@ target_compile_options(EconomicSimulator PRIVATE
     -Wunreachable-code# 実行されることのないデッドコードを禁止
     -Wimplicit-fallthrough # switch文のbreak忘れを禁止
 )
+
+# ターゲット（EconomicSimulator）に対して確実にサニタイザを紐付ける
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(EconomicSimulator PRIVATE 
+        -fsanitize=address 
+        -fsanitize=undefined
+    )
+    target_link_options(EconomicSimulator PRIVATE 
+        -fsanitize=address 
+        -fsanitize=undefined
+    )
+endif()
