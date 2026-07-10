@@ -3,6 +3,7 @@
 #include "strategies/labor_demander.hpp"
 #include "strategies/labor_supplier.hpp"
 
+// TODO 各エージェントについて資産を追加する処理を追加。
 namespace labor_demander {
 void reset(Component& comp) {
     comp.log_ = {
