@@ -9,7 +9,6 @@
 #include <random>
 #include <ranges>
 
-#include "config/contract.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
@@ -43,7 +42,7 @@ void performRationedTrade(
 
     double remainAmount{supply};
     for (const std::size_t i : consumerIdxs) {
-        auto&        request = ACCESS(requestBox, i);
+        auto&        request = requestBox[i];
         const double requestAmount{request.amount_};
         if (remainAmount <= requestAmount) {
             request.tradeAmount_ = remainAmount;

@@ -5,7 +5,6 @@
 #include <cstddef>
 
 #include "components/labor_supplier.hpp"
-#include "config/contract.hpp"
 #include "core/forward.hpp"
 
 namespace labor_supplier {
@@ -42,7 +41,7 @@ struct AcceptOfferView {
 
     [[nodiscard]] auto getMyEntry(const std::size_t idx)
         -> std::pair<const world::LaborRequest&, const world::LaborEntry&> {
-        auto& [request, myEntry]{ACCESS(comp_.posting_.myEntries_, idx)};
+        auto& [request, myEntry] = comp_.posting_.myEntries_[idx];
         return {*request, *myEntry};
     }
 

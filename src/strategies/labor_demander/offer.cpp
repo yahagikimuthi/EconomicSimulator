@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <numeric>
 
-#include "config/contract.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
@@ -25,7 +24,7 @@ void sortApplicants(
         sortApplicantIdxs,
         sortApplicantIdxs.begin() + static_cast<int>(k),
         std::ranges::greater{},
-        [&entryBox](const std::size_t idx) -> double { return ACCESS(entryBox, idx).productPower_; }
+        [&entryBox](const std::size_t idx) -> double { return entryBox[idx].productPower_; }
     );
 }
 }  // namespace
@@ -40,8 +39,8 @@ void offerApplicants(OfferApplicantsView view) {
     int offerNum{};
     for (const std::size_t i : sortApplicantIdxs) {
         if (offerNum >= employ) break;
-        ACCESS(myRequest.entryBox_, i).isOffer_ = true;
-        view.recordOffer(ACCESS(myRequest.entryBox_, i));
+        myRequest.entryBox_[i].isOffer_ = true;
+        view.recordOffer(myRequest.entryBox_[i]);
         ++offerNum;
     }
 }

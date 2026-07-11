@@ -24,8 +24,7 @@ void pickSample(
     sampleRequests.clear();
 
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
-        for (std::size_t i{}; i < k; ++i)
-            ACCESS(sampleRequests, i) = std::ref(ACCESS(requestBox, i));
+        for (std::size_t i{}; i < k; ++i) sampleRequests[i] = std::ref(requestBox[i]);
         return;
     }
 
@@ -65,9 +64,8 @@ void jobEntry(
     const double productPower{view.productPower()};
 
     for (std::size_t i{}; i < static_cast<std::size_t>(entryCnt); ++i) {
-        auto  requestRef = ACCESS(sampleRequests, i);
-        auto& request    = requestRef.get();
-        auto& entryBox   = request.entryBox_;
+        auto& request  = sampleRequests[i].get();
+        auto& entryBox = request.entryBox_;
         view.entry(request, entryBox.emplace_back(id, productPower));
     }
 }

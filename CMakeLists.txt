@@ -43,6 +43,7 @@ target_compile_options(EconomicSimulator PRIVATE
     -Wpedantic        # ISO C++規格に違反したコードを禁止
     -Wunreachable-code# 実行されることのないデッドコードを禁止
     -Wimplicit-fallthrough # switch文のbreak忘れを禁止
+    -D_GLIBCXX_DEBUG #operator[]の境界チェック
 )
 
 # ターゲット（EconomicSimulator）に対して確実にサニタイザを紐付ける
