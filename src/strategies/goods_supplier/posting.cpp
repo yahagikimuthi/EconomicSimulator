@@ -88,13 +88,10 @@ namespace {
     const CalcAvgCostView view, const double totalCost, const double employeeCnt
 ) -> double {
     assert(totalCost >= 0.0 && "total cost is required > 0");
-    const double avgWage{(employeeCnt != 0.0) ? totalCost / employeeCnt : 0.0};
-    const double avgProductivity{
-        (employeeCnt != 0.0)
-            ? view.sumEmployeeProductPower() * view.firmProductPower() / employeeCnt
-            : view.firmProductPower()
-    };
-    const double avgCost{(avgProductivity != 0.0) ? avgWage / avgProductivity : 0.0};
+    if (employeeCnt == 0.0) return 0.0;
+
+    const double sumProductPower{view.sumEmployeeProductPower() * view.firmProductPower()};
+    const double avgCost{totalCost / sumProductPower};
     assert(avgCost >= 0.0 && "average cost is required >= 0");
     return avgCost;
 }
