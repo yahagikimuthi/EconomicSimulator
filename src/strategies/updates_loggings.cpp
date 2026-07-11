@@ -59,7 +59,7 @@ namespace goods_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
     dropBox.prices_.emplace_back(comp.plan_.price_);
     dropBox.supplies_.emplace_back(comp.plan_.supply_);
-    dropBox.markups_.emplace_back(comp.plan_.supply_);
+    dropBox.markups_.emplace_back(comp.plan_.markup_);
     dropBox.inventory_.emplace_back(comp.production_.inventory_);
 }
 void reset(Component& comp) {
@@ -69,7 +69,7 @@ void reset(Component& comp) {
         .supply_ = comp.plan_.supply_,
         .sales_  = comp.salesLedger.currentSales,
         .isSold_ = (comp.salesLedger.currentSales != 0.0)
-                       ? (comp.plan_.supply_ * comp.plan_.price_ / comp.salesLedger.currentSales <
+                       ? (comp.salesLedger.inventory_ / comp.plan_.supply_ <
                           comp.parameter_.targetInventoryRatio_)
                        : false
     };
