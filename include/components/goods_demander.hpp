@@ -6,7 +6,7 @@
 
 namespace goods_demander {
 struct Posting {
-    using GoodsMarketCoordinate = std::tuple<const world::GoodsEntry*, world::GoodsRequest*>;
+    using GoodsMarketCoordinate = std::pair<const world::GoodsEntry*, world::GoodsRequest*>;
     GoodsMarketCoordinate myRequest_{nullptr, nullptr};
     bool                  isPosting_{false};
 };
@@ -23,7 +23,7 @@ struct Component {
     Parameter  parameter_;
 
     Component();
-    [[nodiscard]] auto purchase() const -> double {return purchasing_.purchase_;}
+    [[nodiscard]] auto purchase() const -> double { return purchasing_.purchase_; }
 
   private:
     static inline int instanceCnt_{};
