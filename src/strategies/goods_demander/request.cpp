@@ -28,7 +28,7 @@ namespace {
 
     for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
         auto& sampleEntry{helper::discreteDistribution(entryBox, &world::GoodsEntry::supply_)};
-        if (betterEntry.get().price_ > sampleEntry.price_) continue;
+        if (betterEntry.get().price_ <= sampleEntry.price_) continue;
         betterEntry = std::ref(sampleEntry);
     }
     return betterEntry.get();
