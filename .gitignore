@@ -1,0 +1,8 @@
+build/
+.VSCodeCounter/
+.vscode/
+.clang-format
+compile_flags.txt
+.clangd
+compile_commands.json
+*.h5
