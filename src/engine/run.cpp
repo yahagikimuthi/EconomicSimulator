@@ -27,7 +27,9 @@ void Engine::run() {
 
 void Engine::runLabor() {
     for (Firm& firm : firms_) {
-        orchestrator::postLaborRequest(firm.index, firm.goods, firm.labor, laborRequestBox_);
+        orchestrator::postLaborRequest(
+            firm.index, firm.finance, firm.goods, firm.labor, laborRequestBox_
+        );
     }
 
     for (HHold& hhold : hholds_) {

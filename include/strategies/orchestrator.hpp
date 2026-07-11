@@ -7,6 +7,7 @@
 namespace orchestrator {
 void postLaborRequest(
     const agent_index::Component&                indexComp,
+    const firm_finance::Component&               financeComp,
     const goods_supplier::Component&             goodsSupplier,
     labor_demander::Component&                   laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
