@@ -16,6 +16,7 @@ struct PostJobView {
     void myRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
         comp_.posting_.myRequest_ = &(*it);
     }
+    void posting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 
   private:
     Component& comp_;
@@ -38,6 +39,9 @@ struct OfferApplicantsView {
     [[nodiscard]] auto myRequest() const -> world::LaborRequest& {
         return *comp_.posting_.myRequest_;
     }
+    [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
+
+    void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 
     void recordOffer(world::LaborEntry& entry) {
         comp_.posting_.offerApplicants_.emplace_back(entry);
@@ -59,6 +63,7 @@ struct RegisterMemberView {
         -> std::vector<std::reference_wrapper<world::LaborEntry>>& {
         return comp_.posting_.offerApplicants_;
     }
+    [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
 
     [[nodiscard]] auto targetEmploy() const -> int { return comp_.plan_.employ_; }
 

@@ -30,8 +30,14 @@ void sortApplicants(
 }  // namespace
 
 void offerApplicants(OfferApplicantsView view) {
+    if (not view.isPosting()) return;
+    auto& myRequest = view.myRequest();
+    if (myRequest.entryBox_.empty()) {
+        view.isPosting(false);
+        return;
+    }
+
     const int employ{view.employPlan()};
-    auto&     myRequest = view.myRequest();
 
     static thread_local std::vector<std::size_t> sortApplicantIdxs;
     sortApplicants(employ, sortApplicantIdxs, myRequest.entryBox_);

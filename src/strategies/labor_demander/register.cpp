@@ -4,6 +4,7 @@
 
 namespace labor_demander {
 [[nodiscard]] auto registerMember(RegisterMemberView view) -> double {
+    if (not view.isPosting()) return 0.0;
     const auto myRequest = view.myRequest();
 
     double sumProductPower{};

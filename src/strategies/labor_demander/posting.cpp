@@ -74,6 +74,11 @@ void postJob(
     const double nextWage{calcNextWage(CalcNextWageView{view})};
     const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, isSold)};
     view.plan(nextWage, nextEmploy);
+    if (nextEmploy > 0) {
+        view.posting(false);
+        return;
+    }
+    view.posting(true);
     view.myRequest(requestBox.emplace_back(id, nextWage));
 }
 }  // namespace labor_demander
