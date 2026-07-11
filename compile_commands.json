@@ -1,0 +1,77 @@
+[
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/components.cpp.o -c /workspaces/Simulator_cpp/src/components.cpp",
+  "file": "/workspaces/Simulator_cpp/src/components.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/engine/initialize.cpp.o -c /workspaces/Simulator_cpp/src/engine/initialize.cpp",
+  "file": "/workspaces/Simulator_cpp/src/engine/initialize.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/engine/run.cpp.o -c /workspaces/Simulator_cpp/src/engine/run.cpp",
+  "file": "/workspaces/Simulator_cpp/src/engine/run.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/main.cpp.o -c /workspaces/Simulator_cpp/src/main.cpp",
+  "file": "/workspaces/Simulator_cpp/src/main.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/goods_demander/afterTrade.cpp.o -c /workspaces/Simulator_cpp/src/strategies/goods_demander/afterTrade.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/goods_demander/afterTrade.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/goods_demander/request.cpp.o -c /workspaces/Simulator_cpp/src/strategies/goods_demander/request.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/goods_demander/request.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/goods_supplier/posting.cpp.o -c /workspaces/Simulator_cpp/src/strategies/goods_supplier/posting.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/goods_supplier/posting.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/goods_supplier/trade.cpp.o -c /workspaces/Simulator_cpp/src/strategies/goods_supplier/trade.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/goods_supplier/trade.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/labor_demander/offer.cpp.o -c /workspaces/Simulator_cpp/src/strategies/labor_demander/offer.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/labor_demander/offer.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/labor_demander/posting.cpp.o -c /workspaces/Simulator_cpp/src/strategies/labor_demander/posting.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/labor_demander/posting.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/labor_demander/register.cpp.o -c /workspaces/Simulator_cpp/src/strategies/labor_demander/register.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/labor_demander/register.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/labor_supplier/accept.cpp.o -c /workspaces/Simulator_cpp/src/strategies/labor_supplier/accept.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/labor_supplier/accept.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/labor_supplier/entry.cpp.o -c /workspaces/Simulator_cpp/src/strategies/labor_supplier/entry.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/labor_supplier/entry.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/orchestrator.cpp.o -c /workspaces/Simulator_cpp/src/strategies/orchestrator.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/orchestrator.cpp"
+},
+{
+  "directory": "/workspaces/Simulator_cpp/build",
+  "command": "/usr/bin/g++ -DH5_BUILT_AS_STATIC_LIB -DHIGHFIVE_HAS_NO_EXCEPTIONS -DTBB_USE_DEBUG -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE -D_LARGEFILE_SOURCE -D_POSIX_C_SOURCE=200809L -isystem /workspaces/Simulator_cpp/include -isystem /usr/local/vcpkg/installed/x64-linux/include -g -O0 -g -Wall -Werror -Wextra -Wshadow -Wconversion -Wsign-conversion -Wpedantic -Wunreachable-code -Wimplicit-fallthrough -fsanitize=address -fsanitize=undefined -std=c++23 -o CMakeFiles/EconomicSimulator.dir/src/strategies/updates_loggings.cpp.o -c /workspaces/Simulator_cpp/src/strategies/updates_loggings.cpp",
+  "file": "/workspaces/Simulator_cpp/src/strategies/updates_loggings.cpp"
+}
+]
