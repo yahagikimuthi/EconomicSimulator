@@ -26,6 +26,7 @@ struct PostJobView {
 
 void postJob(
     const int                                    id,
+    const double                                 asset,
     const bool                                   isSold,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view

@@ -51,21 +51,25 @@ namespace {
     return std::max(epsilonWage, nextWage);
 }
 
-[[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int {
+[[nodiscard]] auto calcNextEmploy(
+    const CalcNextEmployView view, const double wage, const double asset, const bool isSold
+) -> int {
     const double diff{std::abs(helper::randNormal(0.0, view.employAdjustVol()))};
-    const double nextEmploy{view.lastTargetEmploy() + (isSold ? -diff : diff)};
-    const int    out{static_cast<int>(std::round(nextEmploy))};
+    const double employ{view.lastTargetEmploy() + (isSold ? diff : -diff)};
+    const double guardedEmploy{std::min(asset / wage, employ)};
+    const int    out{static_cast<int>(std::round(guardedEmploy))};
     return std::max(1, out);
 }
 }  // namespace
 void postJob(
     const int                                    id,
+    const double                                 asset,
     const bool                                   isSold,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view
 ) {
     const double nextWage{calcNextWage(CalcNextWageView{view})};
-    const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, isSold)};
+    const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, nextWage, asset, isSold)};
     view.plan(nextWage, nextEmploy);
     if (nextEmploy == 0) {
         view.posting(false);
