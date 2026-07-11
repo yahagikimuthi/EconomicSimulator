@@ -67,8 +67,8 @@ void trade(TradeView view) {
     auto& myEntry    = view.myEntry();
     auto& requestBox = myEntry.requestBox_;
 
-    assert(myEntry.price_ == view.price() && "price is different");
-    assert(myEntry.supply_ <= view.inventory());
+    assert(myEntry.price_ > view.price() && "price is different");
+    assert(myEntry.supply_ > view.inventory());
 
     const double totalDemand{calcTotalDemand(requestBox)};
     const bool   isExcessDemand{totalDemand >= view.inventory()};
@@ -76,6 +76,6 @@ void trade(TradeView view) {
     isExcessDemand ? performRationedTrade(view.inventory(), requestBox)
                    : performFullTrade(requestBox);
     view.inventoryMinus(salesAmount);
-    view.salesPlus(salesAmount + view.price());
+    view.salesPlus(salesAmount * view.price());
 }
 }  // namespace goods_supplier
