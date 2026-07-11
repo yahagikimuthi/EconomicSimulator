@@ -60,16 +60,22 @@ struct CalcAvgCostView {
 };
 
 namespace {
-[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
-    const double out{(view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory()};
-    assert(out >= 0.0 && "supply amount is required >= 0");
-    return out;
-}
-
 [[nodiscard]] auto markupGuard(
     const double markup, const double epsilon = config::goods_supplier::epsilonMarkup
 ) -> double {
     return std::max(markup, epsilon);
+}
+
+[[nodiscard]] auto priceGuard(
+    const double price, const double epsilon = config::goods_supplier::epsilonPrice
+) -> double {
+    return std::max(price, epsilon);
+}
+
+[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
+    const double out{(view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory()};
+    assert(out >= 0.0 && "supply amount is required >= 0");
+    return out;
 }
 
 [[nodiscard]] auto calcMarkup(const CalcMarkupView view) -> double {
@@ -91,12 +97,6 @@ namespace {
     const double avgCost{(avgProductivity != 0.0) ? avgWage / avgProductivity : 0.0};
     assert(avgCost >= 0.0 && "average cost is required >= 0");
     return avgCost;
-}
-
-[[nodiscard]] auto priceGuard(
-    const double price, const double epsilon = config::goods_supplier::epsilonPrice
-) -> double {
-    return std::max(price, epsilon);
 }
 
 [[nodiscard]] auto judgePrice(
