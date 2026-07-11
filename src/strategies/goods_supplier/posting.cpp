@@ -47,8 +47,8 @@ namespace {
 [[nodiscard]] auto calcMarkup(
     const CalcMarkupView view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
 ) -> double {
-    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol(), -1.0, 1.0))};
-    const double nextMarkup{view.lastMarkup() * (view.isSold() ? 1.0 + alpha : 1.0 - alpha)};
+    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol()))};
+    const double nextMarkup{view.lastMarkup() + (view.isSold() ? alpha : -alpha)};
     return std::max(epsilonMarkup, nextMarkup);
 }
 
