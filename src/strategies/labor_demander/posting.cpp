@@ -31,7 +31,7 @@ struct CalcNextEmployView {
     [[nodiscard]] auto employAdjustVol() const -> double {
         return comp_.parameter_.employAdjustmentVolatility_;
     }
-    [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
+    [[nodiscard]] auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }
 
   private:
     Component& comp_;
@@ -53,7 +53,7 @@ namespace {
 
 [[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int {
     const double diff{std::abs(helper::randNormal(0.0, view.employAdjustVol()))};
-    const double employ{view.lastTargetEmploy() + (isSold ? diff : -diff)};
+    const double employ{view.lastEmploy() + (isSold ? diff : -diff)};
     const int    out{static_cast<int>(std::round(employ))};
     return std::max(1, out);
 }
