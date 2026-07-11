@@ -56,7 +56,7 @@ namespace {
     const double epsilonPrice = config::goods_supplier::epsilonPrice
 ) -> double {
     assert(markup > 0.0 && "markup is required > 0");
-    assert(totalCost > 0.0 && "total cost is required > 0");
+    assert(totalCost >= 0.0 && "total cost is required > 0");
     const double price{totalCost * markup};
     return std::max(epsilonPrice, price);
 }
