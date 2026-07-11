@@ -63,6 +63,7 @@ void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
 }  // namespace
 
 void trade(TradeView view) {
+    if (not view.isPosting()) return;
     auto& myEntry    = view.myEntry();
     auto& requestBox = myEntry.requestBox_;
 

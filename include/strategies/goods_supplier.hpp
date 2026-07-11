@@ -31,6 +31,8 @@ struct PostGoodsView {
     [[nodiscard]] auto lastMarkup() const -> double { return comp_.log_.markup_; }
     [[nodiscard]] auto isSold() const -> bool { return comp_.log_.isSold_; }
 
+    void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
+
   private:
     Component& comp_;
     friend struct CalcSupplyView;
@@ -54,6 +56,8 @@ struct TradeView {
     }
     [[nodiscard]] auto inventory() const -> double { return comp_.salesLedger.inventory_; }
     [[nodiscard]] auto price() const -> double { return comp_.plan_.price_; }
+
+    [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
 
   private:
     Component& comp_;

@@ -39,7 +39,9 @@ struct CalcMarkupView {
 
 namespace {
 [[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
-    return (view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory();
+    const double out{(view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory()};
+    assert(out >= 0.0 && "supply amount is required >= 0");
+    return out;
 }
 
 [[nodiscard]] auto calcMarkup(
@@ -66,6 +68,11 @@ void postGoods(
     PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double supply{calcSupply(CalcSupplyView{view})};
+    if (supply == 0.0) {
+        view.isPosting(false);
+        return;
+    }
+    view.isPosting(true);
     const double markup{calcMarkup(CalcMarkupView{view})};
     const double price{judgePrice(markup, totalCost)};
     view.myEntry(entryBox.emplace_back(price, supply));
