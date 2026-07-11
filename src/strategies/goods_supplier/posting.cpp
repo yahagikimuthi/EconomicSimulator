@@ -37,6 +37,20 @@ struct CalcMarkupView {
     Component& comp_;
 };
 
+struct JudgePriceView {
+    JudgePriceView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+
+    [[nodiscard]] auto firmProductPower() const -> double {
+        return comp_.production_.firmProductPower_;
+    }
+    [[nodiscard]] auto sumEmployeeProductPower() const -> double {
+        return comp_.production_.sumEmployeeProductPower_;
+    }
+
+  private:
+    Component& comp_;
+};
+
 namespace {
 [[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
     const double out{(view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory()};
@@ -53,23 +67,35 @@ namespace {
 }
 
 [[nodiscard]] auto judgePrice(
-    const double markup,
-    const double totalCost,
-    const double epsilonPrice = config::goods_supplier::epsilonPrice
+    const JudgePriceView view,
+    const double         markup,
+    const double         totalCost,
+    const double         employeeCnt,
+    const double         epsilonPrice = config::goods_supplier::epsilonPrice
 ) -> double {
     assert(markup > 0.0 && "markup is required > 0");
     assert(totalCost >= 0.0 && "total cost is required > 0");
-    const double price{totalCost * markup};
+    const double avgWage{(employeeCnt != 0.0) ? totalCost / employeeCnt : 0.0};
+    const double avgProductivity{
+        (employeeCnt != 0.0)
+            ? view.sumEmployeeProductPower() * view.firmProductPower() / employeeCnt
+            : view.firmProductPower()
+    };
+    const double avgCost{(avgProductivity != 0.0) ? avgWage / avgProductivity : 0.0};
+    const double price{avgCost * (1.0 + markup)};
     return std::max(epsilonPrice, price);
 }
 }  // namespace
 
 void postGoods(
-    PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    PostGoodsView                              view,
+    const double                               totalCost,
+    const double                               employeeCnt,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double supply{calcSupply(CalcSupplyView{view})};
     const double markup{calcMarkup(CalcMarkupView{view})};
-    const double price{judgePrice(markup, totalCost)};
+    const double price{judgePrice(JudgePriceView{view}, markup, totalCost, employeeCnt)};
     view.plan(price, supply, markup);
 
     // markupやprice自体は供給量0でも計算対象

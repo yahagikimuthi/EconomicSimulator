@@ -37,10 +37,14 @@ struct PostGoodsView {
     Component& comp_;
     friend struct CalcSupplyView;
     friend struct CalcMarkupView;
+    friend struct JudgePriceView;
 };
 
 void postGoods(
-    PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    PostGoodsView                              view,
+    const double                               totalCost,
+    const double                               employeeCnt,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox
 );
 
 struct TradeView {

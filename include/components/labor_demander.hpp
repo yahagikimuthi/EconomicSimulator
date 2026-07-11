@@ -42,5 +42,6 @@ struct Component {
     Component();
 
     [[nodiscard]] auto sumWage() const -> double { return employmentLedger.sumWage_; }
+    [[nodiscard]] auto employeeCnt() const -> int { return employmentLedger.employing_; }
 };
 }  // namespace labor_demander
