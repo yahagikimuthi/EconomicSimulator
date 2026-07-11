@@ -54,8 +54,8 @@ namespace {
 }
 
 [[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int {
-    const int employeeCnt{view.employeeCnt()};
-    assert(employeeCnt >= 1 && "employee count is required >= 1");
+    const int employeeCnt{std::max(1, view.employeeCnt())};
+
     const double alpha{
         std::abs(helper::randNormal(0.0, view.employAdjustVol(), -1.0, 1.0)) /
         std::sqrt(employeeCnt)

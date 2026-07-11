@@ -33,8 +33,8 @@ void createHHold(const int id, entt::registry& registry) {
 }  // namespace
 */
 Engine::Engine(const int totalStep, const std::string& filename)
-    : logger{filename}, totalStep_{totalStep} {
-    if (not logger.isValid()) {
+    : logger_{filename}, totalStep_{totalStep} {
+    if (not logger_.isValid()) {
         assert(false && "can not create file");
     }
 
