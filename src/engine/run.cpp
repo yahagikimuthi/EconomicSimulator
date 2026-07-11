@@ -1,23 +1,28 @@
 #include "core/engine.hpp"
 
-#include <strategies/common.hpp>
-#include <strategies/goods_demander.hpp>
-#include <strategies/goods_supplier.hpp>
-#include <strategies/labor_demander.hpp>
-#include <strategies/labor_supplier.hpp>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <ranges>
 #include <string>
 
 #include "config.hpp"
+#include "strategies/common.hpp"
+#include "strategies/goods_demander.hpp"
+#include "strategies/goods_supplier.hpp"
+#include "strategies/labor_demander.hpp"
+#include "strategies/labor_supplier.hpp"
 #include "strategies/orchestrator.hpp"
 #include "world/message.hpp"
 
 namespace core {
 void Engine::run() {
-    runLabor();
-    runGoods();
-    update();
-    logging();
-    reset();
+    for (const auto _ : std::views::iota(0, totalStep_)) {
+        runLabor();
+        runGoods();
+        update();
+        logging();
+        reset();
+    }
 }
 
 void Engine::runLabor() {
@@ -80,6 +85,7 @@ void Engine::logging() {
         hhold_finance::logging(dropBox_, hhold.finance);
         labor_supplier::logging(dropBox_, hhold.labor);
     }
+    logger_.save(dropBox_, config::currentStep);
 }
 
 void Engine::reset() {

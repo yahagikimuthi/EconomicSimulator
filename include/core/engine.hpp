@@ -62,7 +62,7 @@ class Engine {
     void logging();
     void reset();
 
-    Logger logger;
+    Logger logger_;
     // entt::registry     registry_;
     std::vector<Firm>  firms_;
     std::vector<HHold> hholds_;

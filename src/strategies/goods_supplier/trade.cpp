@@ -18,7 +18,7 @@ namespace {
     const double demand{std::ranges::fold_left(
         requestBox | std::ranges::views::transform(&world::GoodsRequest::amount_),
         0.0,
-        std::plus<>()
+        std::plus<>{}
     )};
     assert(demand >= 0.0 && "total demand is required >= 0");
     return demand;
@@ -67,10 +67,11 @@ void trade(TradeView view) {
     auto& myEntry    = view.myEntry();
     auto& requestBox = myEntry.requestBox_;
 
-    assert(myEntry.price_ > view.price() && "price is different");
-    assert(myEntry.supply_ > view.inventory());
+    assert(myEntry.price_ == view.price() && "price is different");
+    assert(myEntry.supply_ == view.inventory());
 
     const double totalDemand{calcTotalDemand(requestBox)};
+    if (totalDemand == 0.0) return;
     const bool   isExcessDemand{totalDemand >= view.inventory()};
     const double salesAmount{std::min(view.inventory(), totalDemand)};
     isExcessDemand ? performRationedTrade(view.inventory(), requestBox)
