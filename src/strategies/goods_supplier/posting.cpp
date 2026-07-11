@@ -38,7 +38,7 @@ struct CalcMarkupView {
 };
 
 struct JudgePriceView {
-    JudgePriceView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+    explicit JudgePriceView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
 
   private:
     Component& comp_;
@@ -46,7 +46,7 @@ struct JudgePriceView {
 };
 
 struct CalcAvgCostView {
-    CalcAvgCostView(const JudgePriceView& parentView) : comp_{parentView.comp_} {}
+    explicit CalcAvgCostView(const JudgePriceView& parentView) : comp_{parentView.comp_} {}
 
     [[nodiscard]] auto firmProductPower() const -> double {
         return comp_.production_.firmProductPower_;
