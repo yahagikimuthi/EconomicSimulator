@@ -7,6 +7,7 @@
 #include <functional>
 #include <iterator>
 #include <random>
+#include <ranges>
 
 #include "config.hpp"
 #include "helper.hpp"
@@ -24,7 +25,7 @@ void pickSample(
     sampleRequests.clear();
 
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
-        for (std::size_t i{}; i < k; ++i) sampleRequests[i] = std::ref(requestBox[i]);
+        for (const auto i : std::views::iota(0UZ, k)) sampleRequests[i] = std::ref(requestBox[i]);
         return;
     }
 
@@ -63,7 +64,7 @@ void jobEntry(
 
     const double productPower{view.productPower()};
 
-    for (std::size_t i{}; i < static_cast<std::size_t>(entryCnt); ++i) {
+    for (const auto i : std::views::iota(0UZ, static_cast<std::size_t>(entryCnt))) {
         auto& request  = sampleRequests[i].get();
         auto& entryBox = request.entryBox_;
         view.entry(request, entryBox.emplace_back(id, productPower));

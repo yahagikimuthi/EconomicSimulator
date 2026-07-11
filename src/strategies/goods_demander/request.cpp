@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <functional>
+#include <ranges>
 
 #include "config.hpp"
 #include "helper.hpp"
@@ -25,7 +26,7 @@ namespace {
 
     if (sampleCnt <= 1) return betterEntry.get();
 
-    for (int _{}; _ < sampleCnt - 1; ++_) {
+    for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
         auto& sampleEntry{helper::discreteDistribution(entryBox, &world::GoodsEntry::supply_)};
         if (betterEntry.get().price_ > sampleEntry.price_) continue;
         betterEntry = std::ref(sampleEntry);

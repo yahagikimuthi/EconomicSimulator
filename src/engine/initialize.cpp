@@ -5,6 +5,7 @@
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
+#include <ranges>
 #include <string>
 
 #include "config.hpp"
@@ -38,10 +39,10 @@ Engine::Engine(const int totalStep, const std::string& filename)
     }
 
     firms_.reserve(config::agent_count::firm);
-    for (int i{}; i < config::agent_count::firm; ++i) firms_.emplace_back();
+    for (const auto _ : std::views::iota(0, config::agent_count::firm)) firms_.emplace_back();
 
     hholds_.reserve(config::agent_count::hhold);
-    for (int i{}; i < config::agent_count::hhold; ++i) hholds_.emplace_back();
+    for (const auto _ : std::views::iota(0, config::agent_count::hhold)) hholds_.emplace_back();
 }
 
 Logger::Logger(const std::string& filename)
