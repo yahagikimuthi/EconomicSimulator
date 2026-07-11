@@ -81,6 +81,7 @@ namespace {
 [[nodiscard]] auto calcAvgCost(
     const CalcAvgCostView view, const double totalCost, const double employeeCnt
 ) -> double {
+    assert(totalCost >= 0.0 && "total cost is required > 0");
     const double avgWage{(employeeCnt != 0.0) ? totalCost / employeeCnt : 0.0};
     const double avgProductivity{
         (employeeCnt != 0.0)
@@ -88,6 +89,7 @@ namespace {
             : view.firmProductPower()
     };
     const double avgCost{(avgProductivity != 0.0) ? avgWage / avgProductivity : 0.0};
+    assert(avgCost >= 0.0 && "average cost is required >= 0");
     return avgCost;
 }
 
@@ -101,7 +103,6 @@ namespace {
     const JudgePriceView view, const double markup, const double totalCost, const double employeeCnt
 ) -> double {
     assert(markup > 0.0 && "markup is required > 0");
-    assert(totalCost >= 0.0 && "total cost is required > 0");
     const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost, employeeCnt)};
     const double price{avgCost * (1.0 + markup)};
     return priceGuard(price);
