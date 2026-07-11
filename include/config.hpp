@@ -14,7 +14,7 @@ constexpr int jobEntryCnt{3};
 }  // namespace config::labor_supplier
 
 namespace config::goods_supplier {
-constexpr double epsilonMarkup{0.001};
+constexpr double epsilonMarkup{1e-12};
 constexpr double epsilonPrice{1e-12};
 }  // namespace config::goods_supplier
 
@@ -25,7 +25,7 @@ constexpr int goodsSampleCnt{5};
 
 namespace config::agent_count {
 constexpr int firm{10};
-constexpr int hhold{100};
+constexpr int hhold{200};
 }  // namespace config::agent_count
 
 namespace config {
