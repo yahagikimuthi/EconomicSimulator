@@ -20,7 +20,7 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
 namespace labor_demander {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
     dropBox.postedEmployments_.emplace_back(comp.plan_.employ_);
-    dropBox.employments_.emplace_back(comp.humanResources.employeeCnt);
+    dropBox.employments_.emplace_back(comp.employmentLedger.employing_);
 }
 void reset(Component& comp) {
     comp.log_ = {
