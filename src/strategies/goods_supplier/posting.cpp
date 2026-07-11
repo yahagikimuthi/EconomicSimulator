@@ -70,6 +70,7 @@ void postGoods(
     const double supply{calcSupply(CalcSupplyView{view})};
     const double markup{calcMarkup(CalcMarkupView{view})};
     const double price{judgePrice(markup, totalCost)};
+    view.plan(price, supply, markup);
 
     // markupやprice自体は供給量0でも計算対象
     if (supply == 0.0) {
@@ -78,6 +79,5 @@ void postGoods(
     }
     view.isPosting(true);
     view.myEntry(entryBox.emplace_back(price, supply));
-    view.plan(price, supply, markup);
 }
 }  // namespace goods_supplier

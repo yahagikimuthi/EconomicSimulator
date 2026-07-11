@@ -33,7 +33,7 @@ struct CalcNextEmployView {
     }
     [[nodiscard]] auto lastTargetEmploy() const -> double { return comp_.log_.targetEmploy_; }
 
-    [[nodiscard]] auto employeeCnt() const -> int { return comp_.log_.actualEmploy_; }
+    [[nodiscard]] auto employeeCnt() const -> double { return comp_.log_.targetEmploy_; }
 
   private:
     Component& comp_;
@@ -54,7 +54,7 @@ namespace {
 }
 
 [[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int {
-    const int employeeCnt{std::max(1, view.employeeCnt())};
+    const double employeeCnt{std::max(1.0, view.employeeCnt())};
 
     const double alpha{
         std::abs(helper::randNormal(0.0, view.employAdjustVol(), -1.0, 1.0)) /
