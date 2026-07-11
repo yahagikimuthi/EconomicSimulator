@@ -15,8 +15,6 @@ struct Component {
     double asset_;
     Component();
 
-    [[nodiscard]] auto asset() const -> double { return asset_; }
-
     void assetPlus(const double plus) { asset_ += plus; }
 };
 }  // namespace firm_finance
