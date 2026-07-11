@@ -62,9 +62,9 @@ struct RegisterMemberView {
 
     [[nodiscard]] auto targetEmploy() const -> int { return comp_.plan_.employ_; }
 
-    void setLog(const double wage, const int actualEmploy) {
+    void updateLedger(const double wage, const int actualEmploy) {
         auto& ledger = comp_.employmentLedger;
-        ledger.employing += actualEmploy, ledger.sumWage += wage * actualEmploy;
+        ledger.employing_ += actualEmploy, ledger.sumWage_ += wage * actualEmploy;
     }
 
   private:

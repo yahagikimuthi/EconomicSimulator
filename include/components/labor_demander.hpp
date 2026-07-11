@@ -19,8 +19,8 @@ struct HR {
     int    employeeCnt;
 };
 struct EmploymentLedger {
-    int    employing;
-    double sumWage;
+    int    employing_;
+    double sumWage_;
 };
 struct Parameter {
     const double wageAdjustmentVolatility_;
@@ -41,6 +41,6 @@ struct Component {
 
     Component();
 
-    [[nodiscard]] auto sumWage() const -> double { return humanResources.sumWage_; }
+    [[nodiscard]] auto sumWage() const -> double { return employmentLedger.sumWage_; }
 };
 }  // namespace labor_demander
