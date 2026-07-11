@@ -27,7 +27,7 @@ Component::Component()
 }  // namespace labor_demander
 
 namespace labor_supplier {
-Component::Component() : parameter_{.productPower_ = randNormal(1.0, 1.0 / 3.0, 0.0, 1.0)} {}
+Component::Component() : parameter_{.productPower_ = randNormal(1.0, 1.0 / 3.0, 0.0, 2.0)} {}
 }  // namespace labor_supplier
 
 namespace goods_demander {
