@@ -74,7 +74,7 @@ void postJob(
     const double nextWage{calcNextWage(CalcNextWageView{view})};
     const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, isSold)};
     view.plan(nextWage, nextEmploy);
-    if (nextEmploy > 0) {
+    if (nextEmploy == 0) {
         view.posting(false);
         return;
     }
