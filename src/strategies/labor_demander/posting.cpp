@@ -5,7 +5,7 @@
 #include <cmath>
 #include <components/labor_demander.hpp>
 
-#include "config/init_setup.hpp"
+#include "config.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 

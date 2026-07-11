@@ -3,8 +3,8 @@
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <cmath>
-#include <config/init_setup.hpp>
 
+#include "config.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 

@@ -4,8 +4,7 @@
 #include <tuple>
 
 #include "components/goods_demander.hpp"
-#include "config/init_setup.hpp"
-#include "config/sim_vars.hpp"
+#include "config.hpp"
 #include "core/forward.hpp"
 
 namespace goods_demander {

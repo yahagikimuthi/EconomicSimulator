@@ -2,7 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 
-#include "config/init_setup.hpp"
+#include "config.hpp"
 
 namespace world {
 

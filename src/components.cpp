@@ -3,7 +3,7 @@
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
-#include "config/init_setup.hpp"
+#include "config.hpp"
 #include "helper.hpp"
 
 using namespace helper;

@@ -7,7 +7,7 @@
 #include <highfive/H5PropertyList.hpp>
 #include <string>
 
-#include "config/init_setup.hpp"
+#include "config.hpp"
 
 namespace core {
 /*

@@ -7,7 +7,7 @@
 #include <strategies/labor_supplier.hpp>
 #include <string>
 
-#include "config/sim_vars.hpp"
+#include "config.hpp"
 #include "strategies/orchestrator.hpp"
 #include "world/message.hpp"
 

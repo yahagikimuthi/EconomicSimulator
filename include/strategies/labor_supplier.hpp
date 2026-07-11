@@ -1,10 +1,10 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <config/init_setup.hpp>
 #include <cstddef>
 
 #include "components/labor_supplier.hpp"
+#include "config.hpp"
 #include "core/forward.hpp"
 
 namespace labor_supplier {

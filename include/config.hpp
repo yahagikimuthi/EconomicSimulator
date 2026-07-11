@@ -27,3 +27,7 @@ namespace config::agent_count {
 constexpr int firm{10};
 constexpr int hhold{100};
 }  // namespace config::agent_count
+
+namespace config {
+static inline int currentStep{0};  // NOLINT
+}  // namespace config
