@@ -40,6 +40,14 @@ struct CalcMarkupView {
 struct JudgePriceView {
     JudgePriceView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
 
+  private:
+    Component& comp_;
+    friend struct CalcAvgCostView;
+};
+
+struct CalcAvgCostView {
+    CalcAvgCostView(const JudgePriceView& parentView) : comp_{parentView.comp_} {}
+
     [[nodiscard]] auto firmProductPower() const -> double {
         return comp_.production_.firmProductPower_;
     }
@@ -58,23 +66,21 @@ namespace {
     return out;
 }
 
-[[nodiscard]] auto calcMarkup(
-    const CalcMarkupView view, const double epsilonMarkup = config::goods_supplier::epsilonMarkup
+[[nodiscard]] auto markupGuard(
+    const double markup, const double epsilon = config::goods_supplier::epsilonMarkup
 ) -> double {
-    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol()))};
-    const double nextMarkup{view.lastMarkup() + (view.isSold() ? alpha : -alpha)};
-    return std::max(epsilonMarkup, nextMarkup);
+    return std::max(markup, epsilon);
 }
 
-[[nodiscard]] auto judgePrice(
-    const JudgePriceView view,
-    const double         markup,
-    const double         totalCost,
-    const double         employeeCnt,
-    const double         epsilonPrice = config::goods_supplier::epsilonPrice
+[[nodiscard]] auto calcMarkup(const CalcMarkupView view) -> double {
+    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol()))};
+    const double nextMarkup{view.lastMarkup() + (view.isSold() ? alpha : -alpha)};
+    return markupGuard(nextMarkup);
+}
+
+[[nodiscard]] auto calcAvgCost(
+    const CalcAvgCostView view, const double totalCost, const double employeeCnt
 ) -> double {
-    assert(markup > 0.0 && "markup is required > 0");
-    assert(totalCost >= 0.0 && "total cost is required > 0");
     const double avgWage{(employeeCnt != 0.0) ? totalCost / employeeCnt : 0.0};
     const double avgProductivity{
         (employeeCnt != 0.0)
@@ -82,8 +88,23 @@ namespace {
             : view.firmProductPower()
     };
     const double avgCost{(avgProductivity != 0.0) ? avgWage / avgProductivity : 0.0};
+    return avgCost;
+}
+
+[[nodiscard]] auto priceGuard(
+    const double price, const double epsilon = config::goods_supplier::epsilonPrice
+) -> double {
+    return std::max(price, epsilon);
+}
+
+[[nodiscard]] auto judgePrice(
+    const JudgePriceView view, const double markup, const double totalCost, const double employeeCnt
+) -> double {
+    assert(markup > 0.0 && "markup is required > 0");
+    assert(totalCost >= 0.0 && "total cost is required > 0");
+    const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost, employeeCnt)};
     const double price{avgCost * (1.0 + markup)};
-    return std::max(epsilonPrice, price);
+    return priceGuard(price);
 }
 }  // namespace
 
