@@ -7,8 +7,9 @@
 namespace labor_supplier {
 void acceptOffer(AcceptOfferView view) {
     for (const auto i : std::views::iota(0UZ, view.myEntryCnt())) {
-        auto [request, myEntry] = view.getMyEntry(i);
+        auto [request, myEntry] = view.myEntry(i);
         if (not myEntry.isOffer_) continue;
+        myEntry.isAccept_ = true;
         view.setContraction(request.firmID_, request.wage_);
         return;
     }

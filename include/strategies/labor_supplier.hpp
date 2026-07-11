@@ -39,8 +39,8 @@ struct AcceptOfferView {
         return comp_.posting_.myEntries_.size();
     }
 
-    [[nodiscard]] auto getMyEntry(const std::size_t idx)
-        -> std::pair<const world::LaborRequest&, const world::LaborEntry&> {
+    [[nodiscard]] auto myEntry(const std::size_t idx)
+        -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
         auto& [request, myEntry] = comp_.posting_.myEntries_[idx];
         return {*request, *myEntry};
     }
