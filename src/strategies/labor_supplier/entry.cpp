@@ -58,6 +58,7 @@ void jobEntry(
         view.isPosting(false);
         return;
     }
+    view.isPosting(true);
     static thread_local std::vector<std::reference_wrapper<world::LaborRequest>> sampleRequests;
     pickSample(requestBox, sampleRequests);
     sortSample(sampleRequests);

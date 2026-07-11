@@ -49,6 +49,8 @@ struct AcceptOfferView {
         comp_.contraction_.firmID_ = firmId, comp_.contraction_.wage_ = wage;
     }
 
+    [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
+
   private:
     Component& comp_;
 };
