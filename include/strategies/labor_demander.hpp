@@ -56,7 +56,7 @@ struct RegisterMemberView {
         return *comp_.posting_.myRequest_;
     }
     [[nodiscard]] auto offerApplicants() const
-        -> std::vector<std::reference_wrapper<world::LaborEntry>> {
+        -> std::vector<std::reference_wrapper<world::LaborEntry>>& {
         return comp_.posting_.offerApplicants_;
     }
 
