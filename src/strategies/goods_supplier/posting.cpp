@@ -68,13 +68,15 @@ void postGoods(
     PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double supply{calcSupply(CalcSupplyView{view})};
+    const double markup{calcMarkup(CalcMarkupView{view})};
+    const double price{judgePrice(markup, totalCost)};
+
+    // markupやprice自体は供給量0でも計算対象
     if (supply == 0.0) {
         view.isPosting(false);
         return;
     }
     view.isPosting(true);
-    const double markup{calcMarkup(CalcMarkupView{view})};
-    const double price{judgePrice(markup, totalCost)};
     view.myEntry(entryBox.emplace_back(price, supply));
     view.plan(price, supply, markup);
 }
