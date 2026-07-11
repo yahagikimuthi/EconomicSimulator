@@ -49,11 +49,10 @@ target_compile_options(EconomicSimulator PRIVATE
 # ターゲット（EconomicSimulator）に対して確実にサニタイザを紐付ける
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(EconomicSimulator PRIVATE 
-        -fsanitize=address 
-        -fsanitize=undefined
+        -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
+        -fno-omit-frame-pointer
     )
     target_link_options(EconomicSimulator PRIVATE 
-        -fsanitize=address 
-        -fsanitize=undefined
+        -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
     )
 endif()
