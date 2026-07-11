@@ -91,7 +91,7 @@ namespace {
     if (employeeCnt == 0.0) return 0.0;
 
     const double sumProductPower{view.sumEmployeeProductPower() * view.firmProductPower()};
-    const double avgCost{totalCost / sumProductPower};
+    const double avgCost{(sumProductPower != 0.0) ? totalCost / sumProductPower : 0.0};
     assert(avgCost >= 0.0 && "average cost is required >= 0");
     return avgCost;
 }
