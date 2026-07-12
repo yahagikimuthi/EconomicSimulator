@@ -5,25 +5,20 @@
 
 #include "components/labor_supplier.hpp"
 #include "config.hpp"
+#include "core/base.hpp"
 #include "core/forward.hpp"
 
 namespace labor_supplier {
-struct JobEntryView {
-    explicit JobEntryView(Component& comp) : comp_{comp} {}
-
+struct [[nodiscard]] JobEntryView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
-
     void entry(
         const world::LaborRequest&                                request,
         const tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
     ) {
         comp_.posting_.myEntries_.emplace_back(&request, &*entryIt);
     }
-
-    [[nodiscard]] auto productPower() const -> double { return comp_.parameter_.productPower_; }
-
-  private:
-    Component& comp_;
+    auto productPower() const -> double { return comp_.parameter_.productPower_; }
 };
 void jobEntry(
     JobEntryView                                 view,
@@ -32,27 +27,18 @@ void jobEntry(
     const int                                    entryCnt = config::labor_supplier::jobEntryCnt
 );
 
-struct AcceptOfferView {
-    explicit AcceptOfferView(Component& comp) : comp_{comp} {}
-
-    [[nodiscard]] auto myEntryCnt() const -> std::size_t {
-        return comp_.posting_.myEntries_.size();
-    }
-
-    [[nodiscard]] auto myEntry(const std::size_t idx)
+struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+    auto myEntryCnt() const -> std::size_t { return comp_.posting_.myEntries_.size(); }
+    auto myEntry(const std::size_t idx)
         -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
         auto& [request, myEntry] = comp_.posting_.myEntries_[idx];
         return {*request, *myEntry};
     }
-
-    [[nodiscard]] auto setContraction(const int firmId, const double wage) {
+    void setContraction(const int firmId, const double wage) {
         comp_.contraction_.firmID_ = firmId, comp_.contraction_.wage_ = wage;
     }
-
-    [[nodiscard]] auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
-
-  private:
-    Component& comp_;
+    auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
 };
 
 void acceptOffer(AcceptOfferView view);

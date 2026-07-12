@@ -5,58 +5,42 @@
 #include <cmath>
 
 #include "config.hpp"
+#include "core/base.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
-struct CalcSupplyView {
-    explicit CalcSupplyView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+struct CalcSupplyView final : BaseView<Component> {
+    explicit CalcSupplyView(PostGoodsView& parentView) : BaseView(parentView.comp_) {}
 
-    [[nodiscard]] auto firmProductPower() const -> double {
-        return comp_.production_.firmProductPower_;
-    }
-    [[nodiscard]] auto sumEmployeeProductPower() const -> double {
+    auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
+    auto sumEmployeeProductPower() const -> double {
         return comp_.production_.sumEmployeeProductPower_;
     }
-    [[nodiscard]] auto inventory() const -> double { return comp_.production_.inventory_; }
-
-  private:
-    const Component& comp_;
+    auto inventory() const -> double { return comp_.production_.inventory_; }
 };
 
-struct CalcMarkupView {
-    explicit CalcMarkupView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
+    explicit CalcMarkupView(PostGoodsView& parentView) : BaseView(parentView.comp_) {}
 
-    [[nodiscard]] auto markupAdjustVol() const -> double {
-        return comp_.parameter_.markupAdjustmentVolatility_;
-    }
-    [[nodiscard]] auto lastMarkup() const -> double { return comp_.log_.markup_; }
-    [[nodiscard]] auto isSold() const -> bool { return comp_.log_.isSold_; }
-
-  private:
-    Component& comp_;
+    auto markupAdjustVol() const -> double { return comp_.parameter_.markupAdjustmentVolatility_; }
+    auto lastMarkup() const -> double { return comp_.log_.markup_; }
+    auto isSold() const -> bool { return comp_.log_.isSold_; }
 };
 
-struct JudgePriceView {
-    explicit JudgePriceView(const PostGoodsView& parentView) : comp_{parentView.comp_} {}
+struct [[nodiscard]] JudgePriceView final : BaseView<Component> {
+    explicit JudgePriceView(PostGoodsView& parentView) : BaseView(parentView.comp_) {}
 
-  private:
-    Component& comp_;
     friend struct CalcAvgCostView;
 };
 
-struct CalcAvgCostView {
-    explicit CalcAvgCostView(const JudgePriceView& parentView) : comp_{parentView.comp_} {}
+struct [[nodiscard]] CalcAvgCostView final : BaseView<Component> {
+    explicit CalcAvgCostView(JudgePriceView& parentView) : BaseView(parentView.comp_) {}
 
-    [[nodiscard]] auto firmProductPower() const -> double {
-        return comp_.production_.firmProductPower_;
-    }
-    [[nodiscard]] auto sumEmployeeProductPower() const -> double {
+    auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
+    auto sumEmployeeProductPower() const -> double {
         return comp_.production_.sumEmployeeProductPower_;
     }
-
-  private:
-    Component& comp_;
 };
 
 namespace {
@@ -72,20 +56,20 @@ namespace {
     return std::max(price, epsilon);
 }
 
-[[nodiscard]] auto calcSupply(const CalcSupplyView view) -> double {
+[[nodiscard]] auto calcSupply(const CalcSupplyView& view) -> double {
     const double out{(view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory()};
     assert(out >= 0.0 && "supply amount is required >= 0");
     return out;
 }
 
-[[nodiscard]] auto calcMarkup(const CalcMarkupView view) -> double {
+[[nodiscard]] auto calcMarkup(const CalcMarkupView& view) -> double {
     const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol()))};
     const double nextMarkup{view.lastMarkup() + (view.isSold() ? alpha : -alpha)};
     return markupGuard(nextMarkup);
 }
 
 [[nodiscard]] auto calcAvgCost(
-    const CalcAvgCostView view, const double totalCost, const double employeeCnt
+    const CalcAvgCostView& view, const double totalCost, const double employeeCnt
 ) -> double {
     assert(totalCost >= 0.0 && "total cost is required > 0");
     if (employeeCnt == 0.0) return 0.0;
@@ -97,7 +81,7 @@ namespace {
 }
 
 [[nodiscard]] auto judgePrice(
-    const JudgePriceView view, const double markup, const double totalCost, const double employeeCnt
+    JudgePriceView view, const double markup, const double totalCost, const double employeeCnt
 ) -> double {
     assert(markup > 0.0 && "markup is required > 0");
     const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost, employeeCnt)};

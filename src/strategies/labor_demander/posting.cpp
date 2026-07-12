@@ -6,40 +6,31 @@
 #include <components/labor_demander.hpp>
 
 #include "config.hpp"
+#include "core/base.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
-struct CalcNextWageView {
-    explicit CalcNextWageView(const PostJobView& parentComp) : comp_{parentComp.comp_} {}
+struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
+    explicit CalcNextWageView(PostJobView& parentComp) : BaseView(parentComp.comp_) {}
 
-    [[nodiscard]] auto log() const -> std::tuple<double, double, double> {
+    auto log() const -> std::tuple<double, double, double> {
         const auto& log = comp_.log_;
         return {log.wage_, log.targetEmploy_, log.actualEmploy_};
     }
-    [[nodiscard]] auto wageAdjustVol() const -> double {
-        return comp_.parameter_.wageAdjustmentVolatility_;
-    }
-
-  private:
-    Component& comp_;
+    auto wageAdjustVol() const -> double { return comp_.parameter_.wageAdjustmentVolatility_; }
 };
 
-struct CalcNextEmployView {
-    explicit CalcNextEmployView(const PostJobView& parentComp_) : comp_{parentComp_.comp_} {}
+struct CalcNextEmployView final : BaseView<Component> {
+    explicit CalcNextEmployView(PostJobView& parentComp_) : BaseView(parentComp_.comp_) {}
 
-    [[nodiscard]] auto employAdjustVol() const -> double {
-        return comp_.parameter_.employAdjustmentVolatility_;
-    }
-    [[nodiscard]] auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }
-
-  private:
-    Component& comp_;
+    auto employAdjustVol() const -> double { return comp_.parameter_.employAdjustmentVolatility_; }
+    auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }
 };
 
 namespace {
 [[nodiscard]] auto calcNextWage(
-    const CalcNextWageView view, const double epsilonWage = config::labor_demander::epsilonWage
+    const CalcNextWageView& view, const double epsilonWage = config::labor_demander::epsilonWage
 ) -> double {
     const auto [lastWage, lastTargetEmploy, lastActualEmploy]{view.log()};
     assert(lastWage > 0.0 && "last wage is required > 0");
@@ -51,7 +42,7 @@ namespace {
     return std::max(epsilonWage, nextWage);
 }
 
-[[nodiscard]] auto calcNextEmploy(const CalcNextEmployView view, const bool isSold) -> int {
+[[nodiscard]] auto calcNextEmploy(const CalcNextEmployView& view, const bool isSold) -> int {
     const double diff{std::abs(helper::randNormal(0.0, view.employAdjustVol()))};
     const double employ{view.lastEmploy() + (isSold ? diff : -diff)};
     const int    out{static_cast<int>(std::round(employ))};
