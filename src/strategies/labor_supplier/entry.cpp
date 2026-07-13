@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
-#include <random>
 #include <ranges>
 
 #include "config.hpp"
@@ -18,8 +17,8 @@ namespace {
 void pickSample(
     tbb::concurrent_vector<world::LaborRequest>&              requestBox,
     std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
-    const int     sampleCnt = config::labor_supplier::jobSampleCnt,
-    std::mt19937& gen       = helper::gen
+    const int      sampleCnt = config::labor_supplier::jobSampleCnt,
+    helper::Pcg32& gen       = helper::gen
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     sampleRequests.clear();

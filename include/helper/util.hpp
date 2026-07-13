@@ -4,46 +4,49 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <functional>
 #include <limits>
 #include <random>
 
+#include "helper/random.hpp"
+
 namespace helper {
-inline static thread_local std::random_device rd;       // NOLINT
-inline static thread_local std::mt19937       gen{42};  // NOLINT
+inline static thread_local std::random_device rd;     // NOLINT
+inline static thread_local Pcg32              gen{};  // NOLINT
 
-[[nodiscard]] inline auto rand(
-    const double first = 0.0, const double last = 1.0, std::mt19937& genRef = gen
-) -> double {
-    assert(first <= last && "first is required lower than last");
-    std::uniform_real_distribution<double> dist{first, last};
-    return dist(genRef);
+[[nodiscard]] constexpr auto rand(Pcg32& genRef = gen) -> double {
+    return static_cast<double>(genRef.next()) / 4294967296.0;  // 2^32
 }
 
-[[nodiscard]] inline auto randInt(const int first, const int last, std::mt19937& genRef = gen) {
-    assert(first <= last && "first is required lower than last");
-    std::uniform_int_distribution<int> dist{first, last};
-    return dist(genRef);
+[[nodiscard]] constexpr auto rand(double min, double max) -> double {
+    assert(min <= max && "min is required lower than last");
+    return min + (rand() * (max - min));
 }
 
-[[nodiscard]] inline auto randNormal(
-    const double  mean   = 0.0,
-    const double  std    = 1.0,
-    const double  min    = -std::numeric_limits<double>::infinity(),
-    const double  max    = std::numeric_limits<double>::infinity(),
-    std::mt19937& genRef = gen
-) -> double {
+[[nodiscard]] constexpr auto randInt(const int min, const int max) -> int {
     assert(min <= max && "first is required lower than last");
-    assert(std > 0.0 && "std is required >= 0");
-    std::normal_distribution<double> dist{mean, std};
+    const double randomNumber{min + (rand() * (max - min))};
+    return static_cast<int>(std::floor(randomNumber));
+}
 
-    return std::clamp(dist(genRef), min, max);
+[[nodiscard]] constexpr auto randNormal(
+    const double mean   = 0.0,
+    const double stddev = 1.0,
+    const double min    = -std::numeric_limits<double>::infinity(),
+    const double max    = std::numeric_limits<double>::infinity()
+) -> double {
+    // u1 は (0, 1] にして log(0) を回避する
+    const double u1{1.0 - rand()};  // next_double() は [0,1) なので 1.0 から引いて (0,1] にする
+    const double u2{rand()};
+    const double z0{std::sqrt(-2.0 * std::log(u1)) * std::cos(2.0 * std::numbers::pi * u2)};
+    const double out{mean + (z0 * stddev)};
+    return std::clamp(out, min, max);
 }
 
 template <typename Container, typename Proj = std::identity>
-[[nodiscard]] inline auto discreteDistribution(
-    Container& container, Proj proj = {}, std::mt19937& genRef = gen
-) -> Container::value_type& {
+[[nodiscard]] inline auto discreteDistribution(Container& container, Proj proj = {})
+    -> Container::value_type& {
     double total{0.0};
     for (const auto& elem : container) {
         const double weight = std::invoke(proj, elem);
@@ -54,7 +57,7 @@ template <typename Container, typename Proj = std::identity>
 
     std::uniform_real_distribution<double> dist{0.0, total};
 
-    const double target = dist(genRef);
+    const double target{rand(0.0, total)};
     double       currentCnt{0.0};
     for (auto& elem : container) {
         currentCnt += std::invoke(proj, elem);

@@ -26,7 +26,6 @@ Component::Component()
     log_.actualEmploy_ = std::min(log_.actualEmploy_, log_.targetEmploy_);
 }
 }  // namespace labor_demander
-
 namespace labor_supplier {
 Component::Component() : parameter_{.productPower_ = randNormal(1.0, 1.0 / 3.0, 0.0, 2.0)} {}
 }  // namespace labor_supplier

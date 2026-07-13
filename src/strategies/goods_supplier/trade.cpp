@@ -5,7 +5,6 @@
 #include <cassert>
 #include <cstddef>
 #include <numeric>
-#include <random>
 #include <ranges>
 
 #include "helper/util.hpp"
@@ -27,7 +26,7 @@ namespace {
 void shuffleIdx(
     const std::size_t         resizeNum,
     std::vector<std::size_t>& shuffleVec,
-    std::mt19937&             gen = helper::gen
+    helper::Pcg32&            gen = helper::gen
 ) {
     shuffleVec.resize(resizeNum);
     std::ranges::iota(shuffleVec, 0UZ);
