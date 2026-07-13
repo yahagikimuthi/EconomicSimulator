@@ -1,8 +1,10 @@
 #include "strategies/orchestrator.hpp"
 
 #include <tbb/concurrent_vector.h>
+#include <components/goods_demander.hpp>
 #include <components/goods_supplier.hpp>
 #include <strategies/common.hpp>
+#include <world/message.hpp>
 
 #include "components/common.hpp"
 
@@ -11,7 +13,7 @@
 #include "strategies/labor_demander.hpp"
 #include "strategies/labor_supplier.hpp"
 
-namespace orchestrator {
+namespace orchestrator::labor {
 void postLaborRequest(
     const agent_index::Component&                indexComp,
     const goods_supplier::Component&             goodsSupplier,
@@ -49,6 +51,27 @@ void registerMember(
     goodsSupplier.setSumEmployeeProductPower(sumEmployeeProductPower);
 }
 
+void endStep(
+    firm_finance::Component&   financeComp,
+    labor_demander::Component& laborDemander,
+    world::CensusDropBox&      dropBox
+) {
+    financeComp.assetPlus(-laborDemander.sumWage());
+    labor_demander::logging(dropBox, laborDemander);
+    labor_demander::reset(laborDemander);
+}
+void endStep(
+    hhold_finance::Component&  financeComp,
+    labor_supplier::Component& laborSupplier,
+    world::CensusDropBox&      dropBox
+) {
+    financeComp.assetPlus(laborSupplier.wage());
+    labor_supplier::logging(dropBox, laborSupplier);
+    labor_supplier::reset(laborSupplier);
+}
+}  // namespace orchestrator::labor
+
+namespace orchestrator::goods {
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
     const labor_demander::Component&           laborDemander,
@@ -80,23 +103,17 @@ void afterTrade(goods_demander::Component& goodsDemander) {
     goods_demander::afterTrade(goods_demander::AfterTradeView{goodsDemander});
 }
 
-void updateAsset(
-    firm_finance::Component&         financeComponent,
-    const labor_demander::Component& laborDemander,
-    const goods_supplier::Component& goodsSupplier
+void endStep(
+    firm_finance::Component&   financeComp,
+    goods_supplier::Component& goodsSupplier,
+    world::CensusDropBox&      dropBox
 ) {
-    const double wage{laborDemander.sumWage()};
-    const double sales{goodsSupplier.sales()};
-    financeComponent.assetPlus(sales - wage);
+    financeComp.assetPlus(goodsSupplier.sales());
+    goods_supplier::logging(dropBox, goodsSupplier);
+    goods_supplier::reset(goodsSupplier);
 }
-
-void updateAsset(
-    hhold_finance::Component&        financeComponent,
-    const labor_supplier::Component& laborSupplier,
-    const goods_demander::Component& goodsDemander
-) {
-    const double wage{laborSupplier.wage()};
-    const double purchase{goodsDemander.purchase()};
-    financeComponent.assetPlus(wage - purchase);
+void endStep(hhold_finance::Component& financeComp, goods_demander::Component& goodsDemander) {
+    financeComp.assetPlus(-goodsDemander.purchase());
+    goods_demander::reset(goodsDemander);
 }
-}  // namespace orchestrator
+}  // namespace orchestrator::goods

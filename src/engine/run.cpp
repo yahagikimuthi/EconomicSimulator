@@ -7,10 +7,6 @@
 
 #include "config.hpp"
 #include "strategies/common.hpp"
-#include "strategies/goods_demander.hpp"
-#include "strategies/goods_supplier.hpp"
-#include "strategies/labor_demander.hpp"
-#include "strategies/labor_supplier.hpp"
 #include "strategies/orchestrator.hpp"
 #include "world/message.hpp"
 
@@ -19,58 +15,65 @@ void Engine::run() {
     for (const auto _ : std::views::iota(0, totalStep_)) {
         runLabor();
         runGoods();
-        update();
         logging();
         reset();
     }
 }
 
 void Engine::runLabor() {
+    using namespace orchestrator;
     for (Firm& firm : firms_) {
-        orchestrator::postLaborRequest(firm.index, firm.goods, firm.labor, laborRequestBox_);
+        labor::postLaborRequest(firm.index, firm.goods, firm.labor, laborRequestBox_);
     }
 
     for (HHold& hhold : hholds_) {
-        orchestrator::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
+        labor::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
     }
 
     for (Firm& firm : firms_) {
-        orchestrator::offer(firm.labor);
+        labor::offer(firm.labor);
     }
 
     for (HHold& hhold : hholds_) {
-        orchestrator::acceptOffer(hhold.labor);
+        labor::acceptOffer(hhold.labor);
     }
 
     for (Firm& firm : firms_) {
-        orchestrator::registerMember(firm.goods, firm.labor);
+        labor::registerMember(firm.goods, firm.labor);
+    }
+
+    for (Firm& firm : firms_) {
+        labor::endStep(firm.finance, firm.labor, dropBox_);
+    }
+    for (HHold& hhold : hholds_) {
+        labor::endStep(hhold.finance, hhold.labor, dropBox_);
     }
 }
 
 void Engine::runGoods() {
+    using namespace orchestrator;
     for (Firm& firm : firms_) {
-        orchestrator::postGoods(firm.goods, firm.labor, goodsEntryBox_);
+        goods::postGoods(firm.goods, firm.labor, goodsEntryBox_);
     }
 
     for (HHold& hhold : hholds_) {
-        orchestrator::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_);
+        goods::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_);
     }
 
     for (Firm& firm : firms_) {
-        orchestrator::trade(firm.goods);
+        goods::trade(firm.goods);
     }
 
     for (HHold& hhold : hholds_) {
-        orchestrator::afterTrade(hhold.goods);
+        goods::afterTrade(hhold.goods);
     }
-}
 
-void Engine::update() {
     for (Firm& firm : firms_) {
-        orchestrator::updateAsset(firm.finance, firm.labor, firm.goods);
+        goods::endStep(firm.finance, firm.goods, dropBox_);
     }
+
     for (HHold& hhold : hholds_) {
-        orchestrator::updateAsset(hhold.finance, hhold.labor, hhold.goods);
+        goods::endStep(hhold.finance, hhold.goods);
     }
 }
 
@@ -78,26 +81,14 @@ void Engine::logging() {
     dropBox_.clear();
     for (Firm& firm : firms_) {
         firm_finance::logging(dropBox_, firm.finance);
-        labor_demander::logging(dropBox_, firm.labor);
-        goods_supplier::logging(dropBox_, firm.goods);
     }
     for (HHold& hhold : hholds_) {
         hhold_finance::logging(dropBox_, hhold.finance);
-        labor_supplier::logging(dropBox_, hhold.labor);
     }
     logger_.save(dropBox_, config::currentStep);
 }
 
 void Engine::reset() {
-    for (Firm& firm : firms_) {
-        labor_demander::reset(firm.labor);
-        goods_supplier::reset(firm.goods);
-    }
-    for (HHold& hhold : hholds_) {
-        labor_supplier::reset(hhold.labor);
-        goods_demander::reset(hhold.goods);
-    }
-
     laborRequestBox_.clear();
     goodsEntryBox_.clear();
     ++config::currentStep;

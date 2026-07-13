@@ -4,7 +4,7 @@
 
 #include "core/forward.hpp"
 
-namespace orchestrator {
+namespace orchestrator::labor {
 void postLaborRequest(
     const agent_index::Component&                indexComp,
     const goods_supplier::Component&             goodsSupplier,
@@ -26,6 +26,20 @@ void registerMember(
     goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
 );
 
+void endStep(
+    firm_finance::Component&   financeComp,
+    labor_demander::Component& laborDemander,
+    world::CensusDropBox&      dropBox
+);
+void endStep(
+    hhold_finance::Component&  financeComp,
+    labor_supplier::Component& laborSupplier,
+    world::CensusDropBox&      dropBox
+);
+}  // namespace orchestrator::labor
+
+namespace orchestrator::goods {
+
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
     const labor_demander::Component&           laborDemander,
@@ -43,15 +57,10 @@ void trade(goods_supplier::Component& goodsSupplier);
 
 void afterTrade(goods_demander::Component& goodsDemander);
 
-void updateAsset(
-    firm_finance::Component&         financeComponent,
-    const labor_demander::Component& laborDemander,
-    const goods_supplier::Component& goodsSupplier
+void endStep(
+    firm_finance::Component&   financeComp,
+    goods_supplier::Component& goodsSupplier,
+    world::CensusDropBox&      dropBox
 );
-
-void updateAsset(
-    hhold_finance::Component&        financeComponent,
-    const labor_supplier::Component& laborSupplier,
-    const goods_demander::Component& goodsDemander
-);
-}  // namespace orchestrator
+void endStep(hhold_finance::Component& financeComp, goods_demander::Component& goodsDemander);
+}  // namespace orchestrator::goods

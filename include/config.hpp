@@ -29,5 +29,5 @@ constexpr int hhold{2000};
 }  // namespace config::agent_count
 
 namespace config {
-static inline int currentStep{0};  // NOLINT
+static thread_local inline int currentStep{0};  // NOLINT
 }  // namespace config
