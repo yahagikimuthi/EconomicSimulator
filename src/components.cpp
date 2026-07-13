@@ -19,7 +19,9 @@ namespace labor_demander {
 Component::Component()
     : log_{.wage_ = rand(0.6, 0.8), .targetEmploy_ = randInt(5, 15), .actualEmploy_ = randInt(4, 12)},
       parameter_{
-          .wageAdjustmentVolatility_ = rand(0.01, 0.1), .employAdjustmentVolatility_ = rand(1, 3)
+          .wageAdjustmentVolatility_   = rand(0.01, 0.1),
+          .employAdjustmentVolatility_ = rand(1, 3),
+          .fillRateThreshold_          = rand(0.5, 0.9)
       } {
     log_.actualEmploy_ = std::min(log_.actualEmploy_, log_.targetEmploy_);
 }

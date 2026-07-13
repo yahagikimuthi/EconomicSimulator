@@ -19,6 +19,7 @@ struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
         return {log.wage_, log.targetEmploy_, log.actualEmploy_};
     }
     auto wageAdjustVol() const -> double { return comp_.parameter_.wageAdjustmentVolatility_; }
+    auto fillRateThreshold() const -> double { return comp_.parameter_.fillRateThreshold_; }
 };
 
 struct CalcNextEmployView final : BaseView<Component> {
@@ -37,8 +38,9 @@ namespace {
     assert(lastTargetEmploy >= 0 && "last target employ is required >= 0");
 
     const double occupancyRate{(lastTargetEmploy != 0) ? lastActualEmploy / lastTargetEmploy : 0.0};
+    const bool   shouldRaiseWage{occupancyRate < view.fillRateThreshold()};
     const double alpha{std::abs(helper::randNormal(0.0, view.wageAdjustVol(), -1.0, 1.0))};
-    const double nextWage{lastWage * ((occupancyRate >= 1.0) ? 1.0 - alpha : 1.0 + alpha)};
+    const double nextWage{lastWage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
     return std::max(epsilonWage, nextWage);
 }
 

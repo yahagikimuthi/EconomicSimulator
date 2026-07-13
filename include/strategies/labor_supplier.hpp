@@ -32,7 +32,7 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     auto myEntryCnt() const -> std::size_t { return comp_.posting_.myEntries_.size(); }
     auto myEntry(const std::size_t idx)
         -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
-        auto& [request, myEntry] = comp_.posting_.myEntries_[idx];
+        auto [request, myEntry] = comp_.posting_.myEntries_[idx];
         return {*request, *myEntry};
     }
     void setContraction(const int firmId, const double wage) {

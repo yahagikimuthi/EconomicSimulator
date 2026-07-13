@@ -25,6 +25,7 @@ struct EmploymentLedger {
 struct Parameter {
     const double wageAdjustmentVolatility_;
     const double employAdjustmentVolatility_;
+    const double fillRateThreshold_;
 };
 struct Posting {
     world::LaborRequest*                                   myRequest_;
