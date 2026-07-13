@@ -6,7 +6,7 @@
 #include <ranges>
 
 #include "config.hpp"
-#include "helper.hpp"
+#include "helper/util.hpp"
 #include "world/message.hpp"
 
 namespace goods_demander {

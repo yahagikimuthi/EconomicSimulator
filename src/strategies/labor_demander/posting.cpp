@@ -7,7 +7,7 @@
 
 #include "config.hpp"
 #include "core/base.hpp"
-#include "helper.hpp"
+#include "helper/util.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {

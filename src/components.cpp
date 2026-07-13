@@ -4,7 +4,7 @@
 #include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
 #include "config.hpp"
-#include "helper.hpp"
+#include "helper/util.hpp"
 
 using namespace helper;
 
