@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -12,8 +10,7 @@
 #include "helper/random.hpp"
 
 namespace helper {
-inline static thread_local std::random_device rd;     // NOLINT
-inline static thread_local Pcg32              gen{};  // NOLINT
+inline static thread_local Pcg32 gen{generatePcg32()};  // NOLINT
 
 [[nodiscard]] constexpr auto rand(Pcg32& genRef = gen) -> double {
     return static_cast<double>(genRef.next()) / 4294967296.0;  // 2^32

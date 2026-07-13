@@ -1,13 +1,7 @@
-// pcg32_constexpr.cpp
-// コンパイル時（constexpr）に計算可能な PCG32 乱数生成器
-// C++17 以降でビルド可能 (C++14 でも rotr を再帰にすれば動作します)
-//
-// 参考: PCG (Permuted Congruential Generator) by M.E. O'Neill
-//       https://www.pcg-random.org/
-
-#include <array>
 #include <cstdint>
-#include <ranges>
+#include <random>
+
+#include "config.hpp"
 
 namespace helper {
 
@@ -18,13 +12,8 @@ class Pcg32 {
     // デフォルトの乗数・初期増分（PCG のリファレンス実装と同じ値）
     static constexpr std::uint64_t default_multiplier{6364136223846793005ULL};
 
-    // state: 内部状態 (64bit)
-    // inc  : 増分（ストリーム選択用の奇数値）
-    constexpr Pcg32() : state_{0x853c49e6748fea9bULL}, inc_{0xda3e39cb94b95bdbULL} {}
-
     // seed と stream(=シーケンス選択)を指定して初期化
-    constexpr Pcg32(std::uint64_t seed, std::uint64_t stream = 1)
-        : state_{}, inc_((stream << 1U) | 1U) {
+    constexpr Pcg32(std::uint64_t seed, std::uint64_t stream = 1) : inc_((stream << 1U) | 1U) {
         step();
         state_ += seed;
         step();
@@ -48,7 +37,7 @@ class Pcg32 {
     constexpr auto operator()() noexcept -> result_type { return next(); }
 
   private:
-    std::uint64_t state_;
+    std::uint64_t state_{};
     std::uint64_t inc_;
 
     constexpr void step() noexcept { state_ = (state_ * default_multiplier) + inc_; }
@@ -58,4 +47,21 @@ class Pcg32 {
         return (v >> rot) | (v << ((~rot + 1U) & 31U));
     }
 };
+
+[[nodiscard]] auto generatePcg32() -> Pcg32 {
+    if (not config::setting::useRuntimeRandomSeed) {
+        return {config::setting::fixedSeedState, config::setting::fixedSeedInc};
+    }
+
+    std::random_device  rd;
+    const std::uint64_t stateHigh{rd()};
+    const std::uint64_t stateLow{rd()};
+    const std::uint64_t state{stateHigh << 32 | stateLow};
+
+    const std::uint64_t incHigh{rd()};
+    const std::uint64_t incLow{rd()};
+    const std::uint64_t inc{(incHigh << 32 | incLow) | 1ULL};
+
+    return {state, inc};
+}
 }  // namespace helper

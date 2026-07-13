@@ -1,7 +1,11 @@
 #pragma once
 
+#include <cstdint>
+
 namespace config::setting {
-constexpr unsigned int seed{42};
+constexpr bool          useRuntimeRandomSeed{false};
+constexpr std::uint64_t fixedSeedState{0x853c49e6748fea9bULL};
+constexpr std::uint64_t fixedSeedInc{0xda3e39cb94b95bdbULL};
 }  // namespace config::setting
 
 namespace config::labor_demander {
