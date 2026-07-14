@@ -57,8 +57,8 @@ void endStep(
     world::CensusDropBox&      dropBox
 ) {
     labor_demander::logging(dropBox, laborDemander);
-    financeComp.assetPlus(-laborDemander.sumWage());
     labor_demander::reset(laborDemander);
+    financeComp.assetPlus(-laborDemander.sumWage());
 }
 void endStep(
     hhold_finance::Component&  financeComp,

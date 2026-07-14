@@ -17,14 +17,6 @@ struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
         plan.price_ = price, plan.markup_ = markup, plan.supply_ = supply;
         comp_.salesLedger.inventory_ = supply;
     }
-    auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
-    auto sumEmployeeProductPower() const -> double {
-        return comp_.production_.sumEmployeeProductPower_;
-    }
-    auto inventory() const -> double { return comp_.production_.inventory_; }
-    auto markupAdjustVol() const -> double { return comp_.parameter_.markupAdjustmentVolatility_; }
-    auto lastMarkup() const -> double { return comp_.log_.markup_; }
-    auto isSold() const -> bool { return comp_.log_.isSold_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 };
 
