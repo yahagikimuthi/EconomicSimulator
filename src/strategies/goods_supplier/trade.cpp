@@ -8,7 +8,6 @@
 #include <pcg_random.hpp>
 #include <ranges>
 
-#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
