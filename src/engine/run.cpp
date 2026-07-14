@@ -78,7 +78,6 @@ void Engine::runGoods() {
 }
 
 void Engine::logging() {
-    dropBox_.clear();
     for (Firm& firm : firms_) {
         firm_finance::logging(dropBox_, firm.finance);
     }
@@ -86,6 +85,7 @@ void Engine::logging() {
         hhold_finance::logging(dropBox_, hhold.finance);
     }
     logger_.save(dropBox_, config::currentStep);
+    dropBox_.clear();
 }
 
 void Engine::reset() {
