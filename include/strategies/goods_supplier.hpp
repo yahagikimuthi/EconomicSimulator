@@ -32,7 +32,6 @@ struct [[nodiscard]] TradeView final : BaseView<Component> {
     auto myEntry() -> world::GoodsEntry& { return *comp_.posting_.myEntry_; }
     void inventoryMinus(double inventoryMinus) { comp_.salesLedger.inventory_ -= inventoryMinus; }
     void salesPlus(const double salesPlus) { comp_.salesLedger.currentSales += salesPlus; }
-    auto targetInvRatio() const -> double { return comp_.parameter_.targetInventoryRatio_; }
     auto inventory() const -> double { return comp_.salesLedger.inventory_; }
     auto price() const -> double { return comp_.plan_.price_; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
