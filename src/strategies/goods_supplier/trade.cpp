@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
+#include <functional>
 #include <numeric>
 #include <pcg_random.hpp>
 #include <ranges>
@@ -23,21 +24,25 @@ namespace {
     return demand;
 }
 
-void shuffleIdx(const std::size_t resizeNum, std::vector<std::size_t>& shuffleVec, pcg32& rng) {
-    shuffleVec.resize(resizeNum);
-    std::ranges::iota(shuffleVec, 0UZ);
-    std::ranges::shuffle(shuffleVec, rng);
+void shuffleIdx(
+    tbb::concurrent_vector<world::GoodsRequest>&              requestBox,
+    std::vector<std::reference_wrapper<world::GoodsRequest>>& requests,
+    pcg32&                                                    rng
+) {
+    requests.clear();
+    for (world::GoodsRequest& request : requestBox) requests.emplace_back(std::ref(request));
+    std::ranges::shuffle(requests, rng);
 }
 
 void performRationedTrade(
     const double supply, pcg32& rng, tbb::concurrent_vector<world::GoodsRequest>& requestBox
 ) {
-    static thread_local std::vector<std::size_t> consumerIdxs;
-    shuffleIdx(requestBox.size(), consumerIdxs, rng);
+    static thread_local std::vector<std::reference_wrapper<world::GoodsRequest>> requests;
+    shuffleIdx(requestBox, requests, rng);
 
     double remainAmount{supply};
-    for (const std::size_t i : consumerIdxs) {
-        auto&        request = requestBox[i];
+    for (auto requestRef : requests) {
+        auto&        request = requestRef.get();
         const double requestAmount{request.amount_};
         if (remainAmount <= requestAmount) {
             request.tradeAmount_ = remainAmount;
@@ -48,6 +53,7 @@ void performRationedTrade(
     }
 
     assert(false && "runtime error");
+    std::unreachable();
 }
 
 void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
@@ -64,7 +70,7 @@ void trade(TradeView view) {
 
     const double totalDemand{calcTotalDemand(requestBox)};
     if (totalDemand == 0.0) return;
-    const bool   isExcessDemand{totalDemand >= myEntry.supply_};
+    const bool   isExcessDemand{totalDemand > myEntry.supply_};
     const double salesAmount{std::min(myEntry.supply_, totalDemand)};
     isExcessDemand ? performRationedTrade(myEntry.supply_, view.rng(), requestBox)
                    : performFullTrade(requestBox);
