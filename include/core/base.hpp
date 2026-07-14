@@ -20,13 +20,3 @@ struct BaseView {
   protected:
     ComponentType& comp_;
 };
-
-struct Component {};
-
-struct ParentView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-};
-
-struct ChildView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-};
