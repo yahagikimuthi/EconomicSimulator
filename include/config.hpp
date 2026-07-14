@@ -24,7 +24,7 @@ constexpr double epsilonPrice{1e-12};
 
 namespace config::goods_demander {
 constexpr int maxPurchaseFrequency{7};
-constexpr int goodsSampleCnt{5};
+constexpr int goodsSampleCnt{2};
 }  // namespace config::goods_demander
 
 namespace config::agent_count {
