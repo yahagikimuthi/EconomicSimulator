@@ -45,7 +45,7 @@ struct Component {
 
     Component(const std::uint64_t state, const std::uint64_t stream);
 
-    [[nodiscard]] auto sumWage() const -> double { return employmentLedger.sumWage_; }
-    [[nodiscard]] auto employeeCnt() const -> int { return employmentLedger.employing_; }
+    [[nodiscard]] auto sumWage() const -> double { return humanResources.sumWage_; }
+    [[nodiscard]] auto employeeCnt() const -> int { return humanResources.employeeCnt; }
 };
 }  // namespace labor_demander
