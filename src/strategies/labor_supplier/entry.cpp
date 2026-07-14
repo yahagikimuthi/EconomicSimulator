@@ -25,7 +25,8 @@ void pickSample(
     sampleRequests.clear();
 
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
-        for (const auto i : std::views::iota(0UZ, k)) sampleRequests[i] = std::ref(requestBox[i]);
+        for (world::LaborRequest& request : requestBox)
+            sampleRequests.emplace_back(std::ref(request));
         return;
     }
 
@@ -33,13 +34,13 @@ void pickSample(
 }
 
 void sortSample(
-    std::vector<std::reference_wrapper<world::LaborRequest>>& sortIdxs,
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests,
     const int entryCnt = config::labor_supplier::jobEntryCnt
 ) {
-    const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortIdxs.size())};
+    const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
-        sortIdxs,
-        sortIdxs.begin() + static_cast<int>(k),
+        sortRequests,
+        sortRequests.begin() + static_cast<int>(k),
         std::ranges::greater{},
         [](const std::reference_wrapper<world::LaborRequest>& requestRef) -> double {
             return requestRef.get().wage_;
