@@ -13,7 +13,7 @@
 
 namespace labor_demander {
 struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
-    explicit CalcNextWageView(PostJobView& parentComp) : BaseView(parentComp.comp_) {}
+    using BaseView<Component>::BaseView;
 
     auto log() const -> std::tuple<double, double, double> {
         const auto& log = comp_.log_;
@@ -25,7 +25,7 @@ struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
 };
 
 struct CalcNextEmployView final : BaseView<Component> {
-    explicit CalcNextEmployView(PostJobView& parentComp_) : BaseView(parentComp_.comp_) {}
+    using BaseView<Component>::BaseView;
 
     auto employAdjustVol() const -> double { return comp_.parameter_.employAdjustmentVolatility_; }
     auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }

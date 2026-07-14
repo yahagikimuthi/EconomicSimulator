@@ -26,10 +26,6 @@ struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
     auto lastMarkup() const -> double { return comp_.log_.markup_; }
     auto isSold() const -> bool { return comp_.log_.isSold_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
-
-    friend struct CalcSupplyView;
-    friend struct CalcMarkupView;
-    friend struct JudgePriceView;
 };
 
 void postGoods(

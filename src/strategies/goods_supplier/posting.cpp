@@ -12,7 +12,7 @@
 
 namespace goods_supplier {
 struct CalcSupplyView final : BaseView<Component> {
-    explicit CalcSupplyView(PostGoodsView& parentView) : BaseView(parentView.comp_) {}
+    using BaseView<Component>::BaseView;
 
     auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
     auto sumEmployeeProductPower() const -> double {
@@ -22,7 +22,7 @@ struct CalcSupplyView final : BaseView<Component> {
 };
 
 struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
-    explicit CalcMarkupView(PostGoodsView& parentView) : BaseView(parentView.comp_) {}
+    using BaseView<Component>::BaseView;
 
     auto markupAdjustVol() const -> double { return comp_.parameter_.markupAdjustmentVolatility_; }
     auto lastMarkup() const -> double { return comp_.log_.markup_; }
@@ -31,13 +31,11 @@ struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
 };
 
 struct [[nodiscard]] JudgePriceView final : BaseView<Component> {
-    explicit JudgePriceView(PostGoodsView& parentView) : BaseView(parentView.comp_) {}
-
-    friend struct CalcAvgCostView;
+    using BaseView<Component>::BaseView;
 };
 
 struct [[nodiscard]] CalcAvgCostView final : BaseView<Component> {
-    explicit CalcAvgCostView(JudgePriceView& parentView) : BaseView(parentView.comp_) {}
+    using BaseView<Component>::BaseView;
 
     auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
     auto sumEmployeeProductPower() const -> double {

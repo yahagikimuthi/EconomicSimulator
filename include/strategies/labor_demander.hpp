@@ -17,9 +17,6 @@ struct [[nodiscard]] PostJobView final : BaseView<Component> {
         comp_.posting_.myRequest_ = &(*it);
     }
     void posting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
-
-    friend struct CalcNextWageView;
-    friend struct CalcNextEmployView;
 };
 
 void postJob(

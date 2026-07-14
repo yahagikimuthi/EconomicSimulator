@@ -1,8 +1,14 @@
 #pragma once
 
+#include <concepts>
+
 template <typename ComponentType>
 struct BaseView {
     explicit BaseView(ComponentType& comp) : comp_{comp} {}
+
+    template <typename DerivedView>
+        requires std::derived_from<std::remove_cvref_t<DerivedView>, BaseView<ComponentType>>
+    explicit BaseView(DerivedView& derived) : comp_{derived.comp_} {}
 
     virtual ~BaseView() = default;
 
@@ -13,4 +19,14 @@ struct BaseView {
 
   protected:
     ComponentType& comp_;
+};
+
+struct Component {};
+
+struct ParentView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+};
+
+struct ChildView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
 };
