@@ -13,8 +13,8 @@ constexpr double epsilonWage{1e-16};
 }
 
 namespace config::labor_supplier {
-constexpr int jobSampleCnt{5};
-constexpr int jobEntryCnt{3};
+constexpr int jobSampleCnt{2};
+constexpr int jobEntryCnt{2};
 }  // namespace config::labor_supplier
 
 namespace config::goods_supplier {
@@ -28,8 +28,8 @@ constexpr int goodsSampleCnt{5};
 }  // namespace config::goods_demander
 
 namespace config::agent_count {
-constexpr int firm{100};
-constexpr int hhold{2000};
+constexpr int firm{10};
+constexpr int hhold{200};
 }  // namespace config::agent_count
 
 namespace config {
