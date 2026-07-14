@@ -77,7 +77,7 @@ void postGoods(
     const labor_demander::Component&           laborDemander,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    const double sumWage{laborDemander.sumWage()};
+    const double sumWage{laborDemander.sumWage()};  //! sumWageはこの時点ではリセット済み！
     const int    employeeCnt{laborDemander.employeeCnt()};
     goods_supplier::postGoods(
         goods_supplier::PostGoodsView{goodsSupplier}, sumWage, employeeCnt, entryBox
