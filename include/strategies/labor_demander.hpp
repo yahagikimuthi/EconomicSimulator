@@ -14,7 +14,7 @@ struct [[nodiscard]] PostJobView final : BaseView<Component> {
         comp_.plan_.wage_ = wage, comp_.plan_.employ_ = employ;
     }
     void myRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
-        comp_.posting_.myRequest_ = &(*it);
+        comp_.posting_.myRequest_ = &*it;
     }
     void posting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
 };
@@ -29,7 +29,7 @@ void postJob(
 struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto employPlan() const -> int { return comp_.plan_.employ_; }
-    auto myRequest() const -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
+    auto myRequest() -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
     void recordOffer(world::LaborEntry& entry) {
