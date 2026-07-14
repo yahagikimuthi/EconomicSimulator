@@ -1,6 +1,8 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstdint>
+#include <pcg_random.hpp>
 
 #include "core/forward.hpp"
 
@@ -35,6 +37,7 @@ struct Parameter {
     const double markupAdjustmentVolatility_;
 };
 struct Component {
+    pcg32       rng_;
     Log         log_{};
     Plan        plan_{};
     SalesLedger salesLedger{};
@@ -42,7 +45,7 @@ struct Component {
     Production  production_;
     Parameter   parameter_;
 
-    Component();
+    Component(const std::uint64_t state, const std::uint64_t stream);
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;
     }

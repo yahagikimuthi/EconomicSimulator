@@ -5,9 +5,10 @@
 #include <cassert>
 #include <cstddef>
 #include <numeric>
+#include <pcg_random.hpp>
 #include <ranges>
 
-#include "helper/util.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
@@ -23,21 +24,17 @@ namespace {
     return demand;
 }
 
-void shuffleIdx(
-    const std::size_t         resizeNum,
-    std::vector<std::size_t>& shuffleVec,
-    helper::Pcg32&            gen = helper::gen
-) {
+void shuffleIdx(const std::size_t resizeNum, std::vector<std::size_t>& shuffleVec, pcg32& rng) {
     shuffleVec.resize(resizeNum);
     std::ranges::iota(shuffleVec, 0UZ);
-    std::ranges::shuffle(shuffleVec, gen);
+    std::ranges::shuffle(shuffleVec, rng);
 }
 
 void performRationedTrade(
-    const double supply, tbb::concurrent_vector<world::GoodsRequest>& requestBox
+    const double supply, pcg32& rng, tbb::concurrent_vector<world::GoodsRequest>& requestBox
 ) {
     static thread_local std::vector<std::size_t> consumerIdxs;
-    shuffleIdx(requestBox.size(), consumerIdxs);
+    shuffleIdx(requestBox.size(), consumerIdxs, rng);
 
     double remainAmount{supply};
     for (const std::size_t i : consumerIdxs) {
@@ -73,7 +70,7 @@ void trade(TradeView view) {
     if (totalDemand == 0.0) return;
     const bool   isExcessDemand{totalDemand >= view.inventory()};
     const double salesAmount{std::min(view.inventory(), totalDemand)};
-    isExcessDemand ? performRationedTrade(view.inventory(), requestBox)
+    isExcessDemand ? performRationedTrade(view.inventory(), view.rng(), requestBox)
                    : performFullTrade(requestBox);
     view.inventoryMinus(salesAmount);
     view.salesPlus(salesAmount * view.price());

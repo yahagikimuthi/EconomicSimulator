@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdint>
+#include <pcg_random.hpp>
+
 namespace agent_index {
 struct Component {
     const int id_;
@@ -12,8 +15,10 @@ struct Component {
 
 namespace firm_finance {
 struct Component {
+    pcg32  rng_;
     double asset_;
-    Component();
+
+    Component(const std::uint64_t state, const std::uint64_t stream);
 
     void assetPlus(const double plus) { asset_ += plus; }
 };
@@ -21,8 +26,10 @@ struct Component {
 
 namespace hhold_finance {
 struct Component {
+    pcg32  rng_;
     double asset_;
-    Component();
+
+    Component(const std::uint64_t state, const std::uint64_t stream);
 
     [[nodiscard]] auto asset() const -> double { return asset_; }
     void               assetPlus(const double plus) { asset_ += plus; }

@@ -6,10 +6,11 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
+#include <pcg_random.hpp>
 #include <ranges>
 
 #include "config.hpp"
-#include "helper/util.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace labor_supplier {
@@ -17,8 +18,8 @@ namespace {
 void pickSample(
     tbb::concurrent_vector<world::LaborRequest>&              requestBox,
     std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
-    const int      sampleCnt = config::labor_supplier::jobSampleCnt,
-    helper::Pcg32& gen       = helper::gen
+    pcg32&                                                    rng,
+    const int sampleCnt = config::labor_supplier::jobSampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     sampleRequests.clear();
@@ -28,7 +29,7 @@ void pickSample(
         return;
     }
 
-    std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), gen);
+    std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), rng);
 }
 
 void sortSample(
@@ -59,7 +60,7 @@ void jobEntry(
     }
     view.isPosting(true);
     static thread_local std::vector<std::reference_wrapper<world::LaborRequest>> sampleRequests;
-    pickSample(requestBox, sampleRequests);
+    pickSample(requestBox, sampleRequests, view.rng());
     sortSample(sampleRequests);
 
     const double productPower{view.productPower()};

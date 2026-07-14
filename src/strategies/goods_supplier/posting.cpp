@@ -3,10 +3,11 @@
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <cmath>
+#include <pcg_random.hpp>
 
 #include "config.hpp"
 #include "core/base.hpp"
-#include "helper/util.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace goods_supplier {
@@ -26,6 +27,7 @@ struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
     auto markupAdjustVol() const -> double { return comp_.parameter_.markupAdjustmentVolatility_; }
     auto lastMarkup() const -> double { return comp_.log_.markup_; }
     auto isSold() const -> bool { return comp_.log_.isSold_; }
+    auto rng() -> pcg32& { return comp_.rng_; }
 };
 
 struct [[nodiscard]] JudgePriceView final : BaseView<Component> {
@@ -62,8 +64,8 @@ namespace {
     return out;
 }
 
-[[nodiscard]] auto calcMarkup(const CalcMarkupView& view) -> double {
-    const double alpha{std::abs(helper::randNormal(0.0, view.markupAdjustVol()))};
+[[nodiscard]] auto calcMarkup(CalcMarkupView view) -> double {
+    const double alpha{std::abs(helper::randNormal(view.rng(), 0.0, view.markupAdjustVol()))};
     const double nextMarkup{view.lastMarkup() + (view.isSold() ? alpha : -alpha)};
     return markupGuard(nextMarkup);
 }

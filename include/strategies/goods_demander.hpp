@@ -1,7 +1,8 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <tuple>
+#include <pcg_random.hpp>
+#include <utility>
 
 #include "components/goods_demander.hpp"
 #include "config.hpp"
@@ -22,6 +23,7 @@ struct [[nodiscard]] PurchaseView final : BaseView<Component> {
     ) {
         comp_.posting_.myRequest_ = {&entry, &*myRequest};
     }
+    auto rng() -> pcg32& { return comp_.rng_; }
 };
 
 void purchase(

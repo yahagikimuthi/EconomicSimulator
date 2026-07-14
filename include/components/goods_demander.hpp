@@ -1,6 +1,9 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstdint>
+#include <pcg_random.hpp>
+#include <utility>
 
 #include "core/forward.hpp"
 
@@ -18,11 +21,12 @@ struct Parameter {
     const int    myPhase_;
 };
 struct Component {
+    pcg32      rng_;
     Posting    posting_;
     Purchasing purchasing_;
     Parameter  parameter_;
 
-    Component();
+    Component(const std::uint64_t state, const std::uint64_t stream);
     [[nodiscard]] auto purchase() const -> double { return purchasing_.purchase_; }
 
   private:

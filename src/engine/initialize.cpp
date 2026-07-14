@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <entt/entt.hpp>
+#include <helper.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
@@ -33,16 +34,33 @@ void createHHold(const int id, entt::registry& registry) {
 }  // namespace
 */
 Engine::Engine(const int totalStep, const std::string& filename)
-    : logger_{filename}, totalStep_{totalStep} {
+    : logger_{filename}, totalStep_{totalStep}, seed_{helper::generatePCG32Seed()} {
     if (not logger_.isValid()) {
         assert(false && "can not create file");
     }
+    masterRng_ = {seed_.state, seed_.stream};
 
     firms_.reserve(config::agent_count::firm);
-    for (const auto _ : std::views::iota(0, config::agent_count::firm)) firms_.emplace_back();
+    for (const auto i : std::views::iota(0, config::agent_count::firm)) {
+        Firm firm{
+            .index   = {i},
+            .finance = {makeSeed(), makeSeed()},
+            .labor   = {makeSeed(), makeSeed()},
+            .goods   = {makeSeed(), makeSeed()}
+        };
+        firms_.push_back(firm);
+    }
 
     hholds_.reserve(config::agent_count::hhold);
-    for (const auto _ : std::views::iota(0, config::agent_count::hhold)) hholds_.emplace_back();
+    for (const auto i : std::views::iota(0, config::agent_count::hhold)) {
+        HHold hhold{
+            .index   = {i},
+            .finance = {makeSeed(), makeSeed()},
+            .labor   = {makeSeed(), makeSeed()},
+            .goods   = {makeSeed(), makeSeed()}
+        };
+        hholds_.push_back(hhold);
+    }
 }
 
 Logger::Logger(const std::string& filename)

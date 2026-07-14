@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstdint>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <string>
@@ -10,30 +11,21 @@
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace core {
-struct Firm {
+struct Firm {  // NOLINT
     agent_index::Component    index;
     firm_finance::Component   finance;
     labor_demander::Component labor;
     goods_supplier::Component goods;
-
-    Firm() : index{instanceCnt++} {}
-
-  private:
-    static inline int instanceCnt{};
 };
-struct HHold {
+struct HHold {  // NOLINT
     agent_index::Component    index;
     hhold_finance::Component  finance;
     labor_supplier::Component labor;
     goods_demander::Component goods;
-
-    HHold() : index{instanceCnt++} {}
-
-  private:
-    static inline int instanceCnt{};
 };
 struct HHoldTag {};
 struct FirmTag {};
@@ -49,7 +41,7 @@ class Logger {
     HighFive::File file_;
 };
 
-class Engine {
+class [[nodiscard]] Engine {
   public:
     explicit Engine(const int totalStep, const std::string& filename);
 
@@ -61,6 +53,9 @@ class Engine {
     void update();
     void logging();
     void reset();
+    auto makeSeed() -> std::uint64_t {
+        return (static_cast<std::uint64_t>(masterRng_()) << 32) | masterRng_();
+    }
 
     Logger logger_;
     // entt::registry     registry_;
@@ -74,5 +69,8 @@ class Engine {
 
     const int totalStep_;
     int       currentStep_{};
+
+    const helper::PCG32Seed seed_;
+    pcg32                   masterRng_;
 };
 }  // namespace core

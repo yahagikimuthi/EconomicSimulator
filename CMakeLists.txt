@@ -17,17 +17,28 @@ set(CMAKE_CXX_EXTENSIONS OFF) # GNU拡張を無効化（標準準拠）
 find_package(HighFive REQUIRED)
 find_package(TBB REQUIRED)
 
+include(FetchContent)
+FetchContent_Declare(
+    pcg_cpp
+    GIT_REPOSITORY https://github.com/imneme/pcg-cpp.git
+    GIT_TAG        master # または特定のコミットハッシュやタグ
+)
+FetchContent_MakeAvailable(pcg_cpp)
+
 # --- ソースファイルの収集 ---
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 # 実行ファイルの定義
 add_executable(EconomicSimulator ${SOURCES})
-target_link_libraries(EconomicSimulator PRIVATE TBB::tbb)
-target_link_libraries(EconomicSimulator PRIVATE HighFive::HighFive)
+target_link_libraries(EconomicSimulator PRIVATE
+    TBB::tbb
+    HighFive::HighFive
+)
 
 # インクルードディレクトリの指定
 target_include_directories(EconomicSimulator SYSTEM PRIVATE 
-${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${pcg_cpp_SOURCE_DIR}/include
 )
 add_compile_definitions(HIGHFIVE_HAS_NO_EXCEPTIONS)
 # --- コンパイル・リンクオプション（警告） ---

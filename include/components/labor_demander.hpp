@@ -1,6 +1,8 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstdint>
+#include <pcg_random.hpp>
 
 #include "core/forward.hpp"
 
@@ -33,6 +35,7 @@ struct Posting {
     bool                                                   isPosting_;
 };
 struct Component {
+    pcg32            rng_;
     Log              log_;
     Plan             plan_{};
     Posting          posting_{};
@@ -40,7 +43,7 @@ struct Component {
     EmploymentLedger employmentLedger{};
     Parameter        parameter_;
 
-    Component();
+    Component(const std::uint64_t state, const std::uint64_t stream);
 
     [[nodiscard]] auto sumWage() const -> double { return employmentLedger.sumWage_; }
     [[nodiscard]] auto employeeCnt() const -> int { return employmentLedger.employing_; }

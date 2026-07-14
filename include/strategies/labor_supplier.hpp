@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
+#include <pcg_random.hpp>
 
 #include "components/labor_supplier.hpp"
 #include "config.hpp"
@@ -19,6 +20,7 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
         comp_.posting_.myEntries_.emplace_back(&request, &*entryIt);
     }
     auto productPower() const -> double { return comp_.parameter_.productPower_; }
+    auto rng() -> pcg32& { return comp_.rng_; }
 };
 void jobEntry(
     JobEntryView                                 view,
