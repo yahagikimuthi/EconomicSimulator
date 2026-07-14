@@ -17,7 +17,21 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 \
 RUN rm -rf /usr/local/vpkg/installed && \
     /usr/local/vcpkg/vcpkg install tbb entt highfive
 
-# 4.clang-formatを追加
+# 4. clang-formatを追加
 RUN apt-get update && apt-get install -y \
     clang-format \
     && rm -rf /var/lib/apt/lists/*
+
+#5. python3, pip
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+#6. pythonライブラリ群 (--break-system-packages を追加)
+RUN pip3 install --no-cache-dir --break-system-packages \
+    h5py \
+    numpy \
+    pandas \
+    matplotlib \
+    seaborn
