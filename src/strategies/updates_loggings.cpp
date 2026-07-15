@@ -46,7 +46,7 @@ struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
             : true
     };
     const double offerRate{view.offerRate() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
-    return offerRate;
+    return std::max(0.0, offerRate);
 }
 }  // namespace
 
