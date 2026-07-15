@@ -26,15 +26,13 @@ namespace labor_demander {
 namespace {
 struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto acceptanceRate() const -> double { return comp_.parameter_.acceptanceRate_; }
+    auto acceptanceRate() const -> double { return comp_.parameter_.offerRate_; }
     auto offerAdjustmentVolatility() const -> double {
         return comp_.parameter_.offerAdjustmentVolatility_;
     }
     auto actualEmploy() const -> double { return comp_.employmentLedger.employing_; }
     auto offerNum() const -> double { return comp_.plan_.offer_; }
-    auto acceptanceRateThreshold() const -> double {
-        return comp_.parameter_.acceptanceRateThreshold_;
-    }
+    auto acceptanceRateThreshold() const -> double { return comp_.parameter_.offerRateThreshold_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
 [[nodiscard]] auto updateAcceptanceRate(UpdateAcceptanceRateView view) -> double {
@@ -57,17 +55,17 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
 void reset(Component& comp) {
     comp.log_ = {
         .wage_         = comp.plan_.wage_,
-        .targetEmploy_ = comp.plan_.employ_,
         .actualEmploy_ = comp.employmentLedger.employing_,
-        .offer_        = comp.plan_.offer_
+        .offerPlan_    = comp.plan_.offer_,
+        .applicantNum_ = comp.employmentLedger.applicantNum_
     };
-    comp.parameter_.acceptanceRate_ = updateAcceptanceRate(UpdateAcceptanceRateView{comp});
+    comp.parameter_.offerRate_ = updateAcceptanceRate(UpdateAcceptanceRateView{comp});
 
     comp.plan_          = {.wage_ = 0.0, .employ_ = 0, .offer_ = 0};
     comp.humanResources = {
         .sumWage_ = comp.employmentLedger.sumWage_, .employeeCnt = comp.employmentLedger.employing_
     };
-    comp.employmentLedger    = {.employing_ = 0, .sumWage_ = 0.0};
+    comp.employmentLedger    = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
     comp.posting_.myRequest_ = nullptr;
     comp.posting_.isPosting_ = false;
     comp.posting_.offerApplicants_.clear();
