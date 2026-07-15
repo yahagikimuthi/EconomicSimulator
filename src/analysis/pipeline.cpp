@@ -31,7 +31,7 @@ void Pipeline::execute() {
         ctx.clear();
     }
 
-    outputManager_.write("step", stepNumVec);
+    outputManager_.write("step", std::move(stepNumVec));
     for (auto& task : tasks_) {
         task->writeResult(outputManager_);
     }
