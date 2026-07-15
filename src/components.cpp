@@ -30,12 +30,14 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
           .applicantNum_ = randInt(rng_, 10, 20)
       },
       parameter_{
-          .offerRate_                  = 0.2,
+          .offerRate_                  = rand(rng_, 0.0, 1.0),
           .wageAdjustmentVolatility_   = rand(rng_, 0.01, 0.1),
           .employAdjustmentVolatility_ = rand(rng_, 1, 3),
-          .offerAdjustmentVolatility_  = rand(rng_, 0.3, 0.5),
-          .acceptRateThreshold_        = rand(rng_, 0.3, 0.8)
-      } {}
+          .offerAdjustmentVolatility_  = rand(rng_, 0.3, 0.5)
+      } {
+    log_.actualEmploy_ = std::max(log_.actualEmploy_, log_.offerPlan_);
+    log_.applicantNum_ = std::max(log_.applicantNum_, log_.actualEmploy_);
+}
 }  // namespace labor_demander
 namespace labor_supplier {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)
