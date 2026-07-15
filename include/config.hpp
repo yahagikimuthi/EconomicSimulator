@@ -38,3 +38,15 @@ constexpr int hhold{400};
 namespace config {
 static thread_local inline int currentStep{0};  // NOLINT
 }  // namespace config
+
+namespace config::save_name {
+static inline const std::string firmAssets{"firmAssets"};
+static inline const std::string postedEmployments{"postedEmployments"};
+static inline const std::string employments{"employments"};
+static inline const std::string prices{"prices"};
+static inline const std::string supplies{"supplies"};
+static inline const std::string markups{"markups"};
+static inline const std::string inventories{"inventories"};
+static inline const std::string householdAssets{"householdAssets"};
+static inline const std::string wages{"wages"};
+}  // namespace config::save_name

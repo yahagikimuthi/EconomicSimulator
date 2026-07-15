@@ -10,7 +10,7 @@ namespace analysis {
 
 class Pipeline {
   public:
-    void requireData(std::string name) { requireDatas_.emplace_back(std::move(name)); }
+    void requireData(const std::string& name) { requireDatas_.emplace_back(name); }
 
     template <LogicType Logic>
     void registerMetric(std::string outName, Logic logic) {

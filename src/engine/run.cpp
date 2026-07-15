@@ -95,9 +95,24 @@ void Engine::reset() {
 }
 
 void Logger::save(const world::CensusDropBox& dropBox, const int step) {
+    namespace name = config::save_name;
     std::string     groupPath{"/step_" + std::to_string(step)};
     HighFive::Group group{file_.createGroup(groupPath)};
 
-    group.createDataSet("prices", dropBox.prices_);
+    const auto create{
+        [&group](const std::string& dataName, const std::span<const double> data) -> void {
+            group.createDataSet(dataName, data);
+        }
+    };
+
+    create(name::firmAssets, dropBox.firmAssets_);
+    create(name::postedEmployments, dropBox.postedEmployments_);
+    create(name::employments, dropBox.employments_);
+    create(name::prices, dropBox.prices_);
+    create(name::supplies, dropBox.supplies_);
+    create(name::markups, dropBox.markups_);
+    create(name::inventories, dropBox.inventories_);
+    create(name::householdAssets, dropBox.hholdAssets_);
+    create(name::wages, dropBox.wages_);
 }
 }  // namespace core

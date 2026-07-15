@@ -1,7 +1,6 @@
 #pragma once
 
 #include <numeric>
-#include <string>
 
 #include "pipeline.hpp"
 
@@ -15,15 +14,8 @@ namespace analysis {
 }
 
 void analysisData() {
+    namespace name = config::save_name;
     Pipeline pipeline{};
-
-    pipeline.requireData("prices");
-
-    pipeline.registerMetric("cpi", [](const DataContext& ctx) -> double {
-        const auto& prices = ctx.get("prices");
-        return calcMean(prices);
-    });
-
     pipeline.execute();
 }
 }  // namespace analysis
