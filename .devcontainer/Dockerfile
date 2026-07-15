@@ -34,4 +34,5 @@ RUN pip3 install --no-cache-dir --break-system-packages \
     numpy \
     pandas \
     matplotlib \
-    seaborn
+    seaborn \
+    scipy
