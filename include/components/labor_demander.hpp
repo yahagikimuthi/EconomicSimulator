@@ -32,6 +32,7 @@ struct Parameter {
     const double employAdjustmentVolatility_;
     const double fillRateThreshold_;
     const double offerAdjustmentVolatility_;
+    const double acceptanceRateThreshold_;
 };
 struct Posting {
     world::LaborRequest*                                   myRequest_;

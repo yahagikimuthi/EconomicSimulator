@@ -47,7 +47,6 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         return comp_.posting_.offerApplicants_;
     }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
-    auto targetEmploy() const -> int { return comp_.plan_.employ_; }
     void updateLedger(const double wage, const int actualEmploy) {
         auto& ledger = comp_.employmentLedger;
         ledger.employing_ += actualEmploy, ledger.sumWage_ += wage * actualEmploy;
