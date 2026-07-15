@@ -9,9 +9,9 @@
 namespace labor_demander {
 struct Log {
     double wage_;
-    int    targetEmploy_;
     int    actualEmploy_;
-    int    offer_;
+    int    offerPlan_;
+    int    applicantNum_;
 };
 struct Plan {
     double wage_;
@@ -23,16 +23,16 @@ struct HR {
     int    employeeCnt;
 };
 struct EmploymentLedger {
+    int    applicantNum_;
     int    employing_;
     double sumWage_;
 };
 struct Parameter {
-    double       acceptanceRate_;
+    double       offerRate_;
     const double wageAdjustmentVolatility_;
     const double employAdjustmentVolatility_;
-    const double fillRateThreshold_;
     const double offerAdjustmentVolatility_;
-    const double acceptanceRateThreshold_;
+    const double offerRateThreshold_;
 };
 struct Posting {
     world::LaborRequest*                                   myRequest_;
