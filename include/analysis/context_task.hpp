@@ -57,7 +57,10 @@ class IMetricTask {
     void reserve(const std::size_t n) { results_.reserve(n); }
 
     virtual void process(const DataContext& ctx) = 0;
-    void writeResult(OutputDataManager& output) { output.write(std::move(outName_), results_); }
+
+    void writeResult(OutputDataManager& output) {
+        output.write(std::move(outName_), std::move(results_));
+    }
 
   protected:
     void pushBackData(const double data) { results_.emplace_back(data); }

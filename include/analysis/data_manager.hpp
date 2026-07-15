@@ -78,7 +78,7 @@ class [[nodiscard]] OutputDataManager {
         }
     }
 
-    void write(const std::string&& dataSetName, const std::vector<double>& container) {
+    void write(const std::string&& dataSetName, const std::vector<double>&& container) {
         outFile_.createDataSet<double>(dataSetName, HighFive::DataSpace::From(container))
             .write(container);
     }
