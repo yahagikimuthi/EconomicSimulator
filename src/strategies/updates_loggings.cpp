@@ -30,9 +30,8 @@ struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
     auto offerAdjustmentVolatility() const -> double {
         return comp_.parameter_.offerAdjustmentVolatility_;
     }
+    auto targetEmploy() const -> double { return comp_.plan_.employ_; }
     auto actualEmploy() const -> double { return comp_.employmentLedger.employing_; }
-    auto offerNum() const -> double { return comp_.plan_.offer_; }
-    auto acceptanceRateThreshold() const -> double { return comp_.parameter_.acceptRateThreshold_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
 
@@ -40,11 +39,7 @@ struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
     const double alpha{
         std::abs(helper::randNormal(view.rng(), 0.0, view.offerAdjustmentVolatility()))
     };
-    const bool shouldRaise{
-        (view.offerNum() != 0.0)
-            ? view.actualEmploy() / view.offerNum() < view.acceptanceRateThreshold()
-            : true
-    };
+    const bool   shouldRaise{view.actualEmploy() < view.targetEmploy()};
     const double offerRate{view.offerRate() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
     return std::max(0.0, offerRate);
 }
