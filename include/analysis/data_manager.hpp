@@ -9,13 +9,15 @@
 #include <string>
 #include <vector>
 
+#include "config.hpp"
+
 namespace analysis {
 class [[nodiscard]] InputDataManager {
   public:
-    InputDataManager(const std::string&& inputPath) : inFile_{inputPath, HighFive::File::ReadOnly} {
+    InputDataManager() : inFile_{config::setting::inputPath, HighFive::File::ReadOnly} {
         if (not inFile_.isValid()) {
             std::cerr << "Failed to load the file\n"
-                      << "Path: " << std::filesystem::absolute(inputPath) << '\n';
+                      << "Path: " << std::filesystem::absolute(config::setting::inputPath) << '\n';
             std::abort();
         }
         stepKeys_ = inFile_.listObjectNames();
@@ -60,19 +62,19 @@ class [[nodiscard]] InputDataManager {
 
 class [[nodiscard]] OutputDataManager {
   public:
-    OutputDataManager(const std::string&& outputPath)
+    OutputDataManager()
         : outFile_{
-              outputPath,
+              config::setting::outputPath,
               HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
           } {
         if (not outFile_.isValid()) {
             std::cerr << "Failed to create the file\n"
-                      << "Path: " << std::filesystem::absolute(outputPath) << '\n';
+                      << "Path: " << std::filesystem::absolute(config::setting::outputPath) << '\n';
             std::abort();
         }
     }
 
-    void write(const std::string& dataSetName, const std::vector<double>& container) {
+    void write(const std::string&& dataSetName, const std::vector<double>& container) {
         outFile_.createDataSet(dataSetName, HighFive::DataSpace::From(container)).write(container);
     }
 
