@@ -13,32 +13,27 @@
 
 namespace labor_demander {
 namespace {
+[[nodiscard]] auto wageGuard(
+    const double wage, const double epsilon = config::labor_demander::epsilonWage
+) -> double {
+    return std::max(wage, epsilon);
+}
+
 struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
 
-    auto log() const -> std::tuple<double, double, double> {
-        const auto& log = comp_.log_;
-        return {log.wage_, log.targetEmploy_, log.actualEmploy_};
-    }
+    auto lastOfferPlan() const -> double { return comp_.log_.offerPlan_; }
+    auto lastApplicantNum() const -> double { return comp_.log_.applicantNum_; }
     auto wageAdjustVol() const -> double { return comp_.parameter_.wageAdjustmentVolatility_; }
-    auto fillRateThreshold() const -> double { return comp_.parameter_.fillRateThreshold_; }
+    auto lastWage() const -> double { return comp_.log_.wage_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
 
-[[nodiscard]] auto calcNextWage(
-    CalcNextWageView view, const double epsilonWage = config::labor_demander::epsilonWage
-) -> double {
-    const auto [lastWage, lastTargetEmploy, lastActualEmploy]{view.log()};
-    assert(lastWage > 0.0 && "last wage is required > 0");
-    assert(lastTargetEmploy >= 0 && "last target employ is required >= 0");
-
-    const double occupancyRate{(lastTargetEmploy != 0) ? lastActualEmploy / lastTargetEmploy : 0.0};
-    const bool   shouldRaiseWage{occupancyRate < view.fillRateThreshold()};
-    const double alpha{
-        std::abs(helper::randNormal(view.rng(), 0.0, view.wageAdjustVol(), -1.0, 1.0))
-    };
-    const double nextWage{lastWage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
-    return std::max(epsilonWage, nextWage);
+[[nodiscard]] auto calcNextWage(CalcNextWageView view) -> double {
+    const bool   shouldRaiseWage{view.lastApplicantNum() < view.lastOfferPlan()};
+    const double alpha{std::abs(helper::randNormal(view.rng(), 0.0, view.wageAdjustVol()))};
+    const double nextWage{view.lastWage() * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
+    return wageGuard(nextWage);
 }
 
 struct CalcNextEmployView final : BaseView<Component> {
@@ -58,16 +53,17 @@ struct CalcNextEmployView final : BaseView<Component> {
 
 struct [[nodiscard]] CalcNextOfferView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-
-    auto acceptanceRate() const -> double { return comp_.parameter_.acceptanceRate_; }
+    auto acceptanceRate() const -> double { return comp_.parameter_.offerRate_; }
 };
 
 [[nodiscard]] auto calcNextOffer(const CalcNextOfferView& view, const int employ) -> int {
     const double acceptanceRate{view.acceptanceRate()};
-    const double offer{(acceptanceRate != 0.0) ? employ / acceptanceRate : employ};
+    assert(acceptanceRate > 0.0 && "acceptance rate is required > 0");
+    const double offer{employ / acceptanceRate};
     return static_cast<int>(std::round(offer));
 }
 }  // namespace
+
 void postJob(
     const int                                    id,
     const bool                                   isSold,
