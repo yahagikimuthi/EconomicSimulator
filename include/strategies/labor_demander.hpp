@@ -29,7 +29,7 @@ void postJob(
 
 struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto employPlan() const -> int { return comp_.plan_.employ_; }
+    auto offerPlan() const -> int { return comp_.plan_.offer_; }
     auto myRequest() -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }

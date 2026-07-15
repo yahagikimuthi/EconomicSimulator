@@ -10,14 +10,14 @@
 namespace labor_demander {
 namespace {
 void sortApplicants(
-    const int                                               employ,
+    const int                                               offer,
     std::vector<std::reference_wrapper<world::LaborEntry>>& applicants,
     tbb::concurrent_vector<world::LaborEntry>&              entryBox
 ) {
-    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(employ))};
+    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer))};
     applicants.clear();
     for (world::LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
-    const bool isOver{entryBox.size() > static_cast<std::size_t>(employ)};
+    const bool isOver{entryBox.size() > static_cast<std::size_t>(offer)};
 
     if (not isOver) return;
 
@@ -40,15 +40,15 @@ void offerApplicants(OfferApplicantsView view) {
         return;
     }
 
-    const int employ{view.employPlan()};
+    const int offer{view.offerPlan()};
 
     static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
-    sortApplicants(employ, applicants, myRequest.entryBox_);
+    sortApplicants(offer, applicants, myRequest.entryBox_);
 
     int offerNum{};
     for (auto requestRef : applicants) {
         world::LaborEntry& request = requestRef.get();
-        if (offerNum >= employ) break;
+        if (offerNum >= offer) break;
         request.isOffer_ = true;
         view.recordOffer(request);
         ++offerNum;
