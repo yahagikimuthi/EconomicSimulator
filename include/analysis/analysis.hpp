@@ -1,5 +1,7 @@
 #pragma once
 
+#include <analysis/context_task.hpp>
+#include <config.hpp>
 #include <numeric>
 
 #include "pipeline.hpp"
@@ -16,6 +18,17 @@ namespace analysis {
 void analysisData() {
     namespace name = config::save_name;
     Pipeline pipeline{};
+
+    pipeline.requireData(name::firmAssets);
+    pipeline.requireData(name::householdAssets);
+
+    pipeline.registerMetric("avgFirmAssets", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::firmAssets));
+    });
+    pipeline.registerMetric("avgHholdAssets", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::householdAssets));
+    });
+
     pipeline.execute();
 }
 }  // namespace analysis
