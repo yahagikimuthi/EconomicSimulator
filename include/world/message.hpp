@@ -44,12 +44,12 @@ struct GoodsEntry {
 
 struct CensusDropBox {
     std::vector<double> firmAssets_;
-    std::vector<int>    postedEmployments_;
-    std::vector<int>    employments_;
+    std::vector<double> postedEmployments_;
+    std::vector<double> employments_;
     std::vector<double> prices_;
     std::vector<double> supplies_;
     std::vector<double> markups_;
-    std::vector<double> inventory_;
+    std::vector<double> inventories_;
 
     std::vector<double> hholdAssets_;
     std::vector<double> wages_;
@@ -63,7 +63,7 @@ struct CensusDropBox {
         prices_.reserve(firmCnt);
         supplies_.reserve(firmCnt);
         markups_.reserve(firmCnt);
-        inventory_.reserve(firmCnt);
+        inventories_.reserve(firmCnt);
 
         hholdAssets_.reserve(hholdCnt);
         wages_.reserve(hholdCnt);
@@ -76,7 +76,7 @@ struct CensusDropBox {
         prices_.clear();
         supplies_.clear();
         markups_.clear();
-        inventory_.clear();
+        inventories_.clear();
 
         hholdAssets_.clear();
         wages_.clear();
