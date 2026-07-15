@@ -32,7 +32,7 @@ struct Parameter {
     const double wageAdjustmentVolatility_;
     const double employAdjustmentVolatility_;
     const double offerAdjustmentVolatility_;
-    const double offerRateThreshold_;
+    const double acceptRateThreshold_;
 };
 struct Posting {
     world::LaborRequest*                                   myRequest_;

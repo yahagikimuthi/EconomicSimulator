@@ -34,7 +34,7 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
           .wageAdjustmentVolatility_   = rand(rng_, 0.01, 0.1),
           .employAdjustmentVolatility_ = rand(rng_, 1, 3),
           .offerAdjustmentVolatility_  = rand(rng_, 0.3, 0.5),
-          .offerRateThreshold_         = rand(rng_, 0.3, 0.8)
+          .acceptRateThreshold_        = rand(rng_, 0.3, 0.8)
       } {}
 }  // namespace labor_demander
 namespace labor_supplier {

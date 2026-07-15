@@ -26,15 +26,16 @@ namespace labor_demander {
 namespace {
 struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto acceptanceRate() const -> double { return comp_.parameter_.offerRate_; }
+    auto offerRate() const -> double { return comp_.parameter_.offerRate_; }
     auto offerAdjustmentVolatility() const -> double {
         return comp_.parameter_.offerAdjustmentVolatility_;
     }
     auto actualEmploy() const -> double { return comp_.employmentLedger.employing_; }
     auto offerNum() const -> double { return comp_.plan_.offer_; }
-    auto acceptanceRateThreshold() const -> double { return comp_.parameter_.offerRateThreshold_; }
+    auto acceptanceRateThreshold() const -> double { return comp_.parameter_.acceptRateThreshold_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
+
 [[nodiscard]] auto updateAcceptanceRate(UpdateAcceptanceRateView view) -> double {
     const double alpha{
         std::abs(helper::randNormal(view.rng(), 0.0, view.offerAdjustmentVolatility()))
@@ -44,7 +45,8 @@ struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
             ? view.actualEmploy() / view.offerNum() < view.acceptanceRateThreshold()
             : true
     };
-    return view.acceptanceRate() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
+    const double offerRate{view.offerRate() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+    return offerRate;
 }
 }  // namespace
 
@@ -69,7 +71,7 @@ void reset(Component& comp) {
     comp.posting_.myRequest_ = nullptr;
     comp.posting_.isPosting_ = false;
     comp.posting_.offerApplicants_.clear();
-}  // namespace labor_demander
+}
 }  // namespace labor_demander
 
 namespace labor_supplier {
