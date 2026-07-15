@@ -51,6 +51,9 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         auto& ledger = comp_.employmentLedger;
         ledger.employing_ += actualEmploy, ledger.sumWage_ += wage * actualEmploy;
     }
+    void applicantNumPlus(const std::size_t n) {
+        comp_.employmentLedger.applicantNum_ += static_cast<int>(n);
+    }
 };
 
 [[nodiscard]] auto registerMember(RegisterMemberView view) -> double;
