@@ -12,6 +12,7 @@
 #include "world/message.hpp"
 
 namespace labor_demander {
+namespace {
 struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
 
@@ -24,15 +25,6 @@ struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
     auto rng() -> pcg32& { return comp_.rng_; }
 };
 
-struct CalcNextEmployView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-
-    auto employAdjustVol() const -> double { return comp_.parameter_.employAdjustmentVolatility_; }
-    auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
-};
-
-namespace {
 [[nodiscard]] auto calcNextWage(
     CalcNextWageView view, const double epsilonWage = config::labor_demander::epsilonWage
 ) -> double {
@@ -49,11 +41,31 @@ namespace {
     return std::max(epsilonWage, nextWage);
 }
 
+struct CalcNextEmployView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+
+    auto employAdjustVol() const -> double { return comp_.parameter_.employAdjustmentVolatility_; }
+    auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }
+    auto rng() -> pcg32& { return comp_.rng_; }
+};
+
 [[nodiscard]] auto calcNextEmploy(CalcNextEmployView view, const bool isSold) -> int {
     const double diff{std::abs(helper::randNormal(view.rng(), 0.0, view.employAdjustVol()))};
     const double employ{view.lastEmploy() + (isSold ? diff : -diff)};
     const int    out{static_cast<int>(std::round(employ))};
     return std::max(1, out);
+}
+
+struct [[nodiscard]] CalcNextOfferView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+
+    auto acceptanceRate() const -> double { return comp_.parameter_.acceptanceRate_; }
+};
+
+[[nodiscard]] auto calcNextOffer(const CalcNextOfferView& view, const int employ) -> int {
+    const double acceptanceRate{view.acceptanceRate()};
+    const double offer{(acceptanceRate != 0.0) ? employ / acceptanceRate : employ};
+    return static_cast<int>(std::round(offer));
 }
 }  // namespace
 void postJob(
@@ -64,7 +76,8 @@ void postJob(
 ) {
     const double nextWage{calcNextWage(CalcNextWageView{view})};
     const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, isSold)};
-    view.plan(nextWage, nextEmploy);
+    const int    nextOffer{calcNextOffer(CalcNextOfferView{view}, nextEmploy)};
+    view.plan(nextWage, nextEmploy, nextOffer);
     if (nextEmploy == 0) {
         view.posting(false);
         return;

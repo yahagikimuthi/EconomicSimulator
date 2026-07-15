@@ -10,8 +10,9 @@
 namespace labor_demander {
 struct [[nodiscard]] PostJobView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    void plan(const double wage, const int employ) {
-        comp_.plan_.wage_ = wage, comp_.plan_.employ_ = employ;
+    void plan(const double wage, const int employ, const int offer) {
+        auto& plan = comp_.plan_;
+        plan.wage_ = wage, plan.employ_ = employ, plan.offer_ = offer;
     }
     void myRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
         comp_.posting_.myRequest_ = &*it;

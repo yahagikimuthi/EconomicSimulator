@@ -11,10 +11,12 @@ struct Log {
     double wage_;
     int    targetEmploy_;
     int    actualEmploy_;
+    int    offer_;
 };
 struct Plan {
     double wage_;
     int    employ_;
+    int    offer_;
 };
 struct HR {
     double sumWage_;
@@ -25,9 +27,11 @@ struct EmploymentLedger {
     double sumWage_;
 };
 struct Parameter {
+    double       acceptanceRate_;
     const double wageAdjustmentVolatility_;
     const double employAdjustmentVolatility_;
     const double fillRateThreshold_;
+    const double offerAdjustmentVolatility_;
 };
 struct Posting {
     world::LaborRequest*                                   myRequest_;
