@@ -33,16 +33,14 @@ def genericKdeFrame(frame, df, columnName, ax, line, title, titleTemplate, xEval
     title.set_text(titleTemplate.format(frame=frame))
     return line, title
 
-def generateKdeGif(df, columnName, fileName, titleTemplate="Distribution Dynamics [{frame}]", 
-                   xlabel="Value", color="teal", xmax=1000.0, ymax=5.0, stepInterval=2):
+def generateKdeGif(df, columnName, filename, titleTemplate="Distribution Dynamics [{frame}]", 
+                   xlabel="Value", color="teal", stepInterval=2):
     fig, ax = plt.subplots(figsize=(7, 4))
     
     xMin = df[columnName].min()
     xMax = df[columnName].max()
     xEval = np.linspace(xMin, xMax, 200)
     
-    ax.set_xlim(xMin, xmax)
-    ax.set_ylim(0, ymax)
     ax.set_xlabel(xlabel)
     ax.set_ylabel("Density")
     ax.grid(True, linestyle='--', alpha=0.5)
@@ -66,6 +64,6 @@ def generateKdeGif(df, columnName, fileName, titleTemplate="Distribution Dynamic
         fig, boundUpdate, frames=range(0, maxStep + 1, stepInterval), blit=True
     )
     
-    ani.save(fileName, writer='pillow', fps=15)
+    ani.save(filename, writer='pillow', fps=15)
     plt.close()
-    print("KDEアニメーションを保存しました: {filename}")
+    print(f"KDEアニメーションを保存しました: {filename}")

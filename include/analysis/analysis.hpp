@@ -19,7 +19,7 @@ void analysisData() {
 
     pipeline.requireData("prices");
 
-    pipeline.registerMetric("cpp", [](const DataContext& ctx) -> double {
+    pipeline.registerMetric("cpi", [](const DataContext& ctx) -> double {
         const auto& prices = ctx.get("prices");
         return calcMean(prices);
     });

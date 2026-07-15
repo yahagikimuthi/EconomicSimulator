@@ -31,8 +31,8 @@ constexpr int goodsSampleCnt{2};
 }  // namespace config::goods_demander
 
 namespace config::agent_count {
-constexpr int firm{10};
-constexpr int hhold{200};
+constexpr int firm{20};
+constexpr int hhold{400};
 }  // namespace config::agent_count
 
 namespace config {

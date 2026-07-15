@@ -17,13 +17,13 @@ def loadSimulationResults(filepath: str) -> None:
                 allRows.append({
                     "step": stepNum,
                     "firmId": firmId,
-                    "price": prices[firmId]
+                    "prices": prices[firmId]
                 })
     
     print("生データを読み込みました")
     return pd.DataFrame(allRows)
 
-def loadMetrics(filepath: str):
+def loadMetrics(filepath: str) -> None:
     with h5py.File(filepath, "r") as f:
         data = {key: f[key][:] for key in f.keys()}
     print("統計量を読み込みました")
