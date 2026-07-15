@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <string>
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
@@ -32,7 +31,7 @@ struct FirmTag {};
 
 class Logger {
   public:
-    explicit Logger(const std::string& filename);
+    explicit Logger();
     [[nodiscard]] auto isValid() const -> bool { return file_.isValid(); }
 
     void save(const world::CensusDropBox& dropBox, const int step);
@@ -43,7 +42,7 @@ class Logger {
 
 class [[nodiscard]] Engine {
   public:
-    explicit Engine(const int totalStep, const std::string& filename);
+    explicit Engine(const int totalStep);
 
     void run();
 

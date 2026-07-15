@@ -7,7 +7,6 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
 #include <ranges>
-#include <string>
 
 #include "config.hpp"
 
@@ -33,8 +32,7 @@ void createHHold(const int id, entt::registry& registry) {
 }
 }  // namespace
 */
-Engine::Engine(const int totalStep, const std::string& filename)
-    : logger_{filename}, totalStep_{totalStep}, seed_{helper::generatePCG32Seed()} {
+Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::generatePCG32Seed()} {
     if (not logger_.isValid()) {
         assert(false && "can not create file");
     }
@@ -63,8 +61,9 @@ Engine::Engine(const int totalStep, const std::string& filename)
     }
 }
 
-Logger::Logger(const std::string& filename)
+Logger::Logger()
     : file_{
-          filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
+          config::setting::simulationResultOutputPath,
+          HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
       } {}
 }  // namespace core
