@@ -53,13 +53,13 @@ struct CalcNextEmployView final : BaseView<Component> {
 
 struct [[nodiscard]] CalcNextOfferView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto acceptanceRate() const -> double { return comp_.parameter_.offerRate_; }
+    auto offerRate() const -> double { return comp_.parameter_.offerRate_; }
 };
 
 [[nodiscard]] auto calcNextOffer(const CalcNextOfferView& view, const int employ) -> int {
-    const double acceptanceRate{view.acceptanceRate()};
-    assert(acceptanceRate > 0.0 && "acceptance rate is required > 0");
-    const double offer{employ / acceptanceRate};
+    const double offerRate{view.offerRate()};
+    assert(offerRate >= 0.0 && "acceptance rate is required > 0");
+    const double offer{employ * (1.0 + offerRate)};
     return static_cast<int>(std::round(offer));
 }
 }  // namespace
