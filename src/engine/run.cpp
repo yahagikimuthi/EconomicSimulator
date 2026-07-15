@@ -2,7 +2,6 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <ranges>
 #include <string>
 
 #include "config.hpp"
@@ -12,7 +11,7 @@
 
 namespace core {
 void Engine::run() {
-    for (const auto _ : std::views::iota(0, totalStep_)) {
+    for (currentStep_ = 0; currentStep_ < totalStep_; ++currentStep_) {
         runLabor();
         runGoods();
         logging();
@@ -84,7 +83,7 @@ void Engine::logging() {
     for (HHold& hhold : hholds_) {
         hhold_finance::logging(dropBox_, hhold.finance);
     }
-    logger_.save(dropBox_, config::currentStep);
+    logger_.save(dropBox_, currentStep_);
     dropBox_.clear();
 }
 
