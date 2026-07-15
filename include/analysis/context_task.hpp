@@ -35,7 +35,7 @@ class [[nodiscard]] DataContext {
     }
 
     std::unordered_map<std::string, std::vector<double>> cache_;
-    std::vector<double>                                  noneData_;
+    const std::vector<double>                            noneData_;
 };
 
 template <typename Logic>
@@ -55,20 +55,20 @@ class IMetricTask {
 
     void         reserve(const std::size_t n) { results_.reserve(n); }
     virtual void process(const DataContext& ctx) = 0;
-    void         writeResult(OutputDataManager& output) { output.write(outName_, results_); }
+    void writeResult(OutputDataManager& output) { output.write(std::move(outName_), results_); }
 
   protected:
     void pushBackData(const double data) { results_.emplace_back(data); }
 
   private:
     std::vector<double> results_;
-    const std::string   outName_;
+    std::string         outName_;
 };
 
 template <LogicType Logic>
 class MetricTask final : public IMetricTask {
   public:
-    MetricTask(std::string&& outName, Logic logic)
+    MetricTask(std::string&& outName, const Logic logic)
         : IMetricTask(std::move(outName)), logic_{logic} {}
 
     void process(const DataContext& ctx) override { pushBackData(logic_(ctx)); }
