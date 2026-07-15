@@ -12,14 +12,15 @@ namespace analysis {
 
 class [[nodiscard]] DataContext {
   public:
-    void set(const std::string& name, std::vector<double>& data) {
+    void set(const std::string& name, std::vector<double>&& data) {
         cache_.try_emplace(name, std::move(data));
     }
 
     auto get(const std::string& name) const -> const std::vector<double>& {
         const std::vector<double>* out{tryGet(name)};
-        if (out == nullptr) return noneData_;
-        return *out;
+        if (out != nullptr) return *out;
+        std::cerr << "this function return empty vector(size=0) now\n";
+        return noneData_;
     }
 
     void clear() { cache_.clear(); }
@@ -53,7 +54,8 @@ class IMetricTask {
     IMetricTask(IMetricTask&&)                         = default;
     auto operator=(IMetricTask&&) -> IMetricTask&      = delete;
 
-    void         reserve(const std::size_t n) { results_.reserve(n); }
+    void reserve(const std::size_t n) { results_.reserve(n); }
+
     virtual void process(const DataContext& ctx) = 0;
     void writeResult(OutputDataManager& output) { output.write(std::move(outName_), results_); }
 

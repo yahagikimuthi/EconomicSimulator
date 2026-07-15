@@ -1,5 +1,11 @@
 #include "analysis/pipeline.hpp"
 
+#include <string>
+#include <vector>
+
+#include "analysis/context_task.hpp"
+#include "analysis/data_manager.hpp"
+
 namespace analysis {
 void Pipeline::execute() {
     std::vector<std::string> stepKeys = inputManager_.getStepKeys();
@@ -16,7 +22,7 @@ void Pipeline::execute() {
         for (const std::string& requireData : requireDatas_) {
             std::vector<double> data;
             inputManager_.read(stepKey, requireData, data);
-            ctx.set(requireData, data);
+            ctx.set(requireData, std::move(data));
         }
 
         for (auto& task : tasks_) {
