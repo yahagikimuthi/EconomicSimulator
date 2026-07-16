@@ -11,7 +11,7 @@
 namespace goods_demander {
 struct Posting {
     using GoodsMarketCoordinate =
-        std::pair<SafePtr<const world::GoodsEntry>, SafePtr<world::GoodsRequest>>;
+        std::pair<SafePtr<const world::GoodsEntry>, SafePtr<const world::GoodsRequest>>;
     GoodsMarketCoordinate myRequest_{nullptr, nullptr};
     bool                  isPosting_{false};
 };
