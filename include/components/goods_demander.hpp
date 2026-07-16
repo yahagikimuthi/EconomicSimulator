@@ -5,11 +5,13 @@
 #include <pcg_random.hpp>
 #include <utility>
 
+#include "core/base.hpp"
 #include "core/forward.hpp"
 
 namespace goods_demander {
 struct Posting {
-    using GoodsMarketCoordinate = std::pair<const world::GoodsEntry*, world::GoodsRequest*>;
+    using GoodsMarketCoordinate =
+        std::pair<SafePtr<const world::GoodsEntry>, SafePtr<world::GoodsRequest>>;
     GoodsMarketCoordinate myRequest_{nullptr, nullptr};
     bool                  isPosting_{false};
 };
