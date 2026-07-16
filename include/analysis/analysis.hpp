@@ -21,12 +21,16 @@ void analysisData() {
 
     pipeline.requireData(name::firmAssets);
     pipeline.requireData(name::householdAssets);
+    pipeline.requireData(name::prices);
 
     pipeline.registerMetric("avgFirmAssets", [](const DataContext& ctx) -> double {
         return calcMean(ctx.get(name::firmAssets));
     });
     pipeline.registerMetric("avgHholdAssets", [](const DataContext& ctx) -> double {
         return calcMean(ctx.get(name::householdAssets));
+    });
+    pipeline.registerMetric("avgPrices", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::prices));
     });
 
     pipeline.execute();
