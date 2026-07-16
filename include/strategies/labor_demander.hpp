@@ -42,7 +42,7 @@ void offerApplicants(OfferApplicantsView view);
 
 struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto myRequest() const -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
+    auto myRequest() const -> const world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto offerApplicants() const -> std::vector<std::reference_wrapper<world::LaborEntry>>& {
         return comp_.posting_.offerApplicants_;
     }
