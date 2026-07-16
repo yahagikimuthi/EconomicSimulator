@@ -9,7 +9,7 @@
 namespace goods_supplier {
 struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    void myEntry(const tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
+    void myEntry(tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT
         comp_.posting_.myEntry_ = &*it;
     }
     void plan(const double price, const double supply, const double markup) {

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <pcg_random.hpp>
 
+#include "core/base.hpp"
 #include "core/forward.hpp"
 
 namespace goods_supplier {
@@ -24,8 +25,8 @@ struct SalesLedger {
     double currentSales;
 };
 struct Posting {
-    world::GoodsEntry* myEntry_{nullptr};
-    bool               isPosting_{false};
+    SafePtr<world::GoodsEntry> myEntry_{nullptr};
+    bool                       isPosting_{false};
 };
 struct Production {
     double firmProductPower_;
