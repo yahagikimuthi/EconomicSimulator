@@ -30,8 +30,8 @@ void purchase(
     PurchaseView                               view,
     const double                               availableAsset,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int  maxPurchaseFrequency = config::goods_demander::maxPurchaseFrequency,
-    const int& step                 = config::currentStep
+    const int                                  step,
+    const int maxPurchaseFrequency = config::goods_demander::maxPurchaseFrequency
 );
 
 struct [[nodiscard]] AfterTradeView final : BaseView<Component> {

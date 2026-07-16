@@ -1,17 +1,15 @@
 #include "strategies/orchestrator.hpp"
 
 #include <tbb/concurrent_vector.h>
-#include <components/goods_demander.hpp>
-#include <components/goods_supplier.hpp>
-#include <strategies/common.hpp>
-#include <world/message.hpp>
 
 #include "components/common.hpp"
-
+#include "components/goods_demander.hpp"
+#include "components/goods_supplier.hpp"
 #include "strategies/goods_demander.hpp"
 #include "strategies/goods_supplier.hpp"
 #include "strategies/labor_demander.hpp"
 #include "strategies/labor_supplier.hpp"
+#include "world/message.hpp"
 
 namespace orchestrator::labor {
 void postLaborRequest(
@@ -88,11 +86,14 @@ void purchase(
     const hhold_finance::Component&            financeComponent,
     goods_demander::Component&                 goodsDemander,
     const labor_supplier::Component&           laborSupplier,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
+    const int                                  step
 ) {
     const double asset{financeComponent.asset()};
     const double wage{laborSupplier.wage()};
-    goods_demander::purchase(goods_demander::PurchaseView{goodsDemander}, asset + wage, entryBox);
+    goods_demander::purchase(
+        goods_demander::PurchaseView{goodsDemander}, asset + wage, entryBox, step
+    );
 }
 
 void trade(goods_supplier::Component& goodsSupplier) {

@@ -35,10 +35,6 @@ constexpr int firm{20};
 constexpr int hhold{400};
 }  // namespace config::agent_count
 
-namespace config {
-static thread_local inline int currentStep{0};  // NOLINT
-}  // namespace config
-
 namespace config::save_name {
 static inline const std::string firmAssets{"firmAssets"};
 static inline const std::string postedEmployments{"postedEmployments"};

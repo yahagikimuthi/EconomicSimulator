@@ -42,8 +42,8 @@ void purchase(
     PurchaseView                               view,
     const double                               availableAsset,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                  maxPurchaseFrequency,
-    const int&                                 step
+    const int                                  step,
+    const int                                  maxPurchaseFrequency
 ) {
     if (entryBox.empty() or (step % maxPurchaseFrequency != view.myPhase())) {
         view.isPosting(false);

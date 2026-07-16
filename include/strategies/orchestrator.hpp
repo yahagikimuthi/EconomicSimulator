@@ -50,7 +50,8 @@ void purchase(
     const hhold_finance::Component&            financeComponent,
     goods_demander::Component&                 goodsDemander,
     const labor_supplier::Component&           laborSupplier,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
+    const int                                  step
 );
 
 void trade(goods_supplier::Component& goodsSupplier);
