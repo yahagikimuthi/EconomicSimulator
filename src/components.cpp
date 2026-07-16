@@ -65,7 +65,7 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
           .isSold_ = true
       },
       production_{
-          .firmProductPower_        = rand(rng_, 0.9, 1.1),
+          .firmProductPower_        = rand(rng_, 0.0001, 0.0005),
           .sumEmployeeProductPower_ = 0.0,
           .inventory_               = rand(rng_, 0.5, 2.0)
       },
