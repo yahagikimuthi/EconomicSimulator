@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <concepts>
+#include <cstddef>
 
 template <typename ComponentType>
 struct BaseView {
@@ -46,6 +47,25 @@ class [[nodiscard]] SafePtr {
         return ptr_;
     }
 
+    auto operator=(const T* const ptr) -> SafePtr& {
+        ptr_ = ptr;
+        return *this;
+    }
+
+    explicit operator bool() const { return ptr_ != nullptr; }
+
+    SafePtr(const SafePtr&)                    = default;
+    auto operator=(const SafePtr&) -> SafePtr& = default;
+    SafePtr(SafePtr&&)                         = default;
+    auto operator=(SafePtr&&) -> SafePtr&      = default;
+    ~SafePtr()                                 = default;
+
   private:
     T* ptr_ = nullptr;
 };
+
+#include <utility>
+void foo() {
+    std::pair<int, int> pair{0, 0};
+    pair = {1, 2};
+}
