@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from typing import Final
 
-def loadSimulationResults(filepath: str) -> None:
+def loadSimulationResults(filepath: str) -> pd.DataFrame:
     allRows: list = []
 
     with h5py.File(filepath, "r") as f:
@@ -35,7 +35,7 @@ def loadSimulationResults(filepath: str) -> None:
     print("生データを読み込みました")
     return pd.DataFrame(allRows)
 
-def loadMetrics(filepath: str) -> None:
+def loadMetrics(filepath: str) -> pd.DataFrame:
     with h5py.File(filepath, "r") as f:
         data: Final[dict] = {key: f[key][:] for key in f.keys()}
     print("統計量を読み込みました")
