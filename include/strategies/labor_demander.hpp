@@ -14,7 +14,7 @@ struct [[nodiscard]] PostJobView final : BaseView<Component> {
         auto& plan = comp_.plan_;
         plan.wage_ = wage, plan.employ_ = employ, plan.offer_ = offer;
     }
-    void myRequest(const tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
+    void myRequest(tbb::concurrent_vector<world::LaborRequest>::iterator it) {  // NOLINT
         comp_.posting_.myRequest_ = &*it;
     }
     void posting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }

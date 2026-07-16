@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <pcg_random.hpp>
 
+#include "core/base.hpp"
 #include "core/forward.hpp"
 
 namespace labor_demander {
@@ -34,7 +35,7 @@ struct Parameter {
     const double offerAdjustmentVolatility_;
 };
 struct Posting {
-    world::LaborRequest*                                   myRequest_;
+    SafePtr<world::LaborRequest>                           myRequest_{nullptr};
     std::vector<std::reference_wrapper<world::LaborEntry>> offerApplicants_;
     bool                                                   isPosting_;
 };
