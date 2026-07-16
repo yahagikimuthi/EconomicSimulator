@@ -63,7 +63,7 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
 
 Logger::Logger()
     : file_{
-          config::setting::simulationResultOutputPath,
+          static_cast<std::string>(config::setting::simulationResultOutputPath),
           HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
       } {}
 }  // namespace core

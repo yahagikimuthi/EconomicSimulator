@@ -19,7 +19,7 @@ void Pipeline::execute() {
     for (const std::string& stepKey : stepKeys) {
         stepNumVec.emplace_back(std::stoi(stepKey.substr(5)));
 
-        for (const std::string& requireData : requireDatas_) {
+        for (std::string_view requireData : requireDatas_) {
             std::vector<double> data;
             inputManager_.read(stepKey, requireData, data);
             ctx.set(requireData, std::move(data));

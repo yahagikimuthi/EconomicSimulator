@@ -10,7 +10,7 @@ namespace analysis {
 
 class Pipeline {
   public:
-    void requireData(const std::string& name) { requireDatas_.emplace_back(name); }
+    void requireData(std::string_view name) { requireDatas_.emplace_back(name); }
 
     template <LogicType Logic>
     void registerMetric(std::string outName, Logic logic) {
@@ -23,7 +23,7 @@ class Pipeline {
     InputDataManager  inputManager_;
     OutputDataManager outputManager_;
 
-    std::vector<std::string>                  requireDatas_;
+    std::vector<std::string_view>             requireDatas_;
     std::vector<std::unique_ptr<IMetricTask>> tasks_;
 };
 }  // namespace analysis

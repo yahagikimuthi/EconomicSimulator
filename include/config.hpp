@@ -4,11 +4,11 @@
 #include <string>
 
 namespace config::setting {
-constexpr bool          useRuntimeRandomSeed{false};
-constexpr std::uint64_t fixedSeedState{0x853c49e6748fea9bULL};
-constexpr std::uint64_t fixedSeedStream{0xda3e39cb94b95bdbULL};
-const std::string       simulationResultOutputPath{"../outputs/result.h5"};
-const std::string       metricDataOutputPath{"../outputs/metrics.h5"};
+constexpr bool             useRuntimeRandomSeed{false};
+constexpr std::uint64_t    fixedSeedState{0x853c49e6748fea9bULL};
+constexpr std::uint64_t    fixedSeedStream{0xda3e39cb94b95bdbULL};
+constexpr std::string_view simulationResultOutputPath{"../outputs/result.h5"};
+constexpr std::string_view metricDataOutputPath{"../outputs/metrics.h5"};
 }  // namespace config::setting
 
 namespace config::labor_demander {
@@ -36,13 +36,13 @@ constexpr int hhold{400};
 }  // namespace config::agent_count
 
 namespace config::save_name {
-static inline const std::string firmAssets{"firmAssets"};
-static inline const std::string postedEmployments{"postedEmployments"};
-static inline const std::string employments{"employments"};
-static inline const std::string prices{"prices"};
-static inline const std::string supplies{"supplies"};
-static inline const std::string markups{"markups"};
-static inline const std::string inventories{"inventories"};
-static inline const std::string householdAssets{"householdAssets"};
-static inline const std::string wages{"wages"};
+constexpr std::string_view firmAssets{"firmAssets"};
+constexpr std::string_view postedEmployments{"postedEmployments"};
+constexpr std::string_view employments{"employments"};
+constexpr std::string_view prices{"prices"};
+constexpr std::string_view supplies{"supplies"};
+constexpr std::string_view markups{"markups"};
+constexpr std::string_view inventories{"inventories"};
+constexpr std::string_view householdAssets{"householdAssets"};
+constexpr std::string_view wages{"wages"};
 }  // namespace config::save_name

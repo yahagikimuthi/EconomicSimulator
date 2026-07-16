@@ -15,11 +15,16 @@ namespace analysis {
 class [[nodiscard]] InputDataManager {
   public:
     InputDataManager()
-        : inFile_{config::setting::simulationResultOutputPath, HighFive::File::ReadOnly} {
+        : inFile_{
+              static_cast<std::string>(config::setting::simulationResultOutputPath),
+              HighFive::File::ReadOnly
+          } {
         if (not inFile_.isValid()) {
             std::cerr << "Failed to load the file\n"
                       << "Path: "
-                      << std::filesystem::absolute(config::setting::simulationResultOutputPath)
+                      << std::filesystem::absolute(
+                             static_cast<std::string>(config::setting::simulationResultOutputPath)
+                         )
                       << '\n';
             std::abort();
         }
@@ -35,19 +40,19 @@ class [[nodiscard]] InputDataManager {
     }
 
     void read(
-        const std::string& path, const std::string& dataName, std::vector<double>& container
+        const std::string& path, std::string_view dataName, std::vector<double>& container
     ) const {
         const auto group{getGroup(path)};
         if (not group) {
             container.clear();
             return;
         }
-        if (not group->exist(dataName)) {
-            std::cerr << "data: " << dataName << "does not exit\n";
+        if (not group->exist(static_cast<std::string>(dataName))) {
+            std::cerr << "data: " << static_cast<std::string>(dataName) << "does not exit\n";
             container.clear();
             return;
         }
-        group->getDataSet(dataName).read(container);
+        group->getDataSet(static_cast<std::string>(dataName)).read(container);
     }
 
   private:
@@ -67,13 +72,16 @@ class [[nodiscard]] OutputDataManager {
   public:
     OutputDataManager()
         : outFile_{
-              config::setting::metricDataOutputPath,
+              static_cast<std::string>(config::setting::metricDataOutputPath),
               HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
           } {
         if (not outFile_.isValid()) {
             std::cerr << "Failed to create the file\n"
                       << "Path: "
-                      << std::filesystem::absolute(config::setting::metricDataOutputPath) << '\n';
+                      << std::filesystem::absolute(
+                             static_cast<std::string>(config::setting::metricDataOutputPath)
+                         )
+                      << '\n';
             std::abort();
         }
     }

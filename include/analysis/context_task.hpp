@@ -12,11 +12,11 @@ namespace analysis {
 
 class [[nodiscard]] DataContext {
   public:
-    void set(const std::string& name, std::vector<double>&& data) {
+    void set(std::string_view name, std::vector<double>&& data) {
         cache_.try_emplace(name, std::move(data));
     }
 
-    auto get(const std::string& name) const -> const std::vector<double>& {
+    auto get(std::string_view name) const -> const std::vector<double>& {
         const std::vector<double>* out{tryGet(name)};
         if (out != nullptr) return *out;
         std::cerr << "this function return empty vector(size=0) now\n";
@@ -26,8 +26,8 @@ class [[nodiscard]] DataContext {
     void clear() { cache_.clear(); }
 
   private:
-    auto tryGet(const std::string& name) const -> const std::vector<double>* {
-        auto it = cache_.find(std::string(name));
+    auto tryGet(std::string_view name) const -> const std::vector<double>* {
+        auto it = cache_.find(name);
         if (it == cache_.end()) {
             std::cerr << "required data not found in context: " << name << '\n';
             return nullptr;
@@ -35,8 +35,8 @@ class [[nodiscard]] DataContext {
         return &(it->second);
     }
 
-    std::unordered_map<std::string, std::vector<double>> cache_;
-    const std::vector<double>                            noneData_;
+    std::unordered_map<std::string_view, std::vector<double>> cache_;
+    const std::vector<double>                                 noneData_;
 };
 
 template <typename Logic>

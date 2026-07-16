@@ -97,8 +97,8 @@ void Logger::save(const world::CensusDropBox& dropBox, const int step) {
     std::string     groupPath{"/step_" + std::to_string(step)};
     HighFive::Group group{file_.createGroup(groupPath)};
 
-    auto create{[&group](const std::string& dataName, const std::vector<double>& data) -> void {
-        group.createDataSet(dataName, data);
+    auto create{[&group](std::string_view dataName, const std::vector<double>& data) -> void {
+        group.createDataSet(static_cast<std::string>(dataName), data);
     }};
 
     create(name::firmAssets, dropBox.firmAssets_);

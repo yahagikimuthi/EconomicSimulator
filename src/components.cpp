@@ -13,18 +13,18 @@ using namespace helper;
 
 namespace firm_finance {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)
-    : rng_{state, stream}, asset_{rand(rng_, 20.0, 50.0)} {}
+    : rng_{state, stream}, asset_{rand(rng_, 100000, 500000)} {}
 }  // namespace firm_finance
 namespace hhold_finance {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)
-    : rng_{state, stream}, asset_{rand(rng_, 2.0, 5.0)} {}
+    : rng_{state, stream}, asset_{rand(rng_, 100000, 500000)} {}
 }  // namespace hhold_finance
 
 namespace labor_demander {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)
     : rng_{state, stream},
       log_{
-          .wage_         = rand(rng_, 0.6, 0.8),
+          .wage_         = rand(rng_, 1000, 5000),
           .actualEmploy_ = randInt(rng_, 4, 12),
           .offerPlan_    = randInt(rng_, 10, 20),
           .applicantNum_ = randInt(rng_, 10, 20)
