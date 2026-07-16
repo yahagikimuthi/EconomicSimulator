@@ -100,10 +100,9 @@ void reset(Component& comp) {
         .price_  = comp.plan_.price_,
         .supply_ = comp.plan_.supply_,
         .sales_  = comp.salesLedger.currentSales,
-        .isSold_ = (comp.salesLedger.currentSales != 0.0)
-                       ? (comp.salesLedger.inventory_ / comp.plan_.supply_ <
-                          comp.parameter_.targetInventoryRatio_)
-                       : false
+        .isSold_ = (comp.plan_.supply_ != 0.0) ? (comp.salesLedger.inventory_ / comp.plan_.supply_ <
+                                                  comp.parameter_.targetInventoryRatio_)
+                                               : true
     };
     comp.plan_                  = {.markup_ = 0.0, .price_ = 0.0, .supply_ = 0.0};
     comp.production_.inventory_ = comp.salesLedger.inventory_;
