@@ -30,19 +30,6 @@ struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
     auto rng() -> pcg32& { return comp_.rng_; }
 };
 
-struct [[nodiscard]] JudgePriceView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-};
-
-struct [[nodiscard]] CalcAvgCostView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-
-    auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
-    auto sumEmployeeProductPower() const -> double {
-        return comp_.production_.sumEmployeeProductPower_;
-    }
-};
-
 namespace {
 [[nodiscard]] auto markupGuard(
     const double markup, const double epsilon = config::goods_supplier::epsilonMarkup
@@ -68,23 +55,17 @@ namespace {
     return markupGuard(nextMarkup);
 }
 
-[[nodiscard]] auto calcAvgCost(
-    const CalcAvgCostView& view, const double totalCost, const double employeeCnt
-) -> double {
+[[nodiscard]] auto calcAvgCost(const double totalCost, const double employeeCnt) -> double {
     assert(totalCost >= 0.0 && "total cost is required > 0");
     if (employeeCnt == 0.0) return 0.0;
-
-    const double sumProductPower{view.sumEmployeeProductPower() * view.firmProductPower()};
-    const double avgCost{(sumProductPower != 0.0) ? totalCost / sumProductPower : 0.0};
-    assert(avgCost >= 0.0 && "average cost is required >= 0");
+    const double avgCost{totalCost / employeeCnt};
     return avgCost;
 }
 
-[[nodiscard]] auto judgePrice(
-    JudgePriceView view, const double markup, const double totalCost, const double employeeCnt
-) -> double {
+[[nodiscard]] auto judgePrice(const double markup, const double totalCost, const double employeeCnt)
+    -> double {
     assert(markup > 0.0 && "markup is required > 0");
-    const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost, employeeCnt)};
+    const double avgCost{calcAvgCost(totalCost, employeeCnt)};
     const double price{avgCost * (1.0 + markup)};
     return priceGuard(price);
 }
@@ -98,7 +79,7 @@ void postGoods(
 ) {
     const double supply{calcSupply(CalcSupplyView{view})};
     const double markup{calcMarkup(CalcMarkupView{view})};
-    const double price{judgePrice(JudgePriceView{view}, markup, totalCost, employeeCnt)};
+    const double price{judgePrice(markup, totalCost, employeeCnt)};
     view.plan(price, supply, markup);
 
     // markupやprice自体は供給量0でも計算対象
