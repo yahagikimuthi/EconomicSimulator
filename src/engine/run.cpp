@@ -56,7 +56,7 @@ void Engine::runGoods() {
     }
 
     for (HHold& hhold : hholds_) {
-        goods::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_);
+        goods::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_, currentStep_);
     }
 
     for (Firm& firm : firms_) {
@@ -90,7 +90,6 @@ void Engine::logging() {
 void Engine::reset() {
     laborRequestBox_.clear();
     goodsEntryBox_.clear();
-    ++config::currentStep;
 }
 
 void Logger::save(const world::CensusDropBox& dropBox, const int step) {
@@ -98,11 +97,9 @@ void Logger::save(const world::CensusDropBox& dropBox, const int step) {
     std::string     groupPath{"/step_" + std::to_string(step)};
     HighFive::Group group{file_.createGroup(groupPath)};
 
-    auto create{
-        [&group](const std::string& dataName, const std::vector<double>& data) mutable -> void {
-            group.createDataSet(dataName, data);
-        }
-    };
+    auto create{[&group](const std::string& dataName, const std::vector<double>& data) -> void {
+        group.createDataSet(dataName, data);
+    }};
 
     create(name::firmAssets, dropBox.firmAssets_);
     create(name::postedEmployments, dropBox.postedEmployments_);
