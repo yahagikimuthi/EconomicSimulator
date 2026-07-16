@@ -2,7 +2,7 @@
 #include "core/engine.hpp"
 
 auto main() -> int {
-    core::Engine engine{100};
+    core::Engine engine{1000};
     engine.run();
 
     analysis::analysisData();
