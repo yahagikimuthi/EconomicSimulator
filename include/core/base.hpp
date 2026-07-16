@@ -63,9 +63,3 @@ class [[nodiscard]] SafePtr {
   private:
     T* ptr_ = nullptr;
 };
-
-#include <utility>
-void foo() {
-    std::pair<int, int> pair{0, 0};
-    pair = {1, 2};
-}
