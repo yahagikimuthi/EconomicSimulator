@@ -1,8 +1,10 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <atomic>
 
 #include "config.hpp"
+#include "core/base.hpp"
 
 namespace world {
 
@@ -40,6 +42,24 @@ struct GoodsEntry {
     tbb::concurrent_vector<GoodsRequest> requestBox_;
 
     GoodsEntry(const double price, const double supply) : price_{price}, supply_{supply} {}
+};
+
+struct Workspace {
+    std::atomic<double> totalLaborInput;
+    double              firmProductPower{};
+};
+
+struct EmployeeMessage {
+    bool isOccupied_{true};
+    bool isLaidOff{false};
+
+    Workspace& workspace_;
+    EmployeeMessage(Workspace& workspace) : workspace_{workspace} {}
+};
+
+struct CompanyBoard {
+    tbb::concurrent_vector<EmployeeMessage>          messages_;
+    tbb::concurrent_vector<SafePtr<EmployeeMessage>> resignationBox_;
 };
 
 struct CensusDropBox {
