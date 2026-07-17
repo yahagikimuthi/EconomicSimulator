@@ -58,12 +58,7 @@ namespace goods_supplier {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)
     : rng_{state, stream},
       log_{
-          .markup_         = rand(rng_, 0.1, 0.3),
-          .price_          = rand(rng_, 1.0, 1.2),
-          .supply_         = rand(rng_, 4.0, 12.0),
-          .sales_          = rand(rng_, 4.0, 14.0),
-          .demandForecast_ = rand(rng_, 5.0, 20.0),
-          .isSold_         = true
+          .markup_ = rand(rng_, 0.1, 0.3), .demandForecast_ = rand(rng_, 5.0, 20.0), .isSold_ = true
       },
       production_{
           .firmProductPower_        = rand(rng_, 0.0001, 0.0005),
@@ -74,10 +69,5 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
           .targetInventoryRatio_          = rand(rng_, 0.1, 0.2),
           .markupAdjustmentVolatility_    = rand(rng_, 0.01, 0.02),
           .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.5)
-      } {
-    log_.isSold_ =
-        log_.price_ * production_.inventory_ / log_.supply_ < parameter_.targetInventoryRatio_;
-    log_.supply_ = std::min(log_.supply_, production_.inventory_);
-    log_.sales_  = log_.price_ * (log_.supply_ - production_.inventory_);
-}
+      } {}
 }  // namespace goods_supplier

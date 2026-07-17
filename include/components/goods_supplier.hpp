@@ -10,9 +10,6 @@
 namespace goods_supplier {
 struct Log {
     double markup_;
-    double price_;
-    double supply_;
-    double sales_;
     double demandForecast_;
     bool   isSold_;
 };
@@ -53,7 +50,6 @@ struct Component {
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;
     }
-    [[nodiscard]] auto isSold() const -> bool { return log_.isSold_; }
     [[nodiscard]] auto sales() const -> double { return salesLedger.currentSales_; }
 };
 }  // namespace goods_supplier
