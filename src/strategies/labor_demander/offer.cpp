@@ -46,11 +46,11 @@ void offerApplicants(OfferApplicantsView view) {
     sortApplicants(offer, applicants, myRequest.entryBox_);
 
     int offerNum{};
-    for (auto requestRef : applicants) {
-        world::LaborEntry& request = requestRef.get();
+    for (auto entryRef : applicants) {
+        world::LaborEntry& entry = entryRef.get();
         if (offerNum >= offer) break;
-        request.isOffer_ = true;
-        view.recordOffer(request);
+        entry.isOffer_ = true;
+        view.recordOffer(entry);
         ++offerNum;
     }
 }
