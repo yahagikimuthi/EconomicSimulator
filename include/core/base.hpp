@@ -47,7 +47,7 @@ class [[nodiscard]] SafePtr {
         return ptr_;
     }
 
-    auto operator=(const T* const ptr) -> SafePtr& {
+    auto operator=(T* ptr) -> SafePtr& {
         ptr_ = ptr;
         return *this;
     }
