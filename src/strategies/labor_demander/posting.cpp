@@ -36,21 +36,6 @@ struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
     return wageGuard(nextWage);
 }
 
-struct CalcNextEmployView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-
-    auto employAdjustVol() const -> double { return comp_.parameter_.employAdjustmentVolatility_; }
-    auto lastEmploy() const -> double { return comp_.log_.actualEmploy_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
-};
-
-[[nodiscard]] auto calcNextEmploy(CalcNextEmployView view, const bool isSold) -> int {
-    const double diff{std::abs(helper::randNormal(view.rng(), 0.0, view.employAdjustVol()))};
-    const double employ{view.lastEmploy() + (isSold ? diff : -diff)};
-    const int    out{static_cast<int>(std::round(employ))};
-    return std::max(1, out);
-}
-
 struct [[nodiscard]] CalcNextOfferView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto offerRate() const -> double { return comp_.parameter_.offerRate_; }
@@ -66,15 +51,14 @@ struct [[nodiscard]] CalcNextOfferView final : BaseView<Component> {
 
 void postJob(
     const int                                    id,
-    const bool                                   isSold,
+    const int                                    desiredEmploy,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view
 ) {
     const double nextWage{calcNextWage(CalcNextWageView{view})};
-    const int    nextEmploy{calcNextEmploy(CalcNextEmployView{view}, isSold)};
-    const int    nextOffer{calcNextOffer(CalcNextOfferView{view}, nextEmploy)};
-    view.plan(nextWage, nextEmploy, nextOffer);
-    if (nextEmploy == 0) {
+    const int    nextOffer{calcNextOffer(CalcNextOfferView{view}, desiredEmploy)};
+    view.plan(nextWage, desiredEmploy, nextOffer);
+    if (desiredEmploy == 0) {
         view.posting(false);
         return;
     }
