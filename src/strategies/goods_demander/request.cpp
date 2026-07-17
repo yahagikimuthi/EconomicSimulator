@@ -1,5 +1,6 @@
 #include "strategies/goods_demander.hpp"
 
+#include <oneapi/tbb/concurrent_vector.h>
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <functional>
@@ -12,6 +13,18 @@
 
 namespace goods_demander {
 namespace {
+[[nodiscard]] auto isPass(
+    const tbb::concurrent_vector<world::GoodsEntry>& entryBox,
+    const int                                        step,
+    const int                                        myPhase,
+    const int maxFrequency = config::goods_demander::maxPurchaseFrequency
+) -> bool {
+    const bool isEmpty{entryBox.empty()};
+    const int  dayOfWeek{step % maxFrequency};
+    const bool isNotMyPhase{dayOfWeek != myPhase};
+    return isEmpty or isNotMyPhase;
+}
+
 [[nodiscard]] auto calcBudget(const double mpc, const double availableAsset) -> double {
     // 使用可能資産×限界消費性向を家計が当期に使用する予算とする
     assert(0.0 < mpc && mpc < 1.0 && "mpc is different range");
@@ -42,10 +55,9 @@ void purchase(
     PurchaseView                               view,
     const double                               availableAsset,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                  step,
-    const int                                  maxPurchaseFrequency
+    const int                                  step
 ) {
-    if (entryBox.empty() or (step % maxPurchaseFrequency != view.myPhase())) {
+    if (isPass(entryBox, step, view.myPhase())) {
         view.isPosting(false);
         return;
     }
