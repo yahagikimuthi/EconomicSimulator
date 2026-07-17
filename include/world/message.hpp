@@ -49,17 +49,17 @@ struct Workspace {
     double              firmProductPower{};
 };
 
-struct EmployeeMessage {
+struct RosterEntry {
     bool isOccupied_{true};
     bool isLaidOff{false};
 
     Workspace& workspace_;
-    EmployeeMessage(Workspace& workspace) : workspace_{workspace} {}
+    RosterEntry(Workspace& workspace) : workspace_{workspace} {}
 };
 
 struct CompanyBoard {
-    tbb::concurrent_vector<EmployeeMessage>          messages_;
-    tbb::concurrent_vector<SafePtr<EmployeeMessage>> resignationBox_;
+    tbb::concurrent_vector<RosterEntry>          roster_;
+    tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox_;
 };
 
 struct CensusDropBox {
