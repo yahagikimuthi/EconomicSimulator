@@ -74,5 +74,6 @@ void trade(TradeView view) {
                    : performFullTrade(requestBox);
     view.inventoryMinus(salesAmount);
     view.salesPlus(salesAmount * myEntry.price_);
+    view.totalDemandPlus(totalDemand);
 }
 }  // namespace goods_supplier

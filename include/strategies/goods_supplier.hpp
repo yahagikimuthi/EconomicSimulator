@@ -34,8 +34,9 @@ void postGoods(
 struct [[nodiscard]] TradeView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto myEntry() -> world::GoodsEntry& { return *comp_.posting_.myEntry_; }
-    void inventoryMinus(double inventoryMinus) { comp_.salesLedger.inventory_ -= inventoryMinus; }
-    void salesPlus(const double salesPlus) { comp_.salesLedger.currentSales_ += salesPlus; }
+    void inventoryMinus(double minus) { comp_.salesLedger.inventory_ -= minus; }
+    void salesPlus(const double plus) { comp_.salesLedger.currentSales_ += plus; }
+    void totalDemandPlus(const double plus) { comp_.salesLedger.totalDemand_ += plus; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
