@@ -99,7 +99,7 @@ void reset(Component& comp) {
         .markup_         = comp.plan_.markup_,
         .demandForecast_ = comp.log_.demandForecast_ +
                            (comp.parameter_.demandForecastAdjustmentParam_ *
-                            (comp.salesLedger.currentSales_ - comp.log_.demandForecast_)),
+                            (comp.salesLedger.totalDemand_ - comp.log_.demandForecast_)),
         .isSold_ = (comp.plan_.supply_ != 0.0) ? comp.salesLedger.inventory_ / comp.plan_.supply_ <
                                                      comp.parameter_.targetInventoryRatio_
                                                : true
