@@ -6,6 +6,7 @@
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace goods_supplier {
 struct Log {
@@ -28,9 +29,10 @@ struct Posting {
     bool                       isPosting_{false};
 };
 struct Production {
-    double firmProductPower_;
-    double sumEmployeeProductPower_;
-    double inventory_;
+    world::Workspace workspace_;
+    double           firmProductPower_;
+    double           sumEmployeeProductPower_;
+    double           inventory_;
 };
 struct Parameter {
     const double targetInventoryRatio_;
