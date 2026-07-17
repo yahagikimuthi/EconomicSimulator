@@ -68,11 +68,8 @@ namespace {
     return markupGuard(nextMarkup);
 }
 
-[[nodiscard]] auto calcAvgCost(
-    const CalcAvgCostView& view, const double totalCost, const double employeeCnt
-) -> double {
+[[nodiscard]] auto calcAvgCost(const CalcAvgCostView& view, const double totalCost) -> double {
     assert(totalCost >= 0.0 && "total cost is required > 0");
-    if (employeeCnt == 0.0) return 0.0;
 
     const double sumProductPower{view.sumEmployeeProductPower() * view.firmProductPower()};
     const double avgCost{(sumProductPower != 0.0) ? totalCost / sumProductPower : 0.0};
@@ -80,25 +77,21 @@ namespace {
     return avgCost;
 }
 
-[[nodiscard]] auto judgePrice(
-    JudgePriceView view, const double markup, const double totalCost, const double employeeCnt
-) -> double {
+[[nodiscard]] auto judgePrice(JudgePriceView view, const double markup, const double totalCost)
+    -> double {
     assert(markup > 0.0 && "markup is required > 0");
-    const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost, employeeCnt)};
+    const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost)};
     const double price{avgCost * (1.0 + markup)};
     return priceGuard(price);
 }
 }  // namespace
 
 void postGoods(
-    PostGoodsView                              view,
-    const double                               totalCost,
-    const double                               employeeCnt,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     const double supply{calcSupply(CalcSupplyView{view})};
     const double markup{calcMarkup(CalcMarkupView{view})};
-    const double price{judgePrice(JudgePriceView{view}, markup, totalCost, employeeCnt)};
+    const double price{judgePrice(JudgePriceView{view}, markup, totalCost)};
     view.plan(price, supply, markup);
 
     // markupやprice自体は供給量0でも計算対象

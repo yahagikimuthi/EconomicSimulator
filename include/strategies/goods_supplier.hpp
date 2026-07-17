@@ -21,10 +21,7 @@ struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
 };
 
 void postGoods(
-    PostGoodsView                              view,
-    const double                               totalCost,
-    const double                               employeeCnt,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 );
 
 struct [[nodiscard]] TradeView final : BaseView<Component> {
