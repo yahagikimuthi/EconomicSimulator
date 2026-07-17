@@ -14,8 +14,8 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
     void entry(
-        const world::LaborRequest&                                request,
-        const tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
+        const world::LaborRequest&                          request,
+        tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
     ) {
         comp_.posting_.myEntries_.emplace_back(&request, &*entryIt);
     }

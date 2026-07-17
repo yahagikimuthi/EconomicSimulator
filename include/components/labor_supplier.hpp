@@ -5,12 +5,15 @@
 #include <pcg_random.hpp>
 #include <utility>
 
+#include "core/base.hpp"
 #include "core/forward.hpp"
 
 namespace labor_supplier {
 struct Posting {
-    std::vector<std::pair<const world::LaborRequest*, world::LaborEntry*>> myEntries_;
-    bool                                                                   isPosting_{false};
+    using LaborMarketCoordinate =
+        std::pair<SafePtr<const world::LaborRequest>, SafePtr<world::LaborEntry>>;
+    std::vector<LaborMarketCoordinate> myEntries_;
+    bool                               isPosting_{false};
 };
 struct Contraction {
     int    firmID_{-1};
