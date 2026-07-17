@@ -5,7 +5,6 @@
 #include <utility>
 
 #include "components/goods_demander.hpp"
-#include "config.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
 
