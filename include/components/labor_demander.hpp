@@ -15,9 +15,10 @@ struct Log {
     int    applicantNum_;
 };
 struct Plan {
-    double wage_;
-    int    employ_;
-    int    offer_;
+    bool   isRecruiting{false};
+    double wage_{};
+    int    employ_{};
+    int    offer_{};
 };
 struct HR {
     world::CompanyBoard                       companyBoard_;
@@ -44,7 +45,7 @@ struct Posting {
 struct Component {
     pcg32            rng_;
     Log              log_;
-    Plan             plan_{};
+    Plan             plan_;
     Posting          posting_{};
     HR               humanResources{};
     EmploymentLedger employmentLedger{};
