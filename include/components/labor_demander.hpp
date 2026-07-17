@@ -35,9 +35,9 @@ struct Parameter {
     const double offerAdjustmentVolatility_;
 };
 struct Posting {
-    SafePtr<world::LaborRequest>            myRequest_{nullptr};
-    std::vector<SafePtr<world::LaborEntry>> offerApplicants_;
-    bool                                    isPosting_;
+    SafePtr<world::LaborRequest>                  myRequest_{nullptr};
+    std::vector<SafePtr<const world::LaborEntry>> offerApplicants_;
+    bool                                          isPosting_;
 };
 struct Component {
     pcg32            rng_;

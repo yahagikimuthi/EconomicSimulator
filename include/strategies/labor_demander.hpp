@@ -33,7 +33,7 @@ struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
     auto myRequest() -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
-    void recordOffer(world::LaborEntry& entry) {
+    void recordOffer(const world::LaborEntry& entry) {
         comp_.posting_.offerApplicants_.emplace_back(&entry);
     }
 };
@@ -44,7 +44,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto myRequest() const -> const world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto offerNum() const -> std::size_t { return comp_.posting_.offerApplicants_.size(); }
-    auto offerApplicant(const std::size_t idx) -> world::LaborEntry& {
+    auto offerApplicant(const std::size_t idx) const -> const world::LaborEntry& {
         return *comp_.posting_.offerApplicants_[idx];
     }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
