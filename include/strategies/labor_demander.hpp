@@ -22,7 +22,7 @@ struct [[nodiscard]] PostJobView final : BaseView<Component> {
 
 void postJob(
     const int                                    id,
-    const bool                                   isSold,
+    const int                                    desiredEmploy,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view
 );
