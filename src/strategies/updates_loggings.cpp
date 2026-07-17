@@ -96,10 +96,13 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
 }
 void reset(Component& comp) {
     comp.log_ = {
-        .markup_ = comp.plan_.markup_,
-        .price_  = comp.plan_.price_,
-        .supply_ = comp.plan_.supply_,
-        .sales_  = comp.salesLedger.currentSales,
+        .markup_         = comp.plan_.markup_,
+        .price_          = comp.plan_.price_,
+        .supply_         = comp.plan_.supply_,
+        .sales_          = comp.salesLedger.currentSales_,
+        .demandForecast_ = comp.log_.demandForecast_ +
+                           (comp.parameter_.demandForecastAdjustmentParam_ *
+                            (comp.salesLedger.currentSales_ - comp.log_.demandForecast_)),
         .isSold_ = (comp.plan_.supply_ != 0.0) ? (comp.salesLedger.inventory_ / comp.plan_.supply_ <
                                                   comp.parameter_.targetInventoryRatio_)
                                                : true
@@ -107,6 +110,6 @@ void reset(Component& comp) {
     comp.plan_                  = {.markup_ = 0.0, .price_ = 0.0, .supply_ = 0.0};
     comp.production_.inventory_ = comp.salesLedger.inventory_;
     comp.posting_               = {.myEntry_ = nullptr, .isPosting_ = false};
-    comp.salesLedger            = {.inventory_ = 0.0, .currentSales = 0.0};
+    comp.salesLedger            = {.inventory_ = 0.0, .currentSales_ = 0.0, .totalDemand_ = 0.0};
 }
 }  // namespace goods_supplier
