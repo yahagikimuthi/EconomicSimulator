@@ -13,6 +13,7 @@ struct Log {
     double price_;
     double supply_;
     double sales_;
+    double demandForecast_;
     bool   isSold_;
 };
 struct Plan {
@@ -36,6 +37,7 @@ struct Production {
 struct Parameter {
     const double targetInventoryRatio_;
     const double markupAdjustmentVolatility_;
+    const double demandForecastAdjustmentParam_;
 };
 struct Component {
     pcg32       rng_;
