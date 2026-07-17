@@ -20,8 +20,8 @@ struct Plan {
     int    offer_;
 };
 struct HR {
-    world::CompanyBoard                       companyBoard;
-    std::vector<SafePtr<world::CompanyBoard>> emptySlotsPool;
+    world::CompanyBoard                       companyBoard_;
+    std::vector<SafePtr<world::CompanyBoard>> emptyRosterPool_;
     double                                    sumWage_;
     int                                       employeeCnt;
 };
@@ -53,6 +53,11 @@ struct Component {
     Component(const std::uint64_t state, const std::uint64_t stream);
 
     [[nodiscard]] auto sumWage() const -> double { return humanResources.sumWage_; }
-    [[nodiscard]] auto employeeCnt() const -> int { return humanResources.employeeCnt; }
+    [[nodiscard]] auto employeeCnt() const -> int {
+        const std::size_t rosterSize{
+            humanResources.companyBoard_.roster_.size() - humanResources.emptyRosterPool_.size()
+        };
+        return static_cast<int>(rosterSize);
+    }
 };
 }  // namespace labor_demander
