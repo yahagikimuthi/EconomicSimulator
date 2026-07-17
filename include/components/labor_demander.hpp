@@ -5,7 +5,7 @@
 #include <pcg_random.hpp>
 
 #include "core/base.hpp"
-#include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace labor_demander {
 struct Log {
@@ -20,8 +20,10 @@ struct Plan {
     int    offer_;
 };
 struct HR {
-    double sumWage_;
-    int    employeeCnt;
+    world::CompanyBoard                       companyBoard;
+    std::vector<SafePtr<world::CompanyBoard>> emptySlotsPool;
+    double                                    sumWage_;
+    int                                       employeeCnt;
 };
 struct EmploymentLedger {
     int    applicantNum_;
