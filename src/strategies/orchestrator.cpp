@@ -19,9 +19,9 @@ void postLaborRequest(
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     const int id{indexComp.id()};
-    const int desiredEmploy{
-        goods_supplier::calcDesiredEmploy(goods_supplier::CalcDesiredEmployView{goodsSupplier})
-    };
+    const int desiredEmploy{goods_supplier::calcDesiredEmploy(
+        goods_supplier::CalcDesiredEmployView{goodsSupplier}, laborDemander.employeeCnt()
+    )};
     labor_demander::postJob(
         id, desiredEmploy, requestBox, labor_demander::PostJobView{laborDemander}
     );

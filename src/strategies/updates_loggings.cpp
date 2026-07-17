@@ -21,7 +21,7 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
     dropBox.hholdAssets_.emplace_back(comp.asset_);
 }
 }  // namespace hhold_finance
-
+// TODO 企業が労働市場に参加していない場合ロギングをパスする処理が必要
 namespace labor_demander {
 namespace {
 struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
@@ -60,7 +60,10 @@ void reset(Component& comp) {
 
     comp.plan_          = {.wage_ = 0.0, .employ_ = 0, .offer_ = 0};
     comp.humanResources = {
-        .sumWage_ = comp.employmentLedger.sumWage_, .employeeCnt = comp.employmentLedger.employing_
+        .companyBoard_    = {},
+        .emptyRosterPool_ = {},
+        .sumWage_         = comp.employmentLedger.sumWage_,
+        .employeeCnt      = comp.employmentLedger.employing_
     };
     comp.employmentLedger    = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
     comp.posting_.myRequest_ = nullptr;
@@ -97,6 +100,7 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
 void reset(Component& comp) {
     comp.log_ = {
         .markup_         = comp.plan_.markup_,
+        .supply_         = comp.plan_.supply_,
         .demandForecast_ = comp.log_.demandForecast_ +
                            (comp.parameter_.demandForecastAdjustmentParam_ *
                             (comp.salesLedger.totalDemand_ - comp.log_.demandForecast_)),

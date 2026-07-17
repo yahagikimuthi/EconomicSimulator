@@ -14,7 +14,7 @@ struct [[nodiscard]] CalcDesiredEmployView final : BaseView<Component> {
     auto lastSupply() const -> double { return comp_.log_.supply_; }
 };
 
-[[nodiscard]] auto calcDesiredEmploy(CalcDesiredEmployView view) -> int;
+[[nodiscard]] auto calcDesiredEmploy(CalcDesiredEmployView view, const int employeeCnt) -> int;
 
 struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
