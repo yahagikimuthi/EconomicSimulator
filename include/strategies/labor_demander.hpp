@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <functional>
+#include <world/message.hpp>
 
 #include "components/labor_demander.hpp"
 #include "core/base.hpp"
@@ -34,7 +35,7 @@ struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
     void recordOffer(world::LaborEntry& entry) {
-        comp_.posting_.offerApplicants_.emplace_back(entry);
+        comp_.posting_.offerApplicants_.emplace_back(&entry);
     }
 };
 
@@ -43,8 +44,9 @@ void offerApplicants(OfferApplicantsView view);
 struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto myRequest() const -> const world::LaborRequest& { return *comp_.posting_.myRequest_; }
-    auto offerApplicants() const -> std::vector<std::reference_wrapper<world::LaborEntry>>& {
-        return comp_.posting_.offerApplicants_;
+    auto offerNum() const -> std::size_t { return comp_.posting_.offerApplicants_.size(); }
+    auto offerApplicant(const std::size_t idx) -> world::LaborEntry& {
+        return *comp_.posting_.offerApplicants_[idx];
     }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void updateLedger(const double wage, const int actualEmploy) {
