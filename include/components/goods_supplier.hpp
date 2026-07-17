@@ -23,7 +23,8 @@ struct Plan {
 };
 struct SalesLedger {
     double inventory_;
-    double currentSales;
+    double currentSales_;
+    double totalDemand_;
 };
 struct Posting {
     SafePtr<world::GoodsEntry> myEntry_{nullptr};
@@ -53,6 +54,6 @@ struct Component {
         production_.sumEmployeeProductPower_ = power;
     }
     [[nodiscard]] auto isSold() const -> bool { return log_.isSold_; }
-    [[nodiscard]] auto sales() const -> double { return salesLedger.currentSales; }
+    [[nodiscard]] auto sales() const -> double { return salesLedger.currentSales_; }
 };
 }  // namespace goods_supplier
