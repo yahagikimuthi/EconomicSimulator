@@ -14,13 +14,17 @@
 namespace orchestrator::labor {
 void postLaborRequest(
     const agent_index::Component&                indexComp,
-    const goods_supplier::Component&             goodsSupplier,
+    goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
-    const int  id{indexComp.id()};
-    const bool isSold{goodsSupplier.isSold()};
-    labor_demander::postJob(id, isSold, requestBox, labor_demander::PostJobView{laborDemander});
+    const int id{indexComp.id()};
+    const int desiredEmploy{
+        goods_supplier::calcDesiredEmploy(goods_supplier::CalcDesiredEmployView{goodsSupplier})
+    };
+    labor_demander::postJob(
+        id, desiredEmploy, requestBox, labor_demander::PostJobView{laborDemander}
+    );
 }
 
 void jobEntry(
