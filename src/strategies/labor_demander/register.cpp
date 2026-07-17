@@ -13,7 +13,7 @@ namespace labor_demander {
     double sumProductPower{};
     int    employeeCnt{};
     for (const auto i : std::views::iota(0UZ, view.offerNum())) {
-        auto& entry = view.offerApplicant(i);
+        const auto& entry = view.offerApplicant(i);
         if (not entry.isAccept_) continue;
         sumProductPower += entry.productPower_;
         ++employeeCnt;
