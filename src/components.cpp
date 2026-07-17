@@ -68,6 +68,9 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
       parameter_{
           .targetInventoryRatio_          = rand(rng_, 0.1, 0.2),
           .markupAdjustmentVolatility_    = rand(rng_, 0.01, 0.02),
-          .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.5)
-      } {}
+          .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.4)
+      } {
+    const double flag{rand(rng_)};
+    log_.isSold_ = (flag <= 0.5) ? true : false;
+}
 }  // namespace goods_supplier
