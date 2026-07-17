@@ -11,9 +11,11 @@ namespace goods_supplier {
 struct [[nodiscard]] CalcDesiredEmployView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto firmProductivity() const -> double { return comp_.production_.firmProductPower_; }
+    auto lastSupply() const -> double { return comp_.log_.supply_; }
 };
 
 [[nodiscard]] auto calcDesiredEmploy(CalcDesiredEmployView view) -> int;
+
 struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     void myEntry(tbb::concurrent_vector<world::GoodsEntry>::iterator it) {  // NOLINT

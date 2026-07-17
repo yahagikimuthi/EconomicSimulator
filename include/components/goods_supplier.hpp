@@ -11,6 +11,7 @@
 namespace goods_supplier {
 struct Log {
     double markup_;
+    double supply_;
     double demandForecast_;
     bool   isSold_;
 };

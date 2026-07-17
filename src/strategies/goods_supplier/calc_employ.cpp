@@ -21,9 +21,13 @@ struct CalcTargetProductionView final : BaseView<Component> {
 }
 }  // namespace
 
-[[nodiscard]] auto calcDesiredEmploy(CalcDesiredEmployView view) -> int {
+[[nodiscard]] auto calcDesiredEmploy(const CalcDesiredEmployView& view, const int employeeCnt)
+    -> int {
     const double targetProduction{calcTargetProduction(CalcTargetProductionView{view})};
-    const double desiredEmploy{std::round(targetProduction / view.firmProductivity())};
-    return static_cast<int>(desiredEmploy);
+    const double avgProductPower{
+        (employeeCnt != 0.0) ? view.lastSupply() / employeeCnt : view.firmProductivity()
+    };
+    const double desiredEmploy{(avgProductPower != 0.0) ? targetProduction / avgProductPower : 1.0};
+    return static_cast<int>(std::round(desiredEmploy));
 }
 }  // namespace goods_supplier
