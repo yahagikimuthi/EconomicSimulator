@@ -2,7 +2,6 @@
 
 #include <cassert>
 #include <concepts>
-#include <cstddef>
 
 template <typename ComponentType>
 struct BaseView {

@@ -1,12 +1,11 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <functional>
-#include <world/message.hpp>
 
 #include "components/labor_demander.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace labor_demander {
 struct [[nodiscard]] PostJobView final : BaseView<Component> {
