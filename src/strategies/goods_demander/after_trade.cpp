@@ -1,5 +1,7 @@
 #include "strategies/goods_demander.hpp"
 
+#include "world/message.hpp"
+
 namespace goods_demander {
 void afterTrade(AfterTradeView view) {
     if (not view.isPosting()) return;
