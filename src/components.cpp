@@ -21,13 +21,21 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
 }  // namespace hhold_finance
 
 namespace labor_demander {
-Component::Component(const std::uint64_t state, const std::uint64_t stream)
+Component::Component(
+    const std::uint64_t state, const std::uint64_t stream, const std::size_t myCompanyBoard
+)
     : rng_{state, stream},
       log_{
           .wage_         = rand(rng_, 1000, 5000),
           .actualEmploy_ = randInt(rng_, 4, 12),
           .offerPlan_    = randInt(rng_, 10, 20),
           .applicantNum_ = randInt(rng_, 10, 20)
+      },
+      humanResources_{
+          .myCompanyBoardIdx_  = myCompanyBoard,
+          .emptyRosterIdxPool_ = {},
+          .sumWage_            = 0.0,
+          .employeeCnt         = 0
       },
       parameter_{
           .offerRate_                  = rand(rng_, 0.0, 1.0),
@@ -55,12 +63,18 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
 }  // namespace goods_demander
 
 namespace goods_supplier {
-Component::Component(const std::uint64_t state, const std::uint64_t stream)
+Component::Component(
+    const std::uint64_t state, const std::uint64_t stream, const std::size_t myWorkspace
+)
     : rng_{state, stream},
       log_{
-          .markup_ = rand(rng_, 0.1, 0.3), .demandForecast_ = rand(rng_, 5.0, 20.0), .isSold_ = true
+          .markup_         = rand(rng_, 0.1, 0.3),
+          .supply_         = rand(rng_, 4, 15),
+          .demandForecast_ = rand(rng_, 5.0, 20.0),
+          .isSold_         = true
       },
       production_{
+          .myWorkspaceIdx_          = myWorkspace,
           .firmProductPower_        = rand(rng_, 0.0001, 0.0005),
           .sumEmployeeProductPower_ = 0.0,
           .inventory_               = rand(rng_, 0.5, 2.0)
@@ -70,6 +84,9 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
           .markupAdjustmentVolatility_    = rand(rng_, 0.01, 0.02),
           .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.4)
       } {
+    production_.firmProductPower_        = rand(rng_, 0.0001, 0.0005);
+    production_.sumEmployeeProductPower_ = 0.0;
+    production_.inventory_               = rand(rng_, 0.5, 2.0);
     const double flag{rand(rng_)};
     log_.isSold_ = (flag <= 0.5) ? true : false;
 }

@@ -43,8 +43,8 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
         Firm firm{
             .index   = {i},
             .finance = {makeSeed(), makeSeed()},
-            .labor   = {makeSeed(), makeSeed()},
-            .goods   = {makeSeed(), makeSeed()}
+            .labor   = {makeSeed(), makeSeed(), static_cast<std::size_t>(i)},
+            .goods   = {makeSeed(), makeSeed(), static_cast<std::size_t>(i)}
         };
         firms_.push_back(firm);
     }
