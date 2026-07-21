@@ -30,10 +30,10 @@ struct Posting {
     bool                       isPosting_{false};
 };
 struct Production {
-    world::Workspace workspace_;
-    double           firmProductPower_;
-    double           sumEmployeeProductPower_;
-    double           inventory_;
+    const std::size_t myWorkspace_;
+    double            firmProductPower_;
+    double            sumEmployeeProductPower_;
+    double            inventory_;
 };
 struct Parameter {
     const double targetInventoryRatio_;
@@ -46,10 +46,10 @@ struct Component {
     Plan        plan_{};
     SalesLedger salesLedger{};
     Posting     posting_;
-    Production  production_;
+    Production  production_{};
     Parameter   parameter_;
 
-    Component(const std::uint64_t state, const std::uint64_t stream);
+    Component(const std::uint64_t state, const std::uint64_t stream, const std::size_t myWorkspace);
     void setSumEmployeeProductPower(const double power) {
         production_.sumEmployeeProductPower_ = power;
     }
