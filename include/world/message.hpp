@@ -58,8 +58,8 @@ struct RosterEntry {
 };
 
 struct CompanyBoard {
-    tbb::concurrent_vector<RosterEntry>          roster_;
-    tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox_;
+    std::vector<RosterEntry>            roster_;
+    tbb::concurrent_vector<std::size_t> resignationBox_;
 };
 
 struct CensusDropBox {
