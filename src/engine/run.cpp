@@ -22,7 +22,9 @@ void Engine::run() {
 void Engine::runLabor() {
     using namespace orchestrator;
     for (Firm& firm : firms_) {
-        labor::postLaborRequest(firm.index, firm.goods, firm.labor, laborRequestBox_);
+        labor::postLaborRequest(
+            firm.index, firm.goods, firm.labor, laborRequestBox_, companyBoards_
+        );
     }
 
     for (HHold& hhold : hholds_) {

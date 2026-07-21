@@ -9,7 +9,8 @@ void postLaborRequest(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox
+    tbb::concurrent_vector<world::LaborRequest>& requestBox,
+    std::vector<world::CompanyBoard>&            companyBoards
 );
 
 void jobEntry(
