@@ -21,10 +21,10 @@ struct Plan {
     int    offer_{};
 };
 struct HR {
-    world::CompanyBoard                       companyBoard_;
-    std::vector<SafePtr<world::CompanyBoard>> emptyRosterPool_;
-    double                                    sumWage_;
-    int                                       employeeCnt;
+    const std::size_t        myCompanyBoardIdx_;
+    std::vector<std::size_t> emptyRosterIdxPool_;
+    double                   sumWage_;
+    int                      employeeCnt;
 };
 struct EmploymentLedger {
     int    applicantNum_;
@@ -47,17 +47,19 @@ struct Component {
     Log              log_;
     Plan             plan_;
     Posting          posting_{};
-    HR               humanResources{};
+    HR               humanResources_;
     EmploymentLedger employmentLedger{};
     Parameter        parameter_;
 
-    Component(const std::uint64_t state, const std::uint64_t stream);
+    Component(
+        const std::uint64_t state, const std::uint64_t stream, const std::size_t myCompanyBoard
+    );
 
-    [[nodiscard]] auto sumWage() const -> double { return humanResources.sumWage_; }
-    [[nodiscard]] auto employeeCnt() const -> int {
-        const std::size_t rosterSize{
-            humanResources.companyBoard_.roster_.size() - humanResources.emptyRosterPool_.size()
-        };
+    [[nodiscard]] auto sumWage() const -> double { return humanResources_.sumWage_; }
+    [[nodiscard]] auto employeeCnt(const std::span<const world::CompanyBoard>& companyBoards) const
+        -> int {
+        const auto&       myRoster = companyBoards[humanResources_.myCompanyBoardIdx_].roster_;
+        const std::size_t rosterSize{myRoster.size() - humanResources_.emptyRosterIdxPool_.size()};
         return static_cast<int>(rosterSize);
     }
 };
