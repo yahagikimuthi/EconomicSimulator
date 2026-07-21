@@ -30,7 +30,7 @@ struct Posting {
     bool                       isPosting_{false};
 };
 struct Production {
-    const std::size_t myWorkspace_;
+    const std::size_t myWorkspaceIdx_;
     double            firmProductPower_;
     double            sumEmployeeProductPower_;
     double            inventory_;
