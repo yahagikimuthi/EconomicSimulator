@@ -50,14 +50,16 @@ struct Workspace {
 };
 
 struct RosterEntry {
-    bool isOccupied_{true};
-    bool isLaidOff{false};
+    double wage_;
+    bool   isOccupied_{true};
+    bool   isLaidOff{false};
 
     Workspace& workspace_;
-    RosterEntry(Workspace& workspace) : workspace_{workspace} {}
+    RosterEntry(const double wage, Workspace& workspace) : wage_{wage}, workspace_{workspace} {}
 };
 
 struct CompanyBoard {
+    const int                           firmId_;
     std::vector<RosterEntry>            roster_;
     tbb::concurrent_vector<std::size_t> resignationBox_;
 };
