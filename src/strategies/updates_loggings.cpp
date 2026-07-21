@@ -58,16 +58,12 @@ void reset(Component& comp) {
     };
     comp.parameter_.offerRate_ = updateAcceptanceRate(UpdateAcceptanceRateView{comp});
 
-    comp.plan_          = {.wage_ = 0.0, .employ_ = 0, .offer_ = 0};
-    comp.humanResources = {
-        .companyBoard_    = {},
-        .emptyRosterPool_ = {},
-        .sumWage_         = comp.employmentLedger.sumWage_,
-        .employeeCnt      = comp.employmentLedger.employing_
-    };
-    comp.employmentLedger    = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
-    comp.posting_.myRequest_ = nullptr;
-    comp.posting_.isPosting_ = false;
+    comp.plan_                       = {.wage_ = 0.0, .employ_ = 0, .offer_ = 0};
+    comp.humanResources_.sumWage_    = comp.employmentLedger.sumWage_;
+    comp.humanResources_.employeeCnt = comp.employmentLedger.employing_;
+    comp.employmentLedger            = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
+    comp.posting_.myRequest_         = nullptr;
+    comp.posting_.isPosting_         = false;
     comp.posting_.offerApplicants_.clear();
 }
 }  // namespace labor_demander
