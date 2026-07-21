@@ -55,6 +55,7 @@ void postJob(
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view
 ) {
+    view.isRecruiting(true);
     const double nextWage{calcNextWage(CalcNextWageView{view})};
     const int    nextOffer{calcNextOffer(CalcNextOfferView{view}, desiredEmploy)};
     view.plan(nextWage, desiredEmploy, nextOffer);
