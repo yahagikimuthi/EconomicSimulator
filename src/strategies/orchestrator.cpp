@@ -16,15 +16,23 @@ void postLaborRequest(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox
+    tbb::concurrent_vector<world::LaborRequest>& requestBox,
+    std::vector<world::CompanyBoard>&            companyBoards
 ) {
     const int id{indexComp.id()};
     const int desiredEmploy{goods_supplier::calcDesiredEmploy(
-        goods_supplier::CalcDesiredEmployView{goodsSupplier}, laborDemander.employeeCnt()
+        goods_supplier::CalcDesiredEmployView{goodsSupplier},
+        laborDemander.employeeCnt(companyBoards)
     )};
-    labor_demander::postJob(
-        id, desiredEmploy, requestBox, labor_demander::PostJobView{laborDemander}
-    );
+    if (desiredEmploy > 0) {
+        labor_demander::postJob(
+            id, desiredEmploy, requestBox, labor_demander::PostJobView{laborDemander}
+        );
+    } else if (desiredEmploy < 0) {
+        labor_demander::layoffs(
+            labor_demander::LayOffsView{laborDemander}, -desiredEmploy, companyBoards
+        );
+    }
 }
 
 void jobEntry(

@@ -18,6 +18,8 @@ struct [[nodiscard]] PostJobView final : BaseView<Component> {
         comp_.posting_.myRequest_ = &*it;
     }
     void posting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
+
+    void isRecruiting(const bool isRecruiting) { comp_.plan_.isRecruiting = isRecruiting; }
 };
 
 void postJob(
@@ -25,6 +27,22 @@ void postJob(
     const int                                    desiredEmploy,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     PostJobView                                  view
+);
+
+struct LayOffsView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+
+    auto roster(std::vector<world::CompanyBoard>& companyBoards)
+        -> std::vector<world::RosterEntry>& {
+        return companyBoards[comp_.humanResources_.myCompanyBoardIdx_].roster_;
+    }
+    auto emptyRosterPool() -> std::vector<std::size_t>& {
+        return comp_.humanResources_.emptyRosterIdxPool_;
+    }
+};
+
+void layoffs(
+    LayOffsView view, const int layOffsCnt, std::vector<world::CompanyBoard>& companyBoards
 );
 
 struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
