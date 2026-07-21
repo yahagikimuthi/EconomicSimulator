@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <pcg_random.hpp>
 #include <utility>
+#include <world/message.hpp>
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
@@ -16,8 +17,8 @@ struct Posting {
     bool                               isPosting_{false};
 };
 struct Contraction {
-    int    firmID_{-1};
-    double wage_{};
+    std::size_t contractFirmIdx_;
+    std::size_t myRosterEntryIdx_;
 };
 struct Parameter {
     double productPower_;
@@ -31,6 +32,10 @@ struct Component {
 
     Component(const std::uint64_t state, const std::uint64_t stream);
 
-    [[nodiscard]] auto wage() const -> double { return contraction_.wage_; }
+    [[nodiscard]] auto wage(const std::span<const world::CompanyBoard> companyBoards) const
+        -> double {
+        auto [firmIdx, myIdx]{contraction_};
+        return companyBoards[firmIdx].roster_[myIdx].wage_;
+    }
 };
 }  // namespace labor_supplier
