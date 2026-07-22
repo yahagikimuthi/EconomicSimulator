@@ -41,14 +41,18 @@ struct Parameter {
 };
 struct [[nodiscard]] Component {
     pcg32       rng_;
-    Log         log_{};
+    Log         log_;
     Plan        plan_{};
     SalesLedger salesLedger{};
-    Posting     posting_;
+    Posting     posting_{};
     Production  production_;
     Parameter   parameter_;
 
-    Component(const std::uint64_t state, const std::uint64_t stream, const std::size_t myWorkspace);
+    Component(
+        const std::uint64_t             state,
+        const std::uint64_t             stream,
+        const SafePtr<world::Workspace> workspace
+    );
 
     auto sales() const -> double { return salesLedger.currentSales_; }
 };

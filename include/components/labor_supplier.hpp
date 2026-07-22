@@ -21,7 +21,7 @@ struct Parameter {
 
 struct [[nodiscard]] Component {
     pcg32                       rng_;
-    Posting                     posting_;
+    Posting                     posting_{};
     SafePtr<world::RosterEntry> rosterEntry_{nullptr};
     double                      productPower_;
     const double                jobSearchThreshold_;

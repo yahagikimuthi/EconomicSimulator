@@ -64,7 +64,7 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
 
 namespace goods_supplier {
 Component::Component(
-    const std::uint64_t state, const std::uint64_t stream, const std::size_t myWorkspace
+    const std::uint64_t state, const std::uint64_t stream, const SafePtr<world::Workspace> workspace
 )
     : rng_{state, stream},
       log_{
@@ -74,20 +74,16 @@ Component::Component(
           .isSold_         = true
       },
       production_{
-          .myWorkspaceIdx_          = myWorkspace,
-          .firmProductPower_        = rand(rng_, 0.0001, 0.0005),
-          .sumEmployeeProductPower_ = 0.0,
-          .inventory_               = rand(rng_, 0.5, 2.0)
+          .workspace_        = workspace,
+          .firmProductPower_ = rand(rng_, 0.0001, 0.0005),
+          .inventory_        = rand(rng_, 0.5, 2.0)
       },
       parameter_{
           .targetInventoryRatio_          = rand(rng_, 0.1, 0.2),
           .markupAdjustmentVolatility_    = rand(rng_, 0.01, 0.02),
           .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.4)
       } {
-    production_.firmProductPower_        = rand(rng_, 0.0001, 0.0005);
-    production_.sumEmployeeProductPower_ = 0.0;
-    production_.inventory_               = rand(rng_, 0.5, 2.0);
-    const double flag{rand(rng_)};
-    log_.isSold_ = (flag <= 0.5) ? true : false;
+    log_.isSold_                             = (rand(rng_) <= 0.5) ? true : false;
+    production_.workspace_->firmProductPower = production_.firmProductPower_;
 }
 }  // namespace goods_supplier
