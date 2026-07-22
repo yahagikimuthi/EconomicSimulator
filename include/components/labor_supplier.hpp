@@ -2,11 +2,12 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstdint>
+#include <helper.hpp>
 #include <pcg_random.hpp>
-#include <world/message.hpp>
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace labor_supplier {
 struct Posting {
@@ -23,6 +24,7 @@ struct [[nodiscard]] Component {
     Posting                     posting_;
     SafePtr<world::RosterEntry> rosterEntry_{nullptr};
     double                      productPower_;
+    const double                jobSearchThreshold_;
 
     Component(const std::uint64_t state, const std::uint64_t stream);
 
@@ -30,5 +32,9 @@ struct [[nodiscard]] Component {
     auto acceptedEntry() const -> const world::LaborEntry& { return *posting_.acceptEntry_; }
     void rosterEntry(const SafePtr<world::RosterEntry> rosterEntry) { rosterEntry_ = rosterEntry; }
     auto isEmploying() const -> bool { return rosterEntry_.hasValue(); }
+    auto shouldSearchJob() -> bool {
+        if (not rosterEntry_) return true;
+        return helper::rand(rng_) < jobSearchThreshold_;
+    }
 };
 }  // namespace labor_supplier
