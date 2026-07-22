@@ -21,10 +21,10 @@ struct Plan {
     int    offer_{};
 };
 struct HR {
-    const std::size_t        myCompanyBoardIdx_;
-    std::vector<std::size_t> emptyRosterIdxPool_;
-    double                   sumWage_;
-    int                      employeeCnt;
+    const SafePtr<world::CompanyBoard>       companyBoard_;
+    std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
+    double                                   sumWage_;
+    int                                      employeeCnt;
 };
 struct EmploymentLedger {
     int    applicantNum_;
@@ -38,9 +38,9 @@ struct Parameter {
     const double offerAdjustmentVolatility_;
 };
 struct Posting {
-    SafePtr<world::LaborRequest>                  myRequest_{nullptr};
-    std::vector<SafePtr<const world::LaborEntry>> offerApplicants_;
-    bool                                          isPosting_;
+    SafePtr<world::LaborRequest>            myRequest_{nullptr};
+    std::vector<SafePtr<world::LaborEntry>> offerApplicants_;
+    bool                                    isPosting_;
 };
 struct Component {
     pcg32            rng_;
@@ -56,10 +56,10 @@ struct Component {
     );
 
     [[nodiscard]] auto sumWage() const -> double { return humanResources_.sumWage_; }
-    [[nodiscard]] auto employeeCnt(const std::span<const world::CompanyBoard>& companyBoards) const
-        -> int {
-        const auto&       myRoster = companyBoards[humanResources_.myCompanyBoardIdx_].roster_;
-        const std::size_t rosterSize{myRoster.size() - humanResources_.emptyRosterIdxPool_.size()};
+    [[nodiscard]] auto employeeCnt() const -> int {
+        const std::size_t rosterSize{
+            humanResources_.companyBoard_->roster_.size() - humanResources_.emptyRosterPool_.size()
+        };
         return static_cast<int>(rosterSize);
     }
 };

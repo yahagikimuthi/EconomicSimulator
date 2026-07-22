@@ -32,12 +32,18 @@ void postJob(
 struct LayOffsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
 
-    auto roster(std::vector<world::CompanyBoard>& companyBoards)
-        -> std::vector<world::RosterEntry>& {
-        return companyBoards[comp_.humanResources_.myCompanyBoardIdx_].roster_;
+    auto rosterSize() const -> int {
+        const std::size_t rosterSize{comp_.humanResources_.companyBoard_->roster_.size()};
+        return static_cast<int>(rosterSize);
     }
-    auto emptyRosterPool() -> std::vector<std::size_t>& {
-        return comp_.humanResources_.emptyRosterIdxPool_;
+    auto getRosterEntry(const int idx) -> world::RosterEntry& {
+        return comp_.humanResources_.companyBoard_->roster_[static_cast<std::size_t>(idx)];
+    }
+    void addEmptyRoster(world::RosterEntry& emptyRoster) {
+        comp_.humanResources_.emptyRosterPool_.emplace_back(&emptyRoster);
+    }
+    auto emptyRosterPool() -> std::vector<SafePtr<world::RosterEntry>>& {
+        return comp_.humanResources_.emptyRosterPool_;
     }
 };
 
@@ -51,7 +57,7 @@ struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
     auto myRequest() -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
-    void recordOffer(const world::LaborEntry& entry) {
+    void recordOffer(world::LaborEntry& entry) {
         comp_.posting_.offerApplicants_.emplace_back(&entry);
     }
 };
@@ -60,9 +66,9 @@ void offerApplicants(OfferApplicantsView view);
 
 struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto myRequest() const -> const world::LaborRequest& { return *comp_.posting_.myRequest_; }
+    auto myRequest() -> world::LaborRequest& { return *comp_.posting_.myRequest_; }
     auto offerNum() const -> std::size_t { return comp_.posting_.offerApplicants_.size(); }
-    auto offerApplicant(const std::size_t idx) const -> const world::LaborEntry& {
+    auto offerApplicant(const std::size_t idx) -> world::LaborEntry& {
         return *comp_.posting_.offerApplicants_[idx];
     }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
@@ -73,6 +79,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     void applicantNumPlus(const std::size_t n) {
         comp_.employmentLedger.applicantNum_ += static_cast<int>(n);
     }
+    auto myCompanyBoard() -> world::CompanyBoard& { return *comp_.humanResources_.companyBoard_; }
 };
 
 [[nodiscard]] auto registerMember(RegisterMemberView view) -> double;

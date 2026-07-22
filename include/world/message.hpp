@@ -2,11 +2,34 @@
 
 #include <tbb/concurrent_vector.h>
 #include <atomic>
+#include <deque>
 
 #include "config.hpp"
 #include "core/base.hpp"
+#include "core/forward.hpp"
 
 namespace world {
+struct Workspace {
+    std::atomic<double> totalLaborInput;
+    double              firmProductPower{};
+};
+
+struct RosterEntry {
+    double wage_;
+    bool   isOccupied_{true};
+    bool   isLaidOff{false};
+
+    CompanyBoard& companyBoard_;
+    RosterEntry(const double wage, CompanyBoard& companyBoard)
+        : wage_{wage}, companyBoard_{companyBoard} {}
+};
+
+struct [[nodiscard]] CompanyBoard {
+    const int                                    firmId_;
+    std::deque<RosterEntry>                      roster_;
+    tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox_;
+    Workspace                                    workspace;
+};
 
 struct LaborEntry {
     const int    hholdID_;
@@ -14,6 +37,8 @@ struct LaborEntry {
 
     bool isOffer_{false};
     bool isAccept_{false};
+
+    SafePtr<RosterEntry> rosterEntry_{nullptr};
 
     LaborEntry(const int id, const double productPower)
         : hholdID_{id}, productPower_{productPower} {}
@@ -42,26 +67,6 @@ struct GoodsEntry {
     tbb::concurrent_vector<GoodsRequest> requestBox_;
 
     GoodsEntry(const double price, const double supply) : price_{price}, supply_{supply} {}
-};
-
-struct Workspace {
-    std::atomic<double> totalLaborInput;
-    double              firmProductPower{};
-};
-
-struct RosterEntry {
-    double wage_;
-    bool   isOccupied_{true};
-    bool   isLaidOff{false};
-
-    Workspace& workspace_;
-    RosterEntry(const double wage, Workspace& workspace) : wage_{wage}, workspace_{workspace} {}
-};
-
-struct CompanyBoard {
-    const int                           firmId_;
-    std::vector<RosterEntry>            roster_;
-    tbb::concurrent_vector<std::size_t> resignationBox_;
 };
 
 struct CensusDropBox {
