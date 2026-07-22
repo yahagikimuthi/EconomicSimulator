@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
+#include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
 #include <vector>
@@ -67,8 +68,10 @@ void jobEntry(
 
     const double productPower{view.productPower()};
 
+    const std::optional<int> firmId{view.contractFirmId()};
     for (const auto i : std::views::iota(0UZ, static_cast<std::size_t>(entryCnt))) {
-        auto& request  = sampleRequests[i].get();
+        auto& request = sampleRequests[i].get();
+        if (request.firmID_ == firmId) continue;
         auto& entryBox = request.entryBox_;
         view.entry(entryBox.emplace_back(id, productPower, request));
     }

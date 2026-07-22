@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
+#include <optional>
 #include <pcg_random.hpp>
 
 #include "components/labor_supplier.hpp"
@@ -13,6 +14,10 @@ namespace labor_supplier {
 struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
+    auto contractFirmId() -> std::optional<int> {
+        if (not comp_.rosterEntry_) return std::nullopt;
+        return comp_.rosterEntry_->companyBoard_.firmId_;
+    }
     void entry(
         tbb::concurrent_vector<world::LaborEntry>::iterator it  // NOLINT
     ) {
