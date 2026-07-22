@@ -39,12 +39,12 @@ struct Parameter {
 struct Posting {
     SafePtr<world::LaborRequest>            myRequest_{nullptr};
     std::vector<SafePtr<world::LaborEntry>> offerApplicants_;
-    bool                                    isPosting_;
+    bool                                    isPosting_{false};
 };
 struct Component {
     pcg32            rng_;
     Log              log_;
-    Plan             plan_;
+    Plan             plan_{};
     Posting          posting_{};
     HR               humanResources_;
     EmploymentLedger employmentLedger{};
