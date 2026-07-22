@@ -3,11 +3,13 @@
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <cassert>
+#include <components/labor_supplier.hpp>
 #include <cstddef>
 #include <functional>
 #include <iterator>
 #include <pcg_random.hpp>
 #include <ranges>
+#include <vector>
 
 #include "config.hpp"
 #include "world/message.hpp"
@@ -47,6 +49,17 @@ void sortSample(
     );
 }
 }  // namespace
+
+struct [[nodiscard]] CheckEmployingView final : BaseView<Component> {
+    auto firmIdx() const -> std::size_t { return comp_.contraction_.contractFirmIdx_; }
+    auto myIdx() const -> std::size_t { return comp_.contraction_.myRosterEntryIdx_; }
+};
+
+[[nodiscard]] auto isEmployingCheck(
+    const CheckEmployingView& view, const std::span<const world::CompanyBoard> companyBoards
+) -> bool {
+    return companyBoards[view.firmIdx()].roster_[view.myIdx()].isLaidOff;
+}
 
 void jobEntry(
     JobEntryView                                 view,
