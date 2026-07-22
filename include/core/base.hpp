@@ -29,23 +29,14 @@ class [[nodiscard]] SafePtr {
 
     auto hasValue() const -> bool { return ptr_ != nullptr; }
 
-    auto operator*() const -> const T& {
+    auto operator*() const -> T& {
         assert(ptr_ != nullptr && "Attempted to access a null pointer via SafePtr");
         return *ptr_;
     }
-    auto operator*() -> T& {
-        assert(ptr_ != nullptr && "Attempted to access a null pointer via SafePtr");
-        return *ptr_;
-    }
-    auto operator->() const -> const T* {
+    auto operator->() const -> T* {
         assert(ptr_ != nullptr && "Attempted to access a null pointer via SafePtr");
         return ptr_;
     }
-    auto operator->() -> T* {
-        assert(ptr_ != nullptr && "Attempted to access a null pointer via SafePtr");
-        return ptr_;
-    }
-
     auto operator=(T* ptr) -> SafePtr& {
         ptr_ = ptr;
         return *this;
