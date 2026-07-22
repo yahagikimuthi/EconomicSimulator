@@ -36,6 +36,8 @@ void jobEntry(
     labor_supplier::Component&                   laborSupplier,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
+    labor_supplier::updateRosterEntry(labor_supplier::UpdateRosterEntryView{laborSupplier});
+    if (not laborSupplier.shouldSearchJob()) return;
     const int id{indexComp.id()};
     labor_supplier::jobEntry(labor_supplier::JobEntryView{laborSupplier}, id, requestBox);
 }

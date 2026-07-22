@@ -11,6 +11,13 @@
 #include "core/forward.hpp"
 
 namespace labor_supplier {
+struct [[nodiscard]] UpdateRosterEntryView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+    auto rosterEntry() -> SafePtr<world::RosterEntry> { return comp_.rosterEntry_; }
+};
+
+void updateRosterEntry(UpdateRosterEntryView view);
+
 struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }

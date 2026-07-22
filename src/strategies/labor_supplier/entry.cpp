@@ -3,7 +3,6 @@
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <cassert>
-#include <components/labor_supplier.hpp>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -13,6 +12,7 @@
 #include <vector>
 
 #include "config.hpp"
+#include "core/base.hpp"
 #include "world/message.hpp"
 
 namespace labor_supplier {
@@ -50,6 +50,14 @@ void sortSample(
     );
 }
 }  // namespace
+
+void updateRosterEntry(UpdateRosterEntryView view) {
+    auto rosterEntry{view.rosterEntry()};
+    if (not rosterEntry) return;
+    if (rosterEntry->isLaidOff or not rosterEntry->isOccupied_) {
+        rosterEntry = nullptr;
+    }
+}
 
 void jobEntry(
     JobEntryView                                 view,
