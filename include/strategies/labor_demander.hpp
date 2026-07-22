@@ -80,7 +80,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     auto myCompanyBoard() -> world::CompanyBoard& { return *comp_.humanResources_.companyBoard_; }
 };
 
-void registerMember(RegisterMemberView view);
+void registerMember(RegisterMemberView view, world::Workspace& workspace);
 
 struct [[nodiscard]] AcceptResignationView final : BaseView<Component> {
     using BaseView<Component>::BaseView;

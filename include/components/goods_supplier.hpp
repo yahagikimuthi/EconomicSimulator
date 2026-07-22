@@ -55,5 +55,6 @@ struct [[nodiscard]] Component {
     );
 
     auto sales() const -> double { return salesLedger.currentSales_; }
+    auto workspace() -> world::Workspace& { return *production_.workspace_; }
 };
 }  // namespace goods_supplier

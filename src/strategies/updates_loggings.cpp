@@ -21,7 +21,7 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
     dropBox.hholdAssets_.emplace_back(comp.asset_);
 }
 }  // namespace hhold_finance
-// TODO 企業が労働市場に参加していない場合ロギングをパスする処理が必要
+
 namespace labor_demander {
 namespace {
 struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
@@ -50,32 +50,33 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
     dropBox.employments_.emplace_back(comp.employmentLedger.employing_);
 }
 void reset(Component& comp) {
-    comp.log_ = {
-        .wage_         = comp.plan_.wage_,
-        .actualEmploy_ = comp.employmentLedger.employing_,
-        .offerPlan_    = comp.plan_.offer_,
-        .applicantNum_ = comp.employmentLedger.applicantNum_
-    };
-    comp.parameter_.offerRate_ = updateAcceptanceRate(UpdateAcceptanceRateView{comp});
+    if (comp.plan_.isRecruiting) {
+        comp.log_ = {
+            .wage_         = comp.plan_.wage_,
+            .actualEmploy_ = comp.employmentLedger.employing_,
+            .offerPlan_    = comp.plan_.offer_,
+            .applicantNum_ = comp.employmentLedger.applicantNum_
+        };
+        comp.parameter_.offerRate_ = updateAcceptanceRate(UpdateAcceptanceRateView{comp});
+    }
 
-    comp.plan_                       = {.wage_ = 0.0, .employ_ = 0, .offer_ = 0};
-    comp.humanResources_.sumWage_    = comp.employmentLedger.sumWage_;
-    comp.humanResources_.employeeCnt = comp.employmentLedger.employing_;
-    comp.employmentLedger            = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
-    comp.posting_.myRequest_         = nullptr;
-    comp.posting_.isPosting_         = false;
+    comp.plan_ = {.isRecruiting = false, .wage_ = 0.0, .employ_ = 0, .offer_ = 0};
+    comp.humanResources_.sumWage_ = comp.employmentLedger.sumWage_;
+    comp.employmentLedger         = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
+    comp.posting_.myRequest_      = nullptr;
+    comp.posting_.isPosting_      = false;
     comp.posting_.offerApplicants_.clear();
 }
 }  // namespace labor_demander
 
 namespace labor_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.wages_.emplace_back(comp.contraction_.wage_);
+    if (not comp.rosterEntry_) return;
+    dropBox.wages_.emplace_back(comp.rosterEntry_->wage_);
 }
 void reset(Component& comp) {
     comp.posting_.myEntries_.clear();
     comp.posting_.isPosting_ = false;
-    comp.contraction_        = {.firmID_ = -1, .wage_ = 0.0};
 }
 }  // namespace labor_supplier
 

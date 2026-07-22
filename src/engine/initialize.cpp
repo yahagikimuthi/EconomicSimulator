@@ -40,9 +40,8 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
 
     firms_.reserve(config::agent_count::firm);
     workspaces_.resize(config::agent_count::firm);
-    companyBoards_.resize(config::agent_count::firm);
     for (const auto i : std::views::iota(0, config::agent_count::firm + 1)) {
-        workspaces_.emplace_back();
+        companyBoards_.emplace_back(i);
         Firm firm{
             .index   = {i},
             .finance = {makeSeed(), makeSeed()},

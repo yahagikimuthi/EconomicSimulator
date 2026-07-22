@@ -52,8 +52,12 @@ void acceptOffer(labor_supplier::Component& laborSupplier) {
     labor_supplier::acceptOffer(labor_supplier::AcceptOfferView{laborSupplier});
 }
 
-void registerMember(labor_demander::Component& laborDemander) {
-    labor_demander::registerMember(labor_demander::RegisterMemberView{laborDemander});
+void registerMember(
+    goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
+) {
+    labor_demander::registerMember(
+        labor_demander::RegisterMemberView{laborDemander}, goodsSupplier.workspace()
+    );
 }
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler) {

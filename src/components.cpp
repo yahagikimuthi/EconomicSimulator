@@ -33,9 +33,7 @@ Component::Component(
           .offerPlan_    = randInt(rng_, 10, 20),
           .applicantNum_ = randInt(rng_, 10, 20)
       },
-      humanResources_{
-          .companyBoard_ = companyBoard, .emptyRosterPool_ = {}, .sumWage_ = 0.0, .employeeCnt = 0
-      },
+      humanResources_{.companyBoard_ = companyBoard, .emptyRosterPool_ = {}, .sumWage_ = 0.0},
       parameter_{
           .offerRate_                  = rand(rng_, 0.0, 1.0),
           .wageAdjustmentVolatility_   = rand(rng_, 0.01, 0.1),
