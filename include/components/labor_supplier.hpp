@@ -17,6 +17,7 @@ struct Posting {
     bool                               isPosting_{false};
 };
 struct Contraction {
+    const bool  isEmploying_;
     std::size_t contractFirmIdx_;
     std::size_t myRosterEntryIdx_;
 };
@@ -24,7 +25,7 @@ struct Parameter {
     double productPower_;
 };
 
-struct Component {
+struct [[nodiscard]] Component {
     pcg32       rng_;
     Posting     posting_;
     Contraction contraction_;
@@ -32,10 +33,11 @@ struct Component {
 
     Component(const std::uint64_t state, const std::uint64_t stream);
 
-    [[nodiscard]] auto wage(const std::span<const world::CompanyBoard> companyBoards) const
-        -> double {
-        auto [firmIdx, myIdx]{contraction_};
-        return companyBoards[firmIdx].roster_[myIdx].wage_;
+    auto wage(const std::span<const world::CompanyBoard> companyBoards) const -> double {
+        if (not contraction_.isEmploying_) return 0.0;
+        return companyBoards[contraction_.contractFirmIdx_]
+            .roster_[contraction_.myRosterEntryIdx_]
+            .wage_;
     }
 };
 }  // namespace labor_supplier
