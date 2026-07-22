@@ -38,7 +38,7 @@ struct LaborEntry {
     bool isOffer_{false};
     bool isAccept_{false};
 
-    SafePtr<RosterEntry>              rosterEntry_{nullptr};
+    const SafePtr<RosterEntry>        rosterEntry_{nullptr};
     const SafePtr<const LaborRequest> request_{nullptr};
 
     LaborEntry(const int id, const double productPower, const LaborRequest& request)
