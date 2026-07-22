@@ -39,12 +39,15 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     masterRng_ = {seed_.state, seed_.stream};
 
     firms_.reserve(config::agent_count::firm);
-    for (const auto i : std::views::iota(0, config::agent_count::firm)) {
+    workspaces_.resize(config::agent_count::firm);
+    companyBoards_.resize(config::agent_count::firm);
+    for (const auto i : std::views::iota(0, config::agent_count::firm + 1)) {
+        workspaces_.emplace_back();
         Firm firm{
             .index   = {i},
             .finance = {makeSeed(), makeSeed()},
-            .labor   = {makeSeed(), makeSeed(), static_cast<std::size_t>(i)},
-            .goods   = {makeSeed(), makeSeed(), static_cast<std::size_t>(i)}
+            .labor   = {makeSeed(), makeSeed(), &companyBoards_[static_cast<std::size_t>(i)]},
+            .goods   = {makeSeed(), makeSeed(), &workspaces_[static_cast<std::size_t>(i)]}
         };
         firms_.push_back(firm);
     }
