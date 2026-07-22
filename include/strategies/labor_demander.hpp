@@ -82,6 +82,17 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
 
 void registerMember(RegisterMemberView view);
 
+struct [[nodiscard]] AcceptResignationView final : BaseView<Component> {
+    void addEmptyRosterPool(const SafePtr<world::RosterEntry> emptyRoster) {
+        comp_.humanResources_.emptyRosterPool_.emplace_back(emptyRoster);
+    }
+    auto resignationBox() -> tbb::concurrent_vector<SafePtr<world::RosterEntry>>& {
+        return comp_.humanResources_.companyBoard_->resignationBox_;
+    }
+};
+
+void acceptResignation(AcceptResignationView view);
+
 void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);
 }  // namespace labor_demander
