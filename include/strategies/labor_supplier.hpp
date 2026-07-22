@@ -14,12 +14,11 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
     void entry(
-        const world::LaborRequest&                          request,
-        tbb::concurrent_vector<world::LaborEntry>::iterator entryIt  // NOLINT
+        tbb::concurrent_vector<world::LaborEntry>::iterator it  // NOLINT
     ) {
-        comp_.posting_.myEntries_.emplace_back(&request, &*entryIt);
+        comp_.posting_.myEntries_.emplace_back(&*it);
     }
-    auto productPower() const -> double { return comp_.parameter_.productPower_; }
+    auto productPower() const -> double { return comp_.productPower_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
 void jobEntry(
@@ -34,16 +33,17 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     auto myEntryCnt() const -> std::size_t { return comp_.posting_.myEntries_.size(); }
     auto myEntry(const std::size_t idx)
         -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
-        auto [request, myEntry] = comp_.posting_.myEntries_[idx];
-        return {*request, *myEntry};
+        auto& myEntry = *comp_.posting_.myEntries_[idx];
+        return {*myEntry.request_, myEntry};
     }
-    void setContraction(const int firmId, const double wage) {
-        comp_.contraction_.firmID_ = firmId, comp_.contraction_.wage_ = wage;
+    void recordAcceptance(const world::LaborEntry& acceptEntry) {
+        comp_.posting_.acceptEntry_ = &acceptEntry;
     }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
 };
 
 void acceptOffer(AcceptOfferView view);
+
 void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);
 }  // namespace labor_supplier

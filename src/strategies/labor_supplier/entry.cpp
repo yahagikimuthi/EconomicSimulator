@@ -50,17 +50,6 @@ void sortSample(
 }
 }  // namespace
 
-struct [[nodiscard]] CheckEmployingView final : BaseView<Component> {
-    auto firmIdx() const -> std::size_t { return comp_.contraction_.contractFirmIdx_; }
-    auto myIdx() const -> std::size_t { return comp_.contraction_.myRosterEntryIdx_; }
-};
-
-[[nodiscard]] auto isEmployingCheck(
-    const CheckEmployingView& view, const std::span<const world::CompanyBoard> companyBoards
-) -> bool {
-    return companyBoards[view.firmIdx()].roster_[view.myIdx()].isLaidOff;
-}
-
 void jobEntry(
     JobEntryView                                 view,
     const int                                    id,
@@ -81,7 +70,7 @@ void jobEntry(
     for (const auto i : std::views::iota(0UZ, static_cast<std::size_t>(entryCnt))) {
         auto& request  = sampleRequests[i].get();
         auto& entryBox = request.entryBox_;
-        view.entry(request, entryBox.emplace_back(id, productPower));
+        view.entry(entryBox.emplace_back(id, productPower, request));
     }
 }
 }  // namespace labor_supplier

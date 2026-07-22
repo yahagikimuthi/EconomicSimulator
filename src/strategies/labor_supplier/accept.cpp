@@ -11,7 +11,7 @@ void acceptOffer(AcceptOfferView view) {
         auto [request, myEntry] = view.myEntry(i);
         if (not myEntry.isOffer_) continue;
         myEntry.isAccept_ = true;
-        view.setContraction(request.firmID_, request.wage_);
+        view.recordAcceptance(myEntry);
         return;
     }
 }

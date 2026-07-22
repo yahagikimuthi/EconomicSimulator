@@ -82,7 +82,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     auto myCompanyBoard() -> world::CompanyBoard& { return *comp_.humanResources_.companyBoard_; }
 };
 
-[[nodiscard]] auto registerMember(RegisterMemberView view) -> double;
+void registerMember(RegisterMemberView view);
 
 void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);
