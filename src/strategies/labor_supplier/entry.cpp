@@ -6,7 +6,6 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
-#include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
 #include <vector>

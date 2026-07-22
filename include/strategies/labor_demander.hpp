@@ -83,6 +83,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
 void registerMember(RegisterMemberView view);
 
 struct [[nodiscard]] AcceptResignationView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
     void addEmptyRosterPool(const SafePtr<world::RosterEntry> emptyRoster) {
         comp_.humanResources_.emptyRosterPool_.emplace_back(emptyRoster);
     }

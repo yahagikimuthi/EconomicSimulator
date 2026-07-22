@@ -1,6 +1,8 @@
 #include "strategies/orchestrator.hpp"
 
 #include <tbb/concurrent_vector.h>
+#include <components/labor_demander.hpp>
+#include <components/labor_supplier.hpp>
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
@@ -12,7 +14,7 @@
 #include "world/message.hpp"
 
 namespace orchestrator::labor {
-void postLaborRequest(
+void AdjustWorkforce(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
@@ -52,6 +54,16 @@ void acceptOffer(labor_supplier::Component& laborSupplier) {
 
 void registerMember(labor_demander::Component& laborDemander) {
     labor_demander::registerMember(labor_demander::RegisterMemberView{laborDemander});
+}
+
+void recordRosterEntry(labor_supplier::Component& laborSuppler) {
+    if (not laborSuppler.isAcceptedOffer()) return;
+    const SafePtr<world::RosterEntry> rosterEntry = {laborSuppler.acceptedEntry().rosterEntry_};
+    laborSuppler.rosterEntry(rosterEntry);
+}
+
+void acceptResignation(labor_demander::Component laborDemander) {
+    labor_demander::acceptResignation(labor_demander::AcceptResignationView{laborDemander});
 }
 
 void endStep(

@@ -36,5 +36,6 @@ struct [[nodiscard]] Component {
         if (not rosterEntry_) return true;
         return helper::rand(rng_) < jobSearchThreshold_;
     }
+    auto isAcceptedOffer() const -> bool { return posting_.acceptEntry_.hasValue(); }
 };
 }  // namespace labor_supplier

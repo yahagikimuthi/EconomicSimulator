@@ -5,7 +5,7 @@
 #include "core/forward.hpp"
 
 namespace orchestrator::labor {
-void postLaborRequest(
+void AdjustWorkforce(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
@@ -26,6 +26,10 @@ void acceptOffer(labor_supplier::Component& laborSupplier);
 void registerMember(
     goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
 );
+
+void recordRosterEntry(labor_supplier::Component& laborSuppler);
+
+void acceptResignation(labor_demander::Component laborDemander);
 
 void endStep(
     firm_finance::Component&   financeComp,
