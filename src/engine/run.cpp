@@ -22,9 +22,7 @@ void Engine::run() {
 void Engine::runLabor() {
     using namespace orchestrator;
     for (Firm& firm : firms_) {
-        labor::postLaborRequest(
-            firm.index, firm.goods, firm.labor, laborRequestBox_, companyBoards_
-        );
+        labor::AdjustWorkforce(firm.index, firm.goods, firm.labor, laborRequestBox_);
     }
 
     for (HHold& hhold : hholds_) {
@@ -41,6 +39,14 @@ void Engine::runLabor() {
 
     for (Firm& firm : firms_) {
         labor::registerMember(firm.goods, firm.labor);
+    }
+
+    for (HHold& hhold : hholds_) {
+        labor::recordRosterEntry(hhold.labor);
+    }
+
+    for (Firm& firm : firms_) {
+        labor::acceptResignation(firm.labor);
     }
 
     for (Firm& firm : firms_) {

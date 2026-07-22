@@ -9,8 +9,7 @@ void AdjustWorkforce(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    std::vector<world::CompanyBoard>&            companyBoards
+    tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
 
 void jobEntry(
@@ -29,7 +28,7 @@ void registerMember(
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler);
 
-void acceptResignation(labor_demander::Component laborDemander);
+void acceptResignation(labor_demander::Component& laborDemander);
 
 void endStep(
     firm_finance::Component&   financeComp,

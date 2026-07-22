@@ -62,7 +62,7 @@ void recordRosterEntry(labor_supplier::Component& laborSuppler) {
     laborSuppler.rosterEntry(rosterEntry);
 }
 
-void acceptResignation(labor_demander::Component laborDemander) {
+void acceptResignation(labor_demander::Component& laborDemander) {
     labor_demander::acceptResignation(labor_demander::AcceptResignationView{laborDemander});
 }
 
