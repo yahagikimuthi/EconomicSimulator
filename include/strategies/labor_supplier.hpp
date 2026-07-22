@@ -44,6 +44,13 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
 
 void acceptOffer(AcceptOfferView view);
 
+struct [[nodiscard]] ProductView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+    auto myWorkspace() -> world::Workspace& { return comp_.rosterEntry_->workspace_; }
+    auto productPower() -> double { return comp_.productPower_; }
+};
+void product(ProductView view);
+
 void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);
 }  // namespace labor_supplier
