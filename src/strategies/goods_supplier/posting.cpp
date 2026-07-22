@@ -24,22 +24,6 @@ namespace {
     return std::max(price, epsilon);
 }
 
-struct CalcSupplyView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-
-    auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
-    auto sumEmployeeProductPower() const -> double {
-        return comp_.production_.sumEmployeeProductPower_;
-    }
-    auto inventory() const -> double { return comp_.production_.inventory_; }
-};
-
-[[nodiscard]] auto calcSupply(const CalcSupplyView& view) -> double {
-    const double out{(view.firmProductPower() * view.sumEmployeeProductPower()) + view.inventory()};
-    assert(out >= 0.0 && "supply amount is required >= 0");
-    return out;
-}
-
 struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
 
@@ -55,32 +39,10 @@ struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
     return markupGuard(nextMarkup);
 }
 
-struct [[nodiscard]] CalcAvgCostView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-
-    auto firmProductPower() const -> double { return comp_.production_.firmProductPower_; }
-    auto sumEmployeeProductPower() const -> double {
-        return comp_.production_.sumEmployeeProductPower_;
-    }
-};
-
-[[nodiscard]] auto calcAvgCost(const CalcAvgCostView& view, const double totalCost) -> double {
-    assert(totalCost >= 0.0 && "total cost is required > 0");
-
-    const double sumProductPower{view.sumEmployeeProductPower() * view.firmProductPower()};
-    const double avgCost{(sumProductPower != 0.0) ? totalCost / sumProductPower : 0.0};
-    assert(avgCost >= 0.0 && "average cost is required >= 0");
-    return avgCost;
-}
-
-struct [[nodiscard]] JudgePriceView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-};
-
-[[nodiscard]] auto judgePrice(JudgePriceView view, const double markup, const double totalCost)
+[[nodiscard]] auto judgePrice(const double supply, const double markup, const double totalCost)
     -> double {
     assert(markup > 0.0 && "markup is required > 0");
-    const double avgCost{calcAvgCost(CalcAvgCostView{view}, totalCost)};
+    const double avgCost{(supply != 0.0) ? totalCost / supply : 0.0};
     const double price{avgCost * (1.0 + markup)};
     return priceGuard(price);
 }
@@ -89,9 +51,9 @@ struct [[nodiscard]] JudgePriceView final : BaseView<Component> {
 void postGoods(
     PostGoodsView view, const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    const double supply{calcSupply(CalcSupplyView{view})};
+    const double supply{view.laborInput()};
     const double markup{calcMarkup(CalcMarkupView{view})};
-    const double price{judgePrice(JudgePriceView{view}, markup, totalCost)};
+    const double price{judgePrice(supply, markup, totalCost)};
     view.plan(price, supply, markup);
 
     // markupやprice自体は供給量0でも計算対象
