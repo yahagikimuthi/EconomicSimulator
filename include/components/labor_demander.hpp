@@ -52,7 +52,9 @@ struct Component {
     Parameter        parameter_;
 
     Component(
-        const std::uint64_t state, const std::uint64_t stream, const std::size_t myCompanyBoard
+        const std::uint64_t                state,
+        const std::uint64_t                stream,
+        const SafePtr<world::CompanyBoard> companyBoard
     );
 
     [[nodiscard]] auto sumWage() const -> double { return humanResources_.sumWage_; }

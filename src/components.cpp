@@ -22,7 +22,9 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
 
 namespace labor_demander {
 Component::Component(
-    const std::uint64_t state, const std::uint64_t stream, const std::size_t myCompanyBoard
+    const std::uint64_t                state,
+    const std::uint64_t                stream,
+    const SafePtr<world::CompanyBoard> companyBoard
 )
     : rng_{state, stream},
       log_{
@@ -32,10 +34,7 @@ Component::Component(
           .applicantNum_ = randInt(rng_, 10, 20)
       },
       humanResources_{
-          .myCompanyBoardIdx_  = myCompanyBoard,
-          .emptyRosterIdxPool_ = {},
-          .sumWage_            = 0.0,
-          .employeeCnt         = 0
+          .companyBoard_ = companyBoard, .emptyRosterPool_ = {}, .sumWage_ = 0.0, .employeeCnt = 0
       },
       parameter_{
           .offerRate_                  = rand(rng_, 0.0, 1.0),
