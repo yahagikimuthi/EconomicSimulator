@@ -12,6 +12,7 @@ void acceptOffer(AcceptOfferView view) {
         if (not myEntry.isOffer_) continue;
         myEntry.isAccept_ = true;
         view.recordAcceptance(myEntry);
+        view.resign();
         return;
     }
 }
