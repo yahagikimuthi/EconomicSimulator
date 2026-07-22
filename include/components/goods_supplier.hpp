@@ -30,29 +30,26 @@ struct Posting {
     bool                       isPosting_{false};
 };
 struct Production {
-    const std::size_t myWorkspaceIdx_;
-    double            firmProductPower_;
-    double            sumEmployeeProductPower_;
-    double            inventory_;
+    const SafePtr<world::Workspace> workspace_;
+    double                          firmProductPower_;
+    double                          inventory_;
 };
 struct Parameter {
     const double targetInventoryRatio_;
     const double markupAdjustmentVolatility_;
     const double demandForecastAdjustmentParam_;
 };
-struct Component {
+struct [[nodiscard]] Component {
     pcg32       rng_;
     Log         log_{};
     Plan        plan_{};
     SalesLedger salesLedger{};
     Posting     posting_;
-    Production  production_{};
+    Production  production_;
     Parameter   parameter_;
 
     Component(const std::uint64_t state, const std::uint64_t stream, const std::size_t myWorkspace);
-    void setSumEmployeeProductPower(const double power) {
-        production_.sumEmployeeProductPower_ = power;
-    }
-    [[nodiscard]] auto sales() const -> double { return salesLedger.currentSales_; }
+
+    auto sales() const -> double { return salesLedger.currentSales_; }
 };
 }  // namespace goods_supplier
