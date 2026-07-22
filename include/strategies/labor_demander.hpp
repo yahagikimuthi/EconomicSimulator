@@ -74,6 +74,21 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         auto& ledger = comp_.employmentLedger;
         ledger.employing_ += actualEmploy, ledger.sumWage_ += wage * actualEmploy;
     }
+    auto addRoster(
+        const double wage, world::CompanyBoard& companyBoard, world::Workspace& workspace
+    ) -> SafePtr<world::RosterEntry> {
+        auto& hr = comp_.humanResources_;
+        if (hr.emptyRosterPool_.empty()) {
+            return &hr.companyBoard_->roster_.emplace_back(wage, companyBoard, workspace);
+        }
+        SafePtr<world::RosterEntry> newEntry = hr.emptyRosterPool_.back();
+        newEntry->wage_                      = wage;
+        newEntry->isOccupied_                = true;
+        newEntry->isLaidOff                  = true;
+        hr.emptyRosterPool_.pop_back();
+        return newEntry;
+    }
+
     void applicantNumPlus(const std::size_t n) {
         comp_.employmentLedger.applicantNum_ += static_cast<int>(n);
     }
@@ -90,6 +105,7 @@ struct [[nodiscard]] AcceptResignationView final : BaseView<Component> {
     auto resignationBox() -> tbb::concurrent_vector<SafePtr<world::RosterEntry>>& {
         return comp_.humanResources_.companyBoard_->resignationBox_;
     }
+    void wageMinus(const double minus) { comp_.humanResources_.sumWage_ -= minus; }
 };
 
 void acceptResignation(AcceptResignationView view);
