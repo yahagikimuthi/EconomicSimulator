@@ -28,6 +28,7 @@ struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
         comp_.salesLedger.inventory_ = supply;
     }
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
+    auto laborInput() const -> double { return comp_.production_.workspace_->totalLaborInput; }
 };
 
 void postGoods(
