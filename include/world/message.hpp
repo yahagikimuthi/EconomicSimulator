@@ -20,15 +20,14 @@ struct RosterEntry {
     bool   isLaidOff{false};
 
     CompanyBoard& companyBoard_;
-    RosterEntry(const double wage, CompanyBoard& companyBoard)
-        : wage_{wage}, companyBoard_{companyBoard} {}
+    Workspace&    workspace_;
+    RosterEntry(const double wage, CompanyBoard& companyBoard, Workspace& workspace)
+        : wage_{wage}, companyBoard_{companyBoard}, workspace_{workspace} {}
 };
 
-struct [[nodiscard]] CompanyBoard {
-    const int                                    firmId_;
+struct CompanyBoard {
     std::deque<RosterEntry>                      roster_;
     tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox_;
-    Workspace                                    workspace;
 };
 
 struct LaborEntry {
@@ -38,7 +37,7 @@ struct LaborEntry {
     bool isOffer_{false};
     bool isAccept_{false};
 
-    const SafePtr<RosterEntry>        rosterEntry_{nullptr};
+    SafePtr<RosterEntry>              rosterEntry_{nullptr};
     const SafePtr<const LaborRequest> request_{nullptr};
 
     LaborEntry(const int id, const double productPower, const LaborRequest& request)
