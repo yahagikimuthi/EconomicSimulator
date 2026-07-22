@@ -76,10 +76,12 @@ void jobEntry(
 
     const double productPower{view.productPower()};
 
-    const std::optional<int> firmId{view.contractFirmId()};
+    const int    firmId{view.contractFirmId()};
+    const double nowWage{view.contractWage()};
     for (const auto i : std::views::iota(0UZ, static_cast<std::size_t>(entryCnt))) {
         auto& request = sampleRequests[i].get();
         if (request.firmID_ == firmId) continue;
+        if (request.wage_ <= nowWage) continue;
         auto& entryBox = request.entryBox_;
         view.entry(entryBox.emplace_back(id, productPower, request));
     }

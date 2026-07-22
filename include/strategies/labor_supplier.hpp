@@ -2,7 +2,6 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
-#include <optional>
 #include <pcg_random.hpp>
 
 #include "components/labor_supplier.hpp"
@@ -21,9 +20,13 @@ void updateRosterEntry(UpdateRosterEntryView view);
 struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
-    auto contractFirmId() -> std::optional<int> {
-        if (not comp_.rosterEntry_) return std::nullopt;
+    auto contractFirmId() const -> int {
+        if (not comp_.rosterEntry_) return -1;
         return comp_.rosterEntry_->companyBoard_.firmId_;
+    }
+    auto contractWage() const -> double {
+        if (not comp_.rosterEntry_) return 0.0;
+        return comp_.rosterEntry_->wage_;
     }
     void entry(
         tbb::concurrent_vector<world::LaborEntry>::iterator it  // NOLINT
