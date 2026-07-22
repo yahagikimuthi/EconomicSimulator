@@ -12,7 +12,7 @@
 namespace labor_supplier {
 struct Posting {
     std::vector<SafePtr<world::LaborEntry>> myEntries_;
-    SafePtr<const world::LaborEntry>        acceptEntry_;
+    SafePtr<const world::LaborEntry>        acceptEntry_{nullptr};
     bool                                    isPosting_{false};
 };
 struct Parameter {

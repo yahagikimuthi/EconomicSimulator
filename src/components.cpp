@@ -49,7 +49,8 @@ Component::Component(
 namespace labor_supplier {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)
     : rng_{state, stream},
-      parameter_{.productPower_ = randNormal(rng_, 1.0, 1.0 / 3.0, 0.0, 2.0)} {}
+      productPower_{randNormal(rng_, 1.0, 1.0 / 3.0, 0.0, 2.0)},
+      jobSearchThreshold_{rand(rng_, 0.01, 0.05)} {}
 }  // namespace labor_supplier
 
 namespace goods_demander {
