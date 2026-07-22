@@ -16,22 +16,18 @@ void postLaborRequest(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
     labor_demander::Component&                   laborDemander,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    std::vector<world::CompanyBoard>&            companyBoards
+    tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     const int id{indexComp.id()};
     const int desiredEmploy{goods_supplier::calcDesiredEmploy(
-        goods_supplier::CalcDesiredEmployView{goodsSupplier},
-        laborDemander.employeeCnt(companyBoards)
+        goods_supplier::CalcDesiredEmployView{goodsSupplier}, laborDemander.employeeCnt()
     )};
     if (desiredEmploy > 0) {
         labor_demander::postJob(
             id, desiredEmploy, requestBox, labor_demander::PostJobView{laborDemander}
         );
     } else if (desiredEmploy < 0) {
-        labor_demander::layoffs(
-            labor_demander::LayOffsView{laborDemander}, -desiredEmploy, companyBoards
-        );
+        labor_demander::layoffs(labor_demander::LayOffsView{laborDemander}, -desiredEmploy);
     }
 }
 
@@ -52,13 +48,8 @@ void acceptOffer(labor_supplier::Component& laborSupplier) {
     labor_supplier::acceptOffer(labor_supplier::AcceptOfferView{laborSupplier});
 }
 
-void registerMember(
-    goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
-) {
-    const double sumEmployeeProductPower{
-        labor_demander::registerMember(labor_demander::RegisterMemberView{laborDemander})
-    };
-    goodsSupplier.setSumEmployeeProductPower(sumEmployeeProductPower);
+void registerMember(labor_demander::Component& laborDemander) {
+    labor_demander::registerMember(labor_demander::RegisterMemberView{laborDemander});
 }
 
 void endStep(

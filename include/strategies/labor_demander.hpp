@@ -47,9 +47,7 @@ struct LayOffsView final : BaseView<Component> {
     }
 };
 
-void layoffs(
-    LayOffsView view, const int layOffsCnt, std::vector<world::CompanyBoard>& companyBoards
-);
+void layoffs(LayOffsView view, const int layOffsCnt);
 
 struct [[nodiscard]] OfferApplicantsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
