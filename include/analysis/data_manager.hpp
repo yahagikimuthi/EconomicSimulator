@@ -15,10 +15,16 @@ namespace analysis {
 class [[nodiscard]] InputDataManager {
   public:
     InputDataManager()
-        : inFile_{
-              static_cast<std::string>(config::setting::simulationResultOutputPath),
-              HighFive::File::ReadOnly
-          } {
+        : inFile_{[]() -> HighFive::File {
+              const std::string filepath{
+                  static_cast<std::string>(config::setting::simulationResultOutputPath)
+              };
+              const std::filesystem::path path{filepath};
+              if (path.has_parent_path()) {
+                  std::filesystem::create_directories(path.parent_path());
+              }
+              return HighFive::File{filepath, HighFive::File::ReadOnly};
+          }()} {
         if (not inFile_.isValid()) {
             std::cerr << "Failed to load the file\n"
                       << "Path: "
@@ -71,10 +77,19 @@ class [[nodiscard]] InputDataManager {
 class [[nodiscard]] OutputDataManager {
   public:
     OutputDataManager()
-        : outFile_{
-              static_cast<std::string>(config::setting::metricDataOutputPath),
-              HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
-          } {
+        : outFile_{[]() -> HighFive::File {
+              const std::string filepath{
+                  static_cast<std::string>(config::setting::metricDataOutputPath)
+              };
+              const std::filesystem::path path{filepath};
+              if (path.has_parent_path()) {
+                  std::filesystem::create_directories(path.parent_path());
+              }
+              return HighFive::File{
+                  filepath,
+                  HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
+              };
+          }()} {
         if (not outFile_.isValid()) {
             std::cerr << "Failed to create the file\n"
                       << "Path: "

@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <entt/entt.hpp>
+#include <filesystem>
 #include <helper.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -37,18 +38,18 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
         assert(false && "can not create file");
     }
     masterRng_ = {seed_.state, seed_.stream};
-
     firms_.reserve(config::agent_count::firm);
     workspaces_.resize(config::agent_count::firm);
-    for (const auto i : std::views::iota(0, config::agent_count::firm + 1)) {
+    for (const auto i : std::views::iota(0, config::agent_count::firm)) {
         companyBoards_.emplace_back(i);
-        Firm firm{
-            .index   = {i},
-            .finance = {makeSeed(), makeSeed()},
-            .labor   = {makeSeed(), makeSeed(), &companyBoards_[static_cast<std::size_t>(i)]},
-            .goods   = {makeSeed(), makeSeed(), &workspaces_[static_cast<std::size_t>(i)]}
-        };
-        firms_.push_back(firm);
+        firms_.emplace_back(
+            Firm{
+                .index   = {i},
+                .finance = {makeSeed(), makeSeed()},
+                .labor   = {makeSeed(), makeSeed(), &companyBoards_[static_cast<std::size_t>(i)]},
+                .goods   = {makeSeed(), makeSeed(), &workspaces_[static_cast<std::size_t>(i)]}
+            }
+        );
     }
 
     hholds_.reserve(config::agent_count::hhold);
@@ -64,8 +65,17 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
 }
 
 Logger::Logger()
-    : file_{
-          static_cast<std::string>(config::setting::simulationResultOutputPath),
-          HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
-      } {}
+    : file_{[]() -> HighFive::File {
+          const std::string filepath{
+              static_cast<std::string>(config::setting::simulationResultOutputPath)
+          };
+          const std::filesystem::path path{filepath};
+          if (path.has_parent_path()) {
+              std::filesystem::create_directories(path.parent_path());
+          }
+          return HighFive::File{
+              filepath,
+              HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
+          };
+      }()} {}
 }  // namespace core
