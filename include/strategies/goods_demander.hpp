@@ -7,6 +7,7 @@
 #include "components/goods_demander.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace goods_demander {
 struct [[nodiscard]] PurchaseView final : BaseView<Component> {
@@ -17,10 +18,9 @@ struct [[nodiscard]] PurchaseView final : BaseView<Component> {
     auto purchasing() const -> double { return comp_.purchasing_.purchase_; }
     auto mpc() const -> double { return comp_.parameter_.mpc_; }
     void entry(
-        const world::GoodsEntry&                                    entry,
-        const tbb::concurrent_vector<world::GoodsRequest>::iterator myRequest  // NOLINT
+        const tbb::concurrent_vector<world::GoodsRequest>::iterator it  // NOLINT
     ) {
-        comp_.posting_.myRequest_ = {&entry, &*myRequest};
+        comp_.posting_.myRequest_ = &*it;
     }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
@@ -36,8 +36,8 @@ struct [[nodiscard]] AfterTradeView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
 
     auto myRequest() const -> std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
-        auto& [entry, myRequest] = comp_.posting_.myRequest_;
-        return {*entry, *myRequest};
+        SafePtr<const world::GoodsRequest> myRequest = comp_.posting_.myRequest_;
+        return {*myRequest->entry_, *myRequest};
     }
     void purchasePlus(const double plus) { comp_.purchasing_.purchase_ += plus; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }

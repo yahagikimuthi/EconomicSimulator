@@ -3,17 +3,14 @@
 #include <tbb/concurrent_vector.h>
 #include <cstdint>
 #include <pcg_random.hpp>
-#include <utility>
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
 
 namespace goods_demander {
 struct Posting {
-    using GoodsMarketCoordinate =
-        std::pair<SafePtr<const world::GoodsEntry>, SafePtr<const world::GoodsRequest>>;
-    GoodsMarketCoordinate myRequest_{nullptr, nullptr};
-    bool                  isPosting_{false};
+    SafePtr<const world::GoodsRequest> myRequest_{nullptr};
+    bool                               isPosting_{false};
 };
 struct Purchasing {
     double purchase_{};

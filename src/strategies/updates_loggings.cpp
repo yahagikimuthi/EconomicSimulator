@@ -82,7 +82,7 @@ void reset(Component& comp) {
 
 namespace goods_demander {
 void reset(Component& comp) {
-    comp.posting_    = {.myRequest_ = {nullptr, nullptr}, .isPosting_ = false};
+    comp.posting_    = {.myRequest_ = nullptr, .isPosting_ = false};
     comp.purchasing_ = {.purchase_ = 0.0};
 }
 }  // namespace goods_demander

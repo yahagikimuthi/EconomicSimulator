@@ -69,6 +69,6 @@ void purchase(
     view.isPosting(true);
     auto& pickedEntry = pickEntry(view.rng(), entryBox);
     assert(pickedEntry.price_ > 0.0 && "price is required > 0.0");
-    view.entry(pickedEntry, pickedEntry.requestBox_.emplace_back(budget / pickedEntry.price_));
+    view.entry(pickedEntry.requestBox_.emplace_back(budget / pickedEntry.price_, pickedEntry));
 }
 }  // namespace goods_demander
