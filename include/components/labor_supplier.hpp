@@ -15,10 +15,6 @@ struct Posting {
     SafePtr<const world::LaborEntry>        acceptEntry_{nullptr};
     bool                                    isPosting_{false};
 };
-struct Parameter {
-    double productPower_;
-};
-
 struct [[nodiscard]] Component {
     pcg32                       rng_;
     Posting                     posting_{};
