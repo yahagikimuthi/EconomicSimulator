@@ -29,6 +29,8 @@ struct CompanyBoard {
     const int                                    firmId_;
     std::deque<RosterEntry>                      roster_;
     tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox_;
+
+    CompanyBoard(const int id) : firmId_{id} {}
 };
 
 struct LaborEntry {
