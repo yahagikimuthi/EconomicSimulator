@@ -23,7 +23,9 @@ struct Plan {
 struct HR {
     const SafePtr<world::CompanyBoard>       companyBoard_;
     std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
-    double                                   sumWage_;
+    double                                   sumWage_{};
+
+    HR(const SafePtr<world::CompanyBoard> companyBoard) : companyBoard_{companyBoard} {}
 };
 struct EmploymentLedger {
     int    applicantNum_;
