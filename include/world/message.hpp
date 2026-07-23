@@ -19,10 +19,10 @@ struct RosterEntry {
     bool   isOccupied_{true};
     bool   isLaidOff{false};
 
-    CompanyBoard& companyBoard_;
-    Workspace&    workspace_;
+    const SafePtr<CompanyBoard> companyBoard_;
+    const SafePtr<Workspace>    workspace_;
     RosterEntry(const double wage, CompanyBoard& companyBoard, Workspace& workspace)
-        : wage_{wage}, companyBoard_{companyBoard}, workspace_{workspace} {}
+        : wage_{wage}, companyBoard_{&companyBoard}, workspace_{&workspace} {}
 };
 
 struct CompanyBoard {
@@ -60,7 +60,8 @@ struct GoodsRequest {
     const double amount_;
     double       tradeAmount_{};
 
-    GoodsRequest(const double amount) : amount_{amount} {}
+    const SafePtr<const GoodsEntry> entry_{nullptr};
+    GoodsRequest(const double amount, const GoodsEntry& entry) : amount_{amount}, entry_{&entry} {}
 };
 
 struct GoodsEntry {

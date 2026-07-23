@@ -22,7 +22,7 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
     auto contractFirmId() const -> int {
         if (not comp_.rosterEntry_) return -1;
-        return comp_.rosterEntry_->companyBoard_.firmId_;
+        return comp_.rosterEntry_->companyBoard_->firmId_;
     }
     auto contractWage() const -> double {
         if (not comp_.rosterEntry_) return 0.0;
@@ -57,7 +57,7 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void resign() {
         if (not comp_.rosterEntry_) return;
-        comp_.rosterEntry_->companyBoard_.resignationBox_.emplace_back(comp_.rosterEntry_);
+        comp_.rosterEntry_->companyBoard_->resignationBox_.emplace_back(comp_.rosterEntry_);
     }
 };
 
@@ -65,7 +65,7 @@ void acceptOffer(AcceptOfferView view);
 
 struct [[nodiscard]] ProductView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto myWorkspace() -> world::Workspace& { return comp_.rosterEntry_->workspace_; }
+    auto myWorkspace() -> world::Workspace& { return *comp_.rosterEntry_->workspace_; }
     auto productPower() -> double { return comp_.productPower_; }
 };
 void product(ProductView view);
