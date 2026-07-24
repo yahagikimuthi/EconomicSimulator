@@ -58,6 +58,10 @@ void Engine::runLabor() {
 }
 
 void Engine::runGoods() {
+    for (HHold& hhold : hholds_) {
+        goods::product(hhold.labor);
+    }
+
     for (Firm& firm : firms_) {
         goods::postGoods(firm.goods, firm.labor, goodsEntryBox_);
     }

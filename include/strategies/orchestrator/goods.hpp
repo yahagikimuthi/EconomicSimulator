@@ -5,6 +5,8 @@
 #include "core/forward.hpp"
 
 namespace goods {
+void product(labor_supplier::Component laborSupplier);
+
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
     const labor_demander::Component&           laborDemander,

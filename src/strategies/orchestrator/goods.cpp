@@ -7,9 +7,14 @@
 #include "strategies/goods_demander/request.hpp"
 #include "strategies/goods_supplier/posting.hpp"
 #include "strategies/goods_supplier/trade.hpp"
+#include "strategies/labor_supplier/product.hpp"
 #include "strategies/updates_loggings.hpp"
 
 namespace goods {
+void product(labor_supplier::Component laborSupplier) {
+    labor_supplier::product(labor_supplier::ProductView{laborSupplier});
+}
+
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
     const labor_demander::Component&           laborDemander,
