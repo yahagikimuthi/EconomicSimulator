@@ -5,8 +5,9 @@
 #include <string>
 
 #include "config.hpp"
-#include "strategies/common.hpp"
-#include "strategies/orchestrator.hpp"
+#include "strategies/orchestrator/goods.hpp"
+#include "strategies/orchestrator/labor.hpp"
+#include "strategies/updates_loggings.hpp"
 #include "world/message.hpp"
 
 namespace core {
@@ -20,7 +21,6 @@ void Engine::run() {
 }
 
 void Engine::runLabor() {
-    using namespace orchestrator;
     for (Firm& firm : firms_) {
         labor::AdjustWorkforce(firm.index, firm.goods, firm.labor, laborRequestBox_);
     }
@@ -58,7 +58,6 @@ void Engine::runLabor() {
 }
 
 void Engine::runGoods() {
-    using namespace orchestrator;
     for (Firm& firm : firms_) {
         goods::postGoods(firm.goods, firm.labor, goodsEntryBox_);
     }

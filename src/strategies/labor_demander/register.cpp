@@ -1,6 +1,6 @@
-#include <oneapi/tbb/concurrent_vector.h>
-#include "strategies/labor_demander.hpp"
+#include "strategies/labor_demander/register.hpp"
 
+#include <tbb/concurrent_vector.h>
 #include <ranges>
 
 #include "world/message.hpp"

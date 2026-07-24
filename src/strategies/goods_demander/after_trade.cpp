@@ -1,4 +1,4 @@
-#include "strategies/goods_demander.hpp"
+#include "strategies/goods_demander/after_trade.hpp"
 
 #include "world/message.hpp"
 

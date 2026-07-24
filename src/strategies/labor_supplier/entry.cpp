@@ -1,4 +1,4 @@
-#include "strategies/labor_supplier.hpp"
+#include "strategies/labor_supplier/entry.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>

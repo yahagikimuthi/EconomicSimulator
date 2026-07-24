@@ -1,4 +1,4 @@
-#include "strategies/labor_demander.hpp"
+#include "strategies/labor_demander/offer.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>

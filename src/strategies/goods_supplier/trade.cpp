@@ -1,4 +1,4 @@
-#include "strategies/goods_supplier.hpp"
+#include "strategies/goods_supplier/trade.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>

@@ -1,4 +1,4 @@
-#include "strategies/labor_supplier.hpp"
+#include "strategies/labor_supplier/accept.hpp"
 
 #include <ranges>
 

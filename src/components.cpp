@@ -81,7 +81,7 @@ Component::Component(
           .markupAdjustmentVolatility_    = rand(rng_, 0.01, 0.02),
           .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.4)
       } {
-    log_.isSold_ = (rand(rng_) <= 0.5) ? true : false;
-    // production_.workspace_->firmProductPower = production_.firmProductPower_;
+    log_.isSold_                             = (rand(rng_) <= 0.5) ? true : false;
+    production_.workspace_->firmProductPower = production_.firmProductPower_;
 }
 }  // namespace goods_supplier

@@ -1,4 +1,4 @@
-#include "strategies/goods_supplier.hpp"
+#include "strategies/goods_supplier/posting.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <cassert>

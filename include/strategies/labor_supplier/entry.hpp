@@ -1,13 +1,11 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <cstddef>
 #include <pcg_random.hpp>
 
 #include "components/labor_supplier.hpp"
-#include "config.hpp"
 #include "core/base.hpp"
-#include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace labor_supplier {
 struct [[nodiscard]] UpdateRosterEntryView final : BaseView<Component> {
@@ -36,40 +34,11 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     auto productPower() const -> double { return comp_.productPower_; }
     auto rng() -> pcg32& { return comp_.rng_; }
 };
+
 void jobEntry(
     JobEntryView                                 view,
     const int                                    id,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     const int                                    entryCnt = config::labor_supplier::jobEntryCnt
 );
-
-struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-    auto myEntryCnt() const -> std::size_t { return comp_.posting_.myEntries_.size(); }
-    auto myEntry(const std::size_t idx)
-        -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
-        auto& myEntry = *comp_.posting_.myEntries_[idx];
-        return {*myEntry.request_, myEntry};
-    }
-    void recordAcceptance(const world::LaborEntry& acceptEntry) {
-        comp_.posting_.acceptEntry_ = &acceptEntry;
-    }
-    auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
-    void resign() {
-        if (not comp_.rosterEntry_) return;
-        comp_.rosterEntry_->companyBoard_->resignationBox_.emplace_back(comp_.rosterEntry_);
-    }
-};
-
-void acceptOffer(AcceptOfferView view);
-
-struct [[nodiscard]] ProductView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-    auto myWorkspace() -> world::Workspace& { return *comp_.rosterEntry_->workspace_; }
-    auto productPower() -> double { return comp_.productPower_; }
-};
-void product(ProductView view);
-
-void logging(world::CensusDropBox& dropBox, const Component& comp);
-void reset(Component& comp);
 }  // namespace labor_supplier

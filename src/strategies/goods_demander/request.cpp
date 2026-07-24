@@ -1,4 +1,4 @@
-#include "strategies/goods_demander.hpp"
+#include "strategies/goods_demander/request.hpp"
 
 #include <oneapi/tbb/concurrent_vector.h>
 #include <tbb/concurrent_vector.h>

@@ -33,10 +33,10 @@ struct EmploymentLedger {
     double sumWage_;
 };
 struct Parameter {
-    double       offerRate_;
-    const double wageAdjustmentVolatility_;
-    const double employAdjustmentVolatility_;
-    const double offerAdjustmentVolatility_;
+    double offerRate_;
+    double wageAdjustmentVolatility_;
+    double employAdjustmentVolatility_;
+    double offerAdjustmentVolatility_;
 };
 struct Posting {
     SafePtr<world::LaborRequest>            myRequest_{nullptr};

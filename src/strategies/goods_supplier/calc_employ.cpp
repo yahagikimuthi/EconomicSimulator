@@ -1,29 +1,24 @@
-#include "strategies/goods_supplier.hpp"
+#include "strategies/goods_supplier/calc_employ.hpp"
 
 #include <cmath>
 
-#include "core/base.hpp"
+#include "strategies/internal/goods_supplier.hpp"
 
-namespace goods_supplier {
-namespace {
-struct CalcTargetProductionView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-    auto inventory() const -> double { return comp_.production_.inventory_; }
-    auto targetInvRatio() const -> double { return comp_.parameter_.targetInventoryRatio_; }
-    auto demandForecast() const -> double { return comp_.log_.demandForecast_; }
-};
-
+namespace goods_supplier::detail {
 [[nodiscard]] auto calcTargetProduction(const CalcTargetProductionView& view) -> double {
     const double targetSupply{view.demandForecast()};
     const double targetBuffedSupply{targetSupply / (1.0 - view.targetInvRatio())};
     const double targetProduction{targetBuffedSupply - view.inventory()};
     return targetProduction;
 }
-}  // namespace
+}  // namespace goods_supplier::detail
 
+namespace goods_supplier {
 [[nodiscard]] auto calcDesiredEmploy(const CalcDesiredEmployView& view, const int employeeCnt)
     -> int {
-    const double targetProduction{calcTargetProduction(CalcTargetProductionView{view})};
+    const double targetProduction{
+        detail::calcTargetProduction(detail::CalcTargetProductionView{view})
+    };
     const double avgProductPower{
         (employeeCnt != 0.0) ? view.lastSupply() / employeeCnt : view.firmProductivity()
     };

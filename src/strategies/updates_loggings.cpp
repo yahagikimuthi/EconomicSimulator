@@ -1,14 +1,15 @@
-#include <components/labor_demander.hpp>
-#include <core/base.hpp>
-#include <cstdlib>
-#include <helper.hpp>
+#include "strategies/updates_loggings.hpp"
+
+#include <cmath>
 #include <pcg_random.hpp>
+
 #include "components/common.hpp"
-#include "strategies/common.hpp"
-#include "strategies/goods_demander.hpp"
-#include "strategies/goods_supplier.hpp"
-#include "strategies/labor_demander.hpp"
-#include "strategies/labor_supplier.hpp"
+#include "components/goods_demander.hpp"
+#include "components/goods_supplier.hpp"
+#include "components/labor_demander.hpp"
+#include "components/labor_supplier.hpp"
+#include "core/base.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace firm_finance {

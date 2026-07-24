@@ -1,4 +1,4 @@
-#include "strategies/labor_supplier.hpp"
+#include "strategies/labor_supplier/product.hpp"
 
 #include "world/message.hpp"
 

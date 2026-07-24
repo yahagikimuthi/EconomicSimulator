@@ -1,4 +1,4 @@
-#include "strategies/labor_demander.hpp"
+#include "strategies/labor_demander/lay_offs.hpp"
 
 namespace labor_demander {
 void layoffs(LayOffsView view, const int layOffsCnt) {
