@@ -9,8 +9,7 @@
 
 #include "world/message.hpp"
 
-namespace goods_supplier {
-namespace {
+namespace goods_supplier::internal {
 [[nodiscard]] auto calcTotalDemand(const tbb::concurrent_vector<world::GoodsRequest>& requestBox)
     -> double {
     const double demand{std::ranges::fold_left(
@@ -59,19 +58,20 @@ void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
         request.tradeAmount_ = request.amount_;
     }
 }
-}  // namespace
+}  // namespace goods_supplier::internal
 
+namespace goods_supplier {
 void trade(TradeView view) {
     if (not view.isPosting()) return;
     auto& myEntry    = view.myEntry();
     auto& requestBox = myEntry.requestBox_;
 
-    const double totalDemand{calcTotalDemand(requestBox)};
+    const double totalDemand{internal::calcTotalDemand(requestBox)};
     if (totalDemand == 0.0) return;
     const bool   isExcessDemand{totalDemand > myEntry.supply_};
     const double salesAmount{std::min(myEntry.supply_, totalDemand)};
-    isExcessDemand ? performRationedTrade(myEntry.supply_, view.rng(), requestBox)
-                   : performFullTrade(requestBox);
+    isExcessDemand ? internal::performRationedTrade(myEntry.supply_, view.rng(), requestBox)
+                   : internal::performFullTrade(requestBox);
     view.inventoryMinus(salesAmount);
     view.salesPlus(salesAmount * myEntry.price_);
     view.totalDemandPlus(totalDemand);

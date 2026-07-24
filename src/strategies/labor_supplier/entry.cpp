@@ -14,13 +14,12 @@
 #include "core/base.hpp"
 #include "world/message.hpp"
 
-namespace labor_supplier {
-namespace {
+namespace labor_supplier::internal {
 void pickSample(
     tbb::concurrent_vector<world::LaborRequest>&              requestBox,
     std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
     pcg32&                                                    rng,
-    const int sampleCnt = config::labor_supplier::jobSampleCnt
+    const int                                                 sampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     sampleRequests.clear();
@@ -35,8 +34,7 @@ void pickSample(
 }
 
 void sortSample(
-    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests,
-    const int entryCnt = config::labor_supplier::jobEntryCnt
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests, const int entryCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
@@ -48,8 +46,9 @@ void sortSample(
         }
     );
 }
-}  // namespace
+}  // namespace labor_supplier::internal
 
+namespace labor_supplier {
 void updateRosterEntry(UpdateRosterEntryView view) {
     auto rosterEntry{view.rosterEntry()};
     if (not rosterEntry) return;
@@ -70,8 +69,8 @@ void jobEntry(
     }
     view.isPosting(true);
     static thread_local std::vector<std::reference_wrapper<world::LaborRequest>> sampleRequests;
-    pickSample(requestBox, sampleRequests, view.rng());
-    sortSample(sampleRequests);
+    internal::pickSample(requestBox, sampleRequests, view.rng());
+    internal::sortSample(sampleRequests);
 
     const double productPower{view.productPower()};
 

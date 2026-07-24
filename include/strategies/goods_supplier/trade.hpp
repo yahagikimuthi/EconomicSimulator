@@ -5,6 +5,23 @@
 #include "components/goods_supplier.hpp"
 #include "world/message.hpp"
 
+namespace goods_supplier::internal {
+[[nodiscard]] auto calcTotalDemand(const tbb::concurrent_vector<world::GoodsRequest>& requestBox)
+    -> double;
+
+void shuffleIdx(
+    tbb::concurrent_vector<world::GoodsRequest>&              requestBox,
+    std::vector<std::reference_wrapper<world::GoodsRequest>>& requests,
+    pcg32&                                                    rng
+);
+
+void performRationedTrade(
+    const double supply, pcg32& rng, tbb::concurrent_vector<world::GoodsRequest>& requestBox
+);
+
+void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox);
+}  // namespace goods_supplier::internal
+
 namespace goods_supplier {
 struct [[nodiscard]] TradeView final : BaseView<Component> {
     using BaseView<Component>::BaseView;

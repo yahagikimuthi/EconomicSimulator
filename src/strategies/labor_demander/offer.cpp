@@ -7,8 +7,7 @@
 
 #include "world/message.hpp"
 
-namespace labor_demander {
-namespace {
+namespace labor_demander::internal {
 void sortApplicants(
     const int                                               offer,
     std::vector<std::reference_wrapper<world::LaborEntry>>& applicants,
@@ -30,8 +29,9 @@ void sortApplicants(
         }
     );
 }
-}  // namespace
+}  // namespace labor_demander::internal
 
+namespace labor_demander {
 void offerApplicants(OfferApplicantsView view) {
     if (not view.isPosting()) return;
     auto& myRequest = view.myRequest();
@@ -43,7 +43,7 @@ void offerApplicants(OfferApplicantsView view) {
     const int offer{view.offerPlan()};
 
     static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
-    sortApplicants(offer, applicants, myRequest.entryBox_);
+    internal::sortApplicants(offer, applicants, myRequest.entryBox_);
 
     int offerNum{};
     for (auto entryRef : applicants) {

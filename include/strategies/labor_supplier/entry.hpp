@@ -4,8 +4,23 @@
 #include <pcg_random.hpp>
 
 #include "components/labor_supplier.hpp"
+#include "config.hpp"
 #include "core/base.hpp"
 #include "world/message.hpp"
+
+namespace labor_supplier::internal {
+void pickSample(
+    tbb::concurrent_vector<world::LaborRequest>&              requestBox,
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
+    pcg32&                                                    rng,
+    const int sampleCnt = config::labor_supplier::jobSampleCnt
+);
+
+void sortSample(
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests,
+    const int entryCnt = config::labor_supplier::jobEntryCnt
+);
+}  // namespace labor_supplier::internal
 
 namespace labor_supplier {
 struct [[nodiscard]] UpdateRosterEntryView final : BaseView<Component> {

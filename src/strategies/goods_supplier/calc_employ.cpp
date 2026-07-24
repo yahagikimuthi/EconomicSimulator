@@ -2,22 +2,20 @@
 
 #include <cmath>
 
-#include "strategies/internal/goods_supplier.hpp"
-
-namespace goods_supplier::detail {
+namespace goods_supplier::internal {
 [[nodiscard]] auto calcTargetProduction(const CalcTargetProductionView& view) -> double {
     const double targetSupply{view.demandForecast()};
     const double targetBuffedSupply{targetSupply / (1.0 - view.targetInvRatio())};
     const double targetProduction{targetBuffedSupply - view.inventory()};
     return targetProduction;
 }
-}  // namespace goods_supplier::detail
+}  // namespace goods_supplier::internal
 
 namespace goods_supplier {
 [[nodiscard]] auto calcDesiredEmploy(const CalcDesiredEmployView& view, const int employeeCnt)
     -> int {
     const double targetProduction{
-        detail::calcTargetProduction(detail::CalcTargetProductionView{view})
+        internal::calcTargetProduction(internal::CalcTargetProductionView{view})
     };
     const double avgProductPower{
         (employeeCnt != 0.0) ? view.lastSupply() / employeeCnt : view.firmProductivity()

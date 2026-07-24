@@ -4,6 +4,30 @@
 
 #include "components/goods_supplier.hpp"
 
+namespace goods_supplier::internal {
+[[nodiscard]] auto markupGuard(
+    const double markup, const double epsilon = config::goods_supplier::epsilonMarkup
+) -> double;
+
+[[nodiscard]] auto priceGuard(
+    const double price, const double epsilon = config::goods_supplier::epsilonPrice
+) -> double;
+
+struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
+    using BaseView<Component>::BaseView;
+
+    auto markupAdjustVol() const -> double { return comp_.parameter_.markupAdjustmentVolatility_; }
+    auto lastMarkup() const -> double { return comp_.log_.markup_; }
+    auto isSold() const -> bool { return comp_.log_.isSold_; }
+    auto rng() -> pcg32& { return comp_.rng_; }
+};
+
+[[nodiscard]] auto calcMarkup(CalcMarkupView view) -> double;
+
+[[nodiscard]] auto judgePrice(const double supply, const double markup, const double totalCost)
+    -> double;
+}  // namespace goods_supplier::internal
+
 namespace goods_supplier {
 struct [[nodiscard]] PostGoodsView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
