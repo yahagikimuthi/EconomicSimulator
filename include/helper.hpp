@@ -30,31 +30,35 @@ struct PCG32Seed {
     return {.state = state, .stream = stream};
 }
 
-[[nodiscard]] constexpr auto rand(pcg32& rng, const double min = 0.0, const double max = 1.0)
-    -> double {
+[[nodiscard]] constexpr auto rand(
+    std::uniform_random_bit_generator auto& rng, const double min = 0.0, const double max = 1.0
+) -> double {
     std::uniform_real_distribution<double> dist{min, max};
     return dist(rng);
 }
 
-[[nodiscard]] constexpr auto randInt(pcg32& rng, const int min, const int max) -> int {
+[[nodiscard]] constexpr auto randInt(
+    std::uniform_random_bit_generator auto& rng, const int min, const int max
+) -> int {
     std::uniform_int_distribution<int> dist{min, max};
     return dist(rng);
 }
 
 [[nodiscard]] constexpr auto randNormal(
-    pcg32&       rng,
-    const double mean   = 0.0,
-    const double stddev = 1.0,
-    const double min    = -std::numeric_limits<double>::infinity(),
-    const double max    = std::numeric_limits<double>::infinity()
+    std::uniform_random_bit_generator auto& rng,
+    const double                            mean   = 0.0,
+    const double                            stddev = 1.0,
+    const double                            min    = -std::numeric_limits<double>::infinity(),
+    const double                            max    = std::numeric_limits<double>::infinity()
 ) -> double {
     std::normal_distribution<double> dist{mean, stddev};
     return std::clamp(dist(rng), min, max);
 }
 
 template <typename Container, typename Proj = std::identity>
-[[nodiscard]] inline auto discreteDistribution(Container& container, pcg32& rng, Proj proj = {})
-    -> Container::value_type& {
+[[nodiscard]] inline auto discreteDistribution(
+    Container& container, std::uniform_random_bit_generator auto& rng, Proj proj = {}
+) -> Container::value_type& {
     double total{0.0};
     for (const auto& elem : container) {
         const double weight = std::invoke(proj, elem);
