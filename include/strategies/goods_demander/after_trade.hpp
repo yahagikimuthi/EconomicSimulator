@@ -12,7 +12,7 @@ struct [[nodiscard]] AfterTradeView final : BaseView<Component> {
 
     auto myRequest() const -> std::pair<const world::GoodsEntry&, const world::GoodsRequest&> {
         SafePtr<const world::GoodsRequest> myRequest = comp_.posting_.myRequest_;
-        return {*myRequest->entry_, *myRequest};
+        return {myRequest->entry_, *myRequest};
     }
     void purchasePlus(const double plus) { comp_.purchasing_.purchase_ += plus; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }

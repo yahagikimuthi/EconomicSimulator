@@ -14,7 +14,7 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     auto myEntry(const std::size_t idx)
         -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
         auto& myEntry = *comp_.posting_.myEntries_[idx];
-        return {*myEntry.request_, myEntry};
+        return {myEntry.request_, myEntry};
     }
     void recordAcceptance(const world::LaborEntry& acceptEntry) {
         comp_.posting_.acceptEntry_ = &acceptEntry;

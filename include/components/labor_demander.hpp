@@ -21,11 +21,11 @@ struct Plan {
     int    offer_{};
 };
 struct HR {
-    const SafePtr<world::CompanyBoard>       companyBoard_;
+    world::CompanyBoard&                     companyBoard_;
     std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
     double                                   sumWage_{};
 
-    HR(const SafePtr<world::CompanyBoard> companyBoard) : companyBoard_{companyBoard} {}
+    HR(world::CompanyBoard& companyBoard) : companyBoard_{companyBoard} {}
 };
 struct EmploymentLedger {
     int    applicantNum_;
@@ -53,15 +53,13 @@ struct Component {
     Parameter        parameter_;
 
     Component(
-        const std::uint64_t                state,
-        const std::uint64_t                stream,
-        const SafePtr<world::CompanyBoard> companyBoard
+        const std::uint64_t state, const std::uint64_t stream, world::CompanyBoard& companyBoard
     );
 
     [[nodiscard]] auto sumWage() const -> double { return humanResources_.sumWage_; }
     [[nodiscard]] auto employeeCnt() const -> int {
         const std::size_t rosterSize{
-            humanResources_.companyBoard_->roster_.size() - humanResources_.emptyRosterPool_.size()
+            humanResources_.companyBoard_.roster_.size() - humanResources_.emptyRosterPool_.size()
         };
         return static_cast<int>(rosterSize);
     }

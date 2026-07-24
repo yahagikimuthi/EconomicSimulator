@@ -40,11 +40,11 @@ struct LaborEntry {
     bool isOffer_{false};
     bool isAccept_{false};
 
-    SafePtr<RosterEntry>              rosterEntry_{nullptr};
-    const SafePtr<const LaborRequest> request_{nullptr};
+    SafePtr<RosterEntry> rosterEntry_{nullptr};
+    const LaborRequest&  request_;
 
     LaborEntry(const int id, const double productPower, const LaborRequest& request)
-        : hholdID_{id}, productPower_{productPower}, request_{&request} {}
+        : hholdID_{id}, productPower_{productPower}, request_{request} {}
 };
 
 struct LaborRequest {
@@ -60,8 +60,8 @@ struct GoodsRequest {
     const double amount_;
     double       tradeAmount_{};
 
-    const SafePtr<const GoodsEntry> entry_{nullptr};
-    GoodsRequest(const double amount, const GoodsEntry& entry) : amount_{amount}, entry_{&entry} {}
+    const GoodsEntry& entry_;
+    GoodsRequest(const double amount, const GoodsEntry& entry) : amount_{amount}, entry_{entry} {}
 };
 
 struct GoodsEntry {

@@ -30,9 +30,9 @@ struct Posting {
     bool                       isPosting_{false};
 };
 struct Production {
-    const SafePtr<world::Workspace> workspace_;
-    double                          firmProductPower_;
-    double                          inventory_;
+    world::Workspace& workspace_;
+    double            firmProductPower_;
+    double            inventory_;
 };
 struct Parameter {
     const double targetInventoryRatio_;
@@ -48,13 +48,9 @@ struct [[nodiscard]] Component {
     Production  production_;
     Parameter   parameter_;
 
-    Component(
-        const std::uint64_t             state,
-        const std::uint64_t             stream,
-        const SafePtr<world::Workspace> workspace
-    );
+    Component(const std::uint64_t state, const std::uint64_t stream, world::Workspace& workspace);
 
     auto sales() const -> double { return salesLedger.currentSales_; }
-    auto workspace() -> world::Workspace& { return *production_.workspace_; }
+    auto workspace() -> world::Workspace& { return production_.workspace_; }
 };
 }  // namespace goods_supplier

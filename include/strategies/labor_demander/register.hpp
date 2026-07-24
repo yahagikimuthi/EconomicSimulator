@@ -25,7 +25,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     ) -> SafePtr<world::RosterEntry> {
         auto& hr = comp_.humanResources_;
         if (hr.emptyRosterPool_.empty()) {
-            return &hr.companyBoard_->roster_.emplace_back(wage, companyBoard, workspace);
+            return &hr.companyBoard_.roster_.emplace_back(wage, companyBoard, workspace);
         }
         SafePtr<world::RosterEntry> newEntry = hr.emptyRosterPool_.back();
         newEntry->wage_                      = wage;
@@ -38,7 +38,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     void applicantNumPlus(const std::size_t n) {
         comp_.employmentLedger.applicantNum_ += static_cast<int>(n);
     }
-    auto myCompanyBoard() -> world::CompanyBoard& { return *comp_.humanResources_.companyBoard_; }
+    auto myCompanyBoard() -> world::CompanyBoard& { return comp_.humanResources_.companyBoard_; }
 };
 
 void registerMember(RegisterMemberView view, world::Workspace& workspace);
@@ -49,7 +49,7 @@ struct [[nodiscard]] AcceptResignationView final : BaseView<Component> {
         comp_.humanResources_.emptyRosterPool_.emplace_back(emptyRoster);
     }
     auto resignationBox() -> tbb::concurrent_vector<SafePtr<world::RosterEntry>>& {
-        return comp_.humanResources_.companyBoard_->resignationBox_;
+        return comp_.humanResources_.companyBoard_.resignationBox_;
     }
     void wageMinus(const double minus) { comp_.humanResources_.sumWage_ -= minus; }
 };
