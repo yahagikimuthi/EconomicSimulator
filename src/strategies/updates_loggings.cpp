@@ -106,9 +106,10 @@ void reset(Component& comp) {
                                                      comp.parameter_.targetInventoryRatio_
                                                : true
     };
-    comp.plan_                  = {.markup_ = 0.0, .price_ = 0.0, .supply_ = 0.0};
-    comp.production_.inventory_ = comp.salesLedger.inventory_;
-    comp.posting_               = {.myEntry_ = nullptr, .isPosting_ = false};
-    comp.salesLedger            = {.inventory_ = 0.0, .currentSales_ = 0.0, .totalDemand_ = 0.0};
+    comp.plan_                                  = {.markup_ = 0.0, .price_ = 0.0, .supply_ = 0.0};
+    comp.production_.workspace_.totalLaborInput = 0.0;
+    comp.production_.inventory_                 = comp.salesLedger.inventory_;
+    comp.posting_                               = {.myEntry_ = nullptr, .isPosting_ = false};
+    comp.salesLedger = {.inventory_ = 0.0, .currentSales_ = 0.0, .totalDemand_ = 0.0};
 }
 }  // namespace goods_supplier
