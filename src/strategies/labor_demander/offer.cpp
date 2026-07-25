@@ -44,6 +44,7 @@ void offerApplicants(OfferApplicantsView view) {
 
     static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
     internal::sortApplicants(offer, applicants, myRequest.entryBox_);
+    assert(applicants.size() == myRequest.entryBox_.size());
 
     int offerNum{};
     for (auto entryRef : applicants) {
