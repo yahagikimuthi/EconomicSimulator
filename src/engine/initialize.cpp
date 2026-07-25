@@ -1,12 +1,13 @@
 #include "core/engine.hpp"
 
 #include <cassert>
-#include <entt/entt.hpp>
+#include <cstdlib>
 #include <filesystem>
 #include <helper.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
+#include <iostream>
 #include <ranges>
 
 #include "config.hpp"
@@ -35,7 +36,8 @@ void createHHold(const int id, entt::registry& registry) {
 */
 Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::generatePCG32Seed()} {
     if (not logger_.isValid()) {
-        assert(false && "can not create file");
+        std::cerr << "can not create file\n";
+        std::abort();
     }
     masterRng_ = {seed_.state, seed_.stream};
     firms_.reserve(config::agent_count::firm);
