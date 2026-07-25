@@ -52,7 +52,7 @@ namespace labor_supplier {
 void updateRosterEntry(UpdateRosterEntryView view) {
     auto rosterEntry{view.rosterEntry()};
     if (not rosterEntry) return;
-    if (rosterEntry->isLaidOff or not rosterEntry->isOccupied_) {
+    if (not rosterEntry->isOccupied_) {
         rosterEntry = nullptr;
     }
 }

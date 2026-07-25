@@ -17,7 +17,6 @@ struct Workspace {
 struct RosterEntry {
     double wage_;
     bool   isOccupied_{true};
-    bool   isLaidOff{false};
 
     const SafePtr<CompanyBoard> companyBoard_;
     const SafePtr<Workspace>    workspace_;

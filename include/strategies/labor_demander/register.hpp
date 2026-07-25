@@ -30,7 +30,6 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         SafePtr<world::RosterEntry> newEntry = hr.emptyRosterPool_.back();
         newEntry->wage_                      = wage;
         newEntry->isOccupied_                = true;
-        newEntry->isLaidOff                  = true;
         hr.emptyRosterPool_.pop_back();
         return newEntry;
     }
