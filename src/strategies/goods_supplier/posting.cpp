@@ -26,6 +26,7 @@ namespace goods_supplier::internal {
 [[nodiscard]] auto judgePrice(const double supply, const double markup, const double totalCost)
     -> double {
     assert(markup > 0.0 && "markup is required > 0");
+    assert(totalCost >= 0.0 && "total cost is required >= 0");
     const double avgCost{(supply != 0.0) ? totalCost / supply : 0.0};
     const double price{avgCost * (1.0 + markup)};
     return priceGuard(price);

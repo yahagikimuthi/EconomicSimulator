@@ -15,13 +15,14 @@ struct Workspace {
 };
 
 struct RosterEntry {
-    double wage_;
-    bool   isOccupied_{true};
+    const int hholdId_;
+    double    wage_;
+    bool      isOccupied_{true};
 
     CompanyBoard& companyBoard_;
     Workspace&    workspace_;
-    RosterEntry(const double wage, CompanyBoard& companyBoard, Workspace& workspace)
-        : wage_{wage}, companyBoard_{companyBoard}, workspace_{workspace} {}
+    RosterEntry(const int id, const double wage, CompanyBoard& companyBoard, Workspace& workspace)
+        : hholdId_{id}, wage_{wage}, companyBoard_{companyBoard}, workspace_{workspace} {}
 };
 
 struct CompanyBoard {

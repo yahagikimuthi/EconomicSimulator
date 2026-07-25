@@ -62,11 +62,12 @@ void reset(Component& comp) {
     }
 
     comp.plan_ = {.isRecruiting = false, .wage_ = 0.0, .employ_ = 0, .offer_ = 0};
-    comp.humanResources_.sumWage_ = comp.employmentLedger.sumWage_;
-    comp.employmentLedger         = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
-    comp.posting_.myRequest_      = nullptr;
-    comp.posting_.isPosting_      = false;
+    comp.humanResources_.sumWage_ += comp.employmentLedger.sumWage_;
+    comp.employmentLedger    = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
+    comp.posting_.myRequest_ = nullptr;
+    comp.posting_.isPosting_ = false;
     comp.posting_.offerApplicants_.clear();
+    comp.humanResources_.companyBoard_.resignationBox_.clear();
 }
 }  // namespace labor_demander
 
