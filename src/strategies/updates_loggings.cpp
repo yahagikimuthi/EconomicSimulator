@@ -77,7 +77,8 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) {
 }
 void reset(Component& comp) {
     comp.posting_.myEntries_.clear();
-    comp.posting_.isPosting_ = false;
+    comp.posting_.acceptEntry_ = nullptr;
+    comp.posting_.isPosting_   = false;
 }
 }  // namespace labor_supplier
 
