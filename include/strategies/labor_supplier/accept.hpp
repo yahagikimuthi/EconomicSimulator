@@ -22,7 +22,7 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void resign() {
         if (not comp_.rosterEntry_) return;
-        comp_.rosterEntry_->companyBoard_->resignationBox_.emplace_back(comp_.rosterEntry_);
+        comp_.rosterEntry_->companyBoard_.resignationBox_.emplace_back(comp_.rosterEntry_);
     }
 };
 

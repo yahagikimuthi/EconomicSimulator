@@ -18,10 +18,10 @@ struct RosterEntry {
     double wage_;
     bool   isOccupied_{true};
 
-    const SafePtr<CompanyBoard> companyBoard_;
-    const SafePtr<Workspace>    workspace_;
+    CompanyBoard& companyBoard_;
+    Workspace&    workspace_;
     RosterEntry(const double wage, CompanyBoard& companyBoard, Workspace& workspace)
-        : wage_{wage}, companyBoard_{&companyBoard}, workspace_{&workspace} {}
+        : wage_{wage}, companyBoard_{companyBoard}, workspace_{workspace} {}
 };
 
 struct CompanyBoard {

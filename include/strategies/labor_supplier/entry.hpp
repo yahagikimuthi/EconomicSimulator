@@ -35,7 +35,7 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
     void isPosting(const bool isPosting) { comp_.posting_.isPosting_ = isPosting; }
     auto contractFirmId() const -> int {
         if (not comp_.rosterEntry_) return -1;
-        return comp_.rosterEntry_->companyBoard_->firmId_;
+        return comp_.rosterEntry_->companyBoard_.firmId_;
     }
     auto contractWage() const -> double {
         if (not comp_.rosterEntry_) return 0.0;
