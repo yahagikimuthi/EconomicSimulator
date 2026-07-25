@@ -16,9 +16,10 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         return *comp_.posting_.offerApplicants_[idx];
     }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
-    void updateLedger(const double wage, const int actualEmploy) {
+    void updateLedger(const double wage, const std::size_t applicantNum, const int actualEmploy) {
         auto& ledger = comp_.employmentLedger;
         ledger.employing_ += actualEmploy, ledger.sumWage_ += wage * actualEmploy;
+        ledger.applicantNum_ = static_cast<int>(applicantNum);
     }
     auto addRoster(
         const double wage, world::CompanyBoard& companyBoard, world::Workspace& workspace
@@ -34,9 +35,6 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         return newEntry;
     }
 
-    void applicantNumPlus(const std::size_t n) {
-        comp_.employmentLedger.applicantNum_ += static_cast<int>(n);
-    }
     auto myCompanyBoard() -> world::CompanyBoard& { return comp_.humanResources_.companyBoard_; }
 };
 

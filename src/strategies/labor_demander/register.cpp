@@ -9,7 +9,6 @@ namespace labor_demander {
 void registerMember(RegisterMemberView view, world::Workspace& workspace) {
     if (not view.isPosting()) return;
     auto& myRequest = view.myRequest();
-    view.applicantNumPlus(myRequest.entryBox_.size());
 
     int employeeCnt{};
     for (const auto i : std::views::iota(0UZ, view.offerNum())) {
@@ -19,7 +18,7 @@ void registerMember(RegisterMemberView view, world::Workspace& workspace) {
         entry.rosterEntry_ = view.addRoster(myRequest.wage_, view.myCompanyBoard(), workspace);
     }
 
-    view.updateLedger(myRequest.wage_, employeeCnt);
+    view.updateLedger(myRequest.wage_, myRequest.entryBox_.size(), employeeCnt);
 }
 
 void acceptResignation(AcceptResignationView view) {
