@@ -23,7 +23,7 @@ void registerMember(RegisterMemberView view, world::Workspace& workspace) {
 
 void acceptResignation(AcceptResignationView view) {
     auto& resignationBox = view.resignationBox();
-    for (SafePtr<world::RosterEntry> resignEntry : resignationBox) {
+    for (const SafePtr<world::RosterEntry> resignEntry : resignationBox) {
         resignEntry->isOccupied_ = false;
         view.wageMinus(resignEntry->wage_);
         view.addEmptyRosterPool(resignEntry);
