@@ -15,7 +15,8 @@ void registerMember(RegisterMemberView view, world::Workspace& workspace) {
         auto& entry = view.offerApplicant(i);
         if (not entry.isAccept_) continue;
         ++employeeCnt;
-        entry.rosterEntry_ = view.addRoster(myRequest.wage_, view.myCompanyBoard(), workspace);
+        entry.rosterEntry_ =
+            view.addRoster(entry.hholdID_, myRequest.wage_, view.myCompanyBoard(), workspace);
     }
 
     view.updateLedger(myRequest.wage_, myRequest.entryBox_.size(), employeeCnt);

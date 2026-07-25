@@ -22,11 +22,14 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
         ledger.applicantNum_ = static_cast<int>(applicantNum);
     }
     auto addRoster(
-        const double wage, world::CompanyBoard& companyBoard, world::Workspace& workspace
+        const int            id,
+        const double         wage,
+        world::CompanyBoard& companyBoard,
+        world::Workspace&    workspace
     ) -> SafePtr<world::RosterEntry> {
         auto& hr = comp_.humanResources_;
         if (hr.emptyRosterPool_.empty()) {
-            return &hr.companyBoard_.roster_.emplace_back(wage, companyBoard, workspace);
+            return &hr.companyBoard_.roster_.emplace_back(id, wage, companyBoard, workspace);
         }
         SafePtr<world::RosterEntry> newEntry = hr.emptyRosterPool_.back();
         newEntry->wage_                      = wage;
