@@ -19,7 +19,7 @@ struct [[nodiscard]] PurchaseView final : BaseView<Component> {
     ) {
         comp_.posting_.myRequest_ = &*it;
     }
-    auto rng() -> pcg32& { return comp_.rng_; }
+    auto rng() const -> pcg32& { return comp_.rng_; }
 };
 
 void purchase(

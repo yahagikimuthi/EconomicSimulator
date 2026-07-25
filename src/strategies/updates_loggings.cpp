@@ -33,10 +33,10 @@ struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
     }
     auto targetEmploy() const -> double { return comp_.plan_.employ_; }
     auto actualEmploy() const -> double { return comp_.employmentLedger.employing_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
+    auto rng() const -> pcg32& { return comp_.rng_; }
 };
 
-[[nodiscard]] auto updateAcceptanceRate(UpdateAcceptanceRateView view) -> double {
+[[nodiscard]] auto updateAcceptanceRate(const UpdateAcceptanceRateView& view) -> double {
     const double alpha{
         std::abs(helper::randNormal(view.rng(), 0.0, view.offerAdjustmentVolatility()))
     };

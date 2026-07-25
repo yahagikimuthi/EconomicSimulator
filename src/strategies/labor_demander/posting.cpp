@@ -14,7 +14,7 @@ namespace labor_demander::internal {
     return std::max(wage, epsilon);
 }
 
-[[nodiscard]] auto calcNextWage(CalcNextWageView view) -> double {
+[[nodiscard]] auto calcNextWage(const CalcNextWageView& view) -> double {
     const bool   shouldRaiseWage{view.lastApplicantNum() < view.lastOfferPlan()};
     const double alpha{std::abs(helper::randNormal(view.rng(), 0.0, view.wageAdjustVol()))};
     const double nextWage{view.lastWage() * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};

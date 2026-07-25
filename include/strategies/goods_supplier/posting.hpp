@@ -19,10 +19,10 @@ struct [[nodiscard]] CalcMarkupView final : BaseView<Component> {
     auto markupAdjustVol() const -> double { return comp_.parameter_.markupAdjustmentVolatility_; }
     auto lastMarkup() const -> double { return comp_.log_.markup_; }
     auto isSold() const -> bool { return comp_.log_.isSold_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
+    auto rng() const -> pcg32& { return comp_.rng_; }
 };
 
-[[nodiscard]] auto calcMarkup(CalcMarkupView view) -> double;
+[[nodiscard]] auto calcMarkup(const CalcMarkupView& view) -> double;
 
 [[nodiscard]] auto judgePrice(const double supply, const double markup, const double totalCost)
     -> double;

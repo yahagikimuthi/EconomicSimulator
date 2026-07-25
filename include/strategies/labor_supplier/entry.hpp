@@ -47,7 +47,7 @@ struct [[nodiscard]] JobEntryView final : BaseView<Component> {
         comp_.posting_.myEntries_.emplace_back(&*it);
     }
     auto productPower() const -> double { return comp_.productPower_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
+    auto rng() const -> pcg32& { return comp_.rng_; }
 };
 
 void jobEntry(

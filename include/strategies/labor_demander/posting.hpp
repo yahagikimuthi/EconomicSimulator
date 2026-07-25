@@ -19,10 +19,10 @@ struct [[nodiscard]] CalcNextWageView final : BaseView<Component> {
     auto lastApplicantNum() const -> double { return comp_.log_.applicantNum_; }
     auto wageAdjustVol() const -> double { return comp_.parameter_.wageAdjustmentVolatility_; }
     auto lastWage() const -> double { return comp_.log_.wage_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
+    auto rng() const -> pcg32& { return comp_.rng_; }
 };
 
-[[nodiscard]] auto calcNextWage(CalcNextWageView view) -> double;
+[[nodiscard]] auto calcNextWage(const CalcNextWageView& view) -> double;
 
 struct [[nodiscard]] CalcNextOfferView final : BaseView<Component> {
     using BaseView<Component>::BaseView;

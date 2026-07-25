@@ -30,7 +30,7 @@ struct [[nodiscard]] TradeView final : BaseView<Component> {
     void salesPlus(const double plus) { comp_.salesLedger.currentSales_ += plus; }
     void totalDemandPlus(const double plus) { comp_.salesLedger.totalDemand_ += plus; }
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
-    auto rng() -> pcg32& { return comp_.rng_; }
+    auto rng() const -> pcg32& { return comp_.rng_; }
 };
 
 void trade(TradeView view);
