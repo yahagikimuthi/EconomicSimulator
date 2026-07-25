@@ -32,6 +32,7 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
             return &hr.companyBoard_.roster_.emplace_back(id, wage, companyBoard, workspace);
         }
         SafePtr<world::RosterEntry> newEntry = hr.emptyRosterPool_.back();
+        newEntry->hholdId_                   = id;
         newEntry->wage_                      = wage;
         newEntry->isOccupied_                = true;
         hr.emptyRosterPool_.pop_back();

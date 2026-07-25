@@ -25,7 +25,7 @@ void sortSample(
 namespace labor_supplier {
 struct [[nodiscard]] UpdateRosterEntryView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
-    auto rosterEntry() -> SafePtr<world::RosterEntry> { return comp_.rosterEntry_; }
+    auto rosterEntry() -> SafePtr<world::RosterEntry>& { return comp_.rosterEntry_; }
 };
 
 void updateRosterEntry(UpdateRosterEntryView view);

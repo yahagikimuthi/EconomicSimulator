@@ -10,12 +10,11 @@
 #include "strategies/updates_loggings.hpp"
 #include "world/message.hpp"
 
-//! FirmID = 4, step = 20, 名簿サイズ<空名簿サイズとなっている。
 namespace core {
 void foo() {}
 void Engine::run() {
     for (currentStep_ = 0; currentStep_ < totalStep_; ++currentStep_) {
-        if (currentStep_ == 100) {
+        if (currentStep_ == 20) {
             foo();
         }
         runLabor();

@@ -15,9 +15,9 @@ struct Workspace {
 };
 
 struct RosterEntry {
-    const int hholdId_;
-    double    wage_;
-    bool      isOccupied_{true};
+    int    hholdId_;
+    double wage_;
+    bool   isOccupied_{true};
 
     CompanyBoard& companyBoard_;
     Workspace&    workspace_;

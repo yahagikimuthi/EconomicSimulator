@@ -50,7 +50,7 @@ void sortSample(
 
 namespace labor_supplier {
 void updateRosterEntry(UpdateRosterEntryView view) {
-    auto rosterEntry{view.rosterEntry()};
+    auto& rosterEntry{view.rosterEntry()};
     if (not rosterEntry) return;
     if (not rosterEntry->isOccupied_) {
         rosterEntry = nullptr;
