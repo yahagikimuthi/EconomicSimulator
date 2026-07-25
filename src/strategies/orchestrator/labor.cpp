@@ -1,6 +1,7 @@
 #include "strategies/orchestrator/labor.hpp"
 
 #include <tbb/concurrent_vector.h>
+#include <core/base.hpp>
 
 #include "components/common.hpp"
 #include "strategies/goods_supplier/calc_employ.hpp"
@@ -62,7 +63,7 @@ void registerMember(
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler) {
     if (not laborSuppler.isAcceptedOffer()) return;
-    const SafePtr<world::RosterEntry> rosterEntry = {laborSuppler.acceptedEntry().rosterEntry_};
+    const SafePtr<world::RosterEntry> rosterEntry{laborSuppler.acceptedEntry().rosterEntry_};
     laborSuppler.rosterEntry(rosterEntry);
 }
 
