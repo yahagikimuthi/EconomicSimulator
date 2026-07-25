@@ -17,7 +17,7 @@ namespace goods_supplier::internal {
     return std::max(price, epsilon);
 }
 
-[[nodiscard]] auto calcMarkup(CalcMarkupView view) -> double {
+[[nodiscard]] auto calcMarkup(const CalcMarkupView& view) -> double {
     const double alpha{std::abs(helper::randNormal(view.rng(), 0.0, view.markupAdjustVol()))};
     const double nextMarkup{view.lastMarkup() + (view.isSold() ? alpha : -alpha)};
     return markupGuard(nextMarkup);
