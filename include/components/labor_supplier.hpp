@@ -26,6 +26,7 @@ struct [[nodiscard]] Component {
 
     auto wage() const -> double { return (rosterEntry_) ? rosterEntry_->wage_ : 0.0; }
     auto acceptedEntry() const -> const world::LaborEntry& { return *posting_.acceptEntry_; }
+    auto isEmployed() const -> bool { return rosterEntry_.hasValue(); }
     void rosterEntry(const SafePtr<world::RosterEntry> rosterEntry) { rosterEntry_ = rosterEntry; }
     auto isEmploying() const -> bool { return rosterEntry_.hasValue(); }
     auto shouldSearchJob() -> bool {
