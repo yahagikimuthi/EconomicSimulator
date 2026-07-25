@@ -12,6 +12,7 @@
 
 namespace goods {
 void product(labor_supplier::Component laborSupplier) {
+    if (not laborSupplier.isEmployed()) return;
     labor_supplier::product(labor_supplier::ProductView{laborSupplier});
 }
 

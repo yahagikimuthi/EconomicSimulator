@@ -24,13 +24,14 @@ struct [[nodiscard]] Component {
 
     Component(const std::uint64_t state, const std::uint64_t stream);
 
-    auto wage() const -> double { return (rosterEntry_) ? rosterEntry_->wage_ : 0.0; }
+    auto wage() const -> double { return isEmployed() ? rosterEntry_->wage_ : 0.0; }
     auto acceptedEntry() const -> const world::LaborEntry& { return *posting_.acceptEntry_; }
     void rosterEntry(const SafePtr<world::RosterEntry> rosterEntry) { rosterEntry_ = rosterEntry; }
     auto shouldSearchJob() -> bool {
-        if (not rosterEntry_) return true;
+        if (not isEmployed()) return true;
         return helper::rand(rng_) < jobSearchThreshold_;
     }
     auto isAcceptedOffer() const -> bool { return posting_.acceptEntry_.hasValue(); }
+    auto isEmployed() const -> bool { return rosterEntry_.hasValue(); }
 };
 }  // namespace labor_supplier
