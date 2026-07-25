@@ -3,7 +3,6 @@
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <cmath>
-#include <components/labor_demander.hpp>
 #include <pcg_random.hpp>
 
 #include "helper.hpp"
