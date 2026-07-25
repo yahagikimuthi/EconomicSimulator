@@ -1,9 +1,11 @@
 #include "strategies/goods_supplier/calc_employ.hpp"
 
+#include <cassert>
 #include <cmath>
 
 namespace goods_supplier::internal {
 [[nodiscard]] auto calcTargetProduction(const CalcTargetProductionView& view) -> double {
+    assert(view.targetInvRatio() != 1.0);
     const double targetSupply{view.demandForecast()};
     const double targetBuffedSupply{targetSupply / (1.0 - view.targetInvRatio())};
     const double targetProduction{targetBuffedSupply - view.inventory()};
