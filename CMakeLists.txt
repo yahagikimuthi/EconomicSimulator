@@ -1,21 +1,17 @@
-cmake_minimum_required(VERSION 3.25)
-project(EconomicSimulator LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.30)
 
-if(POLICY CMP0167)
-    cmake_policy(SET CMP0167 OLD)
-endif()
+project(EconomicSimulator CXX)
 
-# --- clangd / LSP 用の設定 ---
-# これによりビルドディレクトリに compile_commands.json が出力
+set(CMAKE_CXX_STANDARD 26)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) # GNU拡張を無効化（標準準拠）
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# --- C++ 標準の設定 ---
-set(CMAKE_CXX_STANDARD 23 CACHE STRING "Force C++23" FORCE)
-set(CMAKE_CXX_STANDARD_REQUIRED ON CACHE BOOL "Force C++23 required" FORCE)
-set(CMAKE_CXX_EXTENSIONS OFF) # GNU拡張を無効化（標準準拠）
+add_executable(EconomicSimulator)
 
 find_package(HighFive REQUIRED)
 find_package(TBB REQUIRED)
+find_package(Git REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -25,11 +21,29 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pcg_cpp)
 
-# --- ソースファイルの収集 ---
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+# --- 1. 通常のソースファイル (.cpp) を再帰的に取得 ---
+file(GLOB_RECURSE EconomicSimulator_SOURCES
+    CONFIGURE_DEPENDS
+    "src/*.cpp"
+)
 
-# 実行ファイルの定義
-add_executable(EconomicSimulator ${SOURCES})
+# --- 2. モジュールファイル (.cppm, .ixx) を再帰的に取得 ---
+file(GLOB_RECURSE EconomicSimulator_MODULES
+    CONFIGURE_DEPENDS
+    "src/*.cppm"
+)
+
+# --- 3. ターゲットへの登録 ---
+target_sources(EconomicSimulator
+    PRIVATE
+        ${EconomicSimulator_SOURCES}
+    
+    # C++20 モジュールとしてコンパイルするための設定
+    PUBLIC
+        FILE_SET CXX_MODULES FILES
+            ${EconomicSimulator_MODULES}
+)
+
 target_link_libraries(EconomicSimulator PRIVATE
     TBB::tbb
     HighFive::HighFive
@@ -41,7 +55,8 @@ target_include_directories(EconomicSimulator SYSTEM PRIVATE
     ${pcg_cpp_SOURCE_DIR}/include
 )
 add_compile_definitions(HIGHFIVE_HAS_NO_EXCEPTIONS)
-# --- コンパイル・リンクオプション（警告） ---
+
+# --- コンパイル・リンクオプション ---
 target_compile_options(EconomicSimulator PRIVATE
     -O0
     -g
@@ -50,20 +65,17 @@ target_compile_options(EconomicSimulator PRIVATE
     -Wextra
     -Wshadow
     -Wconversion
-    -Wsign-conversion # 符号あり/なしの変換も徹底的に弾く
-    -Wpedantic        # ISO C++規格に違反したコードを禁止
-    -Wunreachable-code# 実行されることのないデッドコードを禁止
-    -Wimplicit-fallthrough # switch文のbreak忘れを禁止
-    -D_GLIBCXX_DEBUG #operator[]の境界チェック
+    -Wsign-conversion
+    -Wpedantic
+    -Wunreachable-code
+    -Wimplicit-fallthrough
+    -D_GLIBCXX_DEBUG
+    -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
+    -fno-omit-frame-pointer
+    -fcontracts
 )
 
-# ターゲット（EconomicSimulator）に対して確実にサニタイザを紐付ける
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(EconomicSimulator PRIVATE 
-        #-fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
-        #-fno-omit-frame-pointer
-    )
-    target_link_options(EconomicSimulator PRIVATE 
-        #-fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
-    )
-endif()
+target_link_options(EconomicSimulator PRIVATE 
+    -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
+    -fcontracts
+)

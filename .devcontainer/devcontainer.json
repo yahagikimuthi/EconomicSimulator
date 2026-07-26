@@ -25,10 +25,10 @@
     },
     // コンテナ内の環境変数として GCC 14 を明示的に優先させる
     "containerEnv": {
-        "CC": "/usr/bin/gcc-14",
-        "CXX": "/usr/bin/g++-14"
+        "CC": "/usr/bin/gcc-16",
+        "CXX": "/usr/bin/g++-16"
     },
-    "remoteUser": "vscode",
+    "remoteUser": "root",
     "runArgs": [
         "--cap-add=SYS_PTRACE",
         "--security-opt",
