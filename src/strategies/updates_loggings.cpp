@@ -47,7 +47,7 @@ struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
 }  // namespace
 
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.postedEmployments_.emplace_back(comp.plan_.employ_);
+    dropBox.postedEmployments_.emplace_back((comp.plan_.isRecruiting) ? comp.plan_.employ_ : 0.0);
     dropBox.employments_.emplace_back(comp.employmentLedger.employing_);
 }
 void reset(Component& comp) {

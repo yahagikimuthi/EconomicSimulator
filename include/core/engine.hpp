@@ -52,6 +52,8 @@ class [[nodiscard]] Engine {
     void update();
     void logging();
     void reset();
+    void check() const;
+
     auto makeSeed() -> std::uint64_t {
         return (static_cast<std::uint64_t>(masterRng_()) << 32) | masterRng_();
     }

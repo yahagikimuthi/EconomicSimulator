@@ -71,7 +71,7 @@ Component::Component(
       },
       production_{
           .workspace_        = workspace,
-          .firmProductPower_ = rand(rng_, 0.0001, 0.0005),
+          .firmProductPower_ = rand(rng_, 0.01, 0.05),
           .inventory_        = rand(rng_, 0.5, 2.0)
       },
       parameter_{

@@ -76,7 +76,8 @@ void jobEntry(
 
     const int    firmId{view.contractFirmId()};
     const double nowWage{view.contractWage()};
-    for (const auto i : std::views::iota(0UZ, static_cast<std::size_t>(entryCnt))) {
+    for (const auto i :
+         std::views::iota(0UZ, std::min(static_cast<std::size_t>(entryCnt), requestBox.size()))) {
         auto& request = sampleRequests[i].get();
         if (request.firmID_ == firmId) continue;
         if (request.wage_ <= nowWage) continue;

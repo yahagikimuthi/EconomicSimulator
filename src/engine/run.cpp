@@ -1,7 +1,9 @@
 #include "core/engine.hpp"
 
+#include <algorithm>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <print>
 #include <string>
 
 #include "config.hpp"
@@ -10,24 +12,19 @@
 #include "strategies/updates_loggings.hpp"
 #include "world/message.hpp"
 
+//! 経済全体の総資産が減り続けている！
 namespace core {
 void foo() {}
 void Engine::run() {
     for (currentStep_ = 0; currentStep_ < totalStep_; ++currentStep_) {
-        if (currentStep_ == 20) {
+        if (currentStep_ == 100) {
             foo();
         }
         runLabor();
         runGoods();
         logging();
         reset();
-
-        for (auto& firm : firms_) {
-            assert(
-                firm.labor.humanResources_.companyBoard_.roster_.size() >=
-                firm.labor.humanResources_.emptyRosterPool_.size()
-            );
-        }
+        check();
     }
 }
 
@@ -106,12 +103,26 @@ void Engine::logging() {
         hhold_finance::logging(dropBox_, hhold.finance);
     }
     logger_.save(dropBox_, currentStep_);
-    dropBox_.clear();
 }
 
 void Engine::reset() {
+    dropBox_.clear();
     laborRequestBox_.clear();
     goodsEntryBox_.clear();
+}
+
+void Engine::check() const {
+    const long long sumFirmAsset{static_cast<long long>(
+        std::ranges::fold_left(firms_, 0.0, [](const double acc, const Firm& firm) -> double {
+            return acc + firm.finance.asset_;
+        })
+    )};
+    const long long sumHHoldAsset{static_cast<long long>(
+        std::ranges::fold_left(hholds_, 0.0, [](const double acc, const HHold& hhold) -> double {
+            return acc + hhold.finance.asset_;
+        })
+    )};
+    std::println("step:{}, {}", currentStep_, sumFirmAsset + sumHHoldAsset);
 }
 
 void Logger::save(const world::CensusDropBox& dropBox, const int step) {
