@@ -22,26 +22,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pcg_cpp)
 
 # --- 1. 通常のソースファイル (.cpp) を再帰的に取得 ---
-file(GLOB_RECURSE EconomicSimulator_SOURCES
+file(GLOB_RECURSE SOURCES
     CONFIGURE_DEPENDS
     "src/*.cpp"
-)
-
-# --- 2. モジュールファイル (.cppm, .ixx) を再帰的に取得 ---
-file(GLOB_RECURSE EconomicSimulator_MODULES
-    CONFIGURE_DEPENDS
-    "src/*.cppm"
 )
 
 # --- 3. ターゲットへの登録 ---
 target_sources(EconomicSimulator
     PRIVATE
-        ${EconomicSimulator_SOURCES}
-    
-    # C++20 モジュールとしてコンパイルするための設定
-    PUBLIC
-        FILE_SET CXX_MODULES FILES
-            ${EconomicSimulator_MODULES}
+        ${SOURCES}
 )
 
 target_link_libraries(EconomicSimulator PRIVATE
