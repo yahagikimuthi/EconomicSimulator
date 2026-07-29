@@ -8,7 +8,7 @@
 namespace labor {
 void adjustWorkforce(
     const agent_index::Component&                indexComp,
-    goods_supplier::Component&                   goodsSupplier,
+    const goods_supplier::GoodsSupplier&         goodsSupplier,
     labor_demander::LaborDemander&               laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
@@ -24,7 +24,7 @@ void offer(labor_demander::LaborDemander& laborDemander);
 void acceptOffer(labor_supplier::Component& laborSupplier);
 
 void registerMember(
-    goods_supplier::Component& goodsSupplier, labor_demander::LaborDemander& laborDemander
+    goods_supplier::GoodsSupplier& goodsSupplier, labor_demander::LaborDemander& laborDemander
 );
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler);

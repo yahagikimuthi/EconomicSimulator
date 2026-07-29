@@ -69,27 +69,33 @@ void reset(Component& comp) {
 }  // namespace labor_supplier
 
 namespace goods_supplier {
-void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.prices.emplace_back(comp.plan_.price_);
-    dropBox.supplies.emplace_back(comp.plan_.supply_);
-    dropBox.markups.emplace_back(comp.plan_.markup_);
-    dropBox.inventories.emplace_back(comp.production_.inventory_);
+auto Planner::updateDemandForecast(const double totalDemand) const -> double {
+    return log_.demandForecast +
+           (param_.demandForecastAdjustVol * (totalDemand - log_.demandForecast));
 }
-void reset(Component& comp) {
-    comp.log_ = {
-        .markup_         = comp.plan_.markup_,
-        .supply_         = comp.plan_.supply_,
-        .demandForecast_ = comp.log_.demandForecast_ +
-                           (comp.parameter_.demandForecastAdjustmentParam_ *
-                            (comp.salesLedger.totalDemand_ - comp.log_.demandForecast_)),
-        .isSold_ = (comp.plan_.supply_ != 0.0) ? comp.salesLedger.inventory_ / comp.plan_.supply_ <
-                                                     comp.parameter_.targetInventoryRatio_
-                                               : true
+
+auto Planner::isSold(const double unsoldAmount) const -> bool {
+    return (plan_.supply != 0.0) ? unsoldAmount / plan_.supply < param_.targetInvRatio : true;
+}
+
+void Planner::endStep(
+    const double totalDemand, const double unsoldAmount, world::CensusDropBox& dropBox
+) {
+    dropBox.prices.emplace_back(plan_.price);
+    dropBox.supplies.emplace_back(plan_.supply);
+    dropBox.markups.emplace_back(plan_.markup);
+    log_ = {
+        .markup         = plan_.markup,
+        .supply         = plan_.supply,
+        .demandForecast = updateDemandForecast(totalDemand),
+        .isSold         = isSold(unsoldAmount)
     };
-    comp.plan_                                  = {.markup_ = 0.0, .price_ = 0.0, .supply_ = 0.0};
-    comp.production_.workspace_.totalLaborInput = 0.0;
-    comp.production_.inventory_                 = comp.salesLedger.inventory_;
-    comp.posting_                               = {.myEntry_ = nullptr, .isPosting_ = false};
-    comp.salesLedger = {.inventory_ = 0.0, .currentSales_ = 0.0, .totalDemand_ = 0.0};
+    plan_.reset();
+}  // namespace goods_supplier
+
+void GoodsSupplier::endStep(world::CensusDropBox& dropBox) {
+    planner_.endStep(trader_.totalDemand(), trader_.inventory(), dropBox);
+    producer_.endStep(trader_.inventory(), dropBox);
+    trader_.endStep();
 }
 }  // namespace goods_supplier

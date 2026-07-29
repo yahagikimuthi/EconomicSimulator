@@ -1,28 +1,32 @@
-#include "strategies/goods_supplier/calc_employ.hpp"
+#include "components/goods_supplier.hpp"
 
 #include <cassert>
 #include <cmath>
 
-namespace goods_supplier::internal {
-[[nodiscard]] auto calcTargetProduction(const CalcTargetProductionView& view) -> double {
-    assert(view.targetInvRatio() != 1.0);
-    const double targetSupply{view.demandForecast()};
-    const double targetBuffedSupply{targetSupply / (1.0 - view.targetInvRatio())};
-    const double targetProduction{targetBuffedSupply - view.inventory()};
-    return targetProduction;
-}
-}  // namespace goods_supplier::internal
-
 namespace goods_supplier {
-[[nodiscard]] auto calcDesiredEmploy(const CalcDesiredEmployView& view, const int employeeCnt)
-    -> int {
-    const double targetProduction{
-        internal::calcTargetProduction(internal::CalcTargetProductionView{view})
-    };
+auto Producer::calcTargetProduction(const double demandForecast, const double targetInvRatio) const
+    -> double {
+    const double targetSupply{demandForecast / (1.0 - targetInvRatio)};
+    return targetSupply - inventory_;
+}
+
+auto Producer::calcDesiredEmploy(
+    const double demandForecast,
+    const double lastSupply,
+    const double targetInvRatio,
+    const int    employeeCnt
+) const -> int {
+    const double targetProduction{calcTargetProduction(demandForecast, targetInvRatio)};
     const double avgProductPower{
-        (employeeCnt != 0.0) ? view.lastSupply() / employeeCnt : view.firmProductivity()
+        (employeeCnt != 0.0) ? lastSupply / employeeCnt : firmProductPower_
     };
     const double desiredEmploy{(avgProductPower != 0.0) ? targetProduction / avgProductPower : 1.0};
     return static_cast<int>(std::round(desiredEmploy));
+}
+
+auto GoodsSupplier::calcDesiredEmploy(const int employeeCnt) const -> int {
+    return producer_.calcDesiredEmploy(
+        planner_.demandForecast(), planner_.lastSupply(), planner_.targetInvRatio(), employeeCnt
+    );
 }
 }  // namespace goods_supplier

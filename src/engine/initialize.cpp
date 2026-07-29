@@ -48,7 +48,7 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
             .index   = {i},
             .finance = {makeSeed(), makeSeed()},
             .labor   = {masterRng_, companyBoards_[static_cast<std::size_t>(i)]},
-            .goods   = {makeSeed(), makeSeed(), workspaces_[static_cast<std::size_t>(i)]}
+            .goods   = {masterRng_, workspaces_[static_cast<std::size_t>(i)]}
         });
     }
 

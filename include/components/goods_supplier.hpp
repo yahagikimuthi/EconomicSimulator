@@ -9,48 +9,110 @@
 #include "world/message.hpp"
 
 namespace goods_supplier {
-struct Log {
-    double markup_;
-    double supply_;
-    double demandForecast_;
-    bool   isSold_;
+class [[nodiscard]] Planner {
+  public:
+    Planner(pcg32& masterRng);
+    void judgePlan(const double supply, const double totalCost);
+    auto pricePlan() const -> double { return plan_.price; }
+    auto demandForecast() const -> double { return log_.demandForecast; }
+    auto lastSupply() const -> double { return log_.supply; }
+    auto targetInvRatio() const -> double { return param_.targetInvRatio; }
+    void endStep(
+        const double totalDemand, const double unsoldAmount, world::CensusDropBox& dropBox
+    );
+
+  private:
+    auto calcMarkup() const -> double;
+    auto judgePrice(const double supply, const double markup, const double totalCost) const
+        -> double;
+    auto updateDemandForecast(const double totalDemand) const -> double;
+    auto isSold(const double unsoldAmount) const -> bool;
+
+    mutable pcg32 rng_;
+    struct {
+        double markup;
+        double price;
+        double supply;
+        void   reset() { markup = 0.0, price = 0.0, supply = 0.0; }
+    } plan_{};
+    struct {
+        double markup;
+        double supply;
+        double demandForecast;
+        bool   isSold;
+    } log_;
+    struct {
+        const double targetInvRatio;
+        const double markupAdjustVol;
+        const double demandForecastAdjustVol;
+    } param_;
 };
-struct Plan {
-    double markup_;
-    double price_;
-    double supply_;
-};
-struct SalesLedger {
-    double inventory_;
-    double currentSales_;
-    double totalDemand_;
-};
-struct Posting {
+
+class Trader {
+  public:
+    Trader(pcg32& masterRng);
+    void post(
+        const double                               supply,
+        const double                               pricePlan,
+        tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    );
+    void trade();
+    auto inventory() const -> double { return ledger_.inventory; }
+    auto sales() const -> double { return ledger_.currentSales; }
+    auto totalDemand() const -> double { return ledger_.totalDemand; }
+    void endStep() { myEntry_ = nullptr, isPosting = false, ledger_.reset(); }
+
+  private:
+    pcg32                      rng_;
     SafePtr<world::GoodsEntry> myEntry_{nullptr};
-    bool                       isPosting_{false};
+    bool                       isPosting{false};
+
+    struct {
+        double inventory;
+        double currentSales;
+        double totalDemand;
+        void   reset() { inventory = 0.0, currentSales = 0.0, totalDemand = 0.0; }
+    } ledger_{};
 };
-struct Production {
+
+class [[nodiscard]] Producer {
+  public:
+    Producer(pcg32& masterRng, world::Workspace& workspace);
+    auto product() const -> double;
+    auto calcDesiredEmploy(
+        const double demandForecast,
+        const double lastSupply,
+        const double targetInvRatio,
+        const int    employeeCnt
+    ) const -> int;
+    void endStep(const double unsoldAmount, world::CensusDropBox& dropBox) {
+        inventory_ = unsoldAmount;
+        dropBox.inventories.emplace_back(inventory_);
+    }
+    auto workspace() -> world::Workspace& { return workspace_; }
+
+  private:
+    auto calcTargetProduction(const double demandForecast, const double targetInvRatio) const
+        -> double;
+
     world::Workspace& workspace_;
-    double            firmProductPower_;
+    const double      firmProductPower_;
     double            inventory_;
 };
-struct Parameter {
-    const double targetInventoryRatio_;
-    const double markupAdjustmentVolatility_;
-    const double demandForecastAdjustmentParam_;
-};
-struct [[nodiscard]] Component {
-    pcg32       rng_;
-    Log         log_;
-    Plan        plan_{};
-    SalesLedger salesLedger{};
-    Posting     posting_{};
-    Production  production_;
-    Parameter   parameter_;
 
-    Component(const std::uint64_t state, const std::uint64_t stream, world::Workspace& workspace);
+class [[nodiscard]] GoodsSupplier {
+  public:
+    GoodsSupplier(pcg32& masterRng, world::Workspace& workspace);
+    void post(const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox);
+    void trade() { trader_.trade(); }
+    auto calcDesiredEmploy(const int employeeCnt) const -> int;
+    void endStep(world::CensusDropBox& dropBox);
+    auto sales() const -> double { return trader_.sales(); }
+    auto workspace() -> world::Workspace& { return producer_.workspace(); }
 
-    auto sales() const -> double { return salesLedger.currentSales_; }
-    auto workspace() -> world::Workspace& { return production_.workspace_; }
+  private:
+    Planner  planner_;
+    Trader   trader_;
+    Producer producer_;
 };
 }  // namespace goods_supplier

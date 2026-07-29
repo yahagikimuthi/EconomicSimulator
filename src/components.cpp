@@ -58,27 +58,25 @@ GoodsDemander::GoodsDemander(pcg32& masterRng)
 }  // namespace goods_demander
 
 namespace goods_supplier {
-Component::Component(
-    const std::uint64_t state, const std::uint64_t stream, world::Workspace& workspace
-)
-    : rng_{state, stream},
+Planner::Planner(pcg32& masterRng)
+    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
       log_{
-          .markup_         = rand(rng_, 0.1, 0.3),
-          .supply_         = rand(rng_, 4, 15),
-          .demandForecast_ = rand(rng_, 5.0, 20.0),
-          .isSold_         = true
+          .markup         = rand(masterRng, 0.1, 0.3),
+          .supply         = rand(masterRng, 4, 15),
+          .demandForecast = rand(masterRng, 5.0, 20.0),
+          .isSold         = rand(masterRng) < 0.5
       },
-      production_{
-          .workspace_        = workspace,
-          .firmProductPower_ = rand(rng_, 0.01, 0.05),
-          .inventory_        = rand(rng_, 0.5, 2.0)
-      },
-      parameter_{
-          .targetInventoryRatio_          = rand(rng_, 0.1, 0.2),
-          .markupAdjustmentVolatility_    = rand(rng_, 0.01, 0.02),
-          .demandForecastAdjustmentParam_ = rand(rng_, 0.1, 0.4)
-      } {
-    log_.isSold_                            = (rand(rng_) <= 0.5) ? true : false;
-    production_.workspace_.firmProductPower = production_.firmProductPower_;
-}
+      param_{
+          .targetInvRatio          = rand(masterRng, 0.1, 0.2),
+          .markupAdjustVol         = rand(masterRng, 0.01, 0.02),
+          .demandForecastAdjustVol = rand(masterRng, 0.1, 0.4)
+      } {}
+
+Trader::Trader(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
+Producer::Producer(pcg32& masterRng, world::Workspace& workspace)
+    : workspace_{workspace},
+      firmProductPower_{rand(masterRng, 0.01, 0.05)},
+      inventory_{rand(masterRng, 0.5, 2.0)} {}
+GoodsSupplier::GoodsSupplier(pcg32& masterRng, world::Workspace& workspace)
+    : planner_{masterRng}, trader_{masterRng}, producer_{masterRng, workspace} {}
 }  // namespace goods_supplier

@@ -18,7 +18,7 @@ struct Firm {  // NOLINT
     agent_index::Component        index;
     firm_finance::Component       finance;
     labor_demander::LaborDemander labor;
-    goods_supplier::Component     goods;
+    goods_supplier::GoodsSupplier goods;
 };
 struct HHold {  // NOLINT
     agent_index::Component        index;

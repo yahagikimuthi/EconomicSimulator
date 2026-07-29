@@ -30,5 +30,4 @@ class GoodsDemander;
 }
 namespace goods_supplier {
 class GoodsSupplier;
-struct Component;
 }  // namespace goods_supplier

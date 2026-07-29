@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <cstdint>
 #include <pcg_random.hpp>
 
 #include "core/base.hpp"

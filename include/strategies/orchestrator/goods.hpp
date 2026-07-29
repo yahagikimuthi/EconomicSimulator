@@ -8,7 +8,7 @@ namespace goods {
 void product(labor_supplier::Component laborSupplier);
 
 void postGoods(
-    goods_supplier::Component&                 goodsSupplier,
+    goods_supplier::GoodsSupplier&             goodsSupplier,
     const labor_demander::LaborDemander&       laborDemander,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 );
@@ -21,14 +21,14 @@ void purchase(
     const int                                  step
 );
 
-void trade(goods_supplier::Component& goodsSupplier);
+void trade(goods_supplier::GoodsSupplier& goodsSupplier);
 
 void afterTrade(goods_demander::GoodsDemander& goodsDemander);
 
 void endStep(
-    firm_finance::Component&   financeComp,
-    goods_supplier::Component& goodsSupplier,
-    world::CensusDropBox&      dropBox
+    firm_finance::Component&       finance,
+    goods_supplier::GoodsSupplier& goodsSupplier,
+    world::CensusDropBox&          dropBox
 );
 void endStep(hhold_finance::Component& finance, goods_demander::GoodsDemander& goodsDemander);
 }  // namespace goods

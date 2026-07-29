@@ -1,4 +1,4 @@
-#include "strategies/goods_supplier/trade.hpp"
+#include "components/goods_supplier.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
@@ -9,7 +9,7 @@
 
 #include "world/message.hpp"
 
-namespace goods_supplier::internal {
+namespace {
 [[nodiscard]] auto calcTotalDemand(const tbb::concurrent_vector<world::GoodsRequest>& requestBox
 ) -> double {
     const double demand{std::ranges::fold_left(
@@ -56,22 +56,20 @@ void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
         request.tradeAmount = request.amount;
     }
 }
-}  // namespace goods_supplier::internal
+}  // namespace
 
 namespace goods_supplier {
-void trade(TradeView view) {
-    if (not view.isPosting()) return;
-    auto& myEntry    = view.myEntry();
-    auto& requestBox = myEntry.requestBox;
-
-    const double totalDemand{internal::calcTotalDemand(requestBox)};
+void Trader::trade() {
+    if (not isPosting) return;
+    auto&        requestBox = myEntry_->requestBox;
+    const double totalDemand{calcTotalDemand(requestBox)};
     if (totalDemand == 0.0) return;
-    const bool   isExcessDemand{totalDemand > myEntry.supply};
-    const double salesAmount{std::min(myEntry.supply, totalDemand)};
-    isExcessDemand ? internal::performRationedTrade(myEntry.supply, view.rng(), requestBox)
-                   : internal::performFullTrade(requestBox);
-    view.inventoryMinus(salesAmount);
-    view.salesPlus(salesAmount * myEntry.price);
-    view.totalDemandPlus(totalDemand);
+    const bool   isExcessDemand{totalDemand > myEntry_->supply};
+    const double salesAmount{std::min(myEntry_->supply, totalDemand)};
+    isExcessDemand ? performRationedTrade(myEntry_->supply, rng_, requestBox)
+                   : performFullTrade(requestBox);
+    ledger_.totalDemand += totalDemand;
+    ledger_.currentSales += totalDemand * myEntry_->price;
+    ledger_.inventory -= salesAmount;
 }
 }  // namespace goods_supplier
