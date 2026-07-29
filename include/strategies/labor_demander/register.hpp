@@ -29,12 +29,12 @@ struct [[nodiscard]] RegisterMemberView final : BaseView<Component> {
     ) -> SafePtr<world::RosterEntry> {
         auto& hr = comp_.humanResources_;
         if (hr.emptyRosterPool_.empty()) {
-            return &hr.companyBoard_.roster_.emplace_back(id, wage, companyBoard, workspace);
+            return &hr.companyBoard_.roster.emplace_back(id, wage, companyBoard, workspace);
         }
         SafePtr<world::RosterEntry> newEntry = hr.emptyRosterPool_.back();
-        newEntry->hholdId_                   = id;
-        newEntry->wage_                      = wage;
-        newEntry->isOccupied_                = true;
+        newEntry->hholdId                    = id;
+        newEntry->wage                       = wage;
+        newEntry->isOccupied                 = true;
         hr.emptyRosterPool_.pop_back();
         return newEntry;
     }
@@ -50,7 +50,7 @@ struct [[nodiscard]] AcceptResignationView final : BaseView<Component> {
         comp_.humanResources_.emptyRosterPool_.emplace_back(emptyRoster);
     }
     auto resignationBox() -> tbb::concurrent_vector<SafePtr<world::RosterEntry>>& {
-        return comp_.humanResources_.companyBoard_.resignationBox_;
+        return comp_.humanResources_.companyBoard_.resignationBox;
     }
     void wageMinus(const double minus) { comp_.humanResources_.sumWage_ -= minus; }
 };

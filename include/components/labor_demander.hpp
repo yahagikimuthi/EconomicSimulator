@@ -59,7 +59,7 @@ struct Component {
     [[nodiscard]] auto sumWage() const -> double { return humanResources_.sumWage_; }
     [[nodiscard]] auto employeeCnt() const -> int {
         const std::size_t rosterSize{
-            humanResources_.companyBoard_.roster_.size() - humanResources_.emptyRosterPool_.size()
+            humanResources_.companyBoard_.roster.size() - humanResources_.emptyRosterPool_.size()
         };
         return static_cast<int>(rosterSize);
     }

@@ -6,8 +6,8 @@ void layoffs(LayOffsView view, const int layOffsCnt) {
     for (int i{view.rosterSize() - 1}; i >= 0; --i) {
         if (currentLayOffsCnt >= layOffsCnt) break;
         auto& rosterEntry = view.getRosterEntry(i);
-        if (not rosterEntry.isOccupied_) continue;
-        rosterEntry.isOccupied_ = false;
+        if (not rosterEntry.isOccupied) continue;
+        rosterEntry.isOccupied = false;
         view.addEmptyRoster(rosterEntry);
         ++currentLayOffsCnt;
     }

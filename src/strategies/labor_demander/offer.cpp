@@ -25,7 +25,7 @@ void sortApplicants(
         applicants.begin() + static_cast<int>(k),
         std::ranges::greater{},
         [](const std::reference_wrapper<const world::LaborEntry> entryRef) -> double {
-            return entryRef.get().productPower_;
+            return entryRef.get().productPower;
         }
     );
 }
@@ -35,7 +35,7 @@ namespace labor_demander {
 void offerApplicants(OfferApplicantsView view) {
     if (not view.isPosting()) return;
     auto& myRequest = view.myRequest();
-    if (myRequest.entryBox_.empty()) {
+    if (myRequest.entryBox.empty()) {
         view.isPosting(false);
         return;
     }
@@ -43,14 +43,14 @@ void offerApplicants(OfferApplicantsView view) {
     const int offer{view.offerPlan()};
 
     static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
-    internal::sortApplicants(offer, applicants, myRequest.entryBox_);
-    assert(applicants.size() == myRequest.entryBox_.size());
+    internal::sortApplicants(offer, applicants, myRequest.entryBox);
+    assert(applicants.size() == myRequest.entryBox.size());
 
     int offerNum{};
     for (auto entryRef : applicants) {
         world::LaborEntry& entry = entryRef.get();
         if (offerNum >= offer) break;
-        entry.isOffer_ = true;
+        entry.isOffer = true;
         view.recordOffer(entry);
         ++offerNum;
     }

@@ -13,20 +13,20 @@ void registerMember(RegisterMemberView view, world::Workspace& workspace) {
     int employeeCnt{};
     for (const auto i : std::views::iota(0UZ, view.offerNum())) {
         auto& entry = view.offerApplicant(i);
-        if (not entry.isAccept_) continue;
+        if (not entry.isAccept) continue;
         ++employeeCnt;
-        entry.rosterEntry_ =
-            view.addRoster(entry.hholdID_, myRequest.wage_, view.myCompanyBoard(), workspace);
+        entry.rosterEntry =
+            view.addRoster(entry.hholdID, myRequest.wage, view.myCompanyBoard(), workspace);
     }
 
-    view.updateLedger(myRequest.wage_, myRequest.entryBox_.size(), employeeCnt);
+    view.updateLedger(myRequest.wage, myRequest.entryBox.size(), employeeCnt);
 }
 
 void acceptResignation(AcceptResignationView view) {
     auto& resignationBox = view.resignationBox();
     for (const SafePtr<world::RosterEntry> resignEntry : resignationBox) {
-        resignEntry->isOccupied_ = false;
-        view.wageMinus(resignEntry->wage_);
+        resignEntry->isOccupied = false;
+        view.wageMinus(resignEntry->wage);
         view.addEmptyRosterPool(resignEntry);
     }
 }

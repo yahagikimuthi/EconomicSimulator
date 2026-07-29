@@ -37,14 +37,13 @@ namespace {
     const int                                  sampleCnt = config::goods_demander::goodsSampleCnt
 ) -> world::GoodsEntry& {
     std::reference_wrapper<world::GoodsEntry> betterEntry =
-        helper::discreteDistribution(entryBox, rng, &world::GoodsEntry::supply_);
+        helper::discreteDistribution(entryBox, rng, &world::GoodsEntry::supply);
 
     if (sampleCnt <= 1) return betterEntry.get();
 
     for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
-        auto& sampleEntry =
-            helper::discreteDistribution(entryBox, rng, &world::GoodsEntry::supply_);
-        if (betterEntry.get().price_ <= sampleEntry.price_) continue;
+        auto& sampleEntry = helper::discreteDistribution(entryBox, rng, &world::GoodsEntry::supply);
+        if (betterEntry.get().price <= sampleEntry.price) continue;
         betterEntry = std::ref(sampleEntry);
     }
     return betterEntry.get();
@@ -68,7 +67,7 @@ void purchase(
     }
     view.isPosting(true);
     auto& pickedEntry = pickEntry(view.rng(), entryBox);
-    assert(pickedEntry.price_ > 0.0 && "price is required > 0.0");
-    view.entry(pickedEntry.requestBox_.emplace_back(budget / pickedEntry.price_, pickedEntry));
+    assert(pickedEntry.price > 0.0 && "price is required > 0.0");
+    view.entry(pickedEntry.requestBox.emplace_back(budget / pickedEntry.price, pickedEntry));
 }
 }  // namespace goods_demander

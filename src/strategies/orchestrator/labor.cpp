@@ -63,7 +63,7 @@ void registerMember(
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler) {
     if (not laborSuppler.isAcceptedOffer()) return;
-    const SafePtr<world::RosterEntry> rosterEntry{laborSuppler.acceptedEntry().rosterEntry_};
+    const SafePtr<world::RosterEntry> rosterEntry{laborSuppler.acceptedEntry().rosterEntry};
     laborSuppler.rosterEntry(rosterEntry);
 }
 

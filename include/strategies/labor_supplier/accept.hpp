@@ -11,10 +11,10 @@ namespace labor_supplier {
 struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     using BaseView<Component>::BaseView;
     auto myEntryCnt() const -> std::size_t { return comp_.posting_.myEntries_.size(); }
-    auto myEntry(const std::size_t idx)
-        -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
+    auto myEntry(const std::size_t idx
+    ) -> std::pair<const world::LaborRequest&, world::LaborEntry&> {
         auto& myEntry = *comp_.posting_.myEntries_[idx];
-        return {myEntry.request_, myEntry};
+        return {myEntry.request, myEntry};
     }
     void recordAcceptance(const world::LaborEntry& acceptEntry) {
         comp_.posting_.acceptEntry_ = &acceptEntry;
@@ -22,7 +22,7 @@ struct [[nodiscard]] AcceptOfferView final : BaseView<Component> {
     auto isPosting() const -> bool { return comp_.posting_.isPosting_; }
     void resign() {
         if (not comp_.rosterEntry_) return;
-        comp_.rosterEntry_->companyBoard_.resignationBox_.emplace_back(comp_.rosterEntry_);
+        comp_.rosterEntry_->companyBoard.resignationBox.emplace_back(comp_.rosterEntry_);
     }
 };
 

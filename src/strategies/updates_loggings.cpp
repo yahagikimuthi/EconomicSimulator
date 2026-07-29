@@ -67,14 +67,14 @@ void reset(Component& comp) {
     comp.posting_.myRequest_ = nullptr;
     comp.posting_.isPosting_ = false;
     comp.posting_.offerApplicants_.clear();
-    comp.humanResources_.companyBoard_.resignationBox_.clear();
+    comp.humanResources_.companyBoard_.resignationBox.clear();
 }
 }  // namespace labor_demander
 
 namespace labor_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
     if (not comp.rosterEntry_) return;
-    dropBox.wages_.emplace_back(comp.rosterEntry_->wage_);
+    dropBox.wages_.emplace_back(comp.rosterEntry_->wage);
 }
 void reset(Component& comp) {
     comp.posting_.myEntries_.clear();

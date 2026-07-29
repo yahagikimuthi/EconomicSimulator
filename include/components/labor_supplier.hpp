@@ -24,7 +24,7 @@ struct [[nodiscard]] Component {
 
     Component(const std::uint64_t state, const std::uint64_t stream);
 
-    auto wage() const -> double { return isEmployed() ? rosterEntry_->wage_ : 0.0; }
+    auto wage() const -> double { return isEmployed() ? rosterEntry_->wage : 0.0; }
     auto acceptedEntry() const -> const world::LaborEntry& { return *posting_.acceptEntry_; }
     void rosterEntry(const SafePtr<world::RosterEntry> rosterEntry) { rosterEntry_ = rosterEntry; }
     auto shouldSearchJob() -> bool {

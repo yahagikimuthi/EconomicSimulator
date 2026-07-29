@@ -42,7 +42,7 @@ void sortSample(
         sortRequests.begin() + static_cast<int>(k),
         std::ranges::greater{},
         [](const std::reference_wrapper<world::LaborRequest>& requestRef) -> double {
-            return requestRef.get().wage_;
+            return requestRef.get().wage;
         }
     );
 }
@@ -52,7 +52,7 @@ namespace labor_supplier {
 void updateRosterEntry(UpdateRosterEntryView view) {
     auto& rosterEntry{view.rosterEntry()};
     if (not rosterEntry) return;
-    if (not rosterEntry->isOccupied_) {
+    if (not rosterEntry->isOccupied) {
         rosterEntry = nullptr;
     }
 }
@@ -79,9 +79,9 @@ void jobEntry(
     for (const auto i :
          std::views::iota(0UZ, std::min(static_cast<std::size_t>(entryCnt), requestBox.size()))) {
         auto& request = sampleRequests[i].get();
-        if (request.firmID_ == firmId) continue;
-        if (request.wage_ <= nowWage) continue;
-        auto& entryBox = request.entryBox_;
+        if (request.firmID == firmId) continue;
+        if (request.wage <= nowWage) continue;
+        auto& entryBox = request.entryBox;
         view.entry(entryBox.emplace_back(id, productPower, request));
     }
 }
