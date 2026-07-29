@@ -4,10 +4,8 @@
 #include <pcg_random.hpp>
 
 #include "components/common.hpp"
-#include "components/goods_demander.hpp"
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander.hpp"
-#include "components/labor_supplier.hpp"
 #include "core/base.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
@@ -55,18 +53,6 @@ void Recruiter::endStep(world::CensusDropBox& dropBox) {
     isRecruiting_ = false;
 }
 }  // namespace labor_demander
-
-namespace labor_supplier {
-void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    if (not comp.rosterEntry_) return;
-    dropBox.wages.emplace_back(comp.rosterEntry_->wage);
-}
-void reset(Component& comp) {
-    comp.posting_.myEntries_.clear();
-    comp.posting_.acceptEntry_ = nullptr;
-    comp.posting_.isPosting_   = false;
-}
-}  // namespace labor_supplier
 
 namespace goods_supplier {
 auto Planner::updateDemandForecast(const double totalDemand) const -> double {

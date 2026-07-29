@@ -5,7 +5,7 @@
 #include "core/forward.hpp"
 
 namespace goods {
-void product(labor_supplier::Component laborSupplier);
+void product(labor_supplier::LaborSupplier laborSupplier);
 
 void postGoods(
     goods_supplier::GoodsSupplier&             goodsSupplier,
@@ -16,7 +16,7 @@ void postGoods(
 void purchase(
     const hhold_finance::Component&            finance,
     goods_demander::GoodsDemander&             goodsDemander,
-    const labor_supplier::Component&           laborSupplier,
+    const labor_supplier::LaborSupplier&       laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     const int                                  step
 );

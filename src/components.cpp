@@ -43,11 +43,14 @@ HumanResourceManager::HumanResourceManager(world::CompanyBoard& companyBoard)
 LaborDemander::LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard)
     : recruiter_{masterRng}, hrManager_{companyBoard} {}
 }  // namespace labor_demander
+
 namespace labor_supplier {
-Component::Component(const std::uint64_t state, const std::uint64_t stream)
-    : rng_{state, stream},
-      productPower_{randNormal(rng_, 1.0, 1.0 / 3.0, 0.0, 2.0)},
-      jobSearchThreshold_{rand(rng_, 0.01, 0.05)} {}
+JobHunter ::JobHunter(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
+LaborSupplier::LaborSupplier(pcg32& masterRng)
+    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
+      jobHunter_{masterRng},
+      productPower_{randNormal(masterRng, 1.0, 1.0 / 3.0, 0.0, 2.0)},
+      jobSearchThreshold_{rand(masterRng, 0.01, 0.05)} {}
 }  // namespace labor_supplier
 
 namespace goods_demander {

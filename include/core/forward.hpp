@@ -23,7 +23,7 @@ namespace labor_demander {
 class LaborDemander;
 }
 namespace labor_supplier {
-struct Component;
+struct LaborSupplier;
 }
 namespace goods_demander {
 class GoodsDemander;

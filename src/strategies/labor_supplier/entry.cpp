@@ -1,8 +1,9 @@
-#include "strategies/labor_supplier/entry.hpp"
+#include "components/labor_supplier.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <cassert>
+#include <config.hpp>
 #include <cstddef>
 #include <functional>
 #include <iterator>
@@ -10,16 +11,15 @@
 #include <ranges>
 #include <vector>
 
-#include "config.hpp"
 #include "core/base.hpp"
 #include "world/message.hpp"
 
-namespace labor_supplier::internal {
+namespace {
 void pickSample(
     tbb::concurrent_vector<world::LaborRequest>&              requestBox,
     std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
     pcg32&                                                    rng,
-    const int                                                 sampleCnt
+    const int sampleCnt = config::labor_supplier::jobSampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     sampleRequests.clear();
@@ -34,7 +34,8 @@ void pickSample(
 }
 
 void sortSample(
-    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests, const int entryCnt
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests,
+    const int entryCnt = config::labor_supplier::jobEntryCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
@@ -46,43 +47,47 @@ void sortSample(
         }
     );
 }
-}  // namespace labor_supplier::internal
+}  // namespace
 
 namespace labor_supplier {
-void updateRosterEntry(UpdateRosterEntryView view) {
-    auto& rosterEntry{view.rosterEntry()};
-    if (not rosterEntry) return;
-    if (not rosterEntry->isOccupied) {
-        rosterEntry = nullptr;
-    }
+auto LaborSupplier::shouldSearchJob() const -> bool {
+    if (not isEmployed()) return true;
+    return helper::rand(rng_) < jobSearchThreshold_;
 }
 
-void jobEntry(
-    JobEntryView                                 view,
+void JobHunter::entry(
     const int                                    id,
+    const int                                    contractFirmId,
+    const double                                 contractWage,
+    const double                                 productPower,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     const int                                    entryCnt
 ) {
-    if (requestBox.empty()) {
-        view.isPosting(false);
-        return;
-    }
-    view.isPosting(true);
+    isPosting_ = true;
     static thread_local std::vector<std::reference_wrapper<world::LaborRequest>> sampleRequests;
-    internal::pickSample(requestBox, sampleRequests, view.rng());
-    internal::sortSample(sampleRequests);
-
-    const double productPower{view.productPower()};
-
-    const int    firmId{view.contractFirmId()};
-    const double nowWage{view.contractWage()};
+    pickSample(requestBox, sampleRequests, rng_);
+    sortSample(sampleRequests);
     for (const auto i :
          std::views::iota(0UZ, std::min(static_cast<std::size_t>(entryCnt), requestBox.size()))) {
         auto& request = sampleRequests[i].get();
-        if (request.firmID == firmId) continue;
-        if (request.wage <= nowWage) continue;
+        if (request.firmID == contractFirmId) continue;
+        if (request.wage <= contractWage) continue;
         auto& entryBox = request.entryBox;
-        view.entry(entryBox.emplace_back(id, productPower, request));
+        auto  it{entryBox.emplace_back(id, productPower, request)};
+        myEntries_.emplace_back(&*it);
+    }
+}
+
+void LaborSupplier::entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
+    updateRosterEntry();
+    if (not shouldSearchJob()) return;
+    if (requestBox.empty()) return;
+    if (isEmployed()) {
+        jobHunter_.entry(
+            id, rosterEntry_->companyBoard.firmId, rosterEntry_->wage, productPower_, requestBox
+        );
+    } else {
+        jobHunter_.entry(id, -1, 0.0, productPower_, requestBox);
     }
 }
 }  // namespace labor_supplier

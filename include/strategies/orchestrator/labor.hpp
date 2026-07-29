@@ -7,38 +7,38 @@
 
 namespace labor {
 void adjustWorkforce(
-    const agent_index::Component&                indexComp,
+    const agent_index::Component&                index,
     const goods_supplier::GoodsSupplier&         goodsSupplier,
     labor_demander::LaborDemander&               laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
 
 void jobEntry(
-    const agent_index::Component&                indexComp,
-    labor_supplier::Component&                   laborSupplier,
+    const agent_index::Component&                index,
+    labor_supplier::LaborSupplier&               laborSupplier,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
 
 void offer(labor_demander::LaborDemander& laborDemander);
 
-void acceptOffer(labor_supplier::Component& laborSupplier);
+void acceptOffer(labor_supplier::LaborSupplier& laborSupplier);
 
 void registerMember(
     goods_supplier::GoodsSupplier& goodsSupplier, labor_demander::LaborDemander& laborDemander
 );
 
-void recordRosterEntry(labor_supplier::Component& laborSuppler);
+void recordRosterEntry(labor_supplier::LaborSupplier& laborSuppler);
 
 void acceptResignation(labor_demander::LaborDemander& laborDemander);
 
 void endStep(
-    firm_finance::Component&       financeComp,
+    firm_finance::Component&       finance,
     labor_demander::LaborDemander& laborDemander,
     world::CensusDropBox&          dropBox
 );
 void endStep(
-    hhold_finance::Component&  financeComp,
-    labor_supplier::Component& laborSupplier,
-    world::CensusDropBox&      dropBox
+    hhold_finance::Component&      finance,
+    labor_supplier::LaborSupplier& laborSupplier,
+    world::CensusDropBox&          dropBox
 );
 }  // namespace labor

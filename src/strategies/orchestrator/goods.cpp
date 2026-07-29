@@ -5,14 +5,9 @@
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
-#include "strategies/labor_supplier/product.hpp"
-#include "strategies/updates_loggings.hpp"
 
 namespace goods {
-void product(labor_supplier::Component laborSupplier) {
-    if (not laborSupplier.isEmployed()) return;
-    labor_supplier::product(labor_supplier::ProductView{laborSupplier});
-}
+void product(labor_supplier::LaborSupplier laborSupplier) { laborSupplier.product(); }
 
 void postGoods(
     goods_supplier::GoodsSupplier&             goodsSupplier,
@@ -25,7 +20,7 @@ void postGoods(
 void purchase(
     const hhold_finance::Component&            finance,
     goods_demander::GoodsDemander&             goodsDemander,
-    const labor_supplier::Component&           laborSupplier,
+    const labor_supplier::LaborSupplier&       laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     const int                                  step
 ) {
@@ -44,6 +39,7 @@ void endStep(
     finance.assetPlus(goodsSupplier.sales());
     goodsSupplier.endStep(dropBox);
 }
+
 void endStep(hhold_finance::Component& finance, goods_demander::GoodsDemander& goodsDemander) {
     finance.assetPlus(-goodsDemander.purchase());
     goodsDemander.endStep();

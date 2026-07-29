@@ -1,19 +1,14 @@
-#include "strategies/labor_supplier/accept.hpp"
-
-#include <ranges>
+#include "components/labor_supplier.hpp"
 
 #include "world/message.hpp"
 
 namespace labor_supplier {
-void acceptOffer(AcceptOfferView view) {
-    if (not view.isPosting()) return;
-    for (const auto i : std::views::iota(0UZ, view.myEntryCnt())) {
-        auto [request, myEntry] = view.myEntry(i);
-        if (not myEntry.isOffer) continue;
-        myEntry.isAccept = true;
-        view.recordAcceptance(myEntry);
-        view.resign();
-        return;
+void JobHunter::accept() {
+    if (not isPosting_) return;
+    for (SafePtr<world::LaborEntry> myEntry : myEntries_) {
+        if (not myEntry->isOffer) continue;
+        myEntry->isAccept = true;
+        acceptedEntry_    = myEntry;
     }
 }
 }  // namespace labor_supplier
