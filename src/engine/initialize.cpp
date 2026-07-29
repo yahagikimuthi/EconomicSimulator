@@ -58,7 +58,7 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
             .index   = {i},
             .finance = {makeSeed(), makeSeed()},
             .labor   = {makeSeed(), makeSeed()},
-            .goods   = {makeSeed(), makeSeed()}
+            .goods   = {masterRng_}
         };
         hholds_.push_back(hhold);
     }

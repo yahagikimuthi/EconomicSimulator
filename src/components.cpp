@@ -51,12 +51,10 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
 }  // namespace labor_supplier
 
 namespace goods_demander {
-Component::Component(const std::uint64_t state, const std::uint64_t stream)
-    : rng_{state, stream},
-      parameter_{
-          .mpc_     = rand(rng_, 0.7, 0.9),
-          .myPhase_ = instanceCnt_++ % config::goods_demander::maxPurchaseFrequency
-      } {}
+GoodsDemander::GoodsDemander(pcg32& masterRng)
+    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
+      mpc_{rand(rng_, 0.7, 0.9)},
+      myPhase_{instanceCnt_++ % config::goods_demander::maxPurchaseFrequency} {}
 }  // namespace goods_demander
 
 namespace goods_supplier {

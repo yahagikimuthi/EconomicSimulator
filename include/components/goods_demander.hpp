@@ -6,29 +6,41 @@
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "world/message.hpp"
 
 namespace goods_demander {
-struct Posting {
-    SafePtr<const world::GoodsRequest> myRequest_{nullptr};
-    bool                               isPosting_{false};
-};
-struct Purchasing {
-    double purchase_{};
-};
-struct Parameter {
-    const double mpc_;
-    const int    myPhase_;
-};
-struct Component {
-    pcg32      rng_;
-    Posting    posting_;
-    Purchasing purchasing_;
-    Parameter  parameter_;
+class [[nodiscard]] GoodsDemander {
+  public:
+    GoodsDemander(pcg32& masterRng);
 
-    Component(const std::uint64_t state, const std::uint64_t stream);
-    [[nodiscard]] auto purchase() const -> double { return purchasing_.purchase_; }
+    void request(
+        const double asset, const int step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    );
+    void afterTrade() {
+        if (not isPosting_) return;
+        purchasing_ += myRequest_->tradeAmount * myRequest_->entry.price;
+    }
+    void endStep() {
+        myRequest_  = nullptr;
+        isPosting_  = false;
+        purchasing_ = 0.0;
+    }
+    auto purchase() const -> double { return purchasing_; }
 
   private:
-    static inline int instanceCnt_{};
+    auto isPass(
+        const double                                     asset,
+        const int                                        step,
+        const tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    ) const -> bool;
+    auto calcBudget(const double asset) const -> double { return asset * mpc_; }
+
+    pcg32                              rng_;
+    SafePtr<const world::GoodsRequest> myRequest_{nullptr};
+    bool                               isPosting_{false};
+    double                             purchasing_{};
+    const double                       mpc_;
+    const int                          myPhase_;
+    static inline int                  instanceCnt_{};
 };
 }  // namespace goods_demander

@@ -21,10 +21,10 @@ struct Firm {  // NOLINT
     goods_supplier::Component     goods;
 };
 struct HHold {  // NOLINT
-    agent_index::Component    index;
-    hhold_finance::Component  finance;
-    labor_supplier::Component labor;
-    goods_demander::Component goods;
+    agent_index::Component        index;
+    hhold_finance::Component      finance;
+    labor_supplier::Component     labor;
+    goods_demander::GoodsDemander goods;
 };
 struct HHoldTag {};
 struct FirmTag {};

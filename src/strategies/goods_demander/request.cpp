@@ -1,4 +1,4 @@
-#include "strategies/goods_demander/request.hpp"
+#include "components/goods_demander.hpp"
 
 #include <oneapi/tbb/concurrent_vector.h>
 #include <tbb/concurrent_vector.h>
@@ -11,26 +11,7 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace goods_demander {
 namespace {
-[[nodiscard]] auto isPass(
-    const tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                        step,
-    const int                                        myPhase,
-    const int maxFrequency = config::goods_demander::maxPurchaseFrequency
-) -> bool {
-    const bool isEmpty{entryBox.empty()};
-    const int  dayOfWeek{step % maxFrequency};
-    const bool isNotMyPhase{dayOfWeek != myPhase};
-    return isEmpty or isNotMyPhase;
-}
-
-[[nodiscard]] auto calcBudget(const double mpc, const double availableAsset) -> double {
-    // 使用可能資産×限界消費性向を家計が当期に使用する予算とする
-    assert(0.0 < mpc && mpc < 1.0 && "mpc is different range");
-    return availableAsset * mpc;
-}
-
 [[nodiscard]] auto pickEntry(
     pcg32&                                     rng,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
@@ -50,24 +31,26 @@ namespace {
 }
 }  // namespace
 
-void purchase(
-    PurchaseView                               view,
-    const double                               availableAsset,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                  step
+namespace goods_demander {
+
+auto GoodsDemander::isPass(
+    const double asset, const int step, const tbb::concurrent_vector<world::GoodsEntry>& entryBox
+) const -> bool {
+    if (asset <= 0.0) return true;
+    if (entryBox.empty()) return true;
+    const int dayOfWeek{step % config::goods_demander::maxPurchaseFrequency};
+    return dayOfWeek != myPhase_;
+}
+
+void GoodsDemander::request(
+    const double asset, const int step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    if (isPass(entryBox, step, view.myPhase())) {
-        view.isPosting(false);
-        return;
-    }
-    const double budget{calcBudget(view.mpc(), availableAsset - view.purchasing())};
-    if (budget <= 0.0) {
-        view.isPosting(false);
-        return;
-    }
-    view.isPosting(true);
-    auto& pickedEntry = pickEntry(view.rng(), entryBox);
-    assert(pickedEntry.price > 0.0 && "price is required > 0.0");
-    view.entry(pickedEntry.requestBox.emplace_back(budget / pickedEntry.price, pickedEntry));
+    if (isPass(asset, step, entryBox)) return;
+    const double budget{calcBudget(asset)};
+    if (budget <= 0.0) return;
+    isPosting_        = true;
+    auto& pickedEntry = pickEntry(rng_, entryBox);
+    auto  it{pickedEntry.requestBox.emplace_back(budget / pickedEntry.price, pickedEntry)};
+    myRequest_ = &*it;
 }
 }  // namespace goods_demander

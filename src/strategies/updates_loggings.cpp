@@ -68,13 +68,6 @@ void reset(Component& comp) {
 }
 }  // namespace labor_supplier
 
-namespace goods_demander {
-void reset(Component& comp) {
-    comp.posting_    = {.myRequest_ = nullptr, .isPosting_ = false};
-    comp.purchasing_ = {.purchase_ = 0.0};
-}
-}  // namespace goods_demander
-
 namespace goods_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
     dropBox.prices.emplace_back(comp.plan_.price_);
