@@ -11,7 +11,6 @@
 #include <ranges>
 #include <vector>
 
-#include "core/base.hpp"
 #include "world/message.hpp"
 
 namespace {
@@ -82,12 +81,6 @@ void LaborSupplier::entry(const int id, tbb::concurrent_vector<world::LaborReque
     updateRosterEntry();
     if (not shouldSearchJob()) return;
     if (requestBox.empty()) return;
-    if (isEmployed()) {
-        jobHunter_.entry(
-            id, rosterEntry_->companyBoard.firmId, rosterEntry_->wage, productPower_, requestBox
-        );
-    } else {
-        jobHunter_.entry(id, -1, 0.0, productPower_, requestBox);
-    }
+    jobHunter_.entry(id, employment_.contractFirmId(), wage(), productPower_, requestBox);
 }
 }  // namespace labor_supplier
