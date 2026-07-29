@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <concepts>
 #include <config.hpp>
 #include <helper.hpp>
 #include <pcg_random.hpp>
@@ -11,13 +12,18 @@
 #include "world/message.hpp"
 
 namespace labor_supplier {
+
+template <typename T>
+concept HasIsEligibleRequest = requires(T t, const world::LaborRequest& request) {
+    { t.isEligibleRequest(request) } -> std::same_as<bool>;
+};
+
 class JobHunter {
   public:
     JobHunter(pcg32& masterRng);
     void entry(
         const int                                    id,
-        const int                                    contractFirmId,
-        const double                                 contractWage,
+        const HasIsEligibleRequest auto&             hasIsEligibleRequest,
         const double                                 productPower,
         tbb::concurrent_vector<world::LaborRequest>& requestBox,
         const int                                    entryCnt = config::labor_supplier::jobEntryCnt
@@ -67,7 +73,6 @@ class LaborSupplier {
   public:
     LaborSupplier(pcg32& masterRng);
     void entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox);
-    auto isEmployed() const -> bool { return employment_.isEmployed(); }
     void accept() { jobHunter_.accept(); }
     void recordRosterEntry() {
         const SafePtr<world::LaborEntry> acceptedEntry{jobHunter_.acceptedEntry()};
@@ -80,6 +85,11 @@ class LaborSupplier {
     }
     void product() { employment_.product(productPower_); }
     auto wage() const -> double { return employment_.wage(); }
+    auto isEligibleRequest(const world::LaborRequest& request) const -> bool {
+        if (request.firmID == employment_.contractFirmId()) return false;
+        if (request.wage < employment_.wage()) return false;
+        return true;
+    }
 
   private:
     void updateRosterEntry() { employment_.updateStatus(); }

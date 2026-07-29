@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cstdlib>
 #include <filesystem>
-#include <helper.hpp>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
@@ -11,6 +10,7 @@
 #include <ranges>
 
 #include "config.hpp"
+#include "helper.hpp"
 
 namespace core {
 /*

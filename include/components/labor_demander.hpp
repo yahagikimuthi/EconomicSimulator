@@ -51,7 +51,6 @@ concept HasAddRoster =
     requires(T& t, const int id, const double wage, world::Workspace& workspace) {
         { t.addRoster(id, wage, workspace) } -> std::same_as<SafePtr<world::RosterEntry>>;
     };
-
 class [[nodiscard]] Recruiter {
   public:
     Recruiter(pcg32& masterRng);

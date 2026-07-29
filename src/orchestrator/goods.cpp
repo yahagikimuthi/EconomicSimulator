@@ -1,4 +1,4 @@
-#include "strategies/orchestrator/goods.hpp"
+#include "orchestrator/goods.hpp"
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"

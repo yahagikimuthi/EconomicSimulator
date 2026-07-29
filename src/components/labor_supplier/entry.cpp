@@ -50,14 +50,13 @@ void sortSample(
 
 namespace labor_supplier {
 auto LaborSupplier::shouldSearchJob() const -> bool {
-    if (not isEmployed()) return true;
+    if (not employment_.isEmployed()) return true;
     return helper::rand(rng_) < jobSearchThreshold_;
 }
 
 void JobHunter::entry(
     const int                                    id,
-    const int                                    contractFirmId,
-    const double                                 contractWage,
+    const HasIsEligibleRequest auto&             hasIsEligibleRequest,
     const double                                 productPower,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     const int                                    entryCnt
@@ -69,18 +68,24 @@ void JobHunter::entry(
     for (const auto i :
          std::views::iota(0UZ, std::min(static_cast<std::size_t>(entryCnt), requestBox.size()))) {
         auto& request = sampleRequests[i].get();
-        if (request.firmID == contractFirmId) continue;
-        if (request.wage <= contractWage) continue;
+        if (not hasIsEligibleRequest.isEligibleRequest(request)) continue;
         auto& entryBox = request.entryBox;
         auto  it{entryBox.emplace_back(id, productPower, request)};
         myEntries_.emplace_back(&*it);
     }
 }
+template void JobHunter::entry<LaborSupplier>(
+    const int,
+    const LaborSupplier&,
+    const double,
+    tbb::concurrent_vector<world::LaborRequest>&,
+    const int
+);
 
 void LaborSupplier::entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
     updateRosterEntry();
     if (not shouldSearchJob()) return;
     if (requestBox.empty()) return;
-    jobHunter_.entry(id, employment_.contractFirmId(), wage(), productPower_, requestBox);
+    jobHunter_.entry(id, *this, productPower_, requestBox);
 }
 }  // namespace labor_supplier

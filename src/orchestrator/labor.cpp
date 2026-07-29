@@ -1,12 +1,10 @@
-#include "strategies/orchestrator/labor.hpp"
+#include "orchestrator/labor.hpp"
 
 #include <tbb/concurrent_vector.h>
 
 #include "components/common.hpp"
 #include "components/goods_supplier.hpp"
 #include "components/labor_supplier.hpp"
-#include "core/base.hpp"
-#include "strategies/updates_loggings.hpp"
 #include "world/message.hpp"
 
 namespace labor {

@@ -7,12 +7,11 @@
 #include <string>
 
 #include "config.hpp"
-#include "strategies/orchestrator/goods.hpp"
-#include "strategies/orchestrator/labor.hpp"
-#include "strategies/updates_loggings.hpp"
+#include "orchestrator/goods.hpp"
+#include "orchestrator/labor.hpp"
+#include "orchestrator/updates_loggings.hpp"
 #include "world/message.hpp"
 
-//! 経済全体の総資産が減り続けている！
 namespace core {
 void foo() {}
 void Engine::run() {
