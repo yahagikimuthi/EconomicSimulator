@@ -27,6 +27,7 @@ class [[nodiscard]] SafePtr {
     SafePtr(T* ptr) : ptr_{ptr} {}
 
     auto hasValue() const -> bool { return ptr_ != nullptr; }
+    auto get() const -> T* { return ptr_; }
 
     auto operator*() const -> T& {
         assert(ptr_ != nullptr && "Attempted to access a null pointer via SafePtr");

@@ -1,14 +1,14 @@
-#include "strategies/labor_demander/lay_offs.hpp"
+#include "components/labor_demander.hpp"
 
 namespace labor_demander {
-void layoffs(LayOffsView view, const int layOffsCnt) {
-    int currentLayOffsCnt{};
-    for (int i{view.rosterSize() - 1}; i >= 0; --i) {
+void HumanResourceManager::layOffs(const int layOffsCnt) {
+    int   currentLayOffsCnt{};
+    auto& roster = companyBoard_.roster;
+    for (int i{static_cast<int>(roster.size()) - 1}; i >= 0; --i) {
         if (currentLayOffsCnt >= layOffsCnt) break;
-        auto& rosterEntry = view.getRosterEntry(i);
+        auto& rosterEntry = roster[static_cast<std::size_t>(i)];
         if (not rosterEntry.isOccupied) continue;
-        rosterEntry.isOccupied = false;
-        view.addEmptyRoster(rosterEntry);
+        emptyRosterPool_.emplace_back(&rosterEntry);
         ++currentLayOffsCnt;
     }
 }

@@ -1,14 +1,15 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <components/labor_demander.hpp>
 
 #include "core/forward.hpp"
 
 namespace labor {
-void AdjustWorkforce(
+void adjustWorkforce(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
-    labor_demander::Component&                   laborDemander,
+    labor_demander::LaborDemander&               laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
 
@@ -18,22 +19,22 @@ void jobEntry(
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 );
 
-void offer(labor_demander::Component& laborDemander);
+void offer(labor_demander::LaborDemander& laborDemander);
 
 void acceptOffer(labor_supplier::Component& laborSupplier);
 
 void registerMember(
-    goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
+    goods_supplier::Component& goodsSupplier, labor_demander::LaborDemander& laborDemander
 );
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler);
 
-void acceptResignation(labor_demander::Component& laborDemander);
+void acceptResignation(labor_demander::LaborDemander& laborDemander);
 
 void endStep(
-    firm_finance::Component&   financeComp,
-    labor_demander::Component& laborDemander,
-    world::CensusDropBox&      dropBox
+    firm_finance::Component&       financeComp,
+    labor_demander::LaborDemander& laborDemander,
+    world::CensusDropBox&          dropBox
 );
 void endStep(
     hhold_finance::Component&  financeComp,

@@ -1,33 +1,44 @@
-#include "strategies/labor_demander/register.hpp"
+#include "components/labor_demander.hpp"
 
 #include <tbb/concurrent_vector.h>
-#include <ranges>
+#include <memory>
 
+#include "core/base.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
-void registerMember(RegisterMemberView view, world::Workspace& workspace) {
-    if (not view.isPosting()) return;
-    auto& myRequest = view.myRequest();
+void Recruiter::registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace) {
+    if (not isPosting_) return;
 
-    int employeeCnt{};
-    for (const auto i : std::views::iota(0UZ, view.offerNum())) {
-        auto& entry = view.offerApplicant(i);
-        if (not entry.isAccept) continue;
-        ++employeeCnt;
-        entry.rosterEntry =
-            view.addRoster(entry.hholdID, myRequest.wage, view.myCompanyBoard(), workspace);
+    int employCnt{};
+    for (SafePtr<world::LaborEntry> offeredApplicant : offerApplicants_) {
+        if (not offeredApplicant->isAccept) continue;
+        offeredApplicant->rosterEntry =
+            hasAddRoster.addRoster(offeredApplicant->hholdID, myRequest_->wage, workspace);
+        ++employCnt;
     }
-
-    view.updateLedger(myRequest.wage, myRequest.entryBox.size(), employeeCnt);
+    ledger_.employing += employCnt;
 }
 
-void acceptResignation(AcceptResignationView view) {
-    auto& resignationBox = view.resignationBox();
+template void
+Recruiter::registerMember<HumanResourceManager>(HumanResourceManager&, world::Workspace&);
+
+auto HumanResourceManager::addRoster(const int id, const double wage, world::Workspace& workspace)
+    -> SafePtr<world::RosterEntry> {
+    if (emptyRosterPool_.empty())
+        return &companyBoard_.roster.emplace_back(id, wage, companyBoard_, workspace);
+    world::RosterEntry* newRoster = emptyRosterPool_.back().get();
+    std::destroy_at(newRoster);
+    std::construct_at(newRoster, id, wage, companyBoard_, workspace);
+    emptyRosterPool_.pop_back();
+    return newRoster;
+}
+
+void HumanResourceManager::acceptResignation() {
+    auto& resignationBox = companyBoard_.resignationBox;
     for (const SafePtr<world::RosterEntry> resignEntry : resignationBox) {
         resignEntry->isOccupied = false;
-        view.wageMinus(resignEntry->wage);
-        view.addEmptyRosterPool(resignEntry);
+        emptyRosterPool_.emplace_back(resignEntry);
     }
 }
 }  // namespace labor_demander

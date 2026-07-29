@@ -10,11 +10,6 @@ namespace hhold_finance {
 void logging(world::CensusDropBox& dropBox, const Component& comp);
 }
 
-namespace labor_demander {
-void logging(world::CensusDropBox& dropBox, const Component& comp);
-void reset(Component& comp);
-}  // namespace labor_demander
-
 namespace labor_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp);
 void reset(Component& comp);

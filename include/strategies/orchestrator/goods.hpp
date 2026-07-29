@@ -9,7 +9,7 @@ void product(labor_supplier::Component laborSupplier);
 
 void postGoods(
     goods_supplier::Component&                 goodsSupplier,
-    const labor_demander::Component&           laborDemander,
+    const labor_demander::LaborDemander&       laborDemander,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 );
 

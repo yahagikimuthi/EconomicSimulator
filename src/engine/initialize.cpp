@@ -44,14 +44,12 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     workspaces_.resize(config::agent_count::firm);
     for (const auto i : std::views::iota(0, config::agent_count::firm)) {
         companyBoards_.emplace_back(i);
-        firms_.emplace_back(
-            Firm{
-                .index   = {i},
-                .finance = {makeSeed(), makeSeed()},
-                .labor   = {makeSeed(), makeSeed(), companyBoards_[static_cast<std::size_t>(i)]},
-                .goods   = {makeSeed(), makeSeed(), workspaces_[static_cast<std::size_t>(i)]}
-            }
-        );
+        firms_.emplace_back(Firm{
+            .index   = {i},
+            .finance = {makeSeed(), makeSeed()},
+            .labor   = {masterRng_, companyBoards_[static_cast<std::size_t>(i)]},
+            .goods   = {makeSeed(), makeSeed(), workspaces_[static_cast<std::size_t>(i)]}
+        });
     }
 
     hholds_.reserve(config::agent_count::hhold);

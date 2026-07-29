@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <pcg_random.hpp>
+#include <world/message.hpp>
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
@@ -21,26 +22,26 @@ Component::Component(const std::uint64_t state, const std::uint64_t stream)
 }  // namespace hhold_finance
 
 namespace labor_demander {
-Component::Component(
-    const std::uint64_t state, const std::uint64_t stream, world::CompanyBoard& companyBoard
-)
-    : rng_{state, stream},
+RequestPlanner::RequestPlanner(pcg32& masterRng)
+    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
       log_{
-          .wage_         = rand(rng_, 1000, 5000),
-          .actualEmploy_ = randInt(rng_, 4, 12),
-          .offerPlan_    = randInt(rng_, 10, 20),
-          .applicantNum_ = randInt(rng_, 10, 20)
+          .wage         = rand(masterRng, 1000, 5000),
+          .actualEmploy = randInt(rng_, 4, 12),
+          .offerPlan    = randInt(rng_, 10, 20),
+          .applicantNum = randInt(masterRng, 10, 20)
       },
-      humanResources_{companyBoard},
-      parameter_{
-          .offerRate_                  = rand(rng_, 0.0, 1.0),
-          .wageAdjustmentVolatility_   = rand(rng_, 0.01, 0.1),
-          .employAdjustmentVolatility_ = rand(rng_, 1, 3),
-          .offerAdjustmentVolatility_  = rand(rng_, 0.3, 0.5)
-      } {
-    log_.actualEmploy_ = std::max(log_.actualEmploy_, log_.offerPlan_);
-    log_.applicantNum_ = std::max(log_.applicantNum_, log_.actualEmploy_);
-}
+      param_{
+          .offerRate      = rand(masterRng),
+          .wageAdjustVol  = rand(masterRng, 0.01, 0.1),
+          .offerAdjustVol = rand(masterRng, 0.3, 0.5)
+      } {}
+
+Recruiter::Recruiter(pcg32& masterRng) : planner_{masterRng} {}
+HumanResourceManager::HumanResourceManager(world::CompanyBoard& companyBoard)
+    : companyBoard_{companyBoard} {}
+
+LaborDemander::LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard)
+    : recruiter_{masterRng}, hrManager_{companyBoard} {}
 }  // namespace labor_demander
 namespace labor_supplier {
 Component::Component(const std::uint64_t state, const std::uint64_t stream)

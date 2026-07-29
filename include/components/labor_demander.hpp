@@ -1,67 +1,136 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <cstdint>
+#include <concepts>
+#include <numeric>
 #include <pcg_random.hpp>
+#include <ranges>
 
 #include "core/base.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
-struct Log {
-    double wage_;
-    int    actualEmploy_;
-    int    offerPlan_;
-    int    applicantNum_;
-};
-struct Plan {
-    bool   isRecruiting{false};
-    double wage_{};
-    int    employ_{};
-    int    offer_{};
-};
-struct HR {
-    world::CompanyBoard&                     companyBoard_;
-    std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
-    double                                   sumWage_{};
+class [[nodiscard]] RequestPlanner {
+  public:
+    RequestPlanner(pcg32& masterRng);
 
-    HR(world::CompanyBoard& companyBoard) : companyBoard_{companyBoard} {}
+    void judgePlan(const int desiredEmploy);
+    auto wagePlan() const -> double { return plan_.wage; }
+    auto offerPlan() const -> int { return plan_.offer; }
+    void endStep(world::CensusDropBox& dropBox, const int actualEmploy, const int applicantNum);
+
+  private:
+    auto calcNextWage() const -> double;
+    auto calcNextOffer(const int desiredEmploy) const -> int;
+    auto updateOfferRate(const int actualEmploy) const -> double;
+
+    mutable pcg32 rng_;
+    struct {
+        double wage;
+        int    employ;
+        int    offer;
+        void   reset() { wage = 0.0, employ = 0, offer = 0; }
+    } plan_{};
+
+    struct {
+        double wage;
+        int    actualEmploy;
+        int    offerPlan;
+        int    applicantNum;
+    } log_{};
+
+    struct {
+        double       offerRate;
+        const double wageAdjustVol;
+        const double offerAdjustVol;
+    } param_;
 };
-struct EmploymentLedger {
-    int    applicantNum_;
-    int    employing_;
-    double sumWage_;
-};
-struct Parameter {
-    double       offerRate_;
-    const double wageAdjustmentVolatility_;
-    const double employAdjustmentVolatility_;
-    const double offerAdjustmentVolatility_;
-};
-struct Posting {
+
+template <typename T>
+concept HasAddRoster =
+    requires(T& t, const int id, const double wage, world::Workspace& workspace) {
+        { t.addRoster(id, wage, workspace) } -> std::same_as<SafePtr<world::RosterEntry>>;
+    };
+
+class [[nodiscard]] Recruiter {
+  public:
+    Recruiter(pcg32& masterRng);
+
+    void post(
+        const int                                    id,
+        const int                                    desiredEmploy,
+        tbb::concurrent_vector<world::LaborRequest>& requestBox
+    );
+    void offer();
+    void registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace);
+    void endStep(world::CensusDropBox& dropBox);
+
+  private:
+    RequestPlanner planner_;
+
     SafePtr<world::LaborRequest>            myRequest_{nullptr};
     std::vector<SafePtr<world::LaborEntry>> offerApplicants_;
     bool                                    isPosting_{false};
+
+    struct {
+        int  remainOfferNum;
+        int  applicantNum;
+        int  employing;
+        void reset() { remainOfferNum = 0, applicantNum = 0, employing = 0; }
+    } ledger_{};
+
+    bool isRecruiting_{false};
 };
-struct Component {
-    pcg32            rng_;
-    Log              log_;
-    Plan             plan_{};
-    Posting          posting_{};
-    HR               humanResources_;
-    EmploymentLedger employmentLedger{};
-    Parameter        parameter_;
 
-    Component(
-        const std::uint64_t state, const std::uint64_t stream, world::CompanyBoard& companyBoard
-    );
-
-    [[nodiscard]] auto sumWage() const -> double { return humanResources_.sumWage_; }
-    [[nodiscard]] auto employeeCnt() const -> int {
-        const std::size_t rosterSize{
-            humanResources_.companyBoard_.roster.size() - humanResources_.emptyRosterPool_.size()
-        };
+class [[nodiscard]] HumanResourceManager {
+  public:
+    HumanResourceManager(world::CompanyBoard& companyBoard);
+    auto addRoster(const int id, const double wage, world::Workspace& workspace)
+        -> SafePtr<world::RosterEntry>;
+    void acceptResignation();
+    void layOffs(const int layOffsCnt);
+    auto employeeCnt() const -> int {
+        const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return static_cast<int>(rosterSize);
     }
+    auto sumWage() const -> double {
+        auto& roster = companyBoard_.roster;
+        auto  view{
+            roster | std::views::filter([](const world::RosterEntry& e) -> bool {
+                return not e.isOccupied;
+            }) |
+            std::views::transform(&world::RosterEntry::wage)
+        };
+        return std::reduce(view.begin(), view.end(), 0.0);
+    }
+
+  private:
+    world::CompanyBoard&                     companyBoard_;
+    std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
+};
+
+class [[nodiscard]] LaborDemander {
+  public:
+    LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard);
+    void post(
+        const int                                    id,
+        const int                                    desiredEmploy,
+        tbb::concurrent_vector<world::LaborRequest>& requestBox
+    ) {
+        recruiter_.post(id, desiredEmploy, requestBox);
+    }
+    void offer() { recruiter_.offer(); }
+    void layOffs(const int layOffsCnt) { hrManager_.layOffs(layOffsCnt); }
+    void registerMember(world::Workspace& workspace) {
+        recruiter_.registerMember(hrManager_, workspace);
+    };
+    void acceptResignation() { hrManager_.acceptResignation(); }
+    auto employeeCnt() const -> int { return hrManager_.employeeCnt(); }
+    auto sumWage() const -> double { return hrManager_.sumWage(); }
+    void endStep(world::CensusDropBox& dropBox) { recruiter_.endStep(dropBox); }
+
+  private:
+    Recruiter            recruiter_;
+    HumanResourceManager hrManager_;
 };
 }  // namespace labor_demander

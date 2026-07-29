@@ -74,43 +74,43 @@ struct GoodsEntry {
 };
 
 struct CensusDropBox {
-    std::vector<double> firmAssets_;
-    std::vector<double> postedEmployments_;
-    std::vector<double> employments_;
-    std::vector<double> prices_;
-    std::vector<double> supplies_;
-    std::vector<double> markups_;
-    std::vector<double> inventories_;
+    std::vector<double> firmAssets;
+    std::vector<double> postedEmployments;
+    std::vector<double> employments;
+    std::vector<double> prices;
+    std::vector<double> supplies;
+    std::vector<double> markups;
+    std::vector<double> inventories;
 
-    std::vector<double> hholdAssets_;
-    std::vector<double> wages_;
+    std::vector<double> hholdAssets;
+    std::vector<double> wages;
 
     CensusDropBox() {
         constexpr std::size_t firmCnt{static_cast<std::size_t>(config::agent_count::firm)};
         constexpr std::size_t hholdCnt{static_cast<std::size_t>(config::agent_count::hhold)};
-        firmAssets_.reserve(firmCnt);
-        postedEmployments_.reserve(firmCnt);
-        employments_.reserve(firmCnt);
-        prices_.reserve(firmCnt);
-        supplies_.reserve(firmCnt);
-        markups_.reserve(firmCnt);
-        inventories_.reserve(firmCnt);
+        firmAssets.reserve(firmCnt);
+        postedEmployments.reserve(firmCnt);
+        employments.reserve(firmCnt);
+        prices.reserve(firmCnt);
+        supplies.reserve(firmCnt);
+        markups.reserve(firmCnt);
+        inventories.reserve(firmCnt);
 
-        hholdAssets_.reserve(hholdCnt);
-        wages_.reserve(hholdCnt);
+        hholdAssets.reserve(hholdCnt);
+        wages.reserve(hholdCnt);
     }
 
     void clear() {
-        firmAssets_.clear();
-        postedEmployments_.clear();
-        employments_.clear();
-        prices_.clear();
-        supplies_.clear();
-        markups_.clear();
-        inventories_.clear();
+        firmAssets.clear();
+        postedEmployments.clear();
+        employments.clear();
+        prices.clear();
+        supplies.clear();
+        markups.clear();
+        inventories.clear();
 
-        hholdAssets_.clear();
-        wages_.clear();
+        hholdAssets.clear();
+        wages.clear();
     }
 };
 }  // namespace world

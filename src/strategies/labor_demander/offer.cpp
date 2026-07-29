@@ -1,4 +1,4 @@
-#include "strategies/labor_demander/offer.hpp"
+#include "components/labor_demander.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
@@ -7,7 +7,7 @@
 
 #include "world/message.hpp"
 
-namespace labor_demander::internal {
+namespace {
 void sortApplicants(
     const int                                               offer,
     std::vector<std::reference_wrapper<world::LaborEntry>>& applicants,
@@ -29,30 +29,26 @@ void sortApplicants(
         }
     );
 }
-}  // namespace labor_demander::internal
+}  // namespace
 
 namespace labor_demander {
-void offerApplicants(OfferApplicantsView view) {
-    if (not view.isPosting()) return;
-    auto& myRequest = view.myRequest();
-    if (myRequest.entryBox.empty()) {
-        view.isPosting(false);
+void Recruiter::offer() {
+    if (not isPosting_) return;
+    if (myRequest_->entryBox.empty()) {
+        isPosting_ = false;
         return;
     }
 
-    const int offer{view.offerPlan()};
-
     static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
-    internal::sortApplicants(offer, applicants, myRequest.entryBox);
-    assert(applicants.size() == myRequest.entryBox.size());
+    sortApplicants(ledger_.remainOfferNum, applicants, myRequest_->entryBox);
 
-    int offerNum{};
     for (auto entryRef : applicants) {
+        if (ledger_.remainOfferNum <= 0) break;
         world::LaborEntry& entry = entryRef.get();
-        if (offerNum >= offer) break;
-        entry.isOffer = true;
-        view.recordOffer(entry);
-        ++offerNum;
+        entry.isOffer            = true;
+        offerApplicants_.emplace_back(&entry);
+        --ledger_.remainOfferNum;
     }
+    ledger_.applicantNum += static_cast<int>(myRequest_->entryBox.size());
 }
 }  // namespace labor_demander

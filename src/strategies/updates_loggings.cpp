@@ -14,67 +14,52 @@
 
 namespace firm_finance {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.firmAssets_.emplace_back(comp.asset_);
+    dropBox.firmAssets.emplace_back(comp.asset_);
 }
 }  // namespace firm_finance
 namespace hhold_finance {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.hholdAssets_.emplace_back(comp.asset_);
+    dropBox.hholdAssets.emplace_back(comp.asset_);
 }
 }  // namespace hhold_finance
 
 namespace labor_demander {
-namespace {
-struct [[nodiscard]] UpdateAcceptanceRateView final : BaseView<Component> {
-    using BaseView<Component>::BaseView;
-    auto offerRate() const -> double { return comp_.parameter_.offerRate_; }
-    auto offerAdjustmentVolatility() const -> double {
-        return comp_.parameter_.offerAdjustmentVolatility_;
-    }
-    auto targetEmploy() const -> double { return comp_.plan_.employ_; }
-    auto actualEmploy() const -> double { return comp_.employmentLedger.employing_; }
-    auto rng() const -> pcg32& { return comp_.rng_; }
-};
-
-[[nodiscard]] auto updateAcceptanceRate(const UpdateAcceptanceRateView& view) -> double {
-    const double alpha{
-        std::abs(helper::randNormal(view.rng(), 0.0, view.offerAdjustmentVolatility()))
-    };
-    const bool   shouldRaise{view.actualEmploy() < view.targetEmploy()};
-    const double offerRate{view.offerRate() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+auto RequestPlanner::updateOfferRate(const int actualEmploy) const -> double {
+    const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.offerAdjustVol, -1.0, 1.0))};
+    const bool   shouldRaise{actualEmploy < plan_.employ};
+    const double offerRate{param_.offerRate * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
     return std::max(0.0, offerRate);
 }
-}  // namespace
 
-void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.postedEmployments_.emplace_back((comp.plan_.isRecruiting) ? comp.plan_.employ_ : 0.0);
-    dropBox.employments_.emplace_back(comp.employmentLedger.employing_);
+void RequestPlanner::endStep(
+    world::CensusDropBox& dropBox, const int actualEmploy, const int applicantNum
+) {
+    dropBox.postedEmployments.emplace_back(plan_.employ);
+    log_ = {
+        .wage         = plan_.wage,
+        .actualEmploy = actualEmploy,
+        .offerPlan    = plan_.offer,
+        .applicantNum = applicantNum
+    };
+    param_.offerRate = updateOfferRate(actualEmploy);
+    plan_.reset();
 }
-void reset(Component& comp) {
-    if (comp.plan_.isRecruiting) {
-        comp.log_ = {
-            .wage_         = comp.plan_.wage_,
-            .actualEmploy_ = comp.employmentLedger.employing_,
-            .offerPlan_    = comp.plan_.offer_,
-            .applicantNum_ = comp.employmentLedger.applicantNum_
-        };
-        comp.parameter_.offerRate_ = updateAcceptanceRate(UpdateAcceptanceRateView{comp});
-    }
 
-    comp.plan_ = {.isRecruiting = false, .wage_ = 0.0, .employ_ = 0, .offer_ = 0};
-    comp.humanResources_.sumWage_ += comp.employmentLedger.sumWage_;
-    comp.employmentLedger    = {.applicantNum_ = 0, .employing_ = 0, .sumWage_ = 0.0};
-    comp.posting_.myRequest_ = nullptr;
-    comp.posting_.isPosting_ = false;
-    comp.posting_.offerApplicants_.clear();
-    comp.humanResources_.companyBoard_.resignationBox.clear();
+void Recruiter::endStep(world::CensusDropBox& dropBox) {
+    if (not isRecruiting_) return;
+    planner_.endStep(dropBox, ledger_.employing, ledger_.applicantNum);
+    myRequest_ = nullptr;
+    offerApplicants_.clear();
+    isPosting_ = false;
+    ledger_.reset();
+    isRecruiting_ = false;
 }
 }  // namespace labor_demander
 
 namespace labor_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
     if (not comp.rosterEntry_) return;
-    dropBox.wages_.emplace_back(comp.rosterEntry_->wage);
+    dropBox.wages.emplace_back(comp.rosterEntry_->wage);
 }
 void reset(Component& comp) {
     comp.posting_.myEntries_.clear();
@@ -92,10 +77,10 @@ void reset(Component& comp) {
 
 namespace goods_supplier {
 void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.prices_.emplace_back(comp.plan_.price_);
-    dropBox.supplies_.emplace_back(comp.plan_.supply_);
-    dropBox.markups_.emplace_back(comp.plan_.markup_);
-    dropBox.inventories_.emplace_back(comp.production_.inventory_);
+    dropBox.prices.emplace_back(comp.plan_.price_);
+    dropBox.supplies.emplace_back(comp.plan_.supply_);
+    dropBox.markups.emplace_back(comp.plan_.markup_);
+    dropBox.inventories.emplace_back(comp.production_.inventory_);
 }
 void reset(Component& comp) {
     comp.log_ = {

@@ -30,6 +30,10 @@ struct PCG32Seed {
     return {.state = state, .stream = stream};
 }
 
+[[nodiscard]] constexpr auto makeSeed(pcg32& rng) -> std::uint64_t {
+    return (static_cast<std::uint64_t>(rng()) << 32 | rng());
+}
+
 [[nodiscard]] constexpr auto rand(
     std::uniform_random_bit_generator auto& rng, const double min = 0.0, const double max = 1.0
 ) -> double {

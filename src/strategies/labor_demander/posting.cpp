@@ -1,49 +1,47 @@
-#include "strategies/labor_demander/posting.hpp"
+#include "components/labor_demander.hpp"
 
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <cmath>
+#include <config.hpp>
 #include <pcg_random.hpp>
 
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace labor_demander::internal {
-[[nodiscard]] auto wageGuard(const double wage, const double epsilon) -> double {
-    return std::max(wage, epsilon);
+namespace {
+[[nodiscard]] auto wageGuard(const double wage) -> double {
+    return std::max(wage, config::labor_demander::epsilonWage);
 }
+}  // namespace
 
-[[nodiscard]] auto calcNextWage(const CalcNextWageView& view) -> double {
-    const bool   shouldRaiseWage{view.lastApplicantNum() < view.lastOfferPlan()};
-    const double alpha{std::abs(helper::randNormal(view.rng(), 0.0, view.wageAdjustVol()))};
-    const double nextWage{view.lastWage() * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
+namespace labor_demander {
+[[nodiscard]] auto RequestPlanner::calcNextWage() const -> double {
+    const bool   shouldRaiseWage{log_.applicantNum < log_.offerPlan};
+    const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.wageAdjustVol))};
+    const double nextWage{log_.wage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
     return wageGuard(nextWage);
 }
 
-[[nodiscard]] auto calcNextOffer(const CalcNextOfferView& view, const int employ) -> int {
-    const double offerRate{view.offerRate()};
-    assert(offerRate >= 0.0 && "acceptance rate is required > 0");
-    const double offer{employ * (1.0 + offerRate)};
+[[nodiscard]] auto RequestPlanner::calcNextOffer(const int employ) const -> int {
+    const double offer{employ * (1.0 + param_.offerRate)};
     return static_cast<int>(std::round(offer));
 }
-}  // namespace labor_demander::internal
 
-namespace labor_demander {
-void postJob(
-    const int                                    id,
-    const int                                    desiredEmploy,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    PostJobView                                  view
+void RequestPlanner::judgePlan(const int desiredEmploy) {
+    plan_ = {
+        .wage = calcNextWage(), .employ = desiredEmploy, .offer = calcNextOffer(desiredEmploy)
+    };
+}
+
+void Recruiter::post(
+    const int id, const int desiredEmploy, tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
-    view.isRecruiting(true);
-    const double nextWage{internal::calcNextWage(internal::CalcNextWageView{view})};
-    const int nextOffer{internal::calcNextOffer(internal::CalcNextOfferView{view}, desiredEmploy)};
-    view.plan(nextWage, desiredEmploy, nextOffer);
-    if (desiredEmploy == 0) {
-        view.posting(false);
-        return;
-    }
-    view.posting(true);
-    view.myRequest(requestBox.emplace_back(id, nextWage));
+    isRecruiting_ = true;
+    planner_.judgePlan(desiredEmploy);
+    if (planner_.offerPlan() == 0) return;
+    isPosting_ = true;
+    auto it{requestBox.emplace_back(id, planner_.wagePlan())};
+    myRequest_ = &*it;
 }
 }  // namespace labor_demander

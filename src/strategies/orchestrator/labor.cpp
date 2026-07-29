@@ -5,32 +5,25 @@
 
 #include "components/common.hpp"
 #include "strategies/goods_supplier/calc_employ.hpp"
-#include "strategies/labor_demander/lay_offs.hpp"
-#include "strategies/labor_demander/offer.hpp"
-#include "strategies/labor_demander/posting.hpp"
-#include "strategies/labor_demander/register.hpp"
 #include "strategies/labor_supplier/accept.hpp"
 #include "strategies/labor_supplier/entry.hpp"
 #include "strategies/updates_loggings.hpp"
 #include "world/message.hpp"
 
 namespace labor {
-void AdjustWorkforce(
+void adjustWorkforce(
     const agent_index::Component&                indexComp,
     goods_supplier::Component&                   goodsSupplier,
-    labor_demander::Component&                   laborDemander,
+    labor_demander::LaborDemander&               laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
-    const int id{indexComp.id()};
     const int desiredEmploy{goods_supplier::calcDesiredEmploy(
         goods_supplier::CalcDesiredEmployView{goodsSupplier}, laborDemander.employeeCnt()
     )};
     if (desiredEmploy > 0) {
-        labor_demander::postJob(
-            id, desiredEmploy, requestBox, labor_demander::PostJobView{laborDemander}
-        );
+        laborDemander.post(indexComp.id(), desiredEmploy, requestBox);
     } else if (desiredEmploy < 0) {
-        labor_demander::layoffs(labor_demander::LayOffsView{laborDemander}, -desiredEmploy);
+        laborDemander.layOffs(-desiredEmploy);
     }
 }
 
@@ -45,20 +38,16 @@ void jobEntry(
     labor_supplier::jobEntry(labor_supplier::JobEntryView{laborSupplier}, id, requestBox);
 }
 
-void offer(labor_demander::Component& laborDemander) {
-    labor_demander::offerApplicants(labor_demander::OfferApplicantsView{laborDemander});
-}
+void offer(labor_demander::LaborDemander& laborDemander) { laborDemander.offer(); }
 
 void acceptOffer(labor_supplier::Component& laborSupplier) {
     labor_supplier::acceptOffer(labor_supplier::AcceptOfferView{laborSupplier});
 }
 
 void registerMember(
-    goods_supplier::Component& goodsSupplier, labor_demander::Component& laborDemander
+    goods_supplier::Component& goodsSupplier, labor_demander::LaborDemander& laborDemander
 ) {
-    labor_demander::registerMember(
-        labor_demander::RegisterMemberView{laborDemander}, goodsSupplier.workspace()
-    );
+    laborDemander.registerMember(goodsSupplier.workspace());
 }
 
 void recordRosterEntry(labor_supplier::Component& laborSuppler) {
@@ -67,17 +56,16 @@ void recordRosterEntry(labor_supplier::Component& laborSuppler) {
     laborSuppler.rosterEntry(rosterEntry);
 }
 
-void acceptResignation(labor_demander::Component& laborDemander) {
-    labor_demander::acceptResignation(labor_demander::AcceptResignationView{laborDemander});
+void acceptResignation(labor_demander::LaborDemander& laborDemander) {
+    laborDemander.acceptResignation();
 }
 
 void endStep(
-    firm_finance::Component&   financeComp,
-    labor_demander::Component& laborDemander,
-    world::CensusDropBox&      dropBox
+    firm_finance::Component&       financeComp,
+    labor_demander::LaborDemander& laborDemander,
+    world::CensusDropBox&          dropBox
 ) {
-    labor_demander::logging(dropBox, laborDemander);
-    labor_demander::reset(laborDemander);
+    laborDemander.endStep(dropBox);
     financeComp.assetPlus(-laborDemander.sumWage());
 }
 void endStep(

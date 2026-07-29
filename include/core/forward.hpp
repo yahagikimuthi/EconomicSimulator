@@ -20,7 +20,7 @@ namespace hhold_finance {
 struct Component;
 }
 namespace labor_demander {
-struct Component;
+class LaborDemander;
 }
 namespace labor_supplier {
 struct Component;
@@ -29,5 +29,6 @@ namespace goods_demander {
 struct Component;
 }
 namespace goods_supplier {
+class GoodsSupplier;
 struct Component;
-}
+}  // namespace goods_supplier

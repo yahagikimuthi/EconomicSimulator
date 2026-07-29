@@ -30,7 +30,7 @@ void Engine::run() {
 
 void Engine::runLabor() {
     for (Firm& firm : firms_) {
-        labor::AdjustWorkforce(firm.index, firm.goods, firm.labor, laborRequestBox_);
+        labor::adjustWorkforce(firm.index, firm.goods, firm.labor, laborRequestBox_);
     }
 
     for (HHold& hhold : hholds_) {
@@ -112,16 +112,16 @@ void Engine::reset() {
 }
 
 void Engine::check() const {
-    const long long sumFirmAsset{static_cast<long long>(
-        std::ranges::fold_left(firms_, 0.0, [](const double acc, const Firm& firm) -> double {
-            return acc + firm.finance.asset_;
-        })
-    )};
-    const long long sumHHoldAsset{static_cast<long long>(
-        std::ranges::fold_left(hholds_, 0.0, [](const double acc, const HHold& hhold) -> double {
-            return acc + hhold.finance.asset_;
-        })
-    )};
+    const long long sumFirmAsset{static_cast<long long>(std::ranges::fold_left(
+        firms_,
+        0.0,
+        [](const double acc, const Firm& firm) -> double { return acc + firm.finance.asset_; }
+    ))};
+    const long long sumHHoldAsset{static_cast<long long>(std::ranges::fold_left(
+        hholds_,
+        0.0,
+        [](const double acc, const HHold& hhold) -> double { return acc + hhold.finance.asset_; }
+    ))};
     std::println("step:{}, {}", currentStep_, sumFirmAsset + sumHHoldAsset);
 }
 
@@ -134,14 +134,14 @@ void Logger::save(const world::CensusDropBox& dropBox, const int step) {
         group.createDataSet(static_cast<std::string>(dataName), data);
     }};
 
-    create(name::firmAssets, dropBox.firmAssets_);
-    create(name::postedEmployments, dropBox.postedEmployments_);
-    create(name::employments, dropBox.employments_);
-    create(name::prices, dropBox.prices_);
-    create(name::supplies, dropBox.supplies_);
-    create(name::markups, dropBox.markups_);
-    create(name::inventories, dropBox.inventories_);
-    create(name::householdAssets, dropBox.hholdAssets_);
-    create(name::wages, dropBox.wages_);
+    create(name::firmAssets, dropBox.firmAssets);
+    create(name::postedEmployments, dropBox.postedEmployments);
+    create(name::employments, dropBox.employments);
+    create(name::prices, dropBox.prices);
+    create(name::supplies, dropBox.supplies);
+    create(name::markups, dropBox.markups);
+    create(name::inventories, dropBox.inventories);
+    create(name::householdAssets, dropBox.hholdAssets);
+    create(name::wages, dropBox.wages);
 }
 }  // namespace core
