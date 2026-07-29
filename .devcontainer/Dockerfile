@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     clang-format \
     git \
     curl \
+    openssh-client \
+    ca-certificates \
     tar \
     unzip \
     zip \
