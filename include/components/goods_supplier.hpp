@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <cstdint>
 #include <pcg_random.hpp>
 
 #include "core/base.hpp"
@@ -12,21 +11,26 @@ namespace goods_supplier {
 class [[nodiscard]] Planner {
   public:
     Planner(pcg32& masterRng);
-    void judgePlan(const double supply, const double totalCost);
-    auto pricePlan() const -> double { return plan_.price; }
-    auto demandForecast() const -> double { return log_.demandForecast; }
-    auto lastSupply() const -> double { return log_.supply; }
-    auto targetInvRatio() const -> double { return param_.targetInvRatio; }
-    void endStep(
-        const double totalDemand, const double unsoldAmount, world::CensusDropBox& dropBox
-    );
+    void judgePlan(const double supply, const double totalCost) PRE(supply >= 0.0)
+        PRE(totalCost >= 0.0);
+    auto pricePlan() const -> double POST(price : price > 0.0) { return plan_.price; }
+    auto demandForecast() const -> double POST(forecast : forecast >= 0.0) {
+        return log_.demandForecast;
+    }
+    auto lastSupply() const -> double POST(supply : supply >= 0.0) { return log_.supply; }
+    auto targetInvRatio() const -> double POST(ratio : ratio >= 0.0) {
+        return param_.targetInvRatio;
+    }
+    void endStep(const double totalDemand, const double unsoldAmount, world::CensusDropBox& dropBox)
+        PRE(totalDemand >= 0.0) PRE(unsoldAmount >= 0.0);
 
   private:
-    auto calcMarkup() const -> double;
+    auto calcMarkup() const -> double POST(markup : markup > 0.0);
     auto judgePrice(const double supply, const double markup, const double totalCost) const
-        -> double;
-    auto updateDemandForecast(const double totalDemand) const -> double;
-    auto isSold(const double unsoldAmount) const -> bool;
+        -> double PRE(supply >= 0.0) PRE(markup > 0.0) PRE(totalCost >= 0.0) POST(price
+                                                                                  : price > 0.0);
+    auto updateDemandForecast(const double totalDemand) const -> double PRE(totalDemand >= 0.0);
+    auto isSold(const double unsoldAmount) const -> bool PRE(unsoldAmount >= 0.0);
 
     mutable pcg32 rng_;
     struct {
@@ -57,9 +61,9 @@ class Trader {
         tbb::concurrent_vector<world::GoodsEntry>& entryBox
     );
     void trade();
-    auto inventory() const -> double { return ledger_.inventory; }
-    auto sales() const -> double { return ledger_.currentSales; }
-    auto totalDemand() const -> double { return ledger_.totalDemand; }
+    auto inventory() const -> double POST(inv : inv >= 0.0) { return ledger_.inventory; }
+    auto sales() const -> double POST(sales : sales >= 0.0) { return ledger_.currentSales; }
+    auto totalDemand() const -> double POST(demand : demand >= 0.0) { return ledger_.totalDemand; }
     void endStep() { myEntry_ = nullptr, isPosting = false, ledger_.reset(); }
 
   private:
@@ -84,8 +88,10 @@ class [[nodiscard]] Producer {
         const double lastSupply,
         const double targetInvRatio,
         const int    employeeCnt
-    ) const -> int;
-    void endStep(const double unsoldAmount, world::CensusDropBox& dropBox) {
+    ) const -> int PRE(demandForecast >= 0.0) PRE(lastSupply >= 0.0) PRE(targetInvRatio >= 0.0)
+                PRE(employeeCnt >= 0);
+    void endStep(const double unsoldAmount, world::CensusDropBox& dropBox)
+        PRE(unsoldAmount >= 0.0) {
         inventory_ = unsoldAmount;
         dropBox.inventories.emplace_back(inventory_);
     }
@@ -93,7 +99,8 @@ class [[nodiscard]] Producer {
 
   private:
     auto calcTargetProduction(const double demandForecast, const double targetInvRatio) const
-        -> double;
+        -> double PRE(demandForecast >= 0.0) PRE(targetInvRatio >= 0.0) POST(production
+                                                                             : production >= 0.0);
 
     world::Workspace& workspace_;
     const double      firmProductPower_;
@@ -105,7 +112,9 @@ class [[nodiscard]] GoodsSupplier {
     GoodsSupplier(pcg32& masterRng, world::Workspace& workspace);
     void post(const double totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox);
     void trade() { trader_.trade(); }
-    auto calcDesiredEmploy(const int employeeCnt) const -> int;
+    auto calcDesiredEmploy(const int employeeCnt) const -> int PRE(employeeCnt >= 0)
+                                                            POST(employ
+                                                                 : employ >= 0);
     void endStep(world::CensusDropBox& dropBox);
     auto sales() const -> double { return trader_.sales(); }
     auto workspace() -> world::Workspace& { return producer_.workspace(); }

@@ -11,13 +11,13 @@ struct CensusDropBox;
 }  // namespace world
 
 namespace agent_index {
-struct Component;
+class Component;
 }
 namespace firm_finance {
-struct Component;
+class Component;
 }
 namespace hhold_finance {
-struct Component;
+class Component;
 }
 namespace labor_demander {
 class LaborDemander;

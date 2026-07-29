@@ -110,19 +110,7 @@ void Engine::reset() {
     goodsEntryBox_.clear();
 }
 
-void Engine::check() const {
-    const long long sumFirmAsset{static_cast<long long>(std::ranges::fold_left(
-        firms_,
-        0.0,
-        [](const double acc, const Firm& firm) -> double { return acc + firm.finance.asset_; }
-    ))};
-    const long long sumHHoldAsset{static_cast<long long>(std::ranges::fold_left(
-        hholds_,
-        0.0,
-        [](const double acc, const HHold& hhold) -> double { return acc + hhold.finance.asset_; }
-    ))};
-    std::println("step:{}, {}", currentStep_, sumFirmAsset + sumHHoldAsset);
-}
+void Engine::check() const {}
 
 void Logger::save(const world::CensusDropBox& dropBox, const int step) {
     namespace name = config::save_name;

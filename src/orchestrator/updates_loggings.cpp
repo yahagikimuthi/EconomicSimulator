@@ -11,14 +11,10 @@
 #include "world/message.hpp"
 
 namespace firm_finance {
-void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.firmAssets.emplace_back(comp.asset_);
-}
+void logging(world::CensusDropBox& dropBox, const Component& comp) { comp.endStep(dropBox); }
 }  // namespace firm_finance
 namespace hhold_finance {
-void logging(world::CensusDropBox& dropBox, const Component& comp) {
-    dropBox.hholdAssets.emplace_back(comp.asset_);
-}
+void logging(world::CensusDropBox& dropBox, const Component& comp) { comp.endStep(dropBox); }
 }  // namespace hhold_finance
 
 namespace labor_demander {

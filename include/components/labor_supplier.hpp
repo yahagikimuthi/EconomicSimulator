@@ -27,7 +27,7 @@ class JobHunter {
         const double                                 productPower,
         tbb::concurrent_vector<world::LaborRequest>& requestBox,
         const int                                    entryCnt = config::labor_supplier::jobEntryCnt
-    );
+    ) PRE(id >= 0) PRE(productPower > 0.0) PRE(entryCnt > 0);
     void accept();
     void endStep() { myEntries_.clear(), acceptedEntry_ = nullptr, isPosting_ = false; }
     auto acceptedEntry() const -> SafePtr<world::LaborEntry> { return acceptedEntry_; }
@@ -46,11 +46,13 @@ class Employment {
         resign();
         rosterEntry_ = rosterEntry;
     }
-    auto contractFirmId() const -> int {
+    auto contractFirmId() const -> int POST(id : id >= 0) {
         return isEmployed() ? rosterEntry_->companyBoard.firmId : -1;
     }
-    auto wage() const -> double { return isEmployed() ? rosterEntry_->wage : 0.0; }
-    void product(const double productPower) {
+    auto wage() const -> double POST(wage : wage >= 0.0) {
+        return isEmployed() ? rosterEntry_->wage : 0.0;
+    }
+    void product(const double productPower) PRE(productPower >= 0.0) {
         if (not isEmployed()) return;
         auto& workspace = rosterEntry_->workspace;
         workspace.totalLaborInput += workspace.firmProductPower * productPower;
@@ -72,7 +74,7 @@ class Employment {
 class LaborSupplier {
   public:
     LaborSupplier(pcg32& masterRng);
-    void entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox);
+    void entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) PRE(id >= 0);
     void accept() { jobHunter_.accept(); }
     void recordRosterEntry() {
         const SafePtr<world::LaborEntry> acceptedEntry{jobHunter_.acceptedEntry()};
@@ -84,7 +86,7 @@ class LaborSupplier {
         jobHunter_.endStep();
     }
     void product() { employment_.product(productPower_); }
-    auto wage() const -> double { return employment_.wage(); }
+    auto wage() const -> double POST(wage : wage >= 0.0) { return employment_.wage(); }
     auto isEligibleRequest(const world::LaborRequest& request) const -> bool {
         if (request.firmID == employment_.contractFirmId()) return false;
         if (request.wage < employment_.wage()) return false;

@@ -1,25 +1,16 @@
 #pragma once
 
 #include <cassert>
-#include <concepts>
 
-template <typename ComponentType>
-struct BaseView {
-    explicit BaseView(ComponentType& comp) : comp_{comp} {}
-
-    template <typename DerivedView>
-        requires std::derived_from<std::remove_cvref_t<DerivedView>, BaseView<ComponentType>>
-    explicit BaseView(DerivedView& derived) : comp_{derived.comp_} {}
-
-    BaseView(const BaseView&)                    = default;
-    auto operator=(const BaseView&) -> BaseView& = default;
-    BaseView(BaseView&&)                         = default;
-    auto operator=(BaseView&&) -> BaseView&      = default;
-
-  protected:
-    ~BaseView() = default;
-    ComponentType& comp_;
-};
+#ifdef __clang__
+#define PRE(...)
+#define POST(...)
+#define ASSERT(...) assert(__VA_ARGS__)
+#else
+#define PRE(...) pre(__VA_ARGS__)
+#define POST(...) post(__VA_ARGS__)
+#define ASSERT(...) contract_assert(__VA_ARGS__)
+#endif
 
 template <typename T>
 class [[nodiscard]] SafePtr {

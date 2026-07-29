@@ -14,7 +14,7 @@ class [[nodiscard]] GoodsDemander {
 
     void request(
         const double asset, const int step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
-    );
+    ) PRE(step >= 0);
     void afterTrade() {
         if (not isPosting_) return;
         purchasing_ += myRequest_->tradeAmount * myRequest_->entry.price;
@@ -31,7 +31,7 @@ class [[nodiscard]] GoodsDemander {
         const double                                     asset,
         const int                                        step,
         const tbb::concurrent_vector<world::GoodsEntry>& entryBox
-    ) const -> bool;
+    ) const -> bool PRE(step >= 0);
     auto calcBudget(const double asset) const -> double { return asset * mpc_; }
 
     pcg32                              rng_;

@@ -1,6 +1,4 @@
-#include <cstdint>
 #include <pcg_random.hpp>
-#include <world/message.hpp>
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
@@ -9,16 +7,15 @@
 #include "components/labor_supplier.hpp"
 #include "config.hpp"
 #include "helper.hpp"
+#include "world/message.hpp"
 
 using namespace helper;
 
 namespace firm_finance {
-Component::Component(const std::uint64_t state, const std::uint64_t stream)
-    : rng_{state, stream}, asset_{rand(rng_, 100000, 500000)} {}
+Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 100000, 500000)} {}
 }  // namespace firm_finance
 namespace hhold_finance {
-Component::Component(const std::uint64_t state, const std::uint64_t stream)
-    : rng_{state, stream}, asset_{rand(rng_, 100000, 500000)} {}
+Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 100000, 500000)} {}
 }  // namespace hhold_finance
 
 namespace labor_demander {
@@ -79,7 +76,9 @@ Trader::Trader(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)
 Producer::Producer(pcg32& masterRng, world::Workspace& workspace)
     : workspace_{workspace},
       firmProductPower_{rand(masterRng, 0.01, 0.05)},
-      inventory_{rand(masterRng, 0.5, 2.0)} {}
+      inventory_{rand(masterRng, 0.5, 2.0)} {
+    workspace_.firmProductPower = firmProductPower_;
+}
 GoodsSupplier::GoodsSupplier(pcg32& masterRng, world::Workspace& workspace)
     : planner_{masterRng}, trader_{masterRng}, producer_{masterRng, workspace} {}
 }  // namespace goods_supplier
