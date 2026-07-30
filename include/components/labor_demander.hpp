@@ -62,8 +62,11 @@ class [[nodiscard]] Recruiter {
         tbb::concurrent_vector<world::LaborRequest>& requestBox
     ) PRE(id >= 0) PRE(desiredEmploy >= 0);
     void offer();
-    void registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace);
     void endStep(world::CensusDropBox& dropBox);
+    auto isPosting() const -> bool { return isPosting_; }
+    auto offerApplicants() -> std::vector<SafePtr<world::LaborEntry>>& { return offerApplicants_; }
+    auto myRequest() -> const world::LaborRequest& { return *myRequest_; }
+    void addEmployingLedger(const int plus) { ledger_.employing += plus; }
 
   private:
     RequestPlanner planner_;
@@ -121,9 +124,7 @@ class [[nodiscard]] LaborDemander {
     }
     void offer() { recruiter_.offer(); }
     void layOffs(const int layOffsCnt) PRE(layOffsCnt > 0) { hrManager_.layOffs(layOffsCnt); }
-    void registerMember(world::Workspace& workspace) {
-        recruiter_.registerMember(hrManager_, workspace);
-    };
+    void registerMember(world::Workspace& workspace);
     void acceptResignation() { hrManager_.acceptResignation(); }
     auto employeeCnt() const -> int POST(cnt : cnt >= 0) { return hrManager_.employeeCnt(); }
     auto sumWage() const -> double POST(wage : wage >= 0.0) { return hrManager_.sumWage(); }

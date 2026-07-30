@@ -7,21 +7,18 @@
 #include "world/message.hpp"
 
 namespace labor_demander {
-void Recruiter::registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace) {
-    if (not isPosting_) return;
 
+void LaborDemander::registerMember(world::Workspace& workspace) {
+    if (not recruiter_.isPosting()) return;
     int employCnt{};
-    for (SafePtr<world::LaborEntry> offeredApplicant : offerApplicants_) {
+    for (SafePtr<world::LaborEntry> offeredApplicant : recruiter_.offerApplicants()) {
         if (not offeredApplicant->isAccept) continue;
         offeredApplicant->rosterEntry =
-            hasAddRoster.addRoster(offeredApplicant->hholdID, myRequest_->wage, workspace);
+            hrManager_.addRoster(offeredApplicant->hholdID, recruiter_.myRequest().wage, workspace);
         ++employCnt;
     }
-    ledger_.employing += employCnt;
+    recruiter_.addEmployingLedger(employCnt);
 }
-
-template void
-Recruiter::registerMember<HumanResourceManager>(HumanResourceManager&, world::Workspace&);
 
 auto HumanResourceManager::addRoster(const int id, const double wage, world::Workspace& workspace)
     -> SafePtr<world::RosterEntry> {
