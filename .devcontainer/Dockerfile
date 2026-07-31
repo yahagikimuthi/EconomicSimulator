@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     build-essential \
     ninja-build \
+    gdb \
+    lldb \
     python3 \
     python3-pip \
     clang-format \
