@@ -56,8 +56,7 @@ auto LaborSupplier::shouldSearchJob() const -> bool {
 
 void JobHunter::entry(
     const int                                    id,
-    const HasIsEligibleRequest auto&             hasIsEligibleRequest,
-    const double                                 productPower,
+    const LaborSupplier&                         laborSupplier,
     tbb::concurrent_vector<world::LaborRequest>& requestBox,
     const int                                    entryCnt
 ) {
@@ -68,24 +67,17 @@ void JobHunter::entry(
     for (const auto i :
          std::views::iota(0UZ, std::min(static_cast<std::size_t>(entryCnt), requestBox.size()))) {
         auto& request = sampleRequests[i].get();
-        if (not hasIsEligibleRequest.isEligibleRequest(request)) continue;
+        if (not laborSupplier.isEligibleRequest(request)) continue;
         auto& entryBox = request.entryBox;
-        auto  it{entryBox.emplace_back(id, productPower, request)};
+        auto  it{entryBox.emplace_back(id, laborSupplier.productPower(), request)};
         myEntries_.emplace_back(&*it);
     }
 }
-template void JobHunter::entry<LaborSupplier>(
-    const int,
-    const LaborSupplier&,
-    const double,
-    tbb::concurrent_vector<world::LaborRequest>&,
-    const int
-);
 
 void LaborSupplier::entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
     updateRosterEntry();
     if (not shouldSearchJob()) return;
     if (requestBox.empty()) return;
-    jobHunter_.entry(id, *this, productPower_, requestBox);
+    jobHunter_.entry(id, *this, requestBox);
 }
 }  // namespace labor_supplier
