@@ -1,19 +1,19 @@
 #pragma once
 
-#include <cstdint>
 #include <pcg_random.hpp>
 #include <world/message.hpp>
 
 #include "core/base.hpp"
+#include "core/values/common.hpp"
 
 namespace agent_index {
 class [[nodiscard]] Component {
   public:
-    Component(const int id) : id_{id} {}
-    auto id() const -> int POST(id : id >= 0) { return id_; }
+    Component(const AgentID id) : id_{id} {}
+    auto id() const -> AgentID POST(id : id >= 0) { return id_; }
 
   private:
-    const int id_;
+    const AgentID id_;
 };
 };  // namespace agent_index
 

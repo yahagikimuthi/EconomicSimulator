@@ -20,6 +20,7 @@ class [[nodiscard]] BaseValueClass {
 class [[nodiscard]] Money : public internal::BaseValueClass<double> {
   public:
     using internal::BaseValueClass<double>::BaseValueClass;
+    Money() : internal::BaseValueClass<double>::BaseValueClass(0.0) {}
     auto operator<=>(const Money&) const = default;
     auto operator+=(const Money other) -> Money& {
         value_ += other.value();
@@ -57,6 +58,7 @@ class [[nodiscard]] Money : public internal::BaseValueClass<double> {
 }
 
 class [[nodiscard]] AgentID : internal::BaseValueClass<int> {
+  public:
     AgentID(const int value) PRE(value >= 0)
         : internal::BaseValueClass<int>::BaseValueClass(value) {}
     auto operator<=>(const AgentID&) const = default;

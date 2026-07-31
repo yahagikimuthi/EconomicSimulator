@@ -7,6 +7,7 @@
 class [[nodiscard]] Wage : public internal::BaseValueClass<double> {
   public:
     using internal::BaseValueClass<double>::BaseValueClass;
+    Wage() : internal::BaseValueClass<double>::BaseValueClass(0.0) {}
     auto operator<=>(const Wage&) const = default;
     auto operator+=(const Wage other) -> Wage& {
         value_ += other.value();
@@ -46,6 +47,7 @@ class [[nodiscard]] Wage : public internal::BaseValueClass<double> {
 class [[nodiscard]] HeadCount : public internal::BaseValueClass<double> {
   public:
     using internal::BaseValueClass<double>::BaseValueClass;
+    HeadCount() : internal::BaseValueClass<double>::BaseValueClass(0.0) {}
     auto operator<=>(const HeadCount&) const = default;
     auto operator+=(const HeadCount other) -> HeadCount& {
         value_ += other.value();
