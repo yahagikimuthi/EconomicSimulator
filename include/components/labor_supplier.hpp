@@ -52,6 +52,7 @@ namespace labor_supplier {
 class JobHunter {
   public:
     JobHunter(pcg32& masterRng);
+
     template <typename F1, typename F2>
         requires requires(F1 isAligned, F2 makeEntrySheet, world::LaborRequest& request) {
             { isAligned(request) } -> std::same_as<bool>;
@@ -59,7 +60,6 @@ class JobHunter {
                 makeEntrySheet(request)
             } -> std::same_as<tbb::concurrent_vector<world::LaborEntry>::iterator>;
         }
-
     void entry(
         const F1                                     isAligned,
         const F2                                     makeEntrySheet,
@@ -104,8 +104,9 @@ class JobHunter {
 
 class Employment {
   public:
+    Employment(pcg32& masterRng);
     auto isEmployed() const -> bool { return rosterEntry_.hasValue(); }
-    void setRosterEntry(const SafePtr<world::RosterEntry> rosterEntry) {
+    void startWorking(const SafePtr<world::RosterEntry> rosterEntry) {
         resign();
         rosterEntry_ = rosterEntry;
     }
@@ -115,11 +116,12 @@ class Employment {
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
-    void product(const double productPower) PRE(productPower >= 0.0) {
+    void executeProduct() {
         if (not isEmployed()) return;
         auto& workspace = rosterEntry_->workspace;
-        workspace.totalLaborInput += workspace.firmProductPower * productPower;
+        workspace.totalLaborInput += workspace.firmProductPower * productPower_;
     }
+    auto productPower() const -> double { return productPower_; }
     void updateStatus() {
         if (not isEmployed()) return;
         if (not rosterEntry_->isOccupied) rosterEntry_ = nullptr;
@@ -132,6 +134,7 @@ class Employment {
     }
 
     SafePtr<world::RosterEntry> rosterEntry_{nullptr};
+    const double                productPower_;
 };
 
 class LaborSupplier {
@@ -149,7 +152,7 @@ class LaborSupplier {
             return true;
         }};
         const auto makeEntrySheet{[&](Request& req) -> auto {
-            return req.entryBox.emplace_back(id, productPower_, req);
+            return req.entryBox.emplace_back(id, employment_.productPower(), req);
         }};
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }
@@ -157,13 +160,13 @@ class LaborSupplier {
     void recordRosterEntry() {
         const SafePtr<world::LaborEntry> acceptedEntry{jobHunter_.acceptedEntry()};
         if (not acceptedEntry) return;
-        employment_.setRosterEntry(acceptedEntry->rosterEntry);
+        employment_.startWorking(acceptedEntry->rosterEntry);
     }
     void endStep(world::CensusDropBox& dropBox) {
         dropBox.wages.emplace_back(wage().value());
         jobHunter_.endStep();
     }
-    void product() { employment_.product(productPower_); }
+    void product() { employment_.executeProduct(); }
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) { return employment_.wage(); }
     auto isEligibleRequest(const world::LaborRequest& request) const -> bool {
         if (request.firmID == employment_.contractFirmId()) return false;
@@ -180,8 +183,7 @@ class LaborSupplier {
 
     mutable pcg32 rng_;
     JobHunter     jobHunter_;
-    Employment    employment_{};
-    const double  productPower_;
+    Employment    employment_;
     const double  jobSearchThreshold_;
 };
 }  // namespace labor_supplier

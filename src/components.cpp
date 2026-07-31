@@ -44,10 +44,12 @@ LaborDemander::LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard
 
 namespace labor_supplier {
 JobHunter ::JobHunter(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
+Employment::Employment(pcg32& masterRng)
+    : productPower_{randNormal(masterRng, 1.0, 1.0 / 3.0, 0.0, 2.0)} {}
 LaborSupplier::LaborSupplier(pcg32& masterRng)
     : rng_{makeSeed(masterRng), makeSeed(masterRng)},
       jobHunter_{masterRng},
-      productPower_{randNormal(masterRng, 1.0, 1.0 / 3.0, 0.0, 2.0)},
+      employment_{masterRng},
       jobSearchThreshold_{rand(masterRng, 0.01, 0.05)} {}
 }  // namespace labor_supplier
 
