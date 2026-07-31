@@ -1,9 +1,7 @@
 #include "core/engine.hpp"
 
-#include <algorithm>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <print>
 #include <string>
 
 #include "config.hpp"
@@ -13,12 +11,8 @@
 #include "world/message.hpp"
 
 namespace core {
-void foo() {}
 void Engine::run() {
-    for (currentStep_ = 0; currentStep_ < totalStep_; ++currentStep_) {
-        if (currentStep_ == 100) {
-            foo();
-        }
+    for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
         runLabor();
         runGoods();
         logging();
@@ -112,9 +106,9 @@ void Engine::reset() {
 
 void Engine::check() const {}
 
-void Logger::save(const world::CensusDropBox& dropBox, const int step) {
+void Logger::save(const world::CensusDropBox& dropBox, const Step step) {
     namespace name = config::save_name;
-    std::string     groupPath{"/step_" + std::to_string(step)};
+    std::string     groupPath{"/step_" + std::to_string(step.value())};
     HighFive::Group group{file_.createGroup(groupPath)};
 
     auto create{[&group](std::string_view dataName, const std::vector<double>& data) -> void {

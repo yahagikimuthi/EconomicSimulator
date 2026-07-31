@@ -43,9 +43,9 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     firms_.reserve(config::agent_count::firm);
     workspaces_.resize(config::agent_count::firm);
     for (const auto i : std::views::iota(0, config::agent_count::firm)) {
-        companyBoards_.emplace_back(i);
+        companyBoards_.emplace_back(AgentID{i});
         firms_.emplace_back(Firm{
-            .index   = {i},
+            .index   = {AgentID{i}},
             .finance = {masterRng_},
             .labor   = {masterRng_, companyBoards_[static_cast<std::size_t>(i)]},
             .goods   = {masterRng_, workspaces_[static_cast<std::size_t>(i)]}
@@ -55,7 +55,10 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     hholds_.reserve(config::agent_count::hhold);
     for (const auto i : std::views::iota(0, config::agent_count::hhold)) {
         HHold hhold{
-            .index = {i}, .finance = {masterRng_}, .labor = {masterRng_}, .goods = {masterRng_}
+            .index   = {AgentID{i}},
+            .finance = {masterRng_},
+            .labor   = {masterRng_},
+            .goods   = {masterRng_}
         };
         hholds_.push_back(hhold);
     }

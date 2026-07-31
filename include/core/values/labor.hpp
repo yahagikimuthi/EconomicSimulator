@@ -4,10 +4,10 @@
 
 #include "core/values/common.hpp"
 
-class [[nodiscard]] Wage : public internal::BaseValueClass<double> {
+class [[nodiscard]] Wage {
   public:
-    using internal::BaseValueClass<double>::BaseValueClass;
-    Wage() : internal::BaseValueClass<double>::BaseValueClass(0.0) {}
+    explicit Wage(const double value) : value_{value} {}
+    auto value() const -> double { return value_; }
     auto operator<=>(const Wage&) const = default;
     auto operator+=(const Wage other) -> Wage& {
         value_ += other.value();
@@ -25,6 +25,10 @@ class [[nodiscard]] Wage : public internal::BaseValueClass<double> {
         value_ /= other;
         return *this;
     }
+    auto operator-() const -> Wage { return Wage{-value_}; }
+
+  private:
+    double value_;
 };
 [[nodiscard]] inline auto operator+(Wage lhs, const Wage rhs) -> Wage {
     lhs += rhs;
@@ -44,10 +48,10 @@ class [[nodiscard]] Wage : public internal::BaseValueClass<double> {
     return lhs;
 }
 
-class [[nodiscard]] HeadCount : public internal::BaseValueClass<double> {
+class [[nodiscard]] HeadCount {
   public:
-    using internal::BaseValueClass<double>::BaseValueClass;
-    HeadCount() : internal::BaseValueClass<double>::BaseValueClass(0.0) {}
+    explicit HeadCount(const double value) : value_{value} {}
+    auto value() const -> double { return value_; }
     auto operator<=>(const HeadCount&) const = default;
     auto operator+=(const HeadCount other) -> HeadCount& {
         value_ += other.value();
@@ -65,6 +69,18 @@ class [[nodiscard]] HeadCount : public internal::BaseValueClass<double> {
         value_ /= other;
         return *this;
     }
+    auto operator++() -> HeadCount& {
+        ++value_;
+        return *this;
+    }
+    auto operator--() -> HeadCount& {
+        --value_;
+        return *this;
+    }
+    auto operator-() const -> HeadCount { return HeadCount{-value_}; }
+
+  private:
+    double value_;
 };
 [[nodiscard]] inline auto operator+(HeadCount lhs, const HeadCount rhs) -> HeadCount {
     lhs += rhs;
@@ -89,9 +105,9 @@ class [[nodiscard]] HeadCount : public internal::BaseValueClass<double> {
 [[nodiscard]] inline auto operator*(Wage lhs, HeadCount rhs) -> Money {
     return Money{lhs.value() * rhs.value()};
 }
-[[nodiscard]] inline auto operator/(Money lhs, Wage rhs) -> Money PRE(rhs != 0.0) {
-    return Money{lhs.value() / rhs.value()};
+[[nodiscard]] inline auto operator/(Money lhs, Wage rhs) -> HeadCount PRE(rhs != Wage{0.0}) {
+    return HeadCount{lhs.value() / rhs.value()};
 }
-[[nodiscard]] inline auto operator/(Money lhs, HeadCount rhs) -> Money PRE(rhs != 0.0) {
-    return Money{lhs.value() / rhs.value()};
+[[nodiscard]] inline auto operator/(Money lhs, HeadCount rhs) -> Wage PRE(rhs != HeadCount{0.0}) {
+    return Wage{lhs.value() / rhs.value()};
 }

@@ -1,3 +1,4 @@
+#include <core/values/goods.hpp>
 #include <pcg_random.hpp>
 
 #include "components/common.hpp"
@@ -22,10 +23,10 @@ namespace labor_demander {
 RequestPlanner::RequestPlanner(pcg32& masterRng)
     : rng_{makeSeed(masterRng), makeSeed(masterRng)},
       log_{
-          .wage         = rand(masterRng, 1000, 5000),
-          .actualEmploy = randInt(rng_, 4, 12),
-          .offerPlan    = randInt(rng_, 10, 20),
-          .applicantNum = randInt(masterRng, 10, 20)
+          .wage         = Wage{rand(masterRng, 1000, 5000)},
+          .actualEmploy = HeadCount{static_cast<double>(randInt(rng_, 4, 12))},
+          .offerPlan    = HeadCount{static_cast<double>(randInt(rng_, 10, 20))},
+          .applicantNum = HeadCount{static_cast<double>(randInt(masterRng, 10, 20))}
       },
       param_{
           .offerRate      = rand(masterRng),
@@ -62,8 +63,8 @@ Planner::Planner(pcg32& masterRng)
     : rng_{makeSeed(masterRng), makeSeed(masterRng)},
       log_{
           .markup         = rand(masterRng, 0.1, 0.3),
-          .supply         = rand(masterRng, 4, 15),
-          .demandForecast = rand(masterRng, 5.0, 20.0),
+          .supply         = GoodsQuantity{rand(masterRng, 4, 15)},
+          .demandForecast = GoodsQuantity{rand(masterRng, 5.0, 20.0)},
           .isSold         = rand(masterRng) < 0.5
       },
       param_{

@@ -5,6 +5,7 @@
 #include "components/common.hpp"
 #include "components/goods_supplier.hpp"
 #include "components/labor_supplier.hpp"
+#include "core/values/labor.hpp"
 #include "world/message.hpp"
 
 namespace labor {
@@ -14,10 +15,10 @@ void adjustWorkforce(
     labor_demander::LaborDemander&               laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
-    const int desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
-    if (desiredEmploy > 0) {
+    const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
+    if (desiredEmploy > HeadCount{0.0}) {
         laborDemander.post(index.id(), desiredEmploy, requestBox);
-    } else if (desiredEmploy < 0) {
+    } else if (desiredEmploy < HeadCount{0.0}) {
         laborDemander.layOffs(-desiredEmploy);
     }
 }
@@ -54,14 +55,14 @@ void endStep(
     world::CensusDropBox&          dropBox
 ) {
     laborDemander.endStep(dropBox);
-    finance.assetPlus(-laborDemander.sumWage());
+    finance.assetPlus(Money{-laborDemander.sumWage().value()});
 }
 void endStep(
     hhold_finance::Component&      finance,
     labor_supplier::LaborSupplier& laborSupplier,
     world::CensusDropBox&          dropBox
 ) {
-    finance.assetPlus(laborSupplier.wage());
+    finance.assetPlus(Money{laborSupplier.wage().value()});
     laborSupplier.endStep(dropBox);
 }
 }  // namespace labor

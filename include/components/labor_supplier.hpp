@@ -42,7 +42,7 @@ inline void sortSample(
         sortRequests.begin() + static_cast<int>(k),
         std::ranges::greater{},
         [](const std::reference_wrapper<world::LaborRequest>& requestRef) -> double {
-            return requestRef.get().wage;
+            return requestRef.get().wage.value();
         }
     );
 }
@@ -109,11 +109,11 @@ class Employment {
         resign();
         rosterEntry_ = rosterEntry;
     }
-    auto contractFirmId() const -> int POST(id : id >= 0) {
-        return isEmployed() ? rosterEntry_->companyBoard.firmId : -1;
+    auto contractFirmId() const -> AgentID {
+        return isEmployed() ? rosterEntry_->companyBoard.firmId : AgentID{-1};
     }
-    auto wage() const -> double POST(wage : wage >= 0.0) {
-        return isEmployed() ? rosterEntry_->wage : 0.0;
+    auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+        return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
     void product(const double productPower) PRE(productPower >= 0.0) {
         if (not isEmployed()) return;
@@ -137,7 +137,7 @@ class Employment {
 class LaborSupplier {
   public:
     LaborSupplier(pcg32& masterRng);
-    void entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) PRE(id >= 0) {
+    void entry(const AgentID id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
         updateRosterEntry();
         if (not shouldSearchJob()) return;
         if (requestBox.empty()) return;
@@ -160,11 +160,11 @@ class LaborSupplier {
         employment_.setRosterEntry(acceptedEntry->rosterEntry);
     }
     void endStep(world::CensusDropBox& dropBox) {
-        dropBox.wages.emplace_back(wage());
+        dropBox.wages.emplace_back(wage().value());
         jobHunter_.endStep();
     }
     void product() { employment_.product(productPower_); }
-    auto wage() const -> double POST(wage : wage >= 0.0) { return employment_.wage(); }
+    auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) { return employment_.wage(); }
     auto isEligibleRequest(const world::LaborRequest& request) const -> bool {
         if (request.firmID == employment_.contractFirmId()) return false;
         if (request.wage < employment_.wage()) return false;

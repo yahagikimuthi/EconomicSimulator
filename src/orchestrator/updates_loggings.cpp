@@ -7,6 +7,8 @@
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander.hpp"
 #include "core/base.hpp"
+#include "core/values/goods.hpp"
+#include "core/values/labor.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
@@ -18,7 +20,7 @@ void logging(world::CensusDropBox& dropBox, const Component& comp) { comp.endSte
 }  // namespace hhold_finance
 
 namespace labor_demander {
-auto RequestPlanner::updateOfferRate(const int actualEmploy) const -> double {
+auto RequestPlanner::updateOfferRate(const HeadCount actualEmploy) const -> double {
     const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.offerAdjustVol, -1.0, 1.0))};
     const bool   shouldRaise{actualEmploy < plan_.employ};
     const double offerRate{param_.offerRate * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
@@ -26,9 +28,9 @@ auto RequestPlanner::updateOfferRate(const int actualEmploy) const -> double {
 }
 
 void RequestPlanner::endStep(
-    world::CensusDropBox& dropBox, const int actualEmploy, const int applicantNum
+    world::CensusDropBox& dropBox, const HeadCount actualEmploy, const HeadCount applicantNum
 ) {
-    dropBox.postedEmployments.emplace_back(plan_.employ);
+    dropBox.postedEmployments.emplace_back(plan_.employ.value());
     log_ = {
         .wage         = plan_.wage,
         .actualEmploy = actualEmploy,
@@ -51,20 +53,22 @@ void Recruiter::endStep(world::CensusDropBox& dropBox) {
 }  // namespace labor_demander
 
 namespace goods_supplier {
-auto Planner::updateDemandForecast(const double totalDemand) const -> double {
+auto Planner::updateDemandForecast(const GoodsQuantity totalDemand) const -> GoodsQuantity {
     return log_.demandForecast +
            (param_.demandForecastAdjustVol * (totalDemand - log_.demandForecast));
 }
 
-auto Planner::isSold(const double unsoldAmount) const -> bool {
-    return (plan_.supply != 0.0) ? unsoldAmount / plan_.supply < param_.targetInvRatio : true;
+auto Planner::isSold(const GoodsQuantity unsoldAmount) const -> bool {
+    return (plan_.supply != GoodsQuantity{0.0})
+               ? unsoldAmount / plan_.supply < param_.targetInvRatio
+               : true;
 }
 
 void Planner::endStep(
-    const double totalDemand, const double unsoldAmount, world::CensusDropBox& dropBox
+    const GoodsQuantity totalDemand, const GoodsQuantity unsoldAmount, world::CensusDropBox& dropBox
 ) {
-    dropBox.prices.emplace_back(plan_.price);
-    dropBox.supplies.emplace_back(plan_.supply);
+    dropBox.prices.emplace_back(plan_.price.value());
+    dropBox.supplies.emplace_back(plan_.supply.value());
     dropBox.markups.emplace_back(plan_.markup);
     log_ = {
         .markup         = plan_.markup,

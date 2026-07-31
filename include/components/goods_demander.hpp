@@ -5,6 +5,7 @@
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "core/values/common.hpp"
 #include "world/message.hpp"
 
 namespace goods_demander {
@@ -13,33 +14,33 @@ class [[nodiscard]] GoodsDemander {
     GoodsDemander(pcg32& masterRng);
 
     void request(
-        const double asset, const int step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
-    ) PRE(step >= 0);
+        const Money asset, const Step step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    );
     void afterTrade() {
         if (not isPosting_) return;
-        purchasing_ += myRequest_->tradeAmount * myRequest_->entry.price;
+        purchasing_ += myRequest_->entry.price * myRequest_->tradeAmount;
     }
     void endStep() {
         myRequest_  = nullptr;
         isPosting_  = false;
-        purchasing_ = 0.0;
+        purchasing_ = Money{0.0};
     }
-    auto purchase() const -> double { return purchasing_; }
+    auto purchase() const -> Money { return purchasing_; }
 
   private:
     auto isPass(
-        const double                                     asset,
-        const int                                        step,
+        const Money                                      asset,
+        const Step                                       step,
         const tbb::concurrent_vector<world::GoodsEntry>& entryBox
-    ) const -> bool PRE(step >= 0);
-    auto calcBudget(const double asset) const -> double { return asset * mpc_; }
+    ) const -> bool;
+    auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
     pcg32                              rng_;
     SafePtr<const world::GoodsRequest> myRequest_{nullptr};
     bool                               isPosting_{false};
-    double                             purchasing_{};
+    Money                              purchasing_{0.0};
     const double                       mpc_;
-    const int                          myPhase_;
+    const Step                         myPhase_;
     static inline int                  instanceCnt_{};
 };
 }  // namespace goods_demander

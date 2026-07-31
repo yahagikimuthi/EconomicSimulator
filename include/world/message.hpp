@@ -7,6 +7,9 @@
 #include "config.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "core/values/common.hpp"
+#include "core/values/goods.hpp"
+#include "core/values/labor.hpp"
 
 namespace world {
 struct Workspace {
@@ -15,27 +18,27 @@ struct Workspace {
 };
 
 struct RosterEntry {
-    int    hholdId;
-    double wage;
-    bool   isOccupied{true};
+    AgentID hholdId;
+    Wage    wage;
+    bool    isOccupied{true};
 
     CompanyBoard& companyBoard;
     Workspace&    workspace;
-    RosterEntry(const int Id, const double Wage, CompanyBoard& CompanyBoard, Workspace& Workspace)
+    RosterEntry(const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace)
         : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
 };
 
 struct CompanyBoard {
-    const int                                    firmId;
+    const AgentID                                firmId;
     std::deque<RosterEntry>                      roster;
     tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox;
 
-    CompanyBoard(const int Id) : firmId{Id} {}
+    CompanyBoard(const AgentID Id) : firmId{Id} {}
 };
 
 struct LaborEntry {
-    const int    hholdID;
-    const double productPower;
+    const AgentID hholdID;
+    const double  productPower;
 
     bool isOffer{false};
     bool isAccept{false};
@@ -43,34 +46,35 @@ struct LaborEntry {
     SafePtr<RosterEntry> rosterEntry{nullptr};
     const LaborRequest&  request;
 
-    LaborEntry(const int Id, const double ProductPower, const LaborRequest& Request)
+    LaborEntry(const AgentID Id, const double ProductPower, const LaborRequest& Request)
         : hholdID{Id}, productPower{ProductPower}, request{Request} {}
 };
 
 struct LaborRequest {
-    const int    firmID;
-    const double wage;
+    const AgentID firmID;
+    const Wage    wage;
 
     tbb::concurrent_vector<LaborEntry> entryBox;
 
-    LaborRequest(const int Id, const double Wage) : firmID{Id}, wage{Wage} {}
+    LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
 };
 
 struct GoodsRequest {
-    const double amount;
-    double       tradeAmount{};
+    const GoodsQuantity amount;
+    GoodsQuantity       tradeAmount{0.0};
 
     const GoodsEntry& entry;
-    GoodsRequest(const double Amount, const GoodsEntry& Entry) : amount{Amount}, entry{Entry} {}
+    GoodsRequest(const GoodsQuantity Amount, const GoodsEntry& Entry)
+        : amount{Amount}, entry{Entry} {}
 };
 
 struct GoodsEntry {
-    const double price;
-    const double supply;
+    const Price         price;
+    const GoodsQuantity supply;
 
     tbb::concurrent_vector<GoodsRequest> requestBox;
 
-    GoodsEntry(const double Price, const double Supply) : price{Price}, supply{Supply} {}
+    GoodsEntry(const Price Price, const GoodsQuantity Supply) : price{Price}, supply{Supply} {}
 };
 
 struct CensusDropBox {

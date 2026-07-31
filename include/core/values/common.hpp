@@ -4,23 +4,10 @@
 
 #include "core/base.hpp"
 
-namespace internal {
-template <typename T>
-class [[nodiscard]] BaseValueClass {
+class [[nodiscard]] Money {
   public:
-    explicit BaseValueClass(T value) : value_{value} {}
-    auto value() const -> T { return value_; }
-
-  protected:
-    auto operator<=>(const BaseValueClass<T>&) const = default;
-    T    value_;
-};
-}  // namespace internal
-
-class [[nodiscard]] Money : public internal::BaseValueClass<double> {
-  public:
-    using internal::BaseValueClass<double>::BaseValueClass;
-    Money() : internal::BaseValueClass<double>::BaseValueClass(0.0) {}
+    explicit Money(const double value) : value_{value} {}
+    auto value() const -> double { return value_; }
     auto operator<=>(const Money&) const = default;
     auto operator+=(const Money other) -> Money& {
         value_ += other.value();
@@ -38,6 +25,10 @@ class [[nodiscard]] Money : public internal::BaseValueClass<double> {
         value_ /= other;
         return *this;
     }
+    auto operator-() const -> Money { return Money{-value_}; }
+
+  private:
+    double value_;
 };
 [[nodiscard]] inline auto operator+(Money lhs, Money rhs) -> Money {
     lhs += rhs;
@@ -57,9 +48,26 @@ class [[nodiscard]] Money : public internal::BaseValueClass<double> {
     return lhs;
 }
 
-class [[nodiscard]] AgentID : internal::BaseValueClass<int> {
+class [[nodiscard]] AgentID {
   public:
-    AgentID(const int value) PRE(value >= 0)
-        : internal::BaseValueClass<int>::BaseValueClass(value) {}
+    explicit AgentID(const int value) PRE(value >= 0) : value_{value} {}
     auto operator<=>(const AgentID&) const = default;
+
+  private:
+    int value_;
+};
+
+class [[nodiscard]] Step {
+  public:
+    explicit Step(const int value) : value_{value} {}
+    auto value() const -> int { return value_; }
+    auto operator<=>(const Step&) const = default;
+    auto operator++() -> Step& {
+        ++value_;
+        return *this;
+    }
+    auto operator%(const int other) const -> Step { return Step{value_ % other}; }
+
+  private:
+    int value_;
 };

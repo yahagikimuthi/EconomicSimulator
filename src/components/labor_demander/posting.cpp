@@ -3,43 +3,47 @@
 #include <tbb/concurrent_vector.h>
 #include <cassert>
 #include <cmath>
-#include <config.hpp>
+#include <core/values/common.hpp>
 #include <pcg_random.hpp>
 
+#include "config.hpp"
+#include "core/values/labor.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace {
-[[nodiscard]] auto wageGuard(const double wage) -> double {
-    return std::max(wage, config::labor_demander::epsilonWage);
+[[nodiscard]] auto wageGuard(const Wage wage) -> Wage {
+    return Wage{std::max(wage.value(), config::labor_demander::epsilonWage)};
 }
 }  // namespace
 
 namespace labor_demander {
-[[nodiscard]] auto RequestPlanner::calcNextWage() const -> double {
+[[nodiscard]] auto RequestPlanner::calcNextWage() const -> Wage {
     const bool   shouldRaiseWage{log_.applicantNum < log_.offerPlan};
     const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.wageAdjustVol))};
-    const double nextWage{log_.wage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
+    const Wage   nextWage{log_.wage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
     return wageGuard(nextWage);
 }
 
-[[nodiscard]] auto RequestPlanner::calcNextOffer(const int employ) const -> int {
-    const double offer{employ * (1.0 + param_.offerRate)};
-    return static_cast<int>(std::round(offer));
+[[nodiscard]] auto RequestPlanner::calcNextOffer(const HeadCount employ) const -> HeadCount {
+    const HeadCount offer{employ * (1.0 + param_.offerRate)};
+    return HeadCount{std::round(offer.value())};
 }
 
-void RequestPlanner::judgePlan(const int desiredEmploy) {
+void RequestPlanner::judgePlan(const HeadCount desiredEmploy) {
     plan_ = {
         .wage = calcNextWage(), .employ = desiredEmploy, .offer = calcNextOffer(desiredEmploy)
     };
 }
 
 void Recruiter::post(
-    const int id, const int desiredEmploy, tbb::concurrent_vector<world::LaborRequest>& requestBox
+    const AgentID                                id,
+    const HeadCount                              desiredEmploy,
+    tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     isRecruiting_ = true;
     planner_.judgePlan(desiredEmploy);
-    if (planner_.offerPlan() == 0) return;
+    if (planner_.offerPlan() == HeadCount{0.0}) return;
     isPosting_ = true;
     auto it{requestBox.emplace_back(id, planner_.wagePlan())};
     myRequest_ = &*it;

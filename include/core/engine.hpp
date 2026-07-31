@@ -34,7 +34,7 @@ class Logger {
     explicit Logger();
     [[nodiscard]] auto isValid() const -> bool { return file_.isValid(); }
 
-    void save(const world::CensusDropBox& dropBox, const int step);
+    void save(const world::CensusDropBox& dropBox, const Step step);
 
   private:
     HighFive::File file_;
@@ -70,8 +70,8 @@ class [[nodiscard]] Engine {
 
     world::CensusDropBox dropBox_;
 
-    const int totalStep_;
-    int       currentStep_{};
+    const Step totalStep_;
+    Step       currentStep_{0};
 
     const helper::PCG32Seed seed_;
     pcg32                   masterRng_;

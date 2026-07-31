@@ -14,7 +14,7 @@ void postGoods(
     const labor_demander::LaborDemander&       laborDemander,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
-    goodsSupplier.post(laborDemander.sumWage(), entryBox);
+    goodsSupplier.post(Money{laborDemander.sumWage().value()}, entryBox);
 }
 
 void purchase(
@@ -22,9 +22,9 @@ void purchase(
     goods_demander::GoodsDemander&             goodsDemander,
     const labor_supplier::LaborSupplier&       laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                  step
+    const Step                                 step
 ) {
-    goodsDemander.request(finance.asset() + laborSupplier.wage(), step, entryBox);
+    goodsDemander.request(finance.asset() + Money{laborSupplier.wage().value()}, step, entryBox);
 }
 
 void trade(goods_supplier::GoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
@@ -41,7 +41,7 @@ void endStep(
 }
 
 void endStep(hhold_finance::Component& finance, goods_demander::GoodsDemander& goodsDemander) {
-    finance.assetPlus(-goodsDemander.purchase());
+    finance.assetPlus(-Money{goodsDemander.purchase().value()});
     goodsDemander.endStep();
 }
 }  // namespace goods

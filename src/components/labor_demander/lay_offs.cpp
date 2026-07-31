@@ -1,9 +1,10 @@
+#include <core/values/labor.hpp>
 #include "components/labor_demander.hpp"
 
 namespace labor_demander {
-void HumanResourceManager::layOffs(const int layOffsCnt) {
-    int   currentLayOffsCnt{};
-    auto& roster = companyBoard_.roster;
+void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
+    HeadCount currentLayOffsCnt{0.0};
+    auto&     roster = companyBoard_.roster;
     for (int i{static_cast<int>(roster.size()) - 1}; i >= 0; --i) {
         if (currentLayOffsCnt >= layOffsCnt) break;
         auto& rosterEntry = roster[static_cast<std::size_t>(i)];

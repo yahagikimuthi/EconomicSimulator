@@ -7,6 +7,8 @@
 #include <ranges>
 
 #include "core/base.hpp"
+#include "core/values/common.hpp"
+#include "core/values/labor.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
@@ -14,31 +16,36 @@ class [[nodiscard]] RequestPlanner {
   public:
     RequestPlanner(pcg32& masterRng);
 
-    void judgePlan(const int desiredEmploy);
-    auto wagePlan() const -> double POST(wage : wage > 0.0) { return plan_.wage; }
-    auto offerPlan() const -> int POST(employ : employ >= 0) { return plan_.offer; }
-    void endStep(world::CensusDropBox& dropBox, const int actualEmploy, const int applicantNum)
-        PRE(actualEmploy >= 0) PRE(applicantNum >= 0);
+    void judgePlan(const HeadCount desiredEmploy);
+    auto wagePlan() const -> Wage POST(wage : wage > Wage{0.0}) { return plan_.wage; }
+    auto offerPlan() const -> HeadCount POST(employ : employ >= HeadCount{0.0}) {
+        return plan_.offer;
+    }
+    void endStep(
+        world::CensusDropBox& dropBox, const HeadCount actualEmploy, const HeadCount applicantNum
+    ) PRE(actualEmploy >= HeadCount{0.0}) PRE(applicantNum >= HeadCount{0.0});
 
   private:
-    auto calcNextWage() const -> double POST(wage : wage > 0.0);
-    auto calcNextOffer(const int desiredEmploy) const -> int POST(offer : offer >= 0);
-    auto updateOfferRate(const int actualEmploy) const -> double POST(rate : rate > 0.0);
+    auto calcNextWage() const -> Wage POST(wage : wage > Wage{0.0});
+    auto calcNextOffer(const HeadCount desiredEmploy) const -> HeadCount
+        POST(offer
+             : offer >= HeadCount{0.0});
+    auto updateOfferRate(const HeadCount actualEmploy) const -> double POST(rate : rate > 0.0);
 
     mutable pcg32 rng_;
     struct {
-        double wage;
-        int    employ;
-        int    offer;
-        void   reset() { wage = 0.0, employ = 0, offer = 0; }
+        Wage      wage{0.0};
+        HeadCount employ{0.0};
+        HeadCount offer{0.0};
+        void      reset() { wage = Wage{0.0}, employ = HeadCount{0.0}, offer = HeadCount{0.0}; }
     } plan_{};
 
     struct {
-        double wage;
-        int    actualEmploy;
-        int    offerPlan;
-        int    applicantNum;
-    } log_{};
+        Wage      wage;
+        HeadCount actualEmploy;
+        HeadCount offerPlan;
+        HeadCount applicantNum;
+    } log_;
 
     struct {
         double       offerRate;
@@ -49,7 +56,7 @@ class [[nodiscard]] RequestPlanner {
 
 template <typename T>
 concept HasAddRoster =
-    requires(T& t, const int id, const double wage, world::Workspace& workspace) {
+    requires(T& t, const AgentID id, const Wage wage, world::Workspace& workspace) {
         { t.addRoster(id, wage, workspace) } -> std::same_as<SafePtr<world::RosterEntry>>;
     };
 class [[nodiscard]] Recruiter {
@@ -57,10 +64,10 @@ class [[nodiscard]] Recruiter {
     Recruiter(pcg32& masterRng);
 
     void post(
-        const int                                    id,
-        const int                                    desiredEmploy,
+        const AgentID                                id,
+        const HeadCount                              desiredEmploy,
         tbb::concurrent_vector<world::LaborRequest>& requestBox
-    ) PRE(id >= 0) PRE(desiredEmploy >= 0);
+    ) PRE(desiredEmploy >= HeadCount{0.0});
     void offer();
     void registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace);
     void endStep(world::CensusDropBox& dropBox);
@@ -73,10 +80,13 @@ class [[nodiscard]] Recruiter {
     bool                                    isPosting_{false};
 
     struct {
-        int  remainOfferNum;
-        int  applicantNum;
-        int  employing;
-        void reset() { remainOfferNum = 0, applicantNum = 0, employing = 0; }
+        HeadCount remainOfferNum{0.0};
+        HeadCount applicantNum{0.0};
+        HeadCount employing{0.0};
+        void      reset() {
+            remainOfferNum = HeadCount{0.0}, applicantNum = HeadCount{0.0},
+            employing = HeadCount{0.0};
+        }
     } ledger_{};
 
     bool isRecruiting_{false};
@@ -85,23 +95,25 @@ class [[nodiscard]] Recruiter {
 class [[nodiscard]] HumanResourceManager {
   public:
     HumanResourceManager(world::CompanyBoard& companyBoard);
-    auto addRoster(const int id, const double wage, world::Workspace& workspace)
-        -> SafePtr<world::RosterEntry> PRE(id >= 0) PRE(wage > 0.0);
+    auto addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
+        -> SafePtr<world::RosterEntry> PRE(id >= AgentID{0}) PRE(wage > Wage{0.0});
     void acceptResignation();
-    void layOffs(const int layOffsCnt) PRE(layOffsCnt > 0);
-    auto employeeCnt() const -> int POST(cnt : cnt >= 0) {
+    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0});
+    auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
-        return static_cast<int>(rosterSize);
+        return HeadCount{static_cast<double>(rosterSize)};
     }
-    auto sumWage() const -> double POST(wage : wage >= 0.0) {
+    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         auto& roster = companyBoard_.roster;
         auto  view{
             roster | std::views::filter([](const world::RosterEntry& e) -> bool {
                 return not e.isOccupied;
             }) |
-            std::views::transform(&world::RosterEntry::wage)
+            std::views::transform([](const world::RosterEntry& entry) -> double {
+                return entry.wage.value();
+            })
         };
-        return std::reduce(view.begin(), view.end(), 0.0);
+        return Wage{std::reduce(view.begin(), view.end(), 0.0)};
     }
 
   private:
@@ -113,20 +125,24 @@ class [[nodiscard]] LaborDemander {
   public:
     LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard);
     void post(
-        const int                                    id,
-        const int                                    desiredEmploy,
+        const AgentID                                id,
+        const HeadCount                              desiredEmploy,
         tbb::concurrent_vector<world::LaborRequest>& requestBox
-    ) PRE(id > 0) PRE(desiredEmploy > 0) {
+    ) PRE(desiredEmploy > HeadCount{0.0}) {
         recruiter_.post(id, desiredEmploy, requestBox);
     }
     void offer() { recruiter_.offer(); }
-    void layOffs(const int layOffsCnt) PRE(layOffsCnt > 0) { hrManager_.layOffs(layOffsCnt); }
+    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0}) {
+        hrManager_.layOffs(layOffsCnt);
+    }
     void registerMember(world::Workspace& workspace) {
         recruiter_.registerMember(hrManager_, workspace);
     };
     void acceptResignation() { hrManager_.acceptResignation(); }
-    auto employeeCnt() const -> int POST(cnt : cnt >= 0) { return hrManager_.employeeCnt(); }
-    auto sumWage() const -> double POST(wage : wage >= 0.0) { return hrManager_.sumWage(); }
+    auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+        return hrManager_.employeeCnt();
+    }
+    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) { return hrManager_.sumWage(); }
     void endStep(world::CensusDropBox& dropBox) { recruiter_.endStep(dropBox); }
 
   private:

@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
+#include <core/values/labor.hpp>
 #include <cstddef>
 #include <functional>
 
@@ -9,14 +10,14 @@
 
 namespace {
 void sortApplicants(
-    const int                                               offer,
+    const HeadCount                                         offer,
     std::vector<std::reference_wrapper<world::LaborEntry>>& applicants,
     tbb::concurrent_vector<world::LaborEntry>&              entryBox
 ) {
-    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer))};
+    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
     applicants.clear();
     for (world::LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
-    const bool isOver{entryBox.size() > static_cast<std::size_t>(offer)};
+    const bool isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
 
     if (not isOver) return;
 
@@ -43,12 +44,12 @@ void Recruiter::offer() {
     sortApplicants(ledger_.remainOfferNum, applicants, myRequest_->entryBox);
 
     for (auto entryRef : applicants) {
-        if (ledger_.remainOfferNum <= 0) break;
+        if (ledger_.remainOfferNum <= HeadCount{0.0}) break;
         world::LaborEntry& entry = entryRef.get();
         entry.isOffer            = true;
         offerApplicants_.emplace_back(&entry);
         --ledger_.remainOfferNum;
     }
-    ledger_.applicantNum += static_cast<int>(myRequest_->entryBox.size());
+    ledger_.applicantNum += HeadCount{static_cast<double>(myRequest_->entryBox.size())};
 }
 }  // namespace labor_demander

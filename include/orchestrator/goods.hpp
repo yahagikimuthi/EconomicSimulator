@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 
 #include "core/forward.hpp"
+#include "core/values/common.hpp"
 
 namespace goods {
 void product(labor_supplier::LaborSupplier laborSupplier);
@@ -18,7 +19,7 @@ void purchase(
     goods_demander::GoodsDemander&             goodsDemander,
     const labor_supplier::LaborSupplier&       laborSupplier,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                  step
+    const Step                                 step
 );
 
 void trade(goods_supplier::GoodsSupplier& goodsSupplier);

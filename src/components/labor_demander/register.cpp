@@ -4,13 +4,15 @@
 #include <memory>
 
 #include "core/base.hpp"
+#include "core/values/common.hpp"
+#include "core/values/labor.hpp"
 #include "world/message.hpp"
 
 namespace labor_demander {
 void Recruiter::registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace) {
     if (not isPosting_) return;
 
-    int employCnt{};
+    HeadCount employCnt{0.0};
     for (SafePtr<world::LaborEntry> offeredApplicant : offerApplicants_) {
         if (not offeredApplicant->isAccept) continue;
         offeredApplicant->rosterEntry =
@@ -23,7 +25,7 @@ void Recruiter::registerMember(HasAddRoster auto& hasAddRoster, world::Workspace
 template void
 Recruiter::registerMember<HumanResourceManager>(HumanResourceManager&, world::Workspace&);
 
-auto HumanResourceManager::addRoster(const int id, const double wage, world::Workspace& workspace)
+auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
     -> SafePtr<world::RosterEntry> {
     if (emptyRosterPool_.empty())
         return &companyBoard_.roster.emplace_back(id, wage, companyBoard_, workspace);
