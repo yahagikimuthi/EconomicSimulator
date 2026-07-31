@@ -54,11 +54,6 @@ class [[nodiscard]] RequestPlanner {
     } param_;
 };
 
-template <typename T>
-concept HasAddRoster =
-    requires(T& t, const AgentID id, const Wage wage, world::Workspace& workspace) {
-        { t.addRoster(id, wage, workspace) } -> std::same_as<SafePtr<world::RosterEntry>>;
-    };
 class [[nodiscard]] Recruiter {
   public:
     Recruiter(pcg32& masterRng);
@@ -69,7 +64,21 @@ class [[nodiscard]] Recruiter {
         tbb::concurrent_vector<world::LaborRequest>& requestBox
     ) PRE(desiredEmploy >= HeadCount{0.0});
     void offer();
-    void registerMember(HasAddRoster auto& hasAddRoster, world::Workspace& workspace);
+    template <typename F>
+        requires requires(F addRoster, AgentID id, Wage wage) {
+            { addRoster(id, wage) } -> std::same_as<SafePtr<world::RosterEntry>>;
+        }
+    void registerMember(F addRoster) {
+        if (not isPosting_) return;
+
+        HeadCount employCnt{0.0};
+        for (SafePtr<world::LaborEntry> offeredApplicant : offerApplicants_) {
+            if (not offeredApplicant->isAccept) continue;
+            offeredApplicant->rosterEntry = addRoster(offeredApplicant->hholdID, myRequest_->wage);
+            ++employCnt;
+        }
+        ledger_.employing += employCnt;
+    }
     void endStep(world::CensusDropBox& dropBox);
 
   private:
@@ -136,7 +145,11 @@ class [[nodiscard]] LaborDemander {
         hrManager_.layOffs(layOffsCnt);
     }
     void registerMember(world::Workspace& workspace) {
-        recruiter_.registerMember(hrManager_, workspace);
+        recruiter_.registerMember(
+            [&](const AgentID id, const Wage wage) -> SafePtr<world::RosterEntry> {
+                return hrManager_.addRoster(id, wage, workspace);
+            }
+        );
     };
     void acceptResignation() { hrManager_.acceptResignation(); }
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
