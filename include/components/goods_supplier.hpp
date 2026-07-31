@@ -14,12 +14,9 @@ class [[nodiscard]] Planner {
     void judgePlan(const double supply, const double totalCost) PRE(supply >= 0.0)
         PRE(totalCost >= 0.0);
     auto pricePlan() const -> double POST(price : price > 0.0) { return plan_.price; }
-    auto demandForecast() const -> double POST(forecast : forecast >= 0.0) {
-        return log_.demandForecast;
-    }
     auto lastSupply() const -> double POST(supply : supply >= 0.0) { return log_.supply; }
-    auto targetInvRatio() const -> double POST(ratio : ratio >= 0.0) {
-        return param_.targetInvRatio;
+    auto targetSupply() const -> double POST(target : target >= 0.0) {
+        return log_.demandForecast / (1.0 - param_.targetInvRatio);
     }
     void endStep(const double totalDemand, const double unsoldAmount, world::CensusDropBox& dropBox)
         PRE(totalDemand >= 0.0) PRE(unsoldAmount >= 0.0);
@@ -84,12 +81,8 @@ class [[nodiscard]] Producer {
     Producer(pcg32& masterRng, world::Workspace& workspace);
     auto product() const -> double;
     auto calcDesiredEmploy(
-        const double demandForecast,
-        const double lastSupply,
-        const double targetInvRatio,
-        const int    employeeCnt
-    ) const -> int PRE(demandForecast >= 0.0) PRE(lastSupply >= 0.0) PRE(targetInvRatio >= 0.0)
-                PRE(employeeCnt >= 0);
+        const double targetSupply, const double lastSupply, const int employeeCnt
+    ) const -> int PRE(targetSupply >= 0.0) PRE(lastSupply >= 0.0) PRE(employeeCnt >= 0);
     void endStep(const double unsoldAmount, world::CensusDropBox& dropBox)
         PRE(unsoldAmount >= 0.0) {
         inventory_ = unsoldAmount;
@@ -98,10 +91,6 @@ class [[nodiscard]] Producer {
     auto workspace() -> world::Workspace& { return workspace_; }
 
   private:
-    auto calcTargetProduction(const double demandForecast, const double targetInvRatio) const
-        -> double PRE(demandForecast >= 0.0) PRE(targetInvRatio >= 0.0) POST(production
-                                                                             : production >= 0.0);
-
     world::Workspace& workspace_;
     const double      firmProductPower_;
     double            inventory_;

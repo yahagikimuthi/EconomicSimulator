@@ -2,33 +2,96 @@
 
 #include <tbb/concurrent_vector.h>
 #include <concepts>
-#include <config.hpp>
-#include <helper.hpp>
+#include <functional>
 #include <pcg_random.hpp>
+#include <ranges>
 #include <vector>
 
+#include "config.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
+namespace labor_supplier::internal {
+inline void pickSample(
+    tbb::concurrent_vector<world::LaborRequest>&              requestBox,
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
+    pcg32&                                                    rng,
+    const int sampleCnt = config::labor_supplier::jobSampleCnt
+) {
+    const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
+    sampleRequests.clear();
+
+    if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
+        for (world::LaborRequest& request : requestBox)
+            sampleRequests.emplace_back(std::ref(request));
+        return;
+    }
+
+    std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), rng);
+}
+
+inline void sortSample(
+    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests,
+    const int entryCnt = config::labor_supplier::jobEntryCnt
+) {
+    const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
+    std::ranges::partial_sort(
+        sortRequests,
+        sortRequests.begin() + static_cast<int>(k),
+        std::ranges::greater{},
+        [](const std::reference_wrapper<world::LaborRequest>& requestRef) -> double {
+            return requestRef.get().wage;
+        }
+    );
+}
+}  // namespace labor_supplier::internal
+
 namespace labor_supplier {
-
-template <typename T>
-concept HasIsEligibleRequest = requires(T t, const world::LaborRequest& request) {
-    { t.isEligibleRequest(request) } -> std::same_as<bool>;
-};
-
 class JobHunter {
   public:
     JobHunter(pcg32& masterRng);
+    template <typename F1, typename F2>
+        requires requires(F1 isAligned, F2 makeEntrySheet, world::LaborRequest& request) {
+            { isAligned(request) } -> std::same_as<bool>;
+            {
+                makeEntrySheet(request)
+            } -> std::same_as<tbb::concurrent_vector<world::LaborEntry>::iterator>;
+        }
+
     void entry(
-        const int                                    id,
-        const HasIsEligibleRequest auto&             hasIsEligibleRequest,
-        const double                                 productPower,
+        const F1                                     isAligned,
+        const F2                                     makeEntrySheet,
         tbb::concurrent_vector<world::LaborRequest>& requestBox,
         const int                                    entryCnt = config::labor_supplier::jobEntryCnt
-    ) PRE(id >= 0) PRE(productPower > 0.0) PRE(entryCnt > 0);
-    void accept();
+    ) PRE(entryCnt > 0) {
+        using Request = world::LaborRequest;
+        isPosting_    = true;
+        static thread_local std::vector<std::reference_wrapper<Request>> sampleRequests;
+        internal::pickSample(requestBox, sampleRequests, rng_);
+        internal::sortSample(sampleRequests);
+        std::ranges::view auto alignedRequests{
+            sampleRequests |
+            std::views::filter([&](const std::reference_wrapper<Request> req) -> bool {
+                return isAligned(req.get());
+            }) |
+            std::views::take(entryCnt)
+        };
+        for (const auto requestRef : alignedRequests) {
+            auto& request = requestRef.get();
+            auto  it{makeEntrySheet(request)};
+            myEntries_.emplace_back(&*it);
+        }
+    }
+    void accept() {
+        if (not isPosting_) return;
+        for (SafePtr<world::LaborEntry> myEntry : myEntries_) {
+            if (not myEntry->isOffer) continue;
+            myEntry->isAccept = true;
+            acceptedEntry_    = myEntry;
+        }
+    }
     void endStep() { myEntries_.clear(), acceptedEntry_ = nullptr, isPosting_ = false; }
     auto acceptedEntry() const -> SafePtr<world::LaborEntry> { return acceptedEntry_; }
 
@@ -74,7 +137,22 @@ class Employment {
 class LaborSupplier {
   public:
     LaborSupplier(pcg32& masterRng);
-    void entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) PRE(id >= 0);
+    void entry(const int id, tbb::concurrent_vector<world::LaborRequest>& requestBox) PRE(id >= 0) {
+        updateRosterEntry();
+        if (not shouldSearchJob()) return;
+        if (requestBox.empty()) return;
+
+        using Request = world::LaborRequest;
+        const auto isAligned{[&](const Request& req) -> bool {
+            if (req.firmID == employment_.contractFirmId()) return false;
+            if (req.wage < employment_.wage()) return false;
+            return true;
+        }};
+        const auto makeEntrySheet{[&](Request& req) -> auto {
+            return req.entryBox.emplace_back(id, productPower_, req);
+        }};
+        jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
+    }
     void accept() { jobHunter_.accept(); }
     void recordRosterEntry() {
         const SafePtr<world::LaborEntry> acceptedEntry{jobHunter_.acceptedEntry()};
@@ -95,7 +173,10 @@ class LaborSupplier {
 
   private:
     void updateRosterEntry() { employment_.updateStatus(); }
-    auto shouldSearchJob() const -> bool;
+    auto shouldSearchJob() const -> bool {
+        if (not employment_.isEmployed()) return true;
+        return helper::rand(rng_) < jobSearchThreshold_;
+    }
 
     mutable pcg32 rng_;
     JobHunter     jobHunter_;
