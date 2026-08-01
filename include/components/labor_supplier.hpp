@@ -87,7 +87,7 @@ class JobHunter {
 
     void accept() {
         if (not isPosting_) return;
-        SafePtr<Entry> acceptEntry{takeAcceptEntry()};
+        const SafePtr<Entry> acceptEntry{takeAcceptEntry()};
         if (not acceptEntry) return;
         acceptEntry->isAccept = true;
         acceptedEntry_        = acceptEntry;
@@ -179,7 +179,9 @@ class LaborSupplier {
         jobHunter_.endStep();
     }
     void product() { employment_.work(); }
-    auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) { return employment_.wage(); }
+    auto wage() const -> Money POST(wage : wage >= Money{0.0}) {
+        return static_cast<Money>(employment_.wage());
+    }
 
   private:
     auto shouldSearchJob() const -> bool {
