@@ -6,7 +6,7 @@
 #include "core/values/common.hpp"
 
 namespace goods {
-void product(labor_supplier::LaborSupplier laborSupplier);
+void product(labor_supplier::LaborSupplier& laborSupplier);
 
 void postGoods(
     goods_supplier::GoodsSupplier&             goodsSupplier,

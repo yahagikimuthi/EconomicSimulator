@@ -18,8 +18,9 @@
             "extensions": [
                 "llvm-vs-code-extensions.vscode-clangd",
                 "ms-vscode.cmake-tools",
-                "ms-python.python", // Python言語サポート (デバッグ・インテリセンス)
-                "ms-python.vscode-pylance" // 高速な型解析
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "vadimcn.vscode-lldb"
             ]
         }
     },

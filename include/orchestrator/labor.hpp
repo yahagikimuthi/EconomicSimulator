@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <components/labor_demander.hpp>
 
 #include "core/forward.hpp"
 

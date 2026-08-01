@@ -7,7 +7,7 @@
 #include "components/labor_supplier.hpp"
 
 namespace goods {
-void product(labor_supplier::LaborSupplier laborSupplier) { laborSupplier.product(); }
+void product(labor_supplier::LaborSupplier& laborSupplier) { laborSupplier.product(); }
 
 void postGoods(
     goods_supplier::GoodsSupplier&             goodsSupplier,

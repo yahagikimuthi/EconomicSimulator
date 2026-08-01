@@ -62,7 +62,7 @@ class [[nodiscard]] HeadCount {
         return *this;
     }
     auto operator*=(const double other) -> HeadCount& {
-        value_ += other;
+        value_ *= other;
         return *this;
     }
     auto operator/=(const double other) -> HeadCount& PRE(other != 0.0) {
