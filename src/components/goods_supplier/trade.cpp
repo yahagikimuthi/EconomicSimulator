@@ -52,7 +52,7 @@ void performRationedTrade(
         remainAmount -= requestAmount;
     }
 
-    assert(false && "runtime error");
+    ASSERT(false && "runtime error");
     std::unreachable();
 }
 
@@ -65,12 +65,12 @@ void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
 
 namespace goods_supplier {
 void Trader::trade() {
-    if (not isPosting) return;
+    if (not isPosting_) return;
     auto&               requestBox = myEntry_->requestBox;
     const GoodsQuantity totalDemand{calcTotalDemand(requestBox)};
     if (totalDemand == GoodsQuantity{0.0}) return;
-    const bool          isExcessDemand{totalDemand > myEntry_->supply};
-    const GoodsQuantity salesAmount{std::min(myEntry_->supply, totalDemand)};
+    const bool          isExcessDemand{totalDemand > ledger_.inventory};
+    const GoodsQuantity salesAmount{std::min(ledger_.inventory, totalDemand)};
     isExcessDemand ? performRationedTrade(myEntry_->supply, rng_, requestBox)
                    : performFullTrade(requestBox);
     ledger_.totalDemand += totalDemand;

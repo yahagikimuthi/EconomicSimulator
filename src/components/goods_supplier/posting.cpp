@@ -48,6 +48,8 @@ void Trader::post(
     tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     if (supply == GoodsQuantity{0.0}) return;
+    isPosting_        = true;
+    ledger_.inventory = supply;
     auto it{entryBox.emplace_back(pricePlan, supply)};
     myEntry_ = &*it;
 }

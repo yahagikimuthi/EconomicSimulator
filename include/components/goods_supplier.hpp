@@ -76,12 +76,12 @@ class Trader {
     auto totalDemand() const -> GoodsQuantity POST(demand : demand >= GoodsQuantity{0.0}) {
         return ledger_.totalDemand;
     }
-    void endStep() { myEntry_ = nullptr, isPosting = false, ledger_.reset(); }
+    void endStep() { myEntry_ = nullptr, isPosting_ = false, ledger_.reset(); }
 
   private:
     pcg32                      rng_;
     SafePtr<world::GoodsEntry> myEntry_{nullptr};
-    bool                       isPosting{false};
+    bool                       isPosting_{false};
 
     struct {
         GoodsQuantity inventory{0.0};
