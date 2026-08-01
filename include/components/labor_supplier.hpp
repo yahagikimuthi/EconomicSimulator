@@ -131,7 +131,7 @@ class Employment {
     void work() {
         if (not isEmployed()) return;
         auto& workspace = rosterEntry_->workspace;
-        workspace.totalLaborInput += workspace.firmProductPower * productPower_;
+        workspace.addInput(GoodsQuantity{workspace.firmProductPower * productPower_});
     }
     auto productPower() const -> double { return productPower_; }
     void updateStatus() {

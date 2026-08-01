@@ -21,9 +21,7 @@ namespace {
 }  // namespace
 
 namespace goods_supplier {
-auto Producer::product() const -> GoodsQuantity {
-    return GoodsQuantity{workspace_.totalLaborInput + inventory_.value()};
-}
+auto Producer::product() const -> GoodsQuantity { return workspace_.totalInput() + inventory_; }
 
 auto Planner::calcMarkup() const -> double {
     const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.markupAdjustVol))};

@@ -109,6 +109,7 @@ class [[nodiscard]] Producer {
         PRE(unsoldAmount >= GoodsQuantity{0.0}) {
         inventory_ = unsoldAmount;
         dropBox.inventories.emplace_back(inventory_.value());
+        workspace_.resetInput();
     }
     auto workspace() -> world::Workspace& { return workspace_; }
 

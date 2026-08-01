@@ -63,7 +63,7 @@ void endStep(
     labor_supplier::LaborSupplier& laborSupplier,
     world::CensusDropBox&          dropBox
 ) {
-    finance.assetPlus(Money{laborSupplier.wage().value()});
+    finance.assetPlus(laborSupplier.wage());
     laborSupplier.endStep(dropBox);
 }
 }  // namespace labor

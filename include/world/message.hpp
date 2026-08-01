@@ -12,9 +12,16 @@
 #include "core/values/labor.hpp"
 
 namespace world {
-struct Workspace {
-    std::atomic<double> totalLaborInput;
-    double              firmProductPower{};
+struct [[nodiscard]] Workspace {
+  public:
+    double firmProductPower{};
+
+    void addInput(const GoodsQuantity input) { totalInput_ += input.value(); }
+    auto totalInput() const -> GoodsQuantity { return GoodsQuantity{totalInput_}; }
+    void resetInput() { totalInput_ = 0.0; }
+
+  private:
+    std::atomic<double> totalInput_;
 };
 
 struct RosterEntry {
