@@ -3,7 +3,6 @@
 #include <cassert>
 #include <cmath>
 
-#include "core/values/cross.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
@@ -13,7 +12,8 @@ auto Producer::calcDesiredEmploy(
 ) const -> HeadCount {
     const GoodsQuantity targetProduction{targetSupply - inventory_};
     const double        avgProductPower{
-        (employeeCnt != HeadCount{0.0}) ? lastSupply / employeeCnt : firmProductPower_
+        (employeeCnt != HeadCount{0.0}) ? lastSupply.value() / employeeCnt.value()
+                                               : firmProductPower_
     };
     const HeadCount desiredEmploy{
         (avgProductPower != 0.0) ? targetProduction.value() / avgProductPower : 1.0
