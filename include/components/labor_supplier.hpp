@@ -22,13 +22,11 @@ inline void pickSample(
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     sampleRequests.clear();
-
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
         for (world::LaborRequest& request : requestBox)
             sampleRequests.emplace_back(std::ref(request));
         return;
     }
-
     std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), rng);
 }
 
@@ -56,7 +54,7 @@ class JobHunter {
     template <typename F1, typename F2>
         requires requires(F1 isAligned, F2 makeEntrySheet, world::LaborRequest& request) {
             { isAligned(request) } -> std::same_as<bool>;
-            { &*makeEntrySheet(request) } -> std::same_as<world::LaborEntry*>;
+            { makeEntrySheet(request) } -> std::same_as<SafePtr<world::LaborEntry>>;
         }
     void entry(
         const F1                                     isAligned,
@@ -77,9 +75,8 @@ class JobHunter {
             std::views::take(entryCnt)
         };
         for (const auto requestRef : alignedRequests) {
-            auto& request = requestRef.get();
-            auto  it{makeEntrySheet(request)};
-            myEntries_.emplace_back(&*it);
+            Request& request = requestRef.get();
+            myEntries_.emplace_back(makeEntrySheet(request));
         }
     }
     void accept() {
@@ -149,8 +146,8 @@ class LaborSupplier {
             if (req.wage < employment_.wage()) return false;
             return true;
         }};
-        const auto makeEntrySheet{[&](Request& req) -> auto {
-            return req.entryBox.emplace_back(id, employment_.productPower(), req);
+        const auto makeEntrySheet{[&](Request& req) -> SafePtr<world::LaborEntry> {
+            return &*req.entryBox.emplace_back(id, employment_.productPower(), req);
         }};
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }

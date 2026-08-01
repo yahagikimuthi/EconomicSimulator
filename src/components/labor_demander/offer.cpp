@@ -9,17 +9,15 @@
 #include "world/message.hpp"
 
 namespace {
-void sortApplicants(
-    const HeadCount                                         offer,
-    std::vector<std::reference_wrapper<world::LaborEntry>>& applicants,
-    tbb::concurrent_vector<world::LaborEntry>&              entryBox
-) {
-    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
+auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<world::LaborEntry>& entryBox)
+    -> std::span<std::reference_wrapper<world::LaborEntry>> {
+    static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
     applicants.clear();
+    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
     for (world::LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
     const bool isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
 
-    if (not isOver) return;
+    if (not isOver) return applicants;
 
     std::ranges::nth_element(
         applicants,
@@ -29,19 +27,18 @@ void sortApplicants(
             return entryRef.get().productPower;
         }
     );
+    return applicants;
 }
 }  // namespace
 
 namespace labor_demander {
 void Recruiter::offer() {
     if (not isPosting_) return;
-    if (myRequest_->entryBox.empty()) {
-        isPosting_ = false;
-        return;
-    }
+    if (myRequest_->entryBox.empty()) return;
 
-    static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
-    sortApplicants(ledger_.remainOfferNum, applicants, myRequest_->entryBox);
+    std::span<std::reference_wrapper<world::LaborEntry>> applicants{
+        sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox)
+    };
 
     for (auto entryRef : applicants) {
         if (ledger_.remainOfferNum <= HeadCount{0.0}) break;
