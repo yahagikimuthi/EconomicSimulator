@@ -10,24 +10,24 @@
 
 namespace {
 auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<world::LaborEntry>& entryBox)
-    -> std::span<std::reference_wrapper<world::LaborEntry>> {
-    static thread_local std::vector<std::reference_wrapper<world::LaborEntry>> applicants;
+    -> std::ranges::view auto {
+    using EntryRef = std::reference_wrapper<world::LaborEntry>;
+    static thread_local std::vector<EntryRef> applicants;
     applicants.clear();
     const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
     for (world::LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
     const bool isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
 
-    if (not isOver) return applicants;
+    const auto toRawRef{[](EntryRef entryRef) -> world::LaborEntry& { return entryRef.get(); }};
+    if (not isOver) return applicants | std::views::transform(toRawRef);
 
     std::ranges::nth_element(
         applicants,
         applicants.begin() + static_cast<int>(k),
         std::ranges::greater{},
-        [](const std::reference_wrapper<const world::LaborEntry> entryRef) -> double {
-            return entryRef.get().productPower;
-        }
+        [](const EntryRef entryRef) -> double { return entryRef.get().productPower; }
     );
-    return applicants;
+    return applicants | std::views::transform(toRawRef);
 }
 }  // namespace
 
@@ -36,14 +36,11 @@ void Recruiter::offer() {
     if (not isPosting_) return;
     if (myRequest_->entryBox.empty()) return;
 
-    std::span<std::reference_wrapper<world::LaborEntry>> applicants{
-        sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox)
-    };
+    std::ranges::view auto applicants{sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox)};
 
-    for (auto entryRef : applicants) {
+    for (auto&& entry : applicants) {
         if (ledger_.remainOfferNum <= HeadCount{0.0}) break;
-        world::LaborEntry& entry = entryRef.get();
-        entry.isOffer            = true;
+        entry.isOffer = true;
         offerApplicants_.emplace_back(&entry);
         --ledger_.remainOfferNum;
     }

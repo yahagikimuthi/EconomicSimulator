@@ -44,6 +44,19 @@ inline void sortSample(
         }
     );
 }
+
+[[nodiscard]] inline auto pickJob(
+    tbb::concurrent_vector<world::LaborRequest>& requestBox, pcg32& rng
+) -> std::ranges::view auto {
+    using Request = world::LaborRequest;
+    static thread_local std::vector<std::reference_wrapper<Request>> sampleRequest;
+    pickSample(requestBox, sampleRequest, rng);
+    sortSample(sampleRequest);
+    return sampleRequest |
+           std::views::transform([](std::reference_wrapper<Request> reqRef) -> Request& {
+               return reqRef.get();
+           });
+}
 }  // namespace labor_supplier::internal
 
 namespace labor_supplier {
@@ -64,33 +77,37 @@ class JobHunter {
     ) PRE(entryCnt > 0) {
         using Request = world::LaborRequest;
         isPosting_    = true;
-        static thread_local std::vector<std::reference_wrapper<Request>> sampleRequests;
-        internal::pickSample(requestBox, sampleRequests, rng_);
-        internal::sortSample(sampleRequests);
         std::ranges::view auto alignedRequests{
-            sampleRequests |
-            std::views::filter([&](const std::reference_wrapper<Request> req) -> bool {
-                return isAligned(req.get());
-            }) |
+            internal::pickJob(requestBox, rng_) |
+            std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
             std::views::take(entryCnt)
         };
-        for (const auto requestRef : alignedRequests) {
-            Request& request = requestRef.get();
-            myEntries_.emplace_back(makeEntrySheet(request));
-        }
+        for (auto&& request : alignedRequests) myEntries_.emplace_back(makeEntrySheet(request));
     }
+
     void accept() {
         if (not isPosting_) return;
-        for (const SafePtr<world::LaborEntry> myEntry : myEntries_) {
-            if (not myEntry->isOffer) continue;
-            myEntry->isAccept = true;
-            acceptedEntry_    = myEntry;
-        }
+        SafePtr<Entry> acceptEntry{takeAcceptEntry()};
+        if (not acceptEntry) return;
+        acceptEntry->isAccept = true;
+        acceptedEntry_        = acceptEntry;
     }
+
     void endStep() { myEntries_.clear(), acceptedEntry_ = nullptr, isPosting_ = false; }
     auto acceptedEntry() const -> SafePtr<world::LaborEntry> { return acceptedEntry_; }
 
   private:
+    using Entry = world::LaborEntry;
+    auto takeAcceptEntry() const -> SafePtr<Entry> {
+        std::ranges::view auto acceptEntry{
+            myEntries_ |
+            std::views::filter([](SafePtr<Entry> entry) -> bool { return entry->isOffer; }) |
+            std::views::take(1)
+        };
+        if (acceptEntry.empty()) return nullptr;
+        return *acceptEntry.begin();
+    }
+
     mutable pcg32                           rng_;
     std::vector<SafePtr<world::LaborEntry>> myEntries_;
     SafePtr<world::LaborEntry>              acceptedEntry_{nullptr};
