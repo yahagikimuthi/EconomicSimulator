@@ -44,7 +44,8 @@ void Recruiter::post(
     isRecruiting_ = true;
     planner_.judgePlan(desiredEmploy);
     if (planner_.offerPlan() == HeadCount{0.0}) return;
-    isPosting_ = true;
+    isPosting_             = true;
+    ledger_.remainOfferNum = planner_.offerPlan();
     auto it{requestBox.emplace_back(id, planner_.wagePlan())};
     myRequest_ = &*it;
 }

@@ -71,10 +71,15 @@ class [[nodiscard]] Recruiter {
     void registerMember(F addRoster) {
         if (not isPosting_) return;
 
-        HeadCount employCnt{0.0};
-        for (SafePtr<world::LaborEntry> offeredApplicant : offerApplicants_) {
-            if (not offeredApplicant->isAccept) continue;
-            offeredApplicant->rosterEntry = addRoster(offeredApplicant->hholdID, myRequest_->wage);
+        HeadCount              employCnt{0.0};
+        std::ranges::view auto acceptApplicants{
+            offerApplicants_ |
+            std::views::filter([](const SafePtr<const world::LaborEntry> entry) -> bool {
+                return entry->isAccept;
+            })
+        };
+        for (const auto acceptApplicant : acceptApplicants) {
+            acceptApplicant->rosterEntry = addRoster(acceptApplicant->hholdID, myRequest_->wage);
             ++employCnt;
         }
         ledger_.employing += employCnt;

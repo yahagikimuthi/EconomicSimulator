@@ -2,10 +2,10 @@
 
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
-#include <core/values/labor.hpp>
 #include <cstddef>
 #include <functional>
 
+#include "core/values/labor.hpp"
 #include "world/message.hpp"
 
 namespace {

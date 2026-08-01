@@ -7,8 +7,8 @@
 #define POST(...)
 #define ASSERT(...) assert(__VA_ARGS__)
 #else
-#define PRE(...) pre(__VA_ARGS__)
-#define POST(...) post(__VA_ARGS__)
+#define PRE(...)
+#define POST(...)
 #define ASSERT(...) contract_assert(__VA_ARGS__)
 #endif
 
@@ -16,6 +16,9 @@ template <typename T>
 class [[nodiscard]] SafePtr {
   public:
     SafePtr(T* ptr) : ptr_{ptr} {}
+
+    template <typename U>
+    SafePtr(const SafePtr<U> other) : ptr_{other.get()} {}
 
     auto hasValue() const -> bool { return ptr_ != nullptr; }
     auto get() const -> T* { return ptr_; }

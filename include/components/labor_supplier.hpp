@@ -56,9 +56,7 @@ class JobHunter {
     template <typename F1, typename F2>
         requires requires(F1 isAligned, F2 makeEntrySheet, world::LaborRequest& request) {
             { isAligned(request) } -> std::same_as<bool>;
-            {
-                makeEntrySheet(request)
-            } -> std::same_as<tbb::concurrent_vector<world::LaborEntry>::iterator>;
+            { &*makeEntrySheet(request) } -> std::same_as<world::LaborEntry*>;
         }
     void entry(
         const F1                                     isAligned,
@@ -86,7 +84,7 @@ class JobHunter {
     }
     void accept() {
         if (not isPosting_) return;
-        for (SafePtr<world::LaborEntry> myEntry : myEntries_) {
+        for (const SafePtr<world::LaborEntry> myEntry : myEntries_) {
             if (not myEntry->isOffer) continue;
             myEntry->isAccept = true;
             acceptedEntry_    = myEntry;
@@ -116,7 +114,7 @@ class Employment {
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
-    void executeProduct() {
+    void work() {
         if (not isEmployed()) return;
         auto& workspace = rosterEntry_->workspace;
         workspace.totalLaborInput += workspace.firmProductPower * productPower_;
@@ -141,7 +139,7 @@ class LaborSupplier {
   public:
     LaborSupplier(pcg32& masterRng);
     void entry(const AgentID id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
-        updateRosterEntry();
+        employment_.updateStatus();
         if (not shouldSearchJob()) return;
         if (requestBox.empty()) return;
 
@@ -166,16 +164,10 @@ class LaborSupplier {
         dropBox.wages.emplace_back(wage().value());
         jobHunter_.endStep();
     }
-    void product() { employment_.executeProduct(); }
+    void product() { employment_.work(); }
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) { return employment_.wage(); }
-    auto isEligibleRequest(const world::LaborRequest& request) const -> bool {
-        if (request.firmID == employment_.contractFirmId()) return false;
-        if (request.wage < employment_.wage()) return false;
-        return true;
-    }
 
   private:
-    void updateRosterEntry() { employment_.updateStatus(); }
     auto shouldSearchJob() const -> bool {
         if (not employment_.isEmployed()) return true;
         return helper::rand(rng_) < jobSearchThreshold_;
