@@ -26,6 +26,7 @@ class [[nodiscard]] Price {
         value_ /= other;
         return *this;
     }
+    explicit operator Money() const { return Money{value_}; }
 
   private:
     double value_;

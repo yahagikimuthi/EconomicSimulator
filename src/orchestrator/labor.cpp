@@ -56,7 +56,7 @@ void endStep(
     world::CensusDropBox&          dropBox
 ) {
     laborDemander.endStep(dropBox);
-    finance.assetPlus(Money{-laborDemander.sumWage().value()});
+    finance.assetPlus(-laborDemander.sumWage());
 }
 void endStep(
     hhold_finance::Component&      finance,

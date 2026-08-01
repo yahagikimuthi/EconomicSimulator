@@ -69,17 +69,17 @@ class [[nodiscard]] Recruiter {
             { addRoster(id, wage) } -> std::same_as<SafePtr<world::RosterEntry>>;
         }
     void registerMember(F addRoster) {
+        using Entry = world::LaborEntry;
         if (not isPosting_) return;
 
         HeadCount              employCnt{0.0};
         std::ranges::view auto acceptApplicants{
             offerApplicants_ |
-            std::views::filter([](const SafePtr<const world::LaborEntry> entry) -> bool {
-                return entry->isAccept;
-            })
+            std::views::transform([](SafePtr<Entry> entry) -> Entry& { return *entry; }) |
+            std::views::filter(&Entry::isAccept)
         };
-        for (const auto acceptApplicant : acceptApplicants) {
-            acceptApplicant->rosterEntry = addRoster(acceptApplicant->hholdID, myRequest_->wage);
+        for (auto&& acceptApplicant : acceptApplicants) {
+            acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
             ++employCnt;
         }
         ledger_.employing += employCnt;
@@ -118,10 +118,10 @@ class [[nodiscard]] HumanResourceManager {
         return HeadCount{static_cast<double>(rosterSize)};
     }
     auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
-        auto& roster = companyBoard_.roster;
-        auto  view{
-            roster | std::views::filter([](const world::RosterEntry& e) -> bool {
-                return not e.isOccupied;
+        const auto& roster = companyBoard_.roster;
+        auto        view{
+            roster | std::views::filter([](const world::RosterEntry& entry) -> bool {
+                return entry.isOccupied;
             }) |
             std::views::transform([](const world::RosterEntry& entry) -> double {
                 return entry.wage.value();
@@ -160,7 +160,9 @@ class [[nodiscard]] LaborDemander {
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         return hrManager_.employeeCnt();
     }
-    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) { return hrManager_.sumWage(); }
+    auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
+        return static_cast<Money>(hrManager_.sumWage());
+    }
     void endStep(world::CensusDropBox& dropBox) { recruiter_.endStep(dropBox); }
 
   private:

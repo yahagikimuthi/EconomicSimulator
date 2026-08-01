@@ -25,7 +25,7 @@ class [[nodiscard]] GoodsDemander {
         isPosting_  = false;
         purchasing_ = Money{0.0};
     }
-    auto purchase() const -> Money { return purchasing_; }
+    auto purchase() const -> Money POST(money : money >= Money{0.0}) { return purchasing_; }
 
   private:
     auto isPass(

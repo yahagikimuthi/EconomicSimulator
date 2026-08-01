@@ -27,6 +27,8 @@ class [[nodiscard]] Wage {
     }
     auto operator-() const -> Wage { return Wage{-value_}; }
 
+    explicit operator Money() const { return Money{value_}; }
+
   private:
     double value_;
 };
