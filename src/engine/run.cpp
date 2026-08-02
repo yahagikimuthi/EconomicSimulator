@@ -23,7 +23,7 @@ template <typename Agent>
     });
 }
 }  // namespace
-
+//! 2ステップ目で労働市場において終了時の総資産が開始時より増加している
 namespace core {
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
@@ -77,8 +77,6 @@ void Engine::runLabor() {
 }
 
 void Engine::runGoods() {
-    std::println("財市場開始");
-    std::println("{}", sumAsset(firms_) + sumAsset(hholds_));
     for (HHold& hhold : hholds_) {
         goods::product(hhold.labor);
     }
@@ -106,8 +104,6 @@ void Engine::runGoods() {
     for (HHold& hhold : hholds_) {
         goods::endStep(hhold.finance, hhold.goods);
     }
-    std::println("財市場終了");
-    std::println("{}", sumAsset(firms_) + sumAsset(hholds_));
 }
 
 void Engine::logging() {
