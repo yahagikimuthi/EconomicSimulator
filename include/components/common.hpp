@@ -22,6 +22,7 @@ class [[nodiscard]] Component {
   public:
     Component(pcg32& masterRng);
     void assetPlus(const Money plus) { asset_ += plus; }
+    auto asset() const -> Money { return asset_; }
     void endStep(world::CensusDropBox& dropBox) const {
         dropBox.firmAssets.emplace_back(asset_.value());
     }

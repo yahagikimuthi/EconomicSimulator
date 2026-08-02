@@ -13,10 +13,10 @@
 using namespace helper;
 
 namespace firm_finance {
-Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 100000, 500000)} {}
+Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 1000, 5000)} {}
 }  // namespace firm_finance
 namespace hhold_finance {
-Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 100000, 500000)} {}
+Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 1000, 5000)} {}
 }  // namespace hhold_finance
 
 namespace labor_demander {
@@ -78,7 +78,7 @@ Planner::Planner(pcg32& masterRng)
 Trader::Trader(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
 Producer::Producer(pcg32& masterRng, world::Workspace& workspace)
     : workspace_{workspace},
-      firmProductPower_{rand(masterRng, 0.01, 0.05)},
+      firmProductPower_{rand(masterRng, 0.1, 0.5)},
       inventory_{rand(masterRng, 0.5, 2.0)} {
     workspace_.firmProductPower = firmProductPower_;
 }

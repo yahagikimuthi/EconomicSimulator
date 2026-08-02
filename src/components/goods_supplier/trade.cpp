@@ -74,7 +74,7 @@ void Trader::trade() {
     isExcessDemand ? performRationedTrade(myEntry_->supply, rng_, requestBox)
                    : performFullTrade(requestBox);
     ledger_.totalDemand += totalDemand;
-    ledger_.currentSales += myEntry_->price * totalDemand;
+    ledger_.currentSales += myEntry_->price * salesAmount;
     ledger_.inventory -= salesAmount;
 }
 }  // namespace goods_supplier

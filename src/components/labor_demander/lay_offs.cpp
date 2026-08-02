@@ -8,13 +8,15 @@ namespace labor_demander {
 void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
     HeadCount              currentLayOffsCnt{0.0};
     auto&                  roster = companyBoard_.roster;
-    std::ranges::view auto alignedEntries{
-        roster | std::views::filter(&world::RosterEntry::isOccupied) | std::views::reverse |
-        std::views::take(layOffsCnt.value())
-    };
-    for (auto&& entry : alignedEntries) {
+    std::ranges::view auto reversedRoster{roster | std::views::reverse};
+
+    HeadCount currentLayOffs{0.0};
+    for (auto&& entry : reversedRoster) {
+        if (currentLayOffs >= layOffsCnt) return;
+        if (not entry.isOccupied) continue;
         entry.isOccupied = false;
         emptyRosterPool_.emplace_back(&entry);
+        ++currentLayOffs;
     }
 }
 }  // namespace labor_demander
