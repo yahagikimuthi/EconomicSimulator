@@ -20,7 +20,7 @@ namespace {
 }
 }  // namespace
 
-namespace goods_supplier {
+namespace goods::supplier {
 auto Producer::product() const -> GoodsQuantity { return workspace_.totalInput() + inventory_; }
 
 auto Planner::calcMarkup() const -> double {
@@ -61,4 +61,4 @@ void GoodsSupplier::post(
     planner_.judgePlan(supply, totalCost);
     trader_.post(supply, planner_.pricePlan(), entryBox);
 }
-}  // namespace goods_supplier
+}  // namespace goods::supplier

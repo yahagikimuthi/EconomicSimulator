@@ -63,7 +63,7 @@ void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
 }
 }  // namespace
 
-namespace goods_supplier {
+namespace goods::supplier {
 void Trader::trade() {
     if (not isPosting_) return;
     auto&               requestBox = myEntry_->requestBox;
@@ -77,4 +77,4 @@ void Trader::trade() {
     ledger_.currentSales += myEntry_->price * salesAmount;
     ledger_.inventory -= salesAmount;
 }
-}  // namespace goods_supplier
+}  // namespace goods::supplier

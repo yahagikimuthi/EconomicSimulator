@@ -31,7 +31,7 @@ auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<world::LaborEn
 }
 }  // namespace
 
-namespace labor_demander {
+namespace labor::demander {
 void Recruiter::offer() {
     if (not isPosting_) return;
     if (myRequest_->entryBox.empty()) return;
@@ -46,4 +46,4 @@ void Recruiter::offer() {
     }
     ledger_.applicantNum += HeadCount{static_cast<double>(myRequest_->entryBox.size())};
 }
-}  // namespace labor_demander
+}  // namespace labor::demander

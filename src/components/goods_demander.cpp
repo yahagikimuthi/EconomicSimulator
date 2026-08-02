@@ -35,7 +35,7 @@ namespace {
 }
 }  // namespace
 
-namespace goods_demander {
+namespace goods::demander {
 
 auto GoodsDemander::isPass(
     const Money asset, const Step step, const tbb::concurrent_vector<world::GoodsEntry>& entryBox
@@ -59,4 +59,4 @@ void GoodsDemander::request(
     };
     myRequest_ = &*it;
 }
-}  // namespace goods_demander
+}  // namespace goods::demander

@@ -19,7 +19,7 @@ namespace hhold_finance {
 void logging(world::CensusDropBox& dropBox, const Component& comp) { comp.endStep(dropBox); }
 }  // namespace hhold_finance
 
-namespace labor_demander {
+namespace labor::demander {
 auto RequestPlanner::updateOfferRate(const HeadCount actualEmploy) const -> double {
     const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.offerAdjustVol, -1.0, 1.0))};
     const bool   shouldRaise{actualEmploy < plan_.employ};
@@ -50,9 +50,9 @@ void Recruiter::endStep(world::CensusDropBox& dropBox) {
     ledger_.reset();
     isRecruiting_ = false;
 }
-}  // namespace labor_demander
+}  // namespace labor::demander
 
-namespace goods_supplier {
+namespace goods::supplier {
 auto Planner::updateDemandForecast(const GoodsQuantity totalDemand) const -> GoodsQuantity {
     return log_.demandForecast +
            (param_.demandForecastAdjustVol * (totalDemand - log_.demandForecast));
@@ -84,4 +84,4 @@ void GoodsSupplier::endStep(world::CensusDropBox& dropBox) {
     producer_.endStep(trader_.inventory(), dropBox);
     trader_.endStep();
 }
-}  // namespace goods_supplier
+}  // namespace goods::supplier

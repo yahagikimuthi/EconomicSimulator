@@ -15,16 +15,16 @@
 
 namespace core {
 struct Firm {  // NOLINT
-    agent_index::Component        index;
-    firm_finance::Component       finance;
-    labor_demander::LaborDemander labor;
-    goods_supplier::GoodsSupplier goods;
+    agent_index::Component         index;
+    firm_finance::Component        finance;
+    labor::demander::LaborDemander labor;
+    goods::supplier::GoodsSupplier goods;
 };
 struct HHold {  // NOLINT
-    agent_index::Component        index;
-    hhold_finance::Component      finance;
-    labor_supplier::LaborSupplier labor;
-    goods_demander::GoodsDemander goods;
+    agent_index::Component         index;
+    hhold_finance::Component       finance;
+    labor::supplier::LaborSupplier labor;
+    goods::demander::GoodsDemander goods;
 };
 struct HHoldTag {};
 struct FirmTag {};

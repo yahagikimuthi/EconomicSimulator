@@ -11,7 +11,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor_demander {
+namespace labor::demander {
 class [[nodiscard]] RequestPlanner {
   public:
     RequestPlanner(pcg32& masterRng);
@@ -178,4 +178,4 @@ class [[nodiscard]] LaborDemander {
     Recruiter            recruiter_;
     HumanResourceManager hrManager_;
 };
-}  // namespace labor_demander
+}  // namespace labor::demander

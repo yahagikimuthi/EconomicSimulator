@@ -41,6 +41,8 @@ struct CompanyBoard {
     tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox;
 
     CompanyBoard(const AgentID Id) : firmId{Id} {}
+
+    void resign(SafePtr<RosterEntry> resignEntry) { resignationBox.emplace_back(resignEntry); }
 };
 
 struct LaborEntry {

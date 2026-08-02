@@ -6,7 +6,7 @@
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
-namespace goods_supplier {
+namespace goods::supplier {
 auto Producer::calcDesiredEmploy(
     const GoodsQuantity targetSupply, const GoodsQuantity lastSupply, const HeadCount employeeCnt
 ) const -> HeadCount {
@@ -24,4 +24,4 @@ auto Producer::calcDesiredEmploy(
 auto GoodsSupplier::calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount {
     return producer_.calcDesiredEmploy(planner_.targetSupply(), planner_.lastSupply(), employeeCnt);
 }
-}  // namespace goods_supplier
+}  // namespace goods::supplier

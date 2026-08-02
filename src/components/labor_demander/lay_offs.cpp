@@ -4,7 +4,7 @@
 
 #include "core/values/labor.hpp"
 
-namespace labor_demander {
+namespace labor::demander {
 void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
     HeadCount              currentLayOffsCnt{0.0};
     auto&                  roster = companyBoard_.roster;
@@ -19,4 +19,4 @@ void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
         ++currentLayOffs;
     }
 }
-}  // namespace labor_demander
+}  // namespace labor::demander

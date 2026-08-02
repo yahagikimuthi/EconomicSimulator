@@ -10,7 +10,7 @@
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
-namespace goods_supplier {
+namespace goods::supplier {
 class [[nodiscard]] Planner {
   public:
     Planner(pcg32& masterRng);
@@ -136,4 +136,4 @@ class [[nodiscard]] GoodsSupplier {
     Trader   trader_;
     Producer producer_;
 };
-}  // namespace goods_supplier
+}  // namespace goods::supplier

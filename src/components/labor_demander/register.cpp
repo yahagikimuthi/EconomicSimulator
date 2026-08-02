@@ -8,7 +8,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor_demander {
+namespace labor::demander {
 auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
     -> SafePtr<world::RosterEntry> {
     if (emptyRosterPool_.empty())
@@ -27,4 +27,4 @@ void HumanResourceManager::acceptResignation() {
         emptyRosterPool_.emplace_back(resignEntry);
     }
 }
-}  // namespace labor_demander
+}  // namespace labor::demander

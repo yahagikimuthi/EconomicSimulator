@@ -17,7 +17,7 @@ namespace {
 }
 }  // namespace
 
-namespace labor_demander {
+namespace labor::demander {
 [[nodiscard]] auto RequestPlanner::calcNextWage() const -> Wage {
     const bool   shouldRaiseWage{log_.applicantNum < log_.offerPlan};
     const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.wageAdjustVol, -1.0, 1.0))};
@@ -49,4 +49,4 @@ void Recruiter::post(
     auto it{requestBox.emplace_back(id, planner_.wagePlan())};
     myRequest_ = &*it;
 }
-}  // namespace labor_demander
+}  // namespace labor::demander

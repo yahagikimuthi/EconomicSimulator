@@ -13,7 +13,7 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace labor_supplier::internal {
+namespace labor::supplier::internal {
 inline void pickSample(
     tbb::concurrent_vector<world::LaborRequest>&              requestBox,
     std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
@@ -57,9 +57,9 @@ inline void sortSample(
                return reqRef.get();
            });
 }
-}  // namespace labor_supplier::internal
+}  // namespace labor::supplier::internal
 
-namespace labor_supplier {
+namespace labor::supplier {
 class JobHunter {
   public:
     JobHunter(pcg32& masterRng);
@@ -99,12 +99,12 @@ class JobHunter {
   private:
     using Entry = world::LaborEntry;
     auto takeAcceptEntry() const -> SafePtr<Entry> {
-        std::ranges::view auto acceptEntry{
+        std::ranges::view auto offered{
             myEntries_ |
             std::views::filter([](SafePtr<Entry> entry) -> bool { return entry->isOffer; }) |
             std::views::take(1)
         };
-        return (acceptEntry.empty()) ? nullptr : *acceptEntry.begin();
+        return (offered.empty()) ? nullptr : offered.front();
     }
 
     mutable pcg32                           rng_;
@@ -141,7 +141,7 @@ class Employment {
   private:
     void resign() {
         if (not isEmployed()) return;
-        rosterEntry_->companyBoard.resignationBox.emplace_back(rosterEntry_);
+        rosterEntry_->companyBoard.resign(rosterEntry_);
     }
 
     SafePtr<world::RosterEntry> rosterEntry_{nullptr};
@@ -194,4 +194,4 @@ class LaborSupplier {
     Employment    employment_;
     const double  jobSearchThreshold_;
 };
-}  // namespace labor_supplier
+}  // namespace labor::supplier

@@ -8,7 +8,7 @@
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
-namespace goods_demander {
+namespace goods::demander {
 class [[nodiscard]] GoodsDemander {
   public:
     GoodsDemander(pcg32& masterRng);
@@ -43,4 +43,4 @@ class [[nodiscard]] GoodsDemander {
     const Step                         myPhase_;
     static inline int                  instanceCnt_{};
 };
-}  // namespace goods_demander
+}  // namespace goods::demander

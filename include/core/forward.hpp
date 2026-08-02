@@ -19,19 +19,15 @@ class Component;
 namespace hhold_finance {
 class Component;
 }
-namespace labor_demander {
+namespace labor::demander {
 class LaborDemander;
 }
-namespace labor_supplier {
+namespace labor::supplier {
 struct LaborSupplier;
 }
-namespace goods_demander {
+namespace goods::demander {
 class GoodsDemander;
 }
-namespace goods_supplier {
+namespace goods::supplier {
 class GoodsSupplier;
-}  // namespace goods_supplier
-
-namespace core {
-class Engine;
-}
+}  // namespace goods::supplier
