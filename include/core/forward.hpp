@@ -31,3 +31,7 @@ class GoodsDemander;
 namespace goods_supplier {
 class GoodsSupplier;
 }  // namespace goods_supplier
+
+namespace core {
+class Engine;
+}

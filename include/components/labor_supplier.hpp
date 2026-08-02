@@ -70,8 +70,8 @@ class JobHunter {
             { makeEntrySheet(request) } -> std::same_as<SafePtr<world::LaborEntry>>;
         }
     void entry(
-        const F1                                     isAligned,
-        const F2                                     makeEntrySheet,
+        F1                                           isAligned,
+        F2                                           makeEntrySheet,
         tbb::concurrent_vector<world::LaborRequest>& requestBox,
         const int                                    entryCnt = config::labor_supplier::jobEntryCnt
     ) PRE(entryCnt > 0) {
@@ -104,8 +104,7 @@ class JobHunter {
             std::views::filter([](SafePtr<Entry> entry) -> bool { return entry->isOffer; }) |
             std::views::take(1)
         };
-        if (acceptEntry.empty()) return nullptr;
-        return *acceptEntry.begin();
+        return (acceptEntry.empty()) ? nullptr : *acceptEntry.begin();
     }
 
     mutable pcg32                           rng_;
@@ -158,16 +157,17 @@ class LaborSupplier {
         if (requestBox.empty()) return;
 
         using Request = world::LaborRequest;
-        const auto isAligned{[&](const Request& req) -> bool {
+        auto isAligned{[&](const Request& req) -> bool {
             if (req.firmID == employment_.contractFirmId()) return false;
             if (req.wage < employment_.wage()) return false;
             return true;
         }};
-        const auto makeEntrySheet{[&](Request& req) -> SafePtr<world::LaborEntry> {
+        auto makeEntrySheet{[&](Request& req) -> SafePtr<world::LaborEntry> {
             return &*req.entryBox.emplace_back(id, employment_.productPower(), req);
         }};
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }
+
     void accept() { jobHunter_.accept(); }
     void recordRosterEntry() {
         const SafePtr<world::LaborEntry> acceptedEntry{jobHunter_.acceptedEntry()};

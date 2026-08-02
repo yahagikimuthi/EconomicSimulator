@@ -1,14 +1,14 @@
 #include "components/goods_demander.hpp"
 
-#include <oneapi/tbb/concurrent_vector.h>
 #include <tbb/concurrent_vector.h>
 #include <cassert>
-#include <core/values/goods.hpp>
 #include <functional>
 #include <pcg_random.hpp>
 #include <ranges>
 
 #include "config.hpp"
+#include "core/values/common.hpp"
+#include "core/values/goods.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 

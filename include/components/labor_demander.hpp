@@ -3,7 +3,6 @@
 #include <tbb/concurrent_vector.h>
 #include <concepts>
 #include <cstddef>
-#include <numeric>
 #include <pcg_random.hpp>
 #include <ranges>
 
@@ -119,20 +118,22 @@ class [[nodiscard]] HumanResourceManager {
         return HeadCount{static_cast<double>(rosterSize)};
     }
     auto employeeCnt() -> HeadCount {
+        ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         if (rosterSize == 0UZ) clearRoster();
         return HeadCount{static_cast<double>(rosterSize)};
     }
     auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+        using Entry        = world::RosterEntry;
         const auto& roster = companyBoard_.roster;
         return Wage{std::ranges::fold_left(
-            roster | std::views::filter([](const world::RosterEntry& entry) -> bool {
+            roster | std::views::filter([](const Entry& entry) -> bool {
                 return entry.isOccupied;
+            }) | std::views::transform([](const Entry& entry) -> double {
+                return entry.wage.value();
             }),
             0.0,
-            [](double acc, const world::RosterEntry& entry) -> double {
-                return acc + entry.wage.value();
-            }
+            std::plus{}
         )};
     };
 
