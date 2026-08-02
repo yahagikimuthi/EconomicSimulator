@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <concepts>
+#include <cstddef>
 #include <numeric>
 #include <pcg_random.hpp>
 #include <ranges>
@@ -117,20 +118,27 @@ class [[nodiscard]] HumanResourceManager {
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
+    auto employeeCnt() -> HeadCount {
+        const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
+        if (rosterSize == 0UZ) clearRoster();
+        return HeadCount{static_cast<double>(rosterSize)};
+    }
     auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         const auto& roster = companyBoard_.roster;
-        auto        view{
+        return Wage{std::ranges::fold_left(
             roster | std::views::filter([](const world::RosterEntry& entry) -> bool {
                 return entry.isOccupied;
-            }) |
-            std::views::transform([](const world::RosterEntry& entry) -> double {
-                return entry.wage.value();
-            })
-        };
-        return Wage{std::reduce(view.begin(), view.end(), 0.0)};
-    }
+            }),
+            0.0,
+            [](double acc, const world::RosterEntry& entry) -> double {
+                return acc + entry.wage.value();
+            }
+        )};
+    };
 
   private:
+    void clearRoster() { companyBoard_.roster.clear(), emptyRosterPool_.clear(); }
+
     world::CompanyBoard&                     companyBoard_;
     std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
 };
