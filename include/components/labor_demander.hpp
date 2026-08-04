@@ -114,6 +114,7 @@ class [[nodiscard]] HumanResourceManager {
     void acceptResignation();
     void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0});
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+        ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
@@ -136,6 +137,7 @@ class [[nodiscard]] HumanResourceManager {
             std::plus{}
         )};
     };
+    void endStep();
 
   private:
     void clearRoster() { companyBoard_.roster.clear(), emptyRosterPool_.clear(); }
@@ -172,7 +174,10 @@ class [[nodiscard]] LaborDemander {
     auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(hrManager_.sumWage());
     }
-    void endStep(world::CensusDropBox& dropBox) { recruiter_.endStep(dropBox); }
+    void endStep(world::CensusDropBox& dropBox) {
+        recruiter_.endStep(dropBox);
+        hrManager_.endStep();
+    }
 
   private:
     Recruiter            recruiter_;

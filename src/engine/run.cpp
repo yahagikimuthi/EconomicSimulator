@@ -1,9 +1,7 @@
 #include "core/engine.hpp"
 
-#include <concepts>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <print>
 #include <string>
 
 #include "config.hpp"
@@ -12,18 +10,6 @@
 #include "orchestrator/updates_loggings.hpp"
 #include "world/message.hpp"
 
-namespace {
-template <typename Agent>
-    requires requires(Agent agent) {
-        { agent.finance.asset() } -> std::same_as<Money>;
-    }
-[[nodiscard]] auto sumAsset(const std::vector<Agent>& agents) {
-    return std::ranges::fold_left(agents, 0.0, [](const double acc, const Agent& agent) -> double {
-        return acc + agent.finance.asset().value();
-    });
-}
-}  // namespace
-//! 2ステップ目で労働市場において終了時の総資産が開始時より増加している
 namespace core {
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
@@ -36,8 +22,6 @@ void Engine::run() {
 }
 
 void Engine::runLabor() {
-    std::println("労働市場開始");
-    std::println("{}", sumAsset(firms_) + sumAsset(hholds_));
     for (Firm& firm : firms_) {
         labor::adjustWorkforce(firm.index, firm.goods, firm.labor, laborRequestBox_);
     }
@@ -72,8 +56,6 @@ void Engine::runLabor() {
     for (HHold& hhold : hholds_) {
         labor::endStep(hhold.finance, hhold.labor, dropBox_);
     }
-    std::println("労働市場終了");
-    std::println("{}", sumAsset(firms_) + sumAsset(hholds_));
 }
 
 void Engine::runGoods() {

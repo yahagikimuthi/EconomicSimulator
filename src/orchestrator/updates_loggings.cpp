@@ -50,6 +50,8 @@ void Recruiter::endStep(world::CensusDropBox& dropBox) {
     ledger_.reset();
     isRecruiting_ = false;
 }
+
+void HumanResourceManager::endStep() { companyBoard_.resignationBox.clear(); }
 }  // namespace labor::demander
 
 namespace goods::supplier {
