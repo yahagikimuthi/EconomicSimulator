@@ -34,7 +34,6 @@ class [[nodiscard]] InputDataManager {
                       << '\n';
             std::abort();
         }
-        stepKeys_ = inFile_.listObjectNames();
     }
 
     auto getStepKeys() const -> std::vector<std::string> {
@@ -45,9 +44,8 @@ class [[nodiscard]] InputDataManager {
         return stepKeys;
     }
 
-    void read(
-        const std::string& path, std::string_view dataName, std::vector<double>& container
-    ) const {
+    void read(const std::string& path, std::string_view dataName, std::vector<double>& container)
+        const {
         const auto group{getGroup(path)};
         if (not group) {
             container.clear();
@@ -70,8 +68,7 @@ class [[nodiscard]] InputDataManager {
         return std::nullopt;
     }
 
-    HighFive::File           inFile_;
-    std::vector<std::string> stepKeys_;
+    HighFive::File inFile_;
 };
 
 class [[nodiscard]] OutputDataManager {

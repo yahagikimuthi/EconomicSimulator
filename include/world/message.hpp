@@ -40,9 +40,8 @@ struct CompanyBoard {
     std::deque<RosterEntry>                      roster;
     tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox;
 
-    CompanyBoard(const AgentID Id) : firmId{Id} {}
-
     void resign(SafePtr<RosterEntry> resignEntry) { resignationBox.emplace_back(resignEntry); }
+    CompanyBoard(const AgentID Id) : firmId{Id} {}
 };
 
 struct LaborEntry {
@@ -60,9 +59,8 @@ struct LaborEntry {
 };
 
 struct LaborRequest {
-    const AgentID firmID;
-    const Wage    wage;
-
+    const AgentID                      firmID;
+    const Wage                         wage;
     tbb::concurrent_vector<LaborEntry> entryBox;
 
     LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}

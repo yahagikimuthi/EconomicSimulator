@@ -10,9 +10,15 @@
 #include "orchestrator/updates_loggings.hpp"
 #include "world/message.hpp"
 
+//! ステップ65、4番企業のオファー数がオーバーフロー
+//! 雇用数、求人率が爆発している。
+void foo() {}
 namespace core {
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
+        if (currentStep_.value() == 6) {
+            foo();
+        }
         runLabor();
         runGoods();
         logging();

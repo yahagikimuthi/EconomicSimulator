@@ -118,12 +118,6 @@ class [[nodiscard]] HumanResourceManager {
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
-    auto employeeCnt() -> HeadCount {
-        ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
-        const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
-        if (rosterSize == 0UZ) clearRoster();
-        return HeadCount{static_cast<double>(rosterSize)};
-    }
     auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         using Entry        = world::RosterEntry;
         const auto& roster = companyBoard_.roster;
@@ -140,8 +134,6 @@ class [[nodiscard]] HumanResourceManager {
     void endStep();
 
   private:
-    void clearRoster() { companyBoard_.roster.clear(), emptyRosterPool_.clear(); }
-
     world::CompanyBoard&                     companyBoard_;
     std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
 };

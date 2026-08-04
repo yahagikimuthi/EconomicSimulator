@@ -1,9 +1,9 @@
 #pragma once
 
-#include <analysis/context_task.hpp>
-#include <config.hpp>
 #include <numeric>
 
+#include "analysis/context_task.hpp"
+#include "config.hpp"
 #include "pipeline.hpp"
 
 namespace analysis {

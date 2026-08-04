@@ -16,14 +16,14 @@ namespace firm_finance {
 Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 1000, 5000)} {}
 }  // namespace firm_finance
 namespace hhold_finance {
-Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 1000, 5000)} {}
+Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 100, 500)} {}
 }  // namespace hhold_finance
 
 namespace labor::demander {
 RequestPlanner::RequestPlanner(pcg32& masterRng)
     : rng_{makeSeed(masterRng), makeSeed(masterRng)},
       log_{
-          .wage         = Wage{rand(masterRng, 1000, 5000)},
+          .wage         = Wage{rand(masterRng, 10, 50)},
           .actualEmploy = HeadCount{static_cast<double>(randInt(rng_, 4, 12))},
           .offerPlan    = HeadCount{static_cast<double>(randInt(rng_, 10, 20))},
           .applicantNum = HeadCount{static_cast<double>(randInt(masterRng, 10, 20))}
@@ -78,7 +78,7 @@ Planner::Planner(pcg32& masterRng)
 Trader::Trader(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
 Producer::Producer(pcg32& masterRng, world::Workspace& workspace)
     : workspace_{workspace},
-      firmProductPower_{rand(masterRng, 0.1, 0.5)},
+      firmProductPower_{rand(masterRng, 1, 5)},
       inventory_{rand(masterRng, 0.5, 2.0)} {
     workspace_.firmProductPower = firmProductPower_;
 }
