@@ -21,18 +21,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pcg_cpp)
 
-# --- 1. 通常のソースファイル (.cpp) を再帰的に取得 ---
+# ソースファイルを取得
 file(GLOB_RECURSE SOURCES
     CONFIGURE_DEPENDS
     "src/*.cpp"
 )
 
-# --- 3. ターゲットへの登録 ---
-target_sources(EconomicSimulator
-    PRIVATE
-        ${SOURCES}
+# ターゲットへの登録
+target_sources(EconomicSimulator PRIVATE
+    ${SOURCES}
 )
 
+# ライブラリのリンク
 target_link_libraries(EconomicSimulator PRIVATE
     TBB::tbb
     HighFive::HighFive
