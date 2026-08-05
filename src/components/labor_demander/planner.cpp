@@ -60,7 +60,6 @@ auto RequestPlanner::updateOfferRate(const HeadCount actualEmploy) const -> doub
     return std::max(0.0, offerRate);
 }
 
-
 void RequestPlanner::endStep(
     world::CensusDropBox& dropBox, const HeadCount actualEmploy, const HeadCount applicantNum
 ) {

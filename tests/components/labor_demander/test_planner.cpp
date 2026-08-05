@@ -1,41 +1,17 @@
 #include "components/labor_demander/planner.hpp"
 
-#include <concepts>
 #include <config.hpp>
 #include <cstdint>
 #include <limits>
 #include <pcg_random.hpp>
-#include <random>
 #include <utility>
 
 #include "core/values/labor.hpp"
 #include "doctest.h"
 #include "helper.hpp"
+#include "test_helper.hpp"
 
-namespace {
-auto makeSeed() -> std::uint64_t {
-    static std::random_device rd{};
-    return rd();
-}
-
-template <typename T>
-concept Numeric = std::integral<T> || std::floating_point<T>;
-
-template <typename T>
-concept ValueType = requires(T t) {
-    { t.value() } -> Numeric;
-};
-
-auto equal(ValueType auto input, ValueType auto expect) -> bool {
-    return input.value() == doctest::Approx(expect.value());
-}
-[[nodiscard]] auto isLessThanOrEq(ValueType auto input, ValueType auto max) -> bool {
-    return (input <= max) or equal(input, max);
-}
-[[nodiscard]] auto isLargerThanOrEq(ValueType auto input, ValueType auto min) -> bool {
-    return (input >= min) or equal(input, min);
-}
-}  // namespace
+using namespace test::helper;
 
 namespace labor::demander {
 class [[nodiscard]] RequestPlannerTester {
@@ -64,8 +40,8 @@ TEST_CASE("judgePlanのテスト") {
         std::pair<Wage, Wage> nextWageRange;
     };
 
-    const std::uint64_t state{makeSeed()};
-    const std::uint64_t stream{makeSeed()};
+    const std::uint64_t state{test::helper::makeSeed()};
+    const std::uint64_t stream{test::helper::makeSeed()};
 
     pcg32 masterRng{state, stream};
     INFO("state: " << state);
