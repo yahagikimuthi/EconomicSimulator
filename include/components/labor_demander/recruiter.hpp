@@ -2,7 +2,6 @@
 
 #include <tbb/concurrent_vector.h>
 #include <ranges>
-#include <utility>
 
 #include "components/labor_demander/concepts.hpp"
 #include "core/base.hpp"
@@ -14,7 +13,7 @@ namespace labor::demander {
 template <IPlanner IPlanner>
 class [[nodiscard]] Recruiter {
   public:
-    Recruiter(const IPlanner&& planner) : planner_{planner} {}
+    Recruiter(const IPlanner& planner) : planner_{planner} {}
 
     void post(
         const AgentID                                id,
@@ -58,6 +57,8 @@ class [[nodiscard]] Recruiter {
     } ledger_{};
 
     bool isRecruiting_{false};
+
+    friend class RecruiterTester;
 };
 }  // namespace labor::demander
 

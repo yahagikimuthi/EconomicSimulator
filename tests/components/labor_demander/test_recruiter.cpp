@@ -11,12 +11,6 @@
 
 using namespace test::helper;
 
-/*
-    { t.judgePlan(headCount) } -> std::same_as<void>;
-    { t.wagePlan() } -> std::same_as<Wage>;
-    { t.offerPlan() } -> std::same_as<HeadCount>;
-    { t.endStep(dropBox, headCount, headCount) } -> std::same_as<void>;*/
-
 namespace labor::demander {
 namespace {
 class [[nodiscard]] PlannerStub {
