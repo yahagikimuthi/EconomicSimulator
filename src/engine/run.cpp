@@ -16,7 +16,7 @@ void foo() {}
 namespace core {
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
-        if (currentStep_.value() == 6) {
+        if (currentStep_.value() == 600) {
             foo();
         }
         runLabor();

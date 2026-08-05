@@ -20,7 +20,7 @@ auto Producer::calcDesiredEmploy(
         (avgProductPower != 0.0) ? targetProduction.value() / avgProductPower : 1.0
     };
     return HeadCount{
-        std::min(static_cast<double>(config::agent_count::hhold), std::round(desiredEmploy.value()))
+        std::min(static_cast<double>(config::agent_count::hhold), std::ceil(desiredEmploy.value()))
     };
 }
 
