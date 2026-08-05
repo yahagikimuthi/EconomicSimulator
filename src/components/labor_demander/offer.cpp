@@ -10,7 +10,7 @@
 
 namespace {
 auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<world::LaborEntry>& entryBox)
-    -> std::ranges::view auto {
+    -> auto {
     using EntryRef = std::reference_wrapper<world::LaborEntry>;
     static thread_local std::vector<EntryRef> applicants;
     applicants.clear();
@@ -36,10 +36,11 @@ void Recruiter::offer() {
     if (not isPosting_) return;
     if (myRequest_->entryBox.empty()) return;
 
-    std::ranges::view auto applicants{sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox)};
-
+    auto applicants{
+        sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox) |
+        std::views::take(ledger_.remainOfferNum.value())
+    };
     for (auto&& entry : applicants) {
-        if (ledger_.remainOfferNum <= HeadCount{0.0}) break;
         entry.isOffer = true;
         offerApplicants_.emplace_back(&entry);
         --ledger_.remainOfferNum;
