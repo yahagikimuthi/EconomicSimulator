@@ -1,24 +1,26 @@
-#include <immintrin.h>
 #include "core/engine.hpp"
 
 #include <cassert>
-#include <components/common.hpp>
-#include <components/goods_demander.hpp>
-#include <components/goods_supplier.hpp>
-#include <components/labor_demander.hpp>
-#include <components/labor_supplier.hpp>
-#include <core/values/goods.hpp>
+
 #include <cstdlib>
 #include <filesystem>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
 #include <iostream>
-#include <ranges>
-#include <world/message.hpp>
 
+#include "components/common.hpp"
+#include "components/goods_demander.hpp"
+#include "components/goods_supplier.hpp"
+#include "components/labor_demander/hr_manager.hpp"
+#include "components/labor_demander/labor_demander.hpp"
+#include "components/labor_demander/planner.hpp"
+#include "components/labor_demander/recruiter.hpp"
+#include "components/labor_supplier.hpp"
 #include "config.hpp"
+#include "core/values/goods.hpp"
 #include "helper.hpp"
+#include "world/message.hpp"
 
 /*
 namespace {
@@ -125,8 +127,14 @@ namespace {
     };
 }
 
-[[nodiscard]] auto makeLaborDemanderRecruiter(pcg32& masterRng) -> labor::demander::Recruiter {
-    return labor::demander::Recruiter{makeLaborDemanderRecruiterPlanner(masterRng)};
+using LaborDemander =
+    labor::demander::LaborDemander<labor::demander::Recruiter<labor::demander::RequestPlanner>>;
+
+[[nodiscard]] auto makeLaborDemanderRecruiter(pcg32& masterRng
+) -> labor::demander::Recruiter<labor::demander::RequestPlanner> {
+    return labor::demander::Recruiter<labor::demander::RequestPlanner>{
+        makeLaborDemanderRecruiterPlanner(masterRng)
+    };
 }
 
 [[nodiscard]] auto makeLaborDemanderHumanResourceManager(world::CompanyBoard& companyBoard
@@ -135,8 +143,8 @@ namespace {
 }
 
 [[nodiscard]] auto makeLaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard)
-    -> labor::demander::LaborDemander {
-    return labor::demander::LaborDemander{
+    -> LaborDemander {
+    return LaborDemander{
         makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(companyBoard)
     };
 }

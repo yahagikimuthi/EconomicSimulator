@@ -67,6 +67,7 @@ target_link_libraries(EconomicSimulator PRIVATE
 )
 target_include_directories(EconomicSimulator SYSTEM PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${pcg_cpp_SOURCE_DIR}/include
 )
 add_compile_definitions(HIGHFIVE_HAS_NO_EXCEPTIONS)
@@ -81,6 +82,7 @@ target_link_libraries(EconomicSimulator_test PRIVATE
 )
 target_include_directories(EconomicSimulator_test SYSTEM PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${pcg_cpp_SOURCE_DIR}/include
 )
 

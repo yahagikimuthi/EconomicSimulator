@@ -1,14 +1,25 @@
-#include "components/labor_demander.hpp"
+#include "components/labor_demander/hr_manager.hpp"
 
-#include <tbb/concurrent_vector.h>
-#include <memory>
+#include <ranges>
 
-#include "core/base.hpp"
-#include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/message.hpp"
 
 namespace labor::demander {
+void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
+    HeadCount              currentLayOffsCnt{0.0};
+    auto&                  roster = companyBoard_.roster;
+    std::ranges::view auto reversedRoster{roster | std::views::reverse};
+
+    HeadCount currentLayOffs{0.0};
+    for (auto&& entry : reversedRoster) {
+        if (currentLayOffs >= layOffsCnt) return;
+        if (not entry.isOccupied) continue;
+        entry.isOccupied = false;
+        emptyRosterPool_.emplace_back(&entry);
+        ++currentLayOffs;
+    }
+}
+
 auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
     -> SafePtr<world::RosterEntry> {
     if (emptyRosterPool_.empty())

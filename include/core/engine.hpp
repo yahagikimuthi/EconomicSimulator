@@ -8,16 +8,19 @@
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
 #include "components/goods_supplier.hpp"
-#include "components/labor_demander.hpp"
+#include "components/labor_demander/labor_demander.hpp"
+#include "components/labor_demander/planner.hpp"
+#include "components/labor_demander/recruiter.hpp"
 #include "components/labor_supplier.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace core {
 struct Firm {  // NOLINT
-    agent_index::Component         index;
-    firm_finance::Component        finance;
-    labor::demander::LaborDemander labor;
+    agent_index::Component  index;
+    firm_finance::Component finance;
+    labor::demander::LaborDemander<labor::demander::Recruiter<labor::demander::RequestPlanner>>
+                                   labor;
     goods::supplier::GoodsSupplier goods;
 };
 struct HHold {  // NOLINT

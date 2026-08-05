@@ -1,4 +1,4 @@
-#include "components/labor_demander.hpp"
+#include "components/labor_demander/planner.hpp"
 
 #include <concepts>
 #include <config.hpp>

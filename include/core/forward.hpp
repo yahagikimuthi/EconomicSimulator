@@ -19,9 +19,6 @@ class Component;
 namespace hhold_finance {
 class Component;
 }
-namespace labor::demander {
-class LaborDemander;
-}
 namespace labor::supplier {
 struct LaborSupplier;
 }

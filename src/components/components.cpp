@@ -2,33 +2,9 @@
 #include <pcg_random.hpp>
 
 #include "components/goods_supplier.hpp"
-#include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
 
 using namespace helper;
-
-namespace labor::demander {
-RequestPlanner::RequestPlanner(
-    const pcg32     rng,
-    const Wage      lastWage,
-    const HeadCount lastEmploy,
-    const HeadCount lastOfferPlan,
-    const HeadCount lastApplicantNum,
-    const double    offerRate,
-    const double    wageAdjustVol,
-    const double    offerAdjustVol
-)
-    : rng_{rng},
-      log_{
-          .wage         = lastWage,
-          .actualEmploy = lastEmploy,
-          .offerPlan    = lastOfferPlan,
-          .applicantNum = lastApplicantNum
-      },
-      param_{
-          .offerRate = offerRate, .wageAdjustVol = wageAdjustVol, .offerAdjustVol = offerAdjustVol
-      } {}
-}  // namespace labor::demander
 
 namespace labor::supplier {
 LaborSupplier::LaborSupplier(
