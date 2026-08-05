@@ -27,7 +27,9 @@ namespace labor::demander {
 
 [[nodiscard]] auto RequestPlanner::calcNextOffer(const HeadCount employ) const -> HeadCount {
     const HeadCount offer{employ * (1.0 + param_.offerRate)};
-    return HeadCount{std::round(offer.value())};
+    return HeadCount{
+        std::min(static_cast<double>(config::agent_count::hhold), std::round(offer.value()))
+    };
 }
 
 void RequestPlanner::judgePlan(const HeadCount desiredEmploy) {

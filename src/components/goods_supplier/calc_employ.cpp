@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cmath>
 
+#include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
@@ -18,7 +19,9 @@ auto Producer::calcDesiredEmploy(
     const HeadCount desiredEmploy{
         (avgProductPower != 0.0) ? targetProduction.value() / avgProductPower : 1.0
     };
-    return HeadCount{std::round(desiredEmploy.value())};
+    return HeadCount{
+        std::min(static_cast<double>(config::agent_count::hhold), std::round(desiredEmploy.value()))
+    };
 }
 
 auto GoodsSupplier::calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount {
