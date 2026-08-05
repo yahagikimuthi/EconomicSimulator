@@ -61,6 +61,8 @@ class [[nodiscard]] RequestPlanner {
         const double wageAdjustVol;
         const double offerAdjustVol;
     } param_;
+
+    friend class RequestPlannerTester;
 };
 
 class [[nodiscard]] Recruiter {
