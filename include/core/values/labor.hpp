@@ -53,6 +53,7 @@ class [[nodiscard]] Wage {
 class [[nodiscard]] HeadCount {
   public:
     explicit HeadCount(const double value) : value_{value} {}
+    explicit HeadCount(const int value) : value_{static_cast<double>(value)} {}
     auto value() const -> double { return value_; }
     auto operator<=>(const HeadCount&) const = default;
     auto operator+=(const HeadCount other) -> HeadCount& {

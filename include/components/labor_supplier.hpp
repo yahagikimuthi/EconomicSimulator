@@ -62,7 +62,7 @@ inline void sortSample(
 namespace labor::supplier {
 class JobHunter {
   public:
-    JobHunter(pcg32& masterRng);
+    JobHunter(const pcg32 rng) : rng_{rng} {}
 
     template <typename F1, typename F2>
         requires requires(F1 isAligned, F2 makeEntrySheet, world::LaborRequest& request) {
@@ -115,7 +115,7 @@ class JobHunter {
 
 class Employment {
   public:
-    Employment(pcg32& masterRng);
+    Employment(const double productPower) : productPower_{productPower} {}
     auto isEmployed() const -> bool { return rosterEntry_.hasValue(); }
     void startWorking(const SafePtr<world::RosterEntry> rosterEntry) {
         resign();
@@ -150,7 +150,12 @@ class Employment {
 
 class LaborSupplier {
   public:
-    LaborSupplier(pcg32& masterRng);
+    LaborSupplier(
+        const pcg32        rng,
+        const JobHunter&&  jobHunter,
+        const Employment&& employment,
+        const double       jobSearchThreshold
+    );
     void entry(const AgentID id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
         employment_.updateStatus();
         if (not shouldSearchJob()) return;

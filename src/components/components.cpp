@@ -1,87 +1,69 @@
 #include <core/values/goods.hpp>
 #include <pcg_random.hpp>
 
-#include "components/common.hpp"
-#include "components/goods_demander.hpp"
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander.hpp"
 #include "components/labor_supplier.hpp"
-#include "config.hpp"
-#include "helper.hpp"
-#include "world/message.hpp"
 
 using namespace helper;
 
-namespace firm_finance {
-Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 1000, 5000)} {}
-}  // namespace firm_finance
-namespace hhold_finance {
-Component::Component(pcg32& masterRng) : asset_{rand(masterRng, 100, 500)} {}
-}  // namespace hhold_finance
-
 namespace labor::demander {
-RequestPlanner::RequestPlanner(pcg32& masterRng)
-    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
+RequestPlanner::RequestPlanner(
+    const pcg32     rng,
+    const Wage      lastWage,
+    const HeadCount lastEmploy,
+    const HeadCount lastOfferPlan,
+    const HeadCount lastApplicantNum,
+    const double    offerRate,
+    const double    wageAdjustVol,
+    const double    offerAdjustVol
+)
+    : rng_{rng},
       log_{
-          .wage         = Wage{rand(masterRng, 10, 50)},
-          .actualEmploy = HeadCount{static_cast<double>(randInt(rng_, 4, 12))},
-          .offerPlan    = HeadCount{static_cast<double>(randInt(rng_, 10, 20))},
-          .applicantNum = HeadCount{static_cast<double>(randInt(masterRng, 10, 20))}
+          .wage         = lastWage,
+          .actualEmploy = lastEmploy,
+          .offerPlan    = lastOfferPlan,
+          .applicantNum = lastApplicantNum
       },
       param_{
-          .offerRate      = rand(masterRng),
-          .wageAdjustVol  = rand(masterRng, 0.01, 0.1),
-          .offerAdjustVol = rand(masterRng, 0.3, 0.5)
+          .offerRate = offerRate, .wageAdjustVol = wageAdjustVol, .offerAdjustVol = offerAdjustVol
       } {}
-
-Recruiter::Recruiter(pcg32& masterRng) : planner_{masterRng} {}
-HumanResourceManager::HumanResourceManager(world::CompanyBoard& companyBoard)
-    : companyBoard_{companyBoard} {}
-
-LaborDemander::LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard)
-    : recruiter_{masterRng}, hrManager_{companyBoard} {}
 }  // namespace labor::demander
 
 namespace labor::supplier {
-JobHunter ::JobHunter(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
-Employment::Employment(pcg32& masterRng)
-    : productPower_{randNormal(masterRng, 1.0, 1.0 / 3.0, 0.0, 2.0)} {}
-LaborSupplier::LaborSupplier(pcg32& masterRng)
-    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
-      jobHunter_{masterRng},
-      employment_{masterRng},
-      jobSearchThreshold_{rand(masterRng, 0.01, 0.05)} {}
+LaborSupplier::LaborSupplier(
+    const pcg32        rng,
+    const JobHunter&&  jobHunter,
+    const Employment&& employment,
+    const double       jobSearchThreshold
+)
+    : rng_{rng},
+      jobHunter_{jobHunter},
+      employment_{employment},
+      jobSearchThreshold_{jobSearchThreshold} {}
 }  // namespace labor::supplier
 
-namespace goods::demander {
-GoodsDemander::GoodsDemander(pcg32& masterRng)
-    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
-      mpc_{rand(rng_, 0.7, 0.9)},
-      myPhase_{instanceCnt_++ % config::goods_demander::maxPurchaseFrequency} {}
-}  // namespace goods::demander
-
 namespace goods::supplier {
-Planner::Planner(pcg32& masterRng)
-    : rng_{makeSeed(masterRng), makeSeed(masterRng)},
+Planner::Planner(
+    const pcg32         rng,
+    const double        lastMarkup,
+    const GoodsQuantity lastSupply,
+    const GoodsQuantity demandForecast,
+    const bool          isSold,
+    const double        targetInvRatio,
+    const double        markupAdjustVol,
+    const double        demandForecastAdjustVol
+)
+    : rng_{rng},
       log_{
-          .markup         = rand(masterRng, 0.1, 0.3),
-          .supply         = GoodsQuantity{rand(masterRng, 4, 15)},
-          .demandForecast = GoodsQuantity{rand(masterRng, 5.0, 20.0)},
-          .isSold         = rand(masterRng) < 0.5
+          .markup         = lastMarkup,
+          .supply         = lastSupply,
+          .demandForecast = demandForecast,
+          .isSold         = isSold
       },
       param_{
-          .targetInvRatio          = rand(masterRng, 0.1, 0.2),
-          .markupAdjustVol         = rand(masterRng, 0.01, 0.02),
-          .demandForecastAdjustVol = rand(masterRng, 0.1, 0.4)
+          .targetInvRatio          = targetInvRatio,
+          .markupAdjustVol         = markupAdjustVol,
+          .demandForecastAdjustVol = demandForecastAdjustVol
       } {}
-
-Trader::Trader(pcg32& masterRng) : rng_{makeSeed(masterRng), makeSeed(masterRng)} {}
-Producer::Producer(pcg32& masterRng, world::Workspace& workspace)
-    : workspace_{workspace},
-      firmProductPower_{rand(masterRng, 1, 5)},
-      inventory_{rand(masterRng, 0.5, 2.0)} {
-    workspace_.firmProductPower = firmProductPower_;
-}
-GoodsSupplier::GoodsSupplier(pcg32& masterRng, world::Workspace& workspace)
-    : planner_{masterRng}, trader_{masterRng}, producer_{masterRng, workspace} {}
 }  // namespace goods::supplier

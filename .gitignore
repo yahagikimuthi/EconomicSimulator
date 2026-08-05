@@ -9,3 +9,4 @@ compile_commands.json
 outputs/
 scripts/__pycache__/
 *.md
+.github/

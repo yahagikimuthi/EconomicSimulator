@@ -14,7 +14,16 @@
 namespace labor::demander {
 class [[nodiscard]] RequestPlanner {
   public:
-    RequestPlanner(pcg32& masterRng);
+    RequestPlanner(
+        const pcg32     rng,
+        const Wage      lastWage,
+        const HeadCount lastEmploy,
+        const HeadCount lastOfferPlan,
+        const HeadCount lastApplicantNum,
+        const double    offerRate,
+        const double    wageAdjustVol,
+        const double    offerAdjustVol
+    );
 
     void judgePlan(const HeadCount desiredEmploy);
     auto wagePlan() const -> Wage POST(wage : wage > Wage{0.0}) { return plan_.wage; }
@@ -56,7 +65,7 @@ class [[nodiscard]] RequestPlanner {
 
 class [[nodiscard]] Recruiter {
   public:
-    Recruiter(pcg32& masterRng);
+    Recruiter(const RequestPlanner&& planner) : planner_{planner} {}
 
     void post(
         const AgentID                                id,
@@ -108,7 +117,7 @@ class [[nodiscard]] Recruiter {
 
 class [[nodiscard]] HumanResourceManager {
   public:
-    HumanResourceManager(world::CompanyBoard& companyBoard);
+    HumanResourceManager(world::CompanyBoard& companyBoard) : companyBoard_{companyBoard} {}
     auto addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
         -> SafePtr<world::RosterEntry> PRE(id >= AgentID{0}) PRE(wage > Wage{0.0});
     void acceptResignation();
@@ -140,7 +149,8 @@ class [[nodiscard]] HumanResourceManager {
 
 class [[nodiscard]] LaborDemander {
   public:
-    LaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard);
+    LaborDemander(const Recruiter&& recruiter, const HumanResourceManager&& hrManager)
+        : recruiter_{recruiter}, hrManager_{hrManager} {}
     void post(
         const AgentID                                id,
         const HeadCount                              desiredEmploy,

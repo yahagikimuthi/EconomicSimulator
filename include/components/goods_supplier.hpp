@@ -13,7 +13,16 @@
 namespace goods::supplier {
 class [[nodiscard]] Planner {
   public:
-    Planner(pcg32& masterRng);
+    Planner(
+        const pcg32         rng,
+        const double        lastMarkup,
+        const GoodsQuantity lastSupply,
+        const GoodsQuantity demandForecast,
+        const bool          isSold,
+        const double        targetInvRatio,
+        const double        markupAdjustVol,
+        const double        demandForecastAdjustVol
+    );
     void judgePlan(const GoodsQuantity supply, const Money totalCost)
         PRE(supply >= GoodsQuantity{0.0}) PRE(totalCost >= Money{0.0});
     auto pricePlan() const -> Price POST(price : price > Price{0.0}) { return plan_.price; }
@@ -62,7 +71,7 @@ class [[nodiscard]] Planner {
 
 class Trader {
   public:
-    Trader(pcg32& masterRng);
+    Trader(const pcg32 rng) : rng_{rng} {}
     void post(
         const GoodsQuantity                        supply,
         const Price                                pricePlan,
@@ -97,7 +106,10 @@ class Trader {
 
 class [[nodiscard]] Producer {
   public:
-    Producer(pcg32& masterRng, world::Workspace& workspace);
+    Producer(
+        world::Workspace& workspace, const double firmProductPower, const GoodsQuantity inventory
+    )
+        : workspace_{workspace}, firmProductPower_{firmProductPower}, inventory_{inventory} {}
     auto product() const -> GoodsQuantity;
     auto calcDesiredEmploy(
         const GoodsQuantity targetSupply,
@@ -121,7 +133,8 @@ class [[nodiscard]] Producer {
 
 class [[nodiscard]] GoodsSupplier {
   public:
-    GoodsSupplier(pcg32& masterRng, world::Workspace& workspace);
+    GoodsSupplier(const Planner&& planner, const Trader&& trader, const Producer&& producer)
+        : planner_{planner}, trader_{trader}, producer_{producer} {}
     void post(const Money totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox);
     void trade() { trader_.trade(); }
     auto calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount

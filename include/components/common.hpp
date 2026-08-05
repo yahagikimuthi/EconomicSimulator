@@ -20,7 +20,8 @@ class [[nodiscard]] Component {
 namespace firm_finance {
 class [[nodiscard]] Component {
   public:
-    Component(pcg32& masterRng);
+    Component(const Money asset) : asset_{asset} {}
+     
     void assetPlus(const Money plus) { asset_ += plus; }
     auto asset() const -> Money { return asset_; }
     void endStep(world::CensusDropBox& dropBox) const {
@@ -35,7 +36,7 @@ class [[nodiscard]] Component {
 namespace hhold_finance {
 class [[nodiscard]] Component {
   public:
-    Component(pcg32& masterRng);
+    Component(const Money asset): asset_{asset} {}
     auto asset() const -> Money { return asset_; }
     void assetPlus(const Money plus) { asset_ += plus; }
     void endStep(world::CensusDropBox& dropBox) const {

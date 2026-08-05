@@ -11,7 +11,8 @@
 namespace goods::demander {
 class [[nodiscard]] GoodsDemander {
   public:
-    GoodsDemander(pcg32& masterRng);
+    GoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
+    : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
 
     void request(
         const Money asset, const Step step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
@@ -41,6 +42,5 @@ class [[nodiscard]] GoodsDemander {
     Money                              purchasing_{0.0};
     const double                       mpc_;
     const Step                         myPhase_;
-    static inline int                  instanceCnt_{};
 };
 }  // namespace goods::demander
