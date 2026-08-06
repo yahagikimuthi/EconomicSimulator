@@ -11,13 +11,9 @@
 
 namespace labor::demander {
 void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
-    HeadCount              currentLayOffsCnt{0.0};
-    auto&                  roster = companyBoard_.roster;
-    std::ranges::view auto reversedRoster{roster | std::views::reverse};
-
     HeadCount currentLayOffs{0.0};
-    for (auto&& entry : reversedRoster) {
-        if (currentLayOffs >= layOffsCnt) return;
+    for (auto& entry : companyBoard_.roster) {
+        if (currentLayOffs >= layOffsCnt) break;
         if (not entry.isOccupied) continue;
         entry.isOccupied = false;
         emptyRosterPool_.emplace_back(&entry);
@@ -45,10 +41,9 @@ void HumanResourceManager::acceptResignation() {
 }
 
 auto HumanResourceManager::sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
-    using Entry                   = world::RosterEntry;
-    const auto&            roster = companyBoard_.roster;
+    using Entry = world::RosterEntry;
     std::ranges::view auto wages{
-        roster | std::views::filter(&Entry::isOccupied) |
+        companyBoard_.roster | std::views::filter(&Entry::isOccupied) |
         std::views::transform([](const Entry& entry) -> double { return entry.wage.value(); })
     };
     return Wage{std::reduce(wages.begin(), wages.end())};

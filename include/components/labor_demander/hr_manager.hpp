@@ -15,7 +15,7 @@ class [[nodiscard]] HumanResourceManager {
     auto addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
         -> SafePtr<world::RosterEntry> PRE(id >= AgentID{0}) PRE(wage > Wage{0.0});
     void acceptResignation();
-    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0});
+    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt >= HeadCount{0.0});
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
@@ -27,5 +27,7 @@ class [[nodiscard]] HumanResourceManager {
   private:
     world::CompanyBoard&                     companyBoard_;
     std::vector<SafePtr<world::RosterEntry>> emptyRosterPool_;
+
+    friend class HumanResourceManagerTester;
 };
 }  // namespace labor::demander

@@ -147,7 +147,7 @@ TEST_CASE("offerのテスト") {  // NOLINT
     SUBCASE("isPosting=falseの場合") {
         Input input{
             .isPosting      = false,
-            .request        = {AgentID{-1}, Wage{0.0}},
+            .request        = {AgentID{42}, Wage{0.0}},
             .myRequest      = nullptr,
             .remainOfferNum = HeadCount{5.0},
             .applicantNum   = HeadCount{0.0}
