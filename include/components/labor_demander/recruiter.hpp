@@ -21,22 +21,7 @@ class [[nodiscard]] Recruiter {
         tbb::concurrent_vector<world::LaborRequest>& requestBox
     ) PRE(desiredEmploy >= HeadCount{0.0});
     void offer();
-    void registerMember(AddRosterFn auto&& addRoster) {
-        using Entry = world::LaborEntry;
-        if (not isPosting_) return;
-
-        HeadCount              employCnt{0.0};
-        std::ranges::view auto acceptApplicants{
-            offerApplicants_ |
-            std::views::transform([](SafePtr<Entry> entry) -> Entry& { return *entry; }) |
-            std::views::filter(&Entry::isAccept)
-        };
-        for (auto&& acceptApplicant : acceptApplicants) {
-            acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
-            ++employCnt;
-        }
-        ledger_.employing += employCnt;
-    }
+    void registerMember(AddRosterFn auto&& addRoster);
     void endStep(world::CensusDropBox& dropBox);
 
   private:
@@ -50,9 +35,11 @@ class [[nodiscard]] Recruiter {
         HeadCount remainOfferNum{0.0};
         HeadCount applicantNum{0.0};
         HeadCount employing{0.0};
-        void      reset() {
-            remainOfferNum = HeadCount{0.0}, applicantNum = HeadCount{0.0},
-            employing = HeadCount{0.0};
+
+        void reset() {
+            remainOfferNum = HeadCount{0.0};
+            applicantNum   = HeadCount{0.0};
+            employing      = HeadCount{0.0};
         }
     } ledger_{};
 
