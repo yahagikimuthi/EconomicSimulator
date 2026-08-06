@@ -9,7 +9,7 @@
 #include "core/values/labor.hpp"
 #include "doctest.h"
 #include "helper.hpp"
-#include "test_helper.hpp"
+#include "tests/test_helper.hpp"
 
 using namespace test::helper;
 

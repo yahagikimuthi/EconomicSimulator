@@ -8,23 +8,13 @@
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "doctest.h"
-#include "test_helper.hpp"
+#include "tests/components/labor_demander/test_helper.hpp"
+#include "tests/test_helper.hpp"
 #include "world/message.hpp"
 
 using namespace test::helper;
 
 namespace labor::demander {
-
-class [[nodiscard]] HumanResourceManagerTester {
-  public:
-    HumanResourceManagerTester(HumanResourceManager& manager) : manager_{manager} {}
-    auto emptyRosterPool() -> auto& { return manager_.emptyRosterPool_; }
-    auto roster() -> auto& { return manager_.companyBoard_.roster; }
-
-  private:
-    HumanResourceManager& manager_;
-};
-
 TEST_CASE("layOffsのテスト") {  // NOLINT
     using HRManager       = HumanResourceManager;
     using HRManagerTester = HumanResourceManagerTester;

@@ -6,7 +6,8 @@
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "test_helper.hpp"
+#include "tests/components/labor_demander/test_helper.hpp"
+#include "tests/test_helper.hpp"
 #include "world/message.hpp"
 
 using namespace test::helper;
@@ -24,21 +25,6 @@ class [[nodiscard]] PlannerStub {
     HeadCount offerPlan_;
 };
 }  // namespace
-
-class [[nodiscard]] RecruiterTester {
-  public:
-    RecruiterTester(Recruiter<PlannerStub>& recruiter) : recruiter_{recruiter} {}
-    auto isRecruiting() -> bool& { return recruiter_.isRecruiting_; }
-    auto isPosting() -> bool& { return recruiter_.isPosting_; }
-    auto myRequest() -> SafePtr<world::LaborRequest>& { return recruiter_.myRequest_; }
-    auto remainOfferNum() -> HeadCount& { return recruiter_.ledger_.remainOfferNum; }
-    auto applicantNum() -> HeadCount& { return recruiter_.ledger_.applicantNum; }
-    auto offerApplicants() -> auto& { return recruiter_.offerApplicants_; }
-    auto employing() -> HeadCount& { return recruiter_.ledger_.employing; }
-
-  private:
-    Recruiter<PlannerStub>& recruiter_;
-};
 
 TEST_CASE("postのテスト") {  // NOLINT
     struct Input {

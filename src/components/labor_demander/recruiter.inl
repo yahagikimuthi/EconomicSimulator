@@ -29,8 +29,8 @@ inline auto sortApplicants(
 }  // namespace labor::demander::internal
 
 namespace labor::demander {
-template <IPlanner IPlanner>
-void Recruiter<IPlanner>::post(
+template <IPlanner T>
+void Recruiter<T>::post(
     const AgentID                                id,
     const HeadCount                              desiredEmploy,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
@@ -44,8 +44,8 @@ void Recruiter<IPlanner>::post(
     myRequest_ = &*it;
 }
 
-template <IPlanner IPlanner>
-void Recruiter<IPlanner>::endStep(world::CensusDropBox& dropBox) {
+template <IPlanner T>
+void Recruiter<T>::endStep(world::CensusDropBox& dropBox) {
     if (not isRecruiting_) return;
     planner_.endStep(dropBox, ledger_.employing, ledger_.applicantNum);
     myRequest_ = nullptr;
@@ -55,8 +55,8 @@ void Recruiter<IPlanner>::endStep(world::CensusDropBox& dropBox) {
     isRecruiting_ = false;
 }
 
-template <IPlanner IPlanner>
-void Recruiter<IPlanner>::offer() {
+template <IPlanner T>
+void Recruiter<T>::offer() {
     if (not isPosting_) return;
     if (myRequest_->entryBox.empty()) return;
 
@@ -72,8 +72,8 @@ void Recruiter<IPlanner>::offer() {
     ledger_.applicantNum += HeadCount{static_cast<double>(myRequest_->entryBox.size())};
 }
 
-template <IPlanner IPlanner>
-void Recruiter<IPlanner>::registerMember(AddRosterFn auto&& addRoster) {
+template <IPlanner T>
+void Recruiter<T>::registerMember(AddRosterFn auto&& addRoster) {
     using Entry = world::LaborEntry;
     if (not isPosting_) return;
 

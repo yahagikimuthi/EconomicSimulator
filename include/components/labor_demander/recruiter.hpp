@@ -10,10 +10,10 @@
 #include "world/message.hpp"
 
 namespace labor::demander {
-template <IPlanner IPlanner>
+template <IPlanner T>
 class [[nodiscard]] Recruiter {
   public:
-    Recruiter(const IPlanner& planner) : planner_{planner} {}
+    Recruiter(const T& planner) : planner_{planner} {}
 
     void post(
         const AgentID                                id,
@@ -25,7 +25,7 @@ class [[nodiscard]] Recruiter {
     void endStep(world::CensusDropBox& dropBox);
 
   private:
-    IPlanner planner_;
+    T planner_;
 
     SafePtr<world::LaborRequest>            myRequest_{nullptr};
     std::vector<SafePtr<world::LaborEntry>> offerApplicants_;
@@ -45,6 +45,7 @@ class [[nodiscard]] Recruiter {
 
     bool isRecruiting_{false};
 
+    template <IPlanner U>
     friend class RecruiterTester;
 };
 }  // namespace labor::demander

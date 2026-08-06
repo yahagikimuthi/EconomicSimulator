@@ -93,7 +93,7 @@ target_link_libraries(EconomicSimulator PRIVATE EconomicSimulator_lib)
 add_executable(EconomicSimulator_test)
 target_sources(EconomicSimulator_test PRIVATE ${TEST_SOURCES})
 target_link_libraries(EconomicSimulator_test PRIVATE EconomicSimulator_lib)
-target_include_directories(EconomicSimulator_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/tests)
+target_include_directories(EconomicSimulator_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # CTestにテストターゲットを登録
 add_test(NAME UnitTests COMMAND EconomicSimulator_test)
