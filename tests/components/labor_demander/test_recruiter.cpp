@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
+#include <ranges>
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
@@ -28,16 +29,13 @@ class [[nodiscard]] PlannerStub {
 class [[nodiscard]] RecruiterTester {
   public:
     RecruiterTester(Recruiter<PlannerStub>& recruiter) : recruiter_{recruiter} {}
-    auto isRecruiting() const -> bool { return recruiter_.isRecruiting_; }
-    auto isPosting() const -> bool { return recruiter_.isPosting_; }
-    auto myRequest() const -> SafePtr<world::LaborRequest> { return recruiter_.myRequest_; }
-    auto remainOfferNum() const -> HeadCount { return recruiter_.ledger_.remainOfferNum; }
-    void remainOfferNum(HeadCount value) { recruiter_.ledger_.remainOfferNum = value; }
-    void isPosting(bool value) { recruiter_.isPosting_ = value; }
-    void myRequest(SafePtr<world::LaborRequest> ptr) { recruiter_.myRequest_ = ptr; }
-    void applicantNum(HeadCount value) { recruiter_.ledger_.applicantNum = value; }
-    auto applicantNum() const -> HeadCount { return recruiter_.ledger_.applicantNum; }
-    auto offerApplicants() const -> const auto& { return recruiter_.offerApplicants_; }
+    auto isRecruiting() -> bool& { return recruiter_.isRecruiting_; }
+    auto isPosting() -> bool& { return recruiter_.isPosting_; }
+    auto myRequest() -> SafePtr<world::LaborRequest>& { return recruiter_.myRequest_; }
+    auto remainOfferNum() -> HeadCount& { return recruiter_.ledger_.remainOfferNum; }
+    auto applicantNum() -> HeadCount& { return recruiter_.ledger_.applicantNum; }
+    auto offerApplicants() -> auto& { return recruiter_.offerApplicants_; }
+    auto employing() -> HeadCount& { return recruiter_.ledger_.employing; }
 
   private:
     Recruiter<PlannerStub>& recruiter_;
@@ -140,10 +138,10 @@ TEST_CASE("offerのテスト") {  // NOLINT
         PlannerStub     planner{.wagePlan_ = Wage{0.0}, .offerPlan_ = HeadCount{0.0}};
         Recruiter       recruiter{planner};
         RecruiterTester tester{recruiter};
-        tester.isPosting(input.isPosting);
-        tester.myRequest(input.myRequest);
-        tester.remainOfferNum(input.remainOfferNum);
-        tester.applicantNum(input.applicantNum);
+        tester.isPosting()      = input.isPosting;
+        tester.myRequest()      = input.myRequest;
+        tester.remainOfferNum() = input.remainOfferNum;
+        tester.applicantNum()   = input.applicantNum;
         return recruiter;
     }};
 
@@ -258,6 +256,128 @@ TEST_CASE("offerのテスト") {  // NOLINT
         CHECK(not entryBox.at(2).isOffer);
         CHECK(entryBox.at(3).isOffer);
         CHECK(entryBox.at(4).isOffer);
+    }
+}
+
+TEST_CASE("registerMemberのテスト") {  // NOLINT
+    using LEntry = world::LaborEntry;
+    struct Input {
+        bool                         isPosting;
+        HeadCount                    employing;
+        std::vector<SafePtr<LEntry>> offerApplicants;
+        SafePtr<world::LaborRequest> myRequest;
+    };
+    struct Expect {
+        int       addRosterCallCnt;
+        HeadCount employing;
+    };
+    auto makeRecruiter{[](const Input& input) -> Recruiter<PlannerStub> {
+        PlannerStub     planner{.wagePlan_ = Wage{-1.0}, .offerPlan_ = HeadCount{-1.0}};
+        Recruiter       recruiter{planner};
+        RecruiterTester tester{recruiter};
+        tester.isPosting()       = input.isPosting;
+        tester.offerApplicants() = input.offerApplicants;
+        tester.employing()       = input.employing;
+        tester.myRequest()       = input.myRequest;
+        return recruiter;
+    }};
+
+    struct AddRoster {
+        int                            callCnt{};
+        std::deque<world::RosterEntry> roster;
+        world::CompanyBoard            board{AgentID{0}};
+        world::Workspace               workspace{};
+        auto operator()(AgentID id, Wage wage) -> SafePtr<world::RosterEntry> {
+            ++callCnt;
+            return &roster.emplace_back(id, wage, board, workspace);
+        }
+    };
+
+    SUBCASE("isPosting=falseの場合") {
+        AddRoster addRoster;
+
+        world::LaborRequest request{AgentID{42}, Wage{1.0}};
+        Input               input{
+                          .isPosting       = false,
+                          .employing       = HeadCount{10.0},
+                          .offerApplicants = {},
+                          .myRequest       = &request
+        };
+        request.entryBox.emplace_back(AgentID{42}, 1.0, request);
+        request.entryBox.back().isOffer = true;
+        input.offerApplicants.emplace_back(&request.entryBox.at(0));
+
+        const Expect expect{.addRosterCallCnt = 0, .employing = HeadCount{10.0}};
+        Recruiter    recruiter{makeRecruiter(input)};
+        recruiter.registerMember(addRoster);
+
+        RecruiterTester tester{recruiter};
+        CHECK(addRoster.callCnt == expect.addRosterCallCnt);
+        CHECK(tester.employing() == expect.employing);
+        CHECK(input.offerApplicants.front()->rosterEntry.get() == nullptr);
+    }
+
+    SUBCASE("オファーを出したがisAcceptが0のとき") {
+        AddRoster addRoster;
+
+        world::LaborRequest request{AgentID{42}, Wage{150.0}};
+        Input               input{
+                          .isPosting       = false,
+                          .employing       = HeadCount{10.0},
+                          .offerApplicants = {},
+                          .myRequest       = &request
+        };
+        auto& entryBox = request.entryBox;
+        entryBox       = {{AgentID{1}, 0.1, request}, {AgentID{2}, 0.2, request}};
+        for (auto& e : entryBox) e.isOffer = true;
+        input.offerApplicants = {&entryBox.at(0), &entryBox.at(1)};
+
+        const Expect expect{.addRosterCallCnt = 0, .employing = HeadCount{10.0}};
+        Recruiter    recruiter{makeRecruiter(input)};
+        recruiter.registerMember(addRoster);
+
+        RecruiterTester tester{recruiter};
+        CHECK(addRoster.callCnt == expect.addRosterCallCnt);
+        CHECK(tester.employing() == expect.employing);
+        CHECK(not input.offerApplicants.at(0)->rosterEntry);
+        CHECK(not input.offerApplicants.at(1)->rosterEntry);
+    }
+
+    SUBCASE("一部の応募者が受諾した場合") {
+        using namespace world;
+        AddRoster addRoster;
+
+        LaborRequest request{AgentID{42}, Wage{150.0}};
+        Input        input{
+                   .isPosting       = true,
+                   .employing       = HeadCount{10.0},
+                   .offerApplicants = {},
+                   .myRequest       = &request
+        };
+        auto& entryBox = request.entryBox;
+        entryBox       = {
+            {AgentID{101}, 0.0, request}, {AgentID{101}, 0.0, request}, {AgentID{103}, 0.0, request}
+        };
+        for (auto& e : request.entryBox) e.isOffer = true;
+        entryBox.at(0).isAccept = true;
+        entryBox.at(2).isAccept = true;
+        input.offerApplicants   = {&entryBox.at(0), &entryBox.at(1), &entryBox.at(2)};
+
+        const Expect expect{.addRosterCallCnt = 2, .employing = HeadCount{12.0}};
+
+        Recruiter recruiter{makeRecruiter(input)};
+        recruiter.registerMember(addRoster);
+
+        RecruiterTester tester{recruiter};
+        CHECK(addRoster.callCnt == expect.addRosterCallCnt);
+        CHECK(tester.employing() == expect.employing);
+        CHECK(input.offerApplicants.at(0)->rosterEntry->hholdId == AgentID{101});
+        CHECK(input.offerApplicants.at(0)->rosterEntry->wage == Wage{150.0});
+        CHECK(input.offerApplicants.at(0)->rosterEntry.get() == &addRoster.roster.at(0));
+        CHECK(input.offerApplicants.at(1)->rosterEntry.get() == nullptr);
+        CHECK(input.offerApplicants.at(2)->rosterEntry->hholdId == AgentID{103});
+        CHECK(input.offerApplicants.at(2)->rosterEntry->wage == Wage{150.0});
+        CHECK(input.offerApplicants.at(2)->rosterEntry.get() == &addRoster.roster.at(1));
     }
 }
 }  // namespace labor::demander

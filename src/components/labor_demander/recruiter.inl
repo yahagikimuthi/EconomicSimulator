@@ -1,7 +1,7 @@
 #pragma once
 
 #if __INCLUDE_LEVEL__ == 0
-#include "components/labor_demander/recruiter.hpp"  // 解析時のみヘッダーを参照させる
+#include "components/labor_demander/recruiter.hpp"  // 解析時のみヘッダーを参照
 #endif
 
 namespace labor::demander::internal {
@@ -70,5 +70,23 @@ void Recruiter<IPlanner>::offer() {
         --ledger_.remainOfferNum;
     }
     ledger_.applicantNum += HeadCount{static_cast<double>(myRequest_->entryBox.size())};
+}
+
+template <IPlanner IPlanner>
+void Recruiter<IPlanner>::registerMember(AddRosterFn auto&& addRoster) {
+    using Entry = world::LaborEntry;
+    if (not isPosting_) return;
+
+    HeadCount              employCnt{0.0};
+    std::ranges::view auto acceptApplicants{
+        offerApplicants_ |
+        std::views::transform([](SafePtr<Entry> entry) -> Entry& { return *entry; }) |
+        std::views::filter(&Entry::isAccept)
+    };
+    for (auto&& acceptApplicant : acceptApplicants) {
+        acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
+        ++employCnt;
+    }
+    ledger_.employing += employCnt;
 }
 }  // namespace labor::demander
