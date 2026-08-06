@@ -1,8 +1,13 @@
 #include "components/labor_demander/hr_manager.hpp"
 
+#include <memory>
+#include <numeric>
 #include <ranges>
 
+#include "core/base.hpp"
+#include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "world/message.hpp"
 
 namespace labor::demander {
 void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
@@ -38,4 +43,14 @@ void HumanResourceManager::acceptResignation() {
         emptyRosterPool_.emplace_back(resignEntry);
     }
 }
+
+auto HumanResourceManager::sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+    using Entry                   = world::RosterEntry;
+    const auto&            roster = companyBoard_.roster;
+    std::ranges::view auto wages{
+        roster | std::views::filter(&Entry::isOccupied) |
+        std::views::transform([](const Entry& entry) -> double { return entry.wage.value(); })
+    };
+    return Wage{std::reduce(wages.begin(), wages.end())};
+};
 }  // namespace labor::demander

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstddef>
-#include <ranges>
 #include <vector>
 
+#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
@@ -21,19 +21,7 @@ class [[nodiscard]] HumanResourceManager {
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
-    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
-        using Entry        = world::RosterEntry;
-        const auto& roster = companyBoard_.roster;
-        return Wage{std::ranges::fold_left(
-            roster | std::views::filter([](const Entry& entry) -> bool {
-                return entry.isOccupied;
-            }) | std::views::transform([](const Entry& entry) -> double {
-                return entry.wage.value();
-            }),
-            0.0,
-            std::plus{}
-        )};
-    };
+    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0});
     void endStep() { companyBoard_.resignationBox.clear(); }
 
   private:

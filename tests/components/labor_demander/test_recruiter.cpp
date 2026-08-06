@@ -2,7 +2,6 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
-#include <ranges>
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
