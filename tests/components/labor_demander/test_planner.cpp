@@ -23,7 +23,7 @@ class [[nodiscard]] RequestPlannerTester {
     const RequestPlanner& planner_;
 };
 
-TEST_CASE("judgePlanのテスト") {
+TEST_CASE("judgePlanのテスト") {  // NOLINT
     struct Log {
         HeadCount applicantNum;
         HeadCount offerPlan;
@@ -81,8 +81,8 @@ TEST_CASE("judgePlanのテスト") {
         RequestPlannerTester tester{planner};
         CHECK(equal(planner.offerPlan(), expect.offerPlan));
         CHECK(equal(tester.employPlan(), expect.employPlan));
-        CHECK(isLargerThanOrEq(planner.wagePlan(), expect.nextWageRange.first));
-        CHECK(isLessThanOrEq(planner.wagePlan(), expect.nextWageRange.second));
+        CHECK(planner.wagePlan() >= expect.nextWageRange.first);
+        CHECK(planner.wagePlan() <= expect.nextWageRange.second);
     }
 
     SUBCASE("賃金引き下げ+等しい件数での判定") {
@@ -102,8 +102,8 @@ TEST_CASE("judgePlanのテスト") {
         RequestPlannerTester tester{planner};
 
         CHECK(equal(tester.employPlan(), expect.employPlan));
-        CHECK(isLessThanOrEq(planner.wagePlan(), expect.nextWageRange.second));
-        CHECK(isLargerThanOrEq(planner.wagePlan(), expect.nextWageRange.first));
+        CHECK(planner.wagePlan() <= expect.nextWageRange.second);
+        CHECK(planner.wagePlan() >= expect.nextWageRange.first);
         CHECK(equal(planner.offerPlan(), expect.offerPlan));
     }
 
@@ -123,7 +123,7 @@ TEST_CASE("judgePlanのテスト") {
         planner.judgePlan(input.desiredEmploy);
         RequestPlannerTester tester{planner};
         CHECK(equal(tester.employPlan(), expect.employPlan));
-        CHECK(isLargerThanOrEq(planner.wagePlan(), expect.nextWageRange.first));
+        CHECK(planner.wagePlan() >= expect.nextWageRange.first);
         CHECK(equal(planner.offerPlan(), expect.offerPlan));
     }
 }

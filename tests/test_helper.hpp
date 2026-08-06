@@ -23,10 +23,4 @@ concept ValueType = requires(T t) {
 auto equal(ValueType auto input, ValueType auto expect) -> bool {
     return input.value() == doctest::Approx(expect.value());
 }
-[[nodiscard]] auto isLessThanOrEq(ValueType auto input, ValueType auto max) -> bool {
-    return (input <= max) or equal(input, max);
-}
-[[nodiscard]] auto isLargerThanOrEq(ValueType auto input, ValueType auto min) -> bool {
-    return (input >= min) or equal(input, min);
-}
 }  // namespace test::helper

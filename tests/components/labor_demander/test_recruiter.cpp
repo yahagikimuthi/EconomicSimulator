@@ -27,17 +27,23 @@ class [[nodiscard]] PlannerStub {
 
 class [[nodiscard]] RecruiterTester {
   public:
-    RecruiterTester(const Recruiter<PlannerStub>& recruiter) : recruiter_{recruiter} {}
+    RecruiterTester(Recruiter<PlannerStub>& recruiter) : recruiter_{recruiter} {}
     auto isRecruiting() const -> bool { return recruiter_.isRecruiting_; }
     auto isPosting() const -> bool { return recruiter_.isPosting_; }
     auto myRequest() const -> SafePtr<world::LaborRequest> { return recruiter_.myRequest_; }
     auto remainOfferNum() const -> HeadCount { return recruiter_.ledger_.remainOfferNum; }
+    void remainOfferNum(HeadCount value) { recruiter_.ledger_.remainOfferNum = value; }
+    void isPosting(bool value) { recruiter_.isPosting_ = value; }
+    void myRequest(SafePtr<world::LaborRequest> ptr) { recruiter_.myRequest_ = ptr; }
+    void applicantNum(HeadCount value) { recruiter_.ledger_.applicantNum = value; }
+    auto applicantNum() const -> HeadCount { return recruiter_.ledger_.applicantNum; }
+    auto offerApplicants() const -> const auto& { return recruiter_.offerApplicants_; }
 
   private:
-    const Recruiter<PlannerStub>& recruiter_;
+    Recruiter<PlannerStub>& recruiter_;
 };
 
-TEST_CASE("postのテスト") {
+TEST_CASE("postのテスト") {  // NOLINT
     struct Input {
         HeadCount                                   offerPlan;
         Wage                                        wagePlan;
@@ -75,7 +81,7 @@ TEST_CASE("postのテスト") {
             .remainOfferNum = HeadCount{0}
         };
 
-        Recruiter<PlannerStub> recruiter{makeRecruiter(input)};
+        Recruiter recruiter{makeRecruiter(input)};
         recruiter.post(input.id, input.desiredEmploy, input.requestBox);
         RecruiterTester tester{recruiter};
 
@@ -95,7 +101,7 @@ TEST_CASE("postのテスト") {
             .requestBox    = {}
         };
 
-        Recruiter<PlannerStub> recruiter{makeRecruiter(input)};
+        Recruiter recruiter{makeRecruiter(input)};
         recruiter.post(input.id, input.desiredEmploy, input.requestBox);
         RecruiterTester tester{recruiter};
 
@@ -114,6 +120,144 @@ TEST_CASE("postのテスト") {
         CHECK(equal(tester.remainOfferNum(), expect.remainOfferNum));
         CHECK(input.requestBox.back().firmID == input.id);
         CHECK(equal(input.requestBox.back().wage, input.wagePlan));
+    }
+}
+
+TEST_CASE("offerのテスト") {  // NOLINT
+    struct Input {
+        bool                         isPosting;
+        world::LaborRequest          request;
+        SafePtr<world::LaborRequest> myRequest;
+        HeadCount                    remainOfferNum;
+        HeadCount                    applicantNum;
+    };
+    struct Expect {
+        HeadCount   remainOfferNum;
+        HeadCount   applicantNum;
+        std::size_t offerApplicantsCnt;
+    };
+    auto makeRecruiter{[](const Input& input) -> Recruiter<PlannerStub> {
+        PlannerStub     planner{.wagePlan_ = Wage{0.0}, .offerPlan_ = HeadCount{0.0}};
+        Recruiter       recruiter{planner};
+        RecruiterTester tester{recruiter};
+        tester.isPosting(input.isPosting);
+        tester.myRequest(input.myRequest);
+        tester.remainOfferNum(input.remainOfferNum);
+        tester.applicantNum(input.applicantNum);
+        return recruiter;
+    }};
+
+    SUBCASE("isPosting=falseの場合") {
+        Input input{
+            .isPosting      = false,
+            .request        = {AgentID{-1}, Wage{0.0}},
+            .myRequest      = nullptr,
+            .remainOfferNum = HeadCount{5.0},
+            .applicantNum   = HeadCount{0.0}
+        };
+        const Expect expect{
+            .remainOfferNum     = HeadCount{5.0},
+            .applicantNum       = HeadCount{0.0},
+            .offerApplicantsCnt = 0UZ
+        };
+        Recruiter recruiter{makeRecruiter(input)};
+
+        recruiter.offer();
+        RecruiterTester tester{recruiter};
+
+        CHECK(tester.remainOfferNum() == expect.remainOfferNum);
+        CHECK(tester.applicantNum() == expect.applicantNum);
+        CHECK(tester.offerApplicants().size() == expect.offerApplicantsCnt);
+    }
+
+    SUBCASE("応募者リストが空の場合") {
+        Input input{
+            .isPosting      = true,
+            .request        = {AgentID{42}, Wage{1.0}},
+            .myRequest      = nullptr,
+            .remainOfferNum = HeadCount{5.0},
+            .applicantNum   = HeadCount{0.0}
+        };
+        input.myRequest        = &input.request;
+        input.request.entryBox = {};
+        const Expect expect{
+            .remainOfferNum     = HeadCount{5.0},
+            .applicantNum       = HeadCount{0.0},
+            .offerApplicantsCnt = 0UZ
+        };
+        Recruiter recruiter{makeRecruiter(input)};
+        recruiter.offer();
+        RecruiterTester tester{recruiter};
+
+        CHECK(tester.remainOfferNum() == expect.remainOfferNum);
+        CHECK(tester.applicantNum() == expect.applicantNum);
+        CHECK(tester.offerApplicants().size() == expect.offerApplicantsCnt);
+    }
+
+    SUBCASE("応募者数<募集枠数") {
+        Input input{
+            .isPosting      = true,
+            .request        = {AgentID{42}, Wage{1.0}},
+            .myRequest      = nullptr,
+            .remainOfferNum = HeadCount{5.0},
+            .applicantNum   = HeadCount{0.0}
+        };
+        input.myRequest = &input.request;
+        input.request.entryBox.emplace_back(AgentID{0}, 1.0, input.request);
+        input.request.entryBox.emplace_back(AgentID{1}, 2.0, input.request);
+
+        const Expect expect{
+            .remainOfferNum     = HeadCount{3.0},
+            .applicantNum       = HeadCount{2.0},
+            .offerApplicantsCnt = 2UZ
+        };
+
+        Recruiter recruiter{makeRecruiter(input)};
+        recruiter.offer();
+        RecruiterTester tester{recruiter};
+
+        CHECK(tester.remainOfferNum() == expect.remainOfferNum);
+        CHECK(tester.applicantNum() == expect.applicantNum);
+        CHECK(tester.offerApplicants().size() == expect.offerApplicantsCnt);
+        auto& entryBox = input.request.entryBox;
+        CHECK(entryBox.at(0).isOffer);
+        CHECK(entryBox.at(1).isOffer);
+    }
+
+    SUBCASE("応募者数>募集枠数") {
+        Input input{
+            .isPosting      = true,
+            .request        = {AgentID{42}, Wage{1.0}},
+            .myRequest      = nullptr,
+            .remainOfferNum = HeadCount{2.0},
+            .applicantNum   = HeadCount{0.0}
+        };
+        input.myRequest = &input.request;
+        input.request.entryBox.emplace_back(AgentID{0}, 1.0, input.request);
+        input.request.entryBox.emplace_back(AgentID{1}, 2.0, input.request);
+        input.request.entryBox.emplace_back(AgentID{2}, 3.0, input.request);
+        input.request.entryBox.emplace_back(AgentID{3}, 4.0, input.request);
+        input.request.entryBox.emplace_back(AgentID{4}, 5.0, input.request);
+
+        const Expect expect{
+            .remainOfferNum     = HeadCount{0.0},
+            .applicantNum       = HeadCount{5.0},
+            .offerApplicantsCnt = 2UZ
+        };
+
+        Recruiter recruiter{makeRecruiter(input)};
+        recruiter.offer();
+        RecruiterTester tester{recruiter};
+
+        CHECK(tester.remainOfferNum() == expect.remainOfferNum);
+        CHECK(tester.applicantNum() == expect.applicantNum);
+        CHECK(tester.offerApplicants().size() == expect.offerApplicantsCnt);
+        auto& entryBox = input.request.entryBox;
+        CHECK(not entryBox.at(0).isOffer);
+        CHECK(not entryBox.at(1).isOffer);
+        CHECK(not entryBox.at(2).isOffer);
+        CHECK(entryBox.at(3).isOffer);
+        CHECK(entryBox.at(4).isOffer);
     }
 }
 }  // namespace labor::demander
