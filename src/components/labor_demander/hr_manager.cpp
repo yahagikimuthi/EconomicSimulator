@@ -36,9 +36,11 @@ auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::W
 void HumanResourceManager::acceptResignation() {
     auto& resignationBox = companyBoard_.resignationBox;
     for (const SafePtr<world::RosterEntry> resignEntry : resignationBox) {
+        ASSERT(not resignEntry->isOccupied);
         resignEntry->isOccupied = false;
         emptyRosterPool_.emplace_back(resignEntry);
     }
+    resignationBox.clear();
 }
 
 auto HumanResourceManager::sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {

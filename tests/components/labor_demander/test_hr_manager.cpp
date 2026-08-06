@@ -8,7 +8,10 @@
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "doctest.h"
+#include "test_helper.hpp"
 #include "world/message.hpp"
+
+using namespace test::helper;
 
 namespace labor::demander {
 
@@ -180,6 +183,43 @@ TEST_CASE("addRosterのテスト") {  // NOLINT
         CHECK(newRoster.get() == &tester.roster().at(1));
         CHECK(newRoster->hholdId == expect.id);
         CHECK(newRoster->wage == expect.wage);
+    }
+}
+
+TEST_CASE("sumWageのテスト") {
+    using HRManager = HumanResourceManager;
+    auto makeHRManager{[](world::CompanyBoard& board) -> HRManager {
+        HRManager manager{board};
+        return manager;
+    }};
+
+    auto makeDummyBoard{[](world::Workspace& workspace) -> world::CompanyBoard {
+        world::CompanyBoard board{AgentID{42}};
+        auto&               roster = board.roster;
+        roster.emplace_back(AgentID{0}, Wage{101.0}, board, workspace);
+        roster.emplace_back(AgentID{1}, Wage{102.0}, board, workspace);
+        roster.emplace_back(AgentID{2}, Wage{103.0}, board, workspace);
+        return board;
+    }};
+
+    SUBCASE("空き名簿が存在しない場合") {
+        world::Workspace workspace;
+
+        auto board{makeDummyBoard(workspace)};
+        auto manager{makeHRManager(board)};
+        Wage sumWage{manager.sumWage()};
+        CHECK(equal(sumWage, Wage{306.0}));
+    }
+
+    SUBCASE("空き名簿が存在する場合") {
+        world::Workspace workspace;
+
+        auto board{makeDummyBoard(workspace)};
+        board.roster.at(1).isOccupied = false;
+
+        auto manager{makeHRManager(board)};
+        Wage sumWage{manager.sumWage()};
+        CHECK(equal(sumWage, Wage{204.0}));
     }
 }
 }  // namespace labor::demander
