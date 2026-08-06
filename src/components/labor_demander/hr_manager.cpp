@@ -26,6 +26,7 @@ auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::W
     if (emptyRosterPool_.empty())
         return &companyBoard_.roster.emplace_back(id, wage, companyBoard_, workspace);
     world::RosterEntry* newRoster = emptyRosterPool_.back().get();
+    ASSERT(newRoster != nullptr);
     std::destroy_at(newRoster);
     std::construct_at(newRoster, id, wage, companyBoard_, workspace);
     emptyRosterPool_.pop_back();
