@@ -10,11 +10,10 @@
 #include "world/message.hpp"
 
 namespace labor {
-template <demander::ILaborDemander T>
 void adjustWorkforce(
     const agent_index::Component&                index,
     const goods::supplier::GoodsSupplier&        goodsSupplier,
-    T&                                           laborDemander,
+    demander::ILaborDemander auto&               laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
@@ -40,20 +39,23 @@ void offer(T& laborDemander) {
 
 void acceptOffer(supplier::LaborSupplier& laborSupplier) { laborSupplier.accept(); }
 
-template <demander::ILaborDemander T>
-void registerMember(goods::supplier::GoodsSupplier& goodsSupplier, T& laborDemander) {
+void registerMember(
+    goods::supplier::GoodsSupplier& goodsSupplier, demander::ILaborDemander auto& laborDemander
+) {
     laborDemander.registerMember(goodsSupplier.workspace());
 }
 
 void recordRosterEntry(supplier::LaborSupplier& laborSuppler) { laborSuppler.recordRosterEntry(); }
 
-template <demander::ILaborDemander T>
-void acceptResignation(T& laborDemander) {
+void acceptResignation(demander::ILaborDemander auto& laborDemander) {
     laborDemander.acceptResignation();
 }
 
-template <demander::ILaborDemander T>
-void endStep(firm_finance::Component& finance, T& laborDemander, world::CensusDropBox& dropBox) {
+void endStep(
+    firm_finance::Component&       finance,
+    demander::ILaborDemander auto& laborDemander,
+    world::CensusDropBox&          dropBox
+) {
     laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());
 }

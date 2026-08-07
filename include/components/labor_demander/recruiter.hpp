@@ -1,7 +1,11 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <algorithm>
+#include <cstddef>
+#include <functional>
 #include <ranges>
+#include <vector>
 
 #include "components/labor_demander/concepts.hpp"
 #include "core/base.hpp"

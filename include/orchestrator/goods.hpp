@@ -12,11 +12,10 @@
 namespace goods {
 void product(labor::supplier::LaborSupplier& laborSupplier) { laborSupplier.product(); }
 
-template <labor::demander::ILaborDemander ILaborDemander>
 void postGoods(
-    supplier::GoodsSupplier&                   goodsSupplier,
-    const ILaborDemander&                      laborDemander,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    supplier::GoodsSupplier&                    goodsSupplier,
+    const labor::demander::ILaborDemander auto& laborDemander,
+    tbb::concurrent_vector<world::GoodsEntry>&  entryBox
 ) {
     goodsSupplier.post(laborDemander.sumWage(), entryBox);
 }
