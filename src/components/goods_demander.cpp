@@ -18,9 +18,7 @@ namespace {
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
     const int                                  sampleCnt = config::goods_demander::goodsSampleCnt
 ) -> world::GoodsEntry& {
-    const auto toDouble{[](const world::GoodsEntry& entry) -> double {
-        return entry.supply.value();
-    }};
+    auto toDouble{[](const world::GoodsEntry& entry) -> double { return entry.supply.value(); }};
     std::reference_wrapper<world::GoodsEntry> betterEntry =
         helper::discreteDistribution(entryBox, rng, toDouble);
 

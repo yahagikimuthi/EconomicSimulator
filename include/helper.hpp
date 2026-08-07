@@ -1,7 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <cassert>
+#include <concepts>
 #include <functional>
 #include <limits>
 #include <pcg_random.hpp>
@@ -9,6 +9,7 @@
 #include <utility>
 
 #include "config.hpp"
+#include "core/base.hpp"
 
 namespace helper {
 struct PCG32Seed {
@@ -43,7 +44,7 @@ struct PCG32Seed {
 
 [[nodiscard]] constexpr auto randInt(
     std::uniform_random_bit_generator auto& rng, const int min, const int max
-) -> int {
+) -> int PRE(min <= max) {
     std::uniform_int_distribution<int> dist{min, max};
     return dist(rng);
 }
@@ -54,22 +55,26 @@ struct PCG32Seed {
     const double                            stddev = 1.0,
     const double                            min    = -std::numeric_limits<double>::infinity(),
     const double                            max    = std::numeric_limits<double>::infinity()
-) -> double {
+) -> double PRE(stddev != 0.0) PRE(min <= max) {
     std::normal_distribution<double> dist{mean, stddev};
     return std::clamp(dist(rng), min, max);
 }
 
-template <typename Container, typename Proj = std::identity>
-[[nodiscard]] inline auto discreteDistribution(
+template <std::ranges::range Container, typename Proj = std::identity>
+    requires requires(Container container, Proj proj) {
+        { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
+        typename Container::value_type;
+    }
+[[nodiscard]] constexpr auto discreteDistribution(
     Container& container, std::uniform_random_bit_generator auto& rng, Proj proj = {}
 ) -> Container::value_type& {
     double total{0.0};
     for (const auto& elem : container) {
         const double weight = std::invoke(proj, elem);
-        assert(weight >= 0.0 && "weight is required >= 0");
+        ASSERT(weight >= 0.0 && "weight is required >= 0");
         total += weight;
     }
-    assert(total >= 0.0 && "total is required >= 0");
+    ASSERT(total >= 0.0 && "total is required >= 0");
 
     std::uniform_real_distribution<double> dist{0.0, total};
 
@@ -81,7 +86,7 @@ template <typename Container, typename Proj = std::identity>
             return elem;
         }
     }
-    assert(false && "runtime error");
+    ASSERT(false && "runtime error");
     std::unreachable();
 }
 }  // namespace helper
