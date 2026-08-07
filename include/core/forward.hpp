@@ -5,7 +5,7 @@ struct LaborEntry;
 struct LaborRequest;
 struct GoodsRequest;
 struct GoodsEntry;
-struct RosterEntry;
+class RosterEntry;
 struct CompanyBoard;
 struct CensusDropBox;
 }  // namespace world
@@ -20,7 +20,7 @@ namespace hhold_finance {
 class Component;
 }
 namespace labor::supplier {
-struct LaborSupplier;
+class LaborSupplier;
 }
 namespace goods::demander {
 class GoodsDemander;

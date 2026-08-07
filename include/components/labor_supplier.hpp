@@ -122,15 +122,14 @@ class Employment {
         rosterEntry_ = rosterEntry;
     }
     auto contractFirmId() const -> AgentID {
-        return isEmployed() ? rosterEntry_->companyBoard.firmId : AgentID{-1};
+        return isEmployed() ? rosterEntry_->firmId() : AgentID{-1};
     }
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
     void work() {
         if (not isEmployed()) return;
-        auto& workspace = rosterEntry_->workspace;
-        workspace.addInput(GoodsQuantity{workspace.firmProductPower * productPower_});
+        rosterEntry_->addInput(productPower_);
     }
     auto productPower() const -> double { return productPower_; }
     void updateStatus() {
@@ -141,7 +140,7 @@ class Employment {
   private:
     void resign() {
         if (not isEmployed()) return;
-        rosterEntry_->companyBoard.resign(rosterEntry_);
+        rosterEntry_->resign();
     }
 
     SafePtr<world::RosterEntry> rosterEntry_{nullptr};

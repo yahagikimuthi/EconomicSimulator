@@ -16,23 +16,14 @@ struct [[nodiscard]] Workspace {
   public:
     double firmProductPower{};
 
-    void addInput(const GoodsQuantity input) { totalInput_ += input.value(); }
+    void addInput(const double workerProductPower) {
+        totalInput_ += firmProductPower * workerProductPower;
+    }
     auto totalInput() const -> GoodsQuantity { return GoodsQuantity{totalInput_}; }
     void resetInput() { totalInput_ = 0.0; }
 
   private:
     std::atomic<double> totalInput_;
-};
-
-struct RosterEntry {
-    AgentID hholdId;
-    Wage    wage;
-    bool    isOccupied{true};
-
-    CompanyBoard& companyBoard;
-    Workspace&    workspace;
-    RosterEntry(const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace)
-        : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
 };
 
 struct CompanyBoard {
@@ -42,6 +33,23 @@ struct CompanyBoard {
 
     void resign(SafePtr<RosterEntry> resignEntry) { resignationBox.emplace_back(resignEntry); }
     CompanyBoard(const AgentID Id) : firmId{Id} {}
+};
+
+class [[nodiscard]] RosterEntry {
+  public:
+    RosterEntry(const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace)
+        : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
+    void addInput(const double productPower) { workspace.addInput(productPower); }
+    void resign() { companyBoard.resign(this); }
+    auto firmId() const -> AgentID { return companyBoard.firmId; }
+
+    const AgentID hholdId;
+    const Wage    wage;
+    bool          isOccupied{true};
+
+  private:
+    CompanyBoard& companyBoard;
+    Workspace&    workspace;
 };
 
 struct LaborEntry {

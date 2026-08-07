@@ -50,7 +50,7 @@ class [[nodiscard]] Money {
 
 class [[nodiscard]] AgentID {
   public:
-    explicit AgentID(const int value) PRE(value >= 0) : value_{value} {}
+    explicit AgentID(const int value) PRE(value >= -1) : value_{value} {}
     auto operator<=>(const AgentID&) const = default;
 
   private:
