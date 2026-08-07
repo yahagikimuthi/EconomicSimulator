@@ -32,11 +32,10 @@ struct HHold {  // NOLINT
 struct HHoldTag {};
 struct FirmTag {};
 
-class Logger {
+class [[nodiscard]] Logger {
   public:
     explicit Logger();
-    [[nodiscard]] auto isValid() const -> bool { return file_.isValid(); }
-
+    auto isValid() const -> bool { return file_.isValid(); }
     void save(const world::CensusDropBox& dropBox, const Step step);
 
   private:
@@ -57,9 +56,7 @@ class [[nodiscard]] Engine {
     void reset();
     void check() const;
 
-    auto makeSeed() -> std::uint64_t {
-        return (static_cast<std::uint64_t>(masterRng_()) << 32) | masterRng_();
-    }
+    auto makeSeed() -> std::uint64_t { return helper::makeSeed(masterRng_); }
 
     Logger logger_;
     // entt::registry     registry_;
