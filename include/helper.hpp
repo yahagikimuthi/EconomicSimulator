@@ -63,7 +63,7 @@ struct PCG32Seed {
 template <std::ranges::range Container, typename Proj = std::identity>
     requires requires(Container container, Proj proj) {
         { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
-        typename Container::value_type;
+        { *container.begin() } -> std::same_as<typename Container::value_type&>;
     }
 [[nodiscard]] constexpr auto discreteDistribution(
     Container& container, std::uniform_random_bit_generator auto& rng, Proj proj = {}

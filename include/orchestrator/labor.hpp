@@ -10,11 +10,11 @@
 #include "world/message.hpp"
 
 namespace labor {
-template <demander::ILaborDemander ILaborDemander>
+template <demander::ILaborDemander T>
 void adjustWorkforce(
     const agent_index::Component&                index,
     const goods::supplier::GoodsSupplier&        goodsSupplier,
-    ILaborDemander&                              laborDemander,
+    T&                                           laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
@@ -33,29 +33,27 @@ void jobEntry(
     laborSupplier.entry(index.id(), requestBox);
 }
 
-template <demander::ILaborDemander ILaborDemander>
-void offer(ILaborDemander& laborDemander) {
+template <demander::ILaborDemander T>
+void offer(T& laborDemander) {
     laborDemander.offer();
 }
 
 void acceptOffer(supplier::LaborSupplier& laborSupplier) { laborSupplier.accept(); }
 
-template <demander::ILaborDemander ILaborDemander>
-void registerMember(goods::supplier::GoodsSupplier& goodsSupplier, ILaborDemander& laborDemander) {
+template <demander::ILaborDemander T>
+void registerMember(goods::supplier::GoodsSupplier& goodsSupplier, T& laborDemander) {
     laborDemander.registerMember(goodsSupplier.workspace());
 }
 
 void recordRosterEntry(supplier::LaborSupplier& laborSuppler) { laborSuppler.recordRosterEntry(); }
 
-template <demander::ILaborDemander ILaborDemander>
-void acceptResignation(ILaborDemander& laborDemander) {
+template <demander::ILaborDemander T>
+void acceptResignation(T& laborDemander) {
     laborDemander.acceptResignation();
 }
 
-template <demander::ILaborDemander ILaborDemander>
-void endStep(
-    firm_finance::Component& finance, ILaborDemander& laborDemander, world::CensusDropBox& dropBox
-) {
+template <demander::ILaborDemander T>
+void endStep(firm_finance::Component& finance, T& laborDemander, world::CensusDropBox& dropBox) {
     laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());
 }
