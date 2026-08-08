@@ -53,6 +53,7 @@ target_compile_options(project_warnings INTERFACE
     -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
     -fno-omit-frame-pointer
     -fcontracts
+    -D_GLIBCXX_ASSERTIONS
 )
 target_link_options(project_warnings INTERFACE
     -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
