@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 #include <deque>
+#include <optional>
 
 #include "config.hpp"
 #include "core/base.hpp"
@@ -59,8 +60,8 @@ struct LaborEntry {
     bool isOffer{false};
     bool isAccept{false};
 
-    SafePtr<RosterEntry> rosterEntry{nullptr};
-    const LaborRequest&  request;
+    std::optional<RosterEntry&> rosterEntry{std::nullopt};
+    const LaborRequest&         request;
 
     LaborEntry(const AgentID Id, const double ProductPower, const LaborRequest& Request)
         : hholdID{Id}, productPower{ProductPower}, request{Request} {}

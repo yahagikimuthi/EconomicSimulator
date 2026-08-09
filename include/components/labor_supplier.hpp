@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <concepts>
 #include <functional>
+#include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
 #include <vector>
@@ -67,7 +68,7 @@ class JobHunter {
     template <typename F1, typename F2>
         requires requires(F1 isAligned, F2 makeEntrySheet, world::LaborRequest& request) {
             { isAligned(request) } -> std::same_as<bool>;
-            { makeEntrySheet(request) } -> std::same_as<SafePtr<world::LaborEntry>>;
+            { makeEntrySheet(request) } -> std::same_as<world::LaborEntry&>;
         }
     void entry(
         F1                                           isAligned,
@@ -87,37 +88,38 @@ class JobHunter {
 
     void accept() {
         if (not isPosting_) return;
-        const SafePtr<Entry> acceptEntry{takeAcceptEntry()};
+        std::optional<Entry&> acceptEntry{takeAcceptEntry()};
         if (not acceptEntry) return;
         acceptEntry->isAccept = true;
         acceptedEntry_        = acceptEntry;
     }
-
-    void endStep() { myEntries_.clear(), acceptedEntry_ = nullptr, isPosting_ = false; }
-    auto acceptedEntry() const -> SafePtr<world::LaborEntry> { return acceptedEntry_; }
+    void endStep() { myEntries_.clear(), acceptedEntry_.reset(), isPosting_ = false; }
+    auto acceptedEntry() -> std::optional<world::LaborEntry&> { return acceptedEntry_; }
 
   private:
     using Entry = world::LaborEntry;
-    auto takeAcceptEntry() const -> SafePtr<Entry> {
+    auto takeAcceptEntry() -> std::optional<Entry&> {
         std::ranges::view auto offered{
-            myEntries_ |
-            std::views::filter([](SafePtr<Entry> entry) -> bool { return entry->isOffer; }) |
+            myEntries_ | std::views::filter([](std::reference_wrapper<Entry> entry) -> bool {
+                return entry.get().isOffer;
+            }) |
             std::views::take(1)
         };
-        return (offered.empty()) ? nullptr : offered.front();
+        if (offered.empty()) return std::nullopt;
+        return std::ref(offered.front().get());
     }
 
-    mutable pcg32                           rng_;
-    std::vector<SafePtr<world::LaborEntry>> myEntries_;
-    SafePtr<world::LaborEntry>              acceptedEntry_{nullptr};
-    bool                                    isPosting_{false};
+    mutable pcg32                                          rng_;
+    std::vector<std::reference_wrapper<world::LaborEntry>> myEntries_;
+    std::optional<world::LaborEntry&>                      acceptedEntry_{std::nullopt};
+    bool                                                   isPosting_{false};
 };
 
 class Employment {
   public:
     Employment(const double productPower) : productPower_{productPower} {}
-    auto isEmployed() const -> bool { return rosterEntry_.hasValue(); }
-    void startWorking(const SafePtr<world::RosterEntry> rosterEntry) {
+    auto isEmployed() const -> bool { return rosterEntry_.has_value(); }
+    void startWorking(world::RosterEntry& rosterEntry) {
         resign();
         rosterEntry_ = rosterEntry;
     }
@@ -134,7 +136,7 @@ class Employment {
     auto productPower() const -> double { return productPower_; }
     void updateStatus() {
         if (not isEmployed()) return;
-        if (not rosterEntry_->isOccupied) rosterEntry_ = nullptr;
+        if (not rosterEntry_->isOccupied) rosterEntry_.reset();
     }
 
   private:
@@ -143,8 +145,8 @@ class Employment {
         rosterEntry_->resign();
     }
 
-    SafePtr<world::RosterEntry> rosterEntry_{nullptr};
-    const double                productPower_;
+    std::optional<world::RosterEntry&> rosterEntry_{std::nullopt};
+    const double                       productPower_;
 };
 
 class LaborSupplier {
@@ -166,17 +168,17 @@ class LaborSupplier {
             if (req.wage < employment_.wage()) return false;
             return true;
         }};
-        auto makeEntrySheet{[&](Request& req) -> SafePtr<world::LaborEntry> {
-            return &*req.entryBox.emplace_back(id, employment_.productPower(), req);
+        auto makeEntrySheet{[&](Request& req) -> world::LaborEntry& {
+            return *req.entryBox.emplace_back(id, employment_.productPower(), req);
         }};
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }
 
     void accept() { jobHunter_.accept(); }
     void recordRosterEntry() {
-        const SafePtr<world::LaborEntry> acceptedEntry{jobHunter_.acceptedEntry()};
+        const std::optional<world::LaborEntry&> acceptedEntry{jobHunter_.acceptedEntry()};
         if (not acceptedEntry) return;
-        employment_.startWorking(acceptedEntry->rosterEntry);
+        employment_.startWorking(*acceptedEntry->rosterEntry);
     }
     void endStep(world::CensusDropBox& dropBox) {
         dropBox.wages.emplace_back(wage().value());
