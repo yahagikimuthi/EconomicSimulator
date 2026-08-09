@@ -76,7 +76,7 @@ TEST_CASE("postのテスト") {  // NOLINT
         CHECK(tester.isRecruiting() == expect.isRecruiting);
         CHECK(tester.isPosting() == expect.isPosting);
         CHECK(input.requestBox.size() == expect.requestBoxSize);
-        CHECK(&*tester.myRequest() == expect.requestPtr.get());
+        CHECK(tester.myRequest() == std::nullopt);
         CHECK(equal(tester.remainOfferNum(), expect.remainOfferNum));
     }
 
@@ -319,7 +319,7 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
         auto& entryBox = request.entryBox;
         entryBox       = {{AgentID{1}, 0.1, request}, {AgentID{2}, 0.2, request}};
         for (auto& e : entryBox) e.isOffer = true;
-        input.offerApplicants = {&entryBox.at(0), &entryBox.at(1)};
+        input.offerApplicants = {std::ref(entryBox.at(0)), std::ref(entryBox.at(1))};
 
         const Expect expect{.addRosterCallCnt = 0, .employing = HeadCount{10.0}};
         Recruiter    recruiter{makeRecruiter(input)};
