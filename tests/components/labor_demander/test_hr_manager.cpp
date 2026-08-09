@@ -2,9 +2,9 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <vector>
 
-#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "doctest.h"
@@ -14,14 +14,19 @@
 
 using namespace test::helper;
 
+namespace {
+template <typename T>
+using RefWrapper = std::reference_wrapper<T>;
+}
+
 namespace labor::demander {
 TEST_CASE("layOffsのテスト") {  // NOLINT
     using HRManager       = HumanResourceManager;
     using HRManagerTester = HumanResourceManagerTester;
     struct Input {
-        world::CompanyBoard                      board;
-        std::vector<SafePtr<world::RosterEntry>> emptyRosterPool;
-        HeadCount                                layOffsCnt;
+        world::CompanyBoard                         board;
+        std::vector<RefWrapper<world::RosterEntry>> emptyRosterPool;
+        HeadCount                                   layOffsCnt;
     };
     struct Expect {
         std::size_t emptyRosterPoolSize_;
@@ -97,10 +102,10 @@ TEST_CASE("addRosterのテスト") {  // NOLINT
     using HRManager       = HumanResourceManager;
     using HRManagerTester = HumanResourceManagerTester;
     struct Input {
-        world::CompanyBoard                      board;
-        std::vector<SafePtr<world::RosterEntry>> emptyRosterPool;
-        AgentID                                  id;
-        Wage                                     wage;
+        world::CompanyBoard                         board;
+        std::vector<RefWrapper<world::RosterEntry>> emptyRosterPool;
+        AgentID                                     id;
+        Wage                                        wage;
     };
     struct Expect {
         std::size_t rosterSize;
@@ -138,15 +143,15 @@ TEST_CASE("addRosterのテスト") {  // NOLINT
             .rosterSize = 4UZ, .id = input.id, .wage = input.wage, .emptyRosterPoolSize = 0UZ
         };
 
-        auto                        manager{makeHRManager(input)};
-        SafePtr<world::RosterEntry> newRoster{manager.addRoster(input.id, input.wage, workspace)};
+        auto                manager{makeHRManager(input)};
+        world::RosterEntry& newRoster{manager.addRoster(input.id, input.wage, workspace)};
 
         HRManagerTester tester{manager};
         CHECK(tester.emptyRosterPool().size() == expect.emptyRosterPoolSize);
         CHECK(tester.roster().size() == expect.rosterSize);
-        CHECK(newRoster.get() == &tester.roster().at(3));
-        CHECK(newRoster->hholdId == expect.id);
-        CHECK(newRoster->wage == expect.wage);
+        CHECK(&newRoster == &tester.roster().at(3));
+        CHECK(newRoster.hholdId == expect.id);
+        CHECK(newRoster.wage == expect.wage);
     }
 
     SUBCASE("空きプールが存在する場合") {
@@ -159,20 +164,20 @@ TEST_CASE("addRosterのテスト") {  // NOLINT
             .wage            = Wage{300.0}
         };
         input.board.roster.at(1).isOccupied = false;
-        input.emptyRosterPool.emplace_back(&input.board.roster.at(1));
+        input.emptyRosterPool.emplace_back(std::ref(input.board.roster.at(1)));
         const Expect expect{
             .rosterSize = 3UZ, .id = input.id, .wage = input.wage, .emptyRosterPoolSize = 0UZ
         };
 
-        auto                        manager{makeHRManager(input)};
-        SafePtr<world::RosterEntry> newRoster{manager.addRoster(input.id, input.wage, workspace)};
+        auto                manager{makeHRManager(input)};
+        world::RosterEntry& newRoster{manager.addRoster(input.id, input.wage, workspace)};
 
         HRManagerTester tester{manager};
         CHECK(tester.emptyRosterPool().size() == expect.emptyRosterPoolSize);
         CHECK(tester.roster().size() == expect.rosterSize);
-        CHECK(newRoster.get() == &tester.roster().at(1));
-        CHECK(newRoster->hholdId == expect.id);
-        CHECK(newRoster->wage == expect.wage);
+        CHECK(&newRoster == &tester.roster().at(1));
+        CHECK(newRoster.hholdId == expect.id);
+        CHECK(newRoster.wage == expect.wage);
     }
 }
 

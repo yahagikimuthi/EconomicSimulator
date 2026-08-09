@@ -3,10 +3,10 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 #include <deque>
+#include <functional>
 #include <optional>
 
 #include "config.hpp"
-#include "core/base.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
@@ -28,11 +28,11 @@ struct [[nodiscard]] Workspace {
 };
 
 struct CompanyBoard {
-    const AgentID                                firmId;
-    std::deque<RosterEntry>                      roster;
-    tbb::concurrent_vector<SafePtr<RosterEntry>> resignationBox;
+    const AgentID                                               firmId;
+    std::deque<RosterEntry>                                     roster;
+    tbb::concurrent_vector<std::reference_wrapper<RosterEntry>> resignationBox;
 
-    void resign(SafePtr<RosterEntry> resignEntry) { resignationBox.emplace_back(resignEntry); }
+    void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
     CompanyBoard(const AgentID Id) : firmId{Id} {}
 };
 
@@ -41,7 +41,7 @@ class [[nodiscard]] RosterEntry {
     RosterEntry(const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace)
         : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
     void addInput(const double productPower) { workspace.addInput(productPower); }
-    void resign() { companyBoard.resign(this); }
+    void resign() { companyBoard.resign(*this); }
     auto firmId() const -> AgentID { return companyBoard.firmId; }
 
     const AgentID hholdId;

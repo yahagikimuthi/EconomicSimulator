@@ -1,6 +1,8 @@
 #include "components/labor_demander/labor_demander.hpp"
 
 #include <cstddef>
+#include <functional>
+#include <optional>
 
 #include "components/labor_demander/recruiter.hpp"
 #include "core/base.hpp"
@@ -14,6 +16,9 @@ namespace labor::demander {
 using HRManager       = HumanResourceManager;
 using HRManagerTester = HumanResourceManagerTester;
 namespace {
+template <typename T>
+using RefWrapper = std::reference_wrapper<T>;
+
 class DummyPlanner {
   public:
     void judgePlan(HeadCount) {}
@@ -25,11 +30,11 @@ class DummyPlanner {
 
 TEST_CASE("registerMemberのテスト") {
     struct Input {
-        world::CompanyBoard                     board;
-        bool                                    isPosting;
-        SafePtr<world::LaborRequest>            myRequest;
-        HeadCount                               employing;
-        std::vector<SafePtr<world::LaborEntry>> offerApplicants;
+        world::CompanyBoard                        board;
+        bool                                       isPosting;
+        std::optional<world::LaborRequest>         myRequest;
+        HeadCount                                  employing;
+        std::vector<RefWrapper<world::LaborEntry>> offerApplicants;
     };
     struct Expect {
         HeadCount   employing;

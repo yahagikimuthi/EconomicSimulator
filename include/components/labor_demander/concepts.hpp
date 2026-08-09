@@ -2,7 +2,6 @@
 
 #include <concepts>
 
-#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
@@ -18,17 +17,17 @@ concept IPlanner = requires(T t, HeadCount headCount, world::CensusDropBox dropB
 
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
-    { f(id, wage) } -> std::same_as<SafePtr<world::RosterEntry>>;
+    { f(id, wage) } -> std::same_as<world::RosterEntry&>;
 };
 
 template <typename T>
 concept IRecruiter = requires(
-    T                                                         t,
-    std::function<SafePtr<world::RosterEntry>(AgentID, Wage)> addRoster,
-    AgentID                                                   agentId,
-    HeadCount                                                 headCount,
-    tbb::concurrent_vector<world::LaborRequest>               requestBox,
-    world::CensusDropBox                                      dropBox
+    T                                                 t,
+    std::function<world::RosterEntry&(AgentID, Wage)> addRoster,
+    AgentID                                           agentId,
+    HeadCount                                         headCount,
+    tbb::concurrent_vector<world::LaborRequest>       requestBox,
+    world::CensusDropBox                              dropBox
 ) {
     { t.post(agentId, headCount, requestBox) } -> std::same_as<void>;
     { t.offer() } -> std::same_as<void>;

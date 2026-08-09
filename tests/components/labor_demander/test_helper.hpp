@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "components/labor_demander/concepts.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/recruiter.hpp"
@@ -21,7 +23,7 @@ class [[nodiscard]] RecruiterTester {
     RecruiterTester(Recruiter<T>& recruiter) : recruiter_{recruiter} {}
     auto isRecruiting() -> bool& { return recruiter_.isRecruiting_; }
     auto isPosting() -> bool& { return recruiter_.isPosting_; }
-    auto myRequest() -> SafePtr<world::LaborRequest>& { return recruiter_.myRequest_; }
+    auto myRequest() -> std::optional<world::LaborRequest&>& { return recruiter_.myRequest_; }
     auto remainOfferNum() -> HeadCount& { return recruiter_.ledger_.remainOfferNum; }
     auto applicantNum() -> HeadCount& { return recruiter_.ledger_.applicantNum; }
     auto offerApplicants() -> auto& { return recruiter_.offerApplicants_; }

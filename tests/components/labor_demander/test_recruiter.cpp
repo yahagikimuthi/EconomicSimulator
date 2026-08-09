@@ -2,6 +2,8 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstddef>
+#include <functional>
+#include <optional>
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
@@ -14,6 +16,9 @@ using namespace test::helper;
 
 namespace labor::demander {
 namespace {
+template <typename T>
+using RefWrapper = std::reference_wrapper<T>;
+
 class [[nodiscard]] PlannerStub {
   public:
     void judgePlan(const HeadCount) {}
@@ -71,7 +76,7 @@ TEST_CASE("postのテスト") {  // NOLINT
         CHECK(tester.isRecruiting() == expect.isRecruiting);
         CHECK(tester.isPosting() == expect.isPosting);
         CHECK(input.requestBox.size() == expect.requestBoxSize);
-        CHECK(tester.myRequest().get() == expect.requestPtr.get());
+        CHECK(&*tester.myRequest() == expect.requestPtr.get());
         CHECK(equal(tester.remainOfferNum(), expect.remainOfferNum));
     }
 
@@ -99,7 +104,7 @@ TEST_CASE("postのテスト") {  // NOLINT
         CHECK(tester.isRecruiting() == expect.isRecruiting);
         CHECK(tester.isPosting() == expect.isPosting);
         CHECK(input.requestBox.size() == expect.requestBoxSize);
-        CHECK(tester.myRequest().get() == expect.requestPtr.get());
+        CHECK(&*tester.myRequest() == expect.requestPtr.get());
         CHECK(equal(tester.remainOfferNum(), expect.remainOfferNum));
         CHECK(input.requestBox.back().firmID == input.id);
         CHECK(equal(input.requestBox.back().wage, input.wagePlan));
@@ -108,11 +113,11 @@ TEST_CASE("postのテスト") {  // NOLINT
 
 TEST_CASE("offerのテスト") {  // NOLINT
     struct Input {
-        bool                         isPosting;
-        world::LaborRequest          request;
-        SafePtr<world::LaborRequest> myRequest;
-        HeadCount                    remainOfferNum;
-        HeadCount                    applicantNum;
+        bool                                isPosting;
+        world::LaborRequest                 request;
+        std::optional<world::LaborRequest&> myRequest;
+        HeadCount                           remainOfferNum;
+        HeadCount                           applicantNum;
     };
     struct Expect {
         HeadCount   remainOfferNum;
@@ -134,7 +139,7 @@ TEST_CASE("offerのテスト") {  // NOLINT
         Input input{
             .isPosting      = false,
             .request        = {AgentID{42}, Wage{0.0}},
-            .myRequest      = nullptr,
+            .myRequest      = std::nullopt,
             .remainOfferNum = HeadCount{5.0},
             .applicantNum   = HeadCount{0.0}
         };
@@ -157,11 +162,11 @@ TEST_CASE("offerのテスト") {  // NOLINT
         Input input{
             .isPosting      = true,
             .request        = {AgentID{42}, Wage{1.0}},
-            .myRequest      = nullptr,
+            .myRequest      = std::nullopt,
             .remainOfferNum = HeadCount{5.0},
             .applicantNum   = HeadCount{0.0}
         };
-        input.myRequest        = &input.request;
+        input.myRequest        = std::ref(input.request);
         input.request.entryBox = {};
         const Expect expect{
             .remainOfferNum     = HeadCount{5.0},
@@ -181,11 +186,11 @@ TEST_CASE("offerのテスト") {  // NOLINT
         Input input{
             .isPosting      = true,
             .request        = {AgentID{42}, Wage{1.0}},
-            .myRequest      = nullptr,
+            .myRequest      = std::nullopt,
             .remainOfferNum = HeadCount{5.0},
             .applicantNum   = HeadCount{0.0}
         };
-        input.myRequest = &input.request;
+        input.myRequest = std::ref(input.request);
         input.request.entryBox.emplace_back(AgentID{0}, 1.0, input.request);
         input.request.entryBox.emplace_back(AgentID{1}, 2.0, input.request);
 
@@ -211,11 +216,11 @@ TEST_CASE("offerのテスト") {  // NOLINT
         Input input{
             .isPosting      = true,
             .request        = {AgentID{42}, Wage{1.0}},
-            .myRequest      = nullptr,
+            .myRequest      = std::nullopt,
             .remainOfferNum = HeadCount{2.0},
             .applicantNum   = HeadCount{0.0}
         };
-        input.myRequest = &input.request;
+        input.myRequest = std::ref(input.request);
         input.request.entryBox.emplace_back(AgentID{0}, 1.0, input.request);
         input.request.entryBox.emplace_back(AgentID{1}, 2.0, input.request);
         input.request.entryBox.emplace_back(AgentID{2}, 3.0, input.request);
@@ -247,10 +252,10 @@ TEST_CASE("offerのテスト") {  // NOLINT
 TEST_CASE("registerMemberのテスト") {  // NOLINT
     using LEntry = world::LaborEntry;
     struct Input {
-        bool                         isPosting;
-        HeadCount                    employing;
-        std::vector<SafePtr<LEntry>> offerApplicants;
-        SafePtr<world::LaborRequest> myRequest;
+        bool                                isPosting;
+        HeadCount                           employing;
+        std::vector<RefWrapper<LEntry>>     offerApplicants;
+        std::optional<world::LaborRequest&> myRequest;
     };
     struct Expect {
         int       addRosterCallCnt;
@@ -272,9 +277,9 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
         std::deque<world::RosterEntry> roster;
         world::CompanyBoard            board{AgentID{0}};
         world::Workspace               workspace{};
-        auto operator()(AgentID id, Wage wage) -> SafePtr<world::RosterEntry> {
+        auto                           operator()(AgentID id, Wage wage) -> world::RosterEntry& {
             ++callCnt;
-            return &roster.emplace_back(id, wage, board, workspace);
+            return roster.emplace_back(id, wage, board, workspace);
         }
     };
 
@@ -286,20 +291,19 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
                           .isPosting       = false,
                           .employing       = HeadCount{10.0},
                           .offerApplicants = {},
-                          .myRequest       = &request
+                          .myRequest       = request
         };
         request.entryBox.emplace_back(AgentID{42}, 1.0, request);
         request.entryBox.back().isOffer = true;
-        input.offerApplicants.emplace_back(&request.entryBox.at(0));
+        input.offerApplicants.emplace_back(std::ref(request.entryBox.at(0)));
 
         const Expect expect{.addRosterCallCnt = 0, .employing = HeadCount{10.0}};
         Recruiter    recruiter{makeRecruiter(input)};
         recruiter.registerMember(addRoster);
-
         RecruiterTester tester{recruiter};
         CHECK(addRoster.callCnt == expect.addRosterCallCnt);
         CHECK(tester.employing() == expect.employing);
-        CHECK(input.offerApplicants.front()->rosterEntry.get() == nullptr);
+        CHECK(not input.offerApplicants.front().get().rosterEntry);
     }
 
     SUBCASE("オファーを出したがisAcceptが0のとき") {
@@ -310,7 +314,7 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
                           .isPosting       = false,
                           .employing       = HeadCount{10.0},
                           .offerApplicants = {},
-                          .myRequest       = &request
+                          .myRequest       = request
         };
         auto& entryBox = request.entryBox;
         entryBox       = {{AgentID{1}, 0.1, request}, {AgentID{2}, 0.2, request}};
@@ -324,8 +328,8 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
         RecruiterTester tester{recruiter};
         CHECK(addRoster.callCnt == expect.addRosterCallCnt);
         CHECK(tester.employing() == expect.employing);
-        CHECK(not input.offerApplicants.at(0)->rosterEntry);
-        CHECK(not input.offerApplicants.at(1)->rosterEntry);
+        CHECK(not input.offerApplicants.at(0).get().rosterEntry);
+        CHECK(not input.offerApplicants.at(1).get().rosterEntry);
     }
 
     SUBCASE("一部の応募者が受諾した場合") {
@@ -337,7 +341,7 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
                    .isPosting       = true,
                    .employing       = HeadCount{10.0},
                    .offerApplicants = {},
-                   .myRequest       = &request
+                   .myRequest       = request
         };
         auto& entryBox = request.entryBox;
         entryBox       = {
@@ -346,7 +350,9 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
         for (auto& e : request.entryBox) e.isOffer = true;
         entryBox.at(0).isAccept = true;
         entryBox.at(2).isAccept = true;
-        input.offerApplicants   = {&entryBox.at(0), &entryBox.at(1), &entryBox.at(2)};
+        input.offerApplicants   = {
+            std::ref(entryBox.at(0)), std::ref(entryBox.at(1)), std::ref(entryBox.at(2))
+        };
 
         const Expect expect{.addRosterCallCnt = 2, .employing = HeadCount{12.0}};
 
@@ -356,13 +362,12 @@ TEST_CASE("registerMemberのテスト") {  // NOLINT
         RecruiterTester tester{recruiter};
         CHECK(addRoster.callCnt == expect.addRosterCallCnt);
         CHECK(tester.employing() == expect.employing);
-        CHECK(input.offerApplicants.at(0)->rosterEntry->hholdId == AgentID{101});
-        CHECK(input.offerApplicants.at(0)->rosterEntry->wage == Wage{150.0});
-        CHECK(input.offerApplicants.at(0)->rosterEntry.get() == &addRoster.roster.at(0));
-        CHECK(input.offerApplicants.at(1)->rosterEntry.get() == nullptr);
-        CHECK(input.offerApplicants.at(2)->rosterEntry->hholdId == AgentID{103});
-        CHECK(input.offerApplicants.at(2)->rosterEntry->wage == Wage{150.0});
-        CHECK(input.offerApplicants.at(2)->rosterEntry.get() == &addRoster.roster.at(1));
+        CHECK(input.offerApplicants.at(0).get().rosterEntry->hholdId == AgentID{101});
+        CHECK(input.offerApplicants.at(0).get().rosterEntry->wage == Wage{150.0});
+        CHECK(not input.offerApplicants.at(1).get().rosterEntry);
+        CHECK(input.offerApplicants.at(2).get().rosterEntry->hholdId == AgentID{103});
+        CHECK(input.offerApplicants.at(2).get().rosterEntry->wage == Wage{150.0});
+        CHECK(&*input.offerApplicants.at(2).get().rosterEntry == &addRoster.roster.at(1));
     }
 }
 }  // namespace labor::demander

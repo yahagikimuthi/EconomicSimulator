@@ -1,5 +1,6 @@
 #include "components/labor_demander/hr_manager.hpp"
 
+#include <functional>
 #include <memory>
 #include <numeric>
 #include <ranges>
@@ -16,28 +17,28 @@ void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
         if (currentLayOffs >= layOffsCnt) break;
         if (not entry.isOccupied) continue;
         entry.isOccupied = false;
-        emptyRosterPool_.emplace_back(&entry);
+        emptyRosterPool_.emplace_back(std::ref(entry));
         ++currentLayOffs;
     }
 }
 
 auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
-    -> SafePtr<world::RosterEntry> {
+    -> world::RosterEntry& {
     if (emptyRosterPool_.empty())
-        return &companyBoard_.roster.emplace_back(id, wage, companyBoard_, workspace);
-    world::RosterEntry* newRoster = emptyRosterPool_.back().get();
+        return companyBoard_.roster.emplace_back(id, wage, companyBoard_, workspace);
+    world::RosterEntry* newRoster = &emptyRosterPool_.back().get();
     ASSERT(newRoster != nullptr);
     std::destroy_at(newRoster);
     std::construct_at(newRoster, id, wage, companyBoard_, workspace);
     emptyRosterPool_.pop_back();
-    return newRoster;
+    return *newRoster;
 }
 
 void HumanResourceManager::acceptResignation() {
     auto& resignationBox = companyBoard_.resignationBox;
-    for (const SafePtr<world::RosterEntry> resignEntry : resignationBox) {
-        ASSERT(not resignEntry->isOccupied);
-        resignEntry->isOccupied = false;
+    for (world::RosterEntry& resignEntry : resignationBox) {
+        ASSERT(not resignEntry.isOccupied);
+        resignEntry.isOccupied = false;
         emptyRosterPool_.emplace_back(resignEntry);
     }
     resignationBox.clear();

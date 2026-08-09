@@ -41,14 +41,14 @@ void Recruiter<T>::post(
     isPosting_             = true;
     ledger_.remainOfferNum = planner_.offerPlan();
     auto it{requestBox.emplace_back(id, planner_.wagePlan())};
-    myRequest_ = &*it;
+    myRequest_ = *it;
 }
 
 template <IPlanner T>
 void Recruiter<T>::endStep(world::CensusDropBox& dropBox) {
     if (not isRecruiting_) return;
     planner_.endStep(dropBox, ledger_.employing, ledger_.applicantNum);
-    myRequest_ = nullptr;
+    myRequest_.reset();
     offerApplicants_.clear();
     isPosting_ = false;
     ledger_.reset();
@@ -66,7 +66,7 @@ void Recruiter<T>::offer() {
     };
     for (auto&& entry : applicants) {
         entry.isOffer = true;
-        offerApplicants_.emplace_back(&entry);
+        offerApplicants_.emplace_back(std::ref(entry));
         --ledger_.remainOfferNum;
     }
     ledger_.applicantNum += HeadCount{static_cast<double>(myRequest_->entryBox.size())};
@@ -79,11 +79,9 @@ void Recruiter<T>::registerMember(AddRosterFn auto&& addRoster) {
 
     HeadCount              employCnt{0.0};
     std::ranges::view auto acceptApplicants{
-        offerApplicants_ |
-        std::views::transform([](SafePtr<Entry> entry) -> Entry& { return *entry; }) |
-        std::views::filter(&Entry::isAccept)
+        offerApplicants_ | std::views::filter(&Entry::isAccept)
     };
-    for (auto&& acceptApplicant : acceptApplicants) {
+    for (world::LaborEntry& acceptApplicant : acceptApplicants) {
         acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
         ++employCnt;
     }

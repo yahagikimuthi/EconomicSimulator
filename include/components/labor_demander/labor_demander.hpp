@@ -26,11 +26,9 @@ class [[nodiscard]] LaborDemander {
         hrManager_.layOffs(layOffsCnt);
     }
     void registerMember(world::Workspace& workspace) {
-        recruiter_.registerMember(
-            [&](const AgentID id, const Wage wage) -> SafePtr<world::RosterEntry> {
-                return hrManager_.addRoster(id, wage, workspace);
-            }
-        );
+        recruiter_.registerMember([&](const AgentID id, const Wage wage) -> world::RosterEntry& {
+            return hrManager_.addRoster(id, wage, workspace);
+        });
     };
     void acceptResignation() { hrManager_.acceptResignation(); }
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {

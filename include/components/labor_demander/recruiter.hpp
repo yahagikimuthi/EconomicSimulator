@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <ranges>
 #include <vector>
 
@@ -29,11 +30,13 @@ class [[nodiscard]] Recruiter {
     void endStep(world::CensusDropBox& dropBox);
 
   private:
-    T planner_;
+    template <typename U>
+    using RefWrapper = std::reference_wrapper<U>;
 
-    SafePtr<world::LaborRequest>            myRequest_{nullptr};
-    std::vector<SafePtr<world::LaborEntry>> offerApplicants_;
-    bool                                    isPosting_{false};
+    T                                          planner_;
+    std::optional<world::LaborRequest&>        myRequest_{std::nullopt};
+    std::vector<RefWrapper<world::LaborEntry>> offerApplicants_;
+    bool                                       isPosting_{false};
 
     struct {
         HeadCount remainOfferNum{0.0};
