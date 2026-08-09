@@ -58,8 +58,5 @@ TEST_CASE("registerMemberのテスト") {
         entryBox                     = {{AgentID{101}, 0.1, request}, {AgentID{102}, 0.2, request}};
         return request;
     }};
-    (void)makeRecruiter;
-    (void)makeHrManager;
-    (void)makeLaborRequest;
 }
 }  // namespace labor::demander

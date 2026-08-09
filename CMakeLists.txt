@@ -22,6 +22,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pcg_cpp)
 
+FetchContent_Declare(
+    boost_pfr
+    GIT_REPOSITORY https://github.com/boostorg/pfr.git
+    GIT_TAG        boost-1.84.0
+)
+FetchContent_MakeAvailable(boost_pfr)
+set_target_properties(boost_pfr PROPERTIES
+    INTERFACE_SYSTEM_INCLUDE_DIRECTORIES $<TARGET_PROPERTY:boost_pfr,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
 # --- ソースファイルの取得 ---
 file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS "src/app_main.cpp")
 
@@ -75,6 +85,7 @@ target_link_libraries(EconomicSimulator_lib PUBLIC
     TBB::tbb
     HighFive::HighFive
     project_warnings
+    Boost::pfr
 )
 
 target_include_directories(EconomicSimulator_lib PUBLIC
