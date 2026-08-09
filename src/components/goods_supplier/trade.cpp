@@ -57,9 +57,7 @@ void performRationedTrade(
 }
 
 void performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
-    for (auto& request : requestBox) {
-        request.tradeAmount = request.amount;
-    }
+    for (auto& request : requestBox) request.tradeAmount = request.amount;
 }
 }  // namespace
 

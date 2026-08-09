@@ -27,13 +27,14 @@ struct [[nodiscard]] Workspace {
     std::atomic<double> totalInput_;
 };
 
-struct CompanyBoard {
+struct [[nodiscard]] CompanyBoard {
     const AgentID                                               firmId;
     std::deque<RosterEntry>                                     roster;
     tbb::concurrent_vector<std::reference_wrapper<RosterEntry>> resignationBox;
 
     void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
     CompanyBoard(const AgentID Id) : firmId{Id} {}
+    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) -> RosterEntry&;
 };
 
 class [[nodiscard]] RosterEntry {
@@ -53,6 +54,11 @@ class [[nodiscard]] RosterEntry {
     Workspace&    workspace;
 };
 
+inline auto CompanyBoard::addRoster(const AgentID id, const Wage wage, Workspace& workspace)
+    -> RosterEntry& {
+    return roster.emplace_back(id, wage, *this, workspace);
+}
+
 struct LaborEntry {
     const AgentID hholdID;
     const double  productPower;
@@ -67,12 +73,15 @@ struct LaborEntry {
         : hholdID{Id}, productPower{ProductPower}, request{Request} {}
 };
 
-struct LaborRequest {
+struct [[nodiscard]] LaborRequest {
+    LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
+    auto entry(const AgentID id, const double productPower) -> LaborEntry& {
+        return *entryBox.emplace_back(id, productPower, *this);
+    }
+
     const AgentID                      firmID;
     const Wage                         wage;
     tbb::concurrent_vector<LaborEntry> entryBox;
-
-    LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
 };
 
 struct GoodsRequest {
@@ -84,13 +93,15 @@ struct GoodsRequest {
         : amount{Amount}, entry{Entry} {}
 };
 
-struct GoodsEntry {
-    const Price         price;
-    const GoodsQuantity supply;
-
-    tbb::concurrent_vector<GoodsRequest> requestBox;
-
+struct [[nodiscard]] GoodsEntry {
     GoodsEntry(const Price Price, const GoodsQuantity Supply) : price{Price}, supply{Supply} {}
+    auto request(const GoodsQuantity amount) -> GoodsRequest& {
+        return *requestBox.emplace_back(amount, *this);
+    }
+
+    const Price                          price;
+    const GoodsQuantity                  supply;
+    tbb::concurrent_vector<GoodsRequest> requestBox;
 };
 
 struct CensusDropBox {

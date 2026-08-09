@@ -169,7 +169,7 @@ class LaborSupplier {
             return true;
         }};
         auto makeEntrySheet{[&](Request& req) -> world::LaborEntry& {
-            return *req.entryBox.emplace_back(id, employment_.productPower(), req);
+            return req.entry(id, employment_.productPower());
         }};
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }

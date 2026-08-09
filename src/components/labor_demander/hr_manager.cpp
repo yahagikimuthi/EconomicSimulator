@@ -24,8 +24,7 @@ void HumanResourceManager::layOffs(const HeadCount layOffsCnt) {
 
 auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
     -> world::RosterEntry& {
-    if (emptyRosterPool_.empty())
-        return companyBoard_.roster.emplace_back(id, wage, companyBoard_, workspace);
+    if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
     world::RosterEntry* newRoster = &emptyRosterPool_.back().get();
     ASSERT(newRoster != nullptr);
     std::destroy_at(newRoster);

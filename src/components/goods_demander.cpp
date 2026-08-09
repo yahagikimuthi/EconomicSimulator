@@ -52,9 +52,6 @@ void GoodsDemander::request(
     if (budget <= Money{0.0}) return;
     isPosting_        = true;
     auto& pickedEntry = pickEntry(rng_, entryBox);
-    auto  it{
-        pickedEntry.requestBox.emplace_back(GoodsQuantity{budget / pickedEntry.price}, pickedEntry)
-    };
-    myRequest_ = *it;
+    myRequest_        = pickedEntry.request(GoodsQuantity{budget / pickedEntry.price});
 }
 }  // namespace goods::demander
