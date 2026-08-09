@@ -12,7 +12,7 @@ namespace goods::demander {
 class [[nodiscard]] GoodsDemander {
   public:
     GoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-    : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
+        : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
 
     void request(
         const Money asset, const Step step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
