@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <optional>
 #include <pcg_random.hpp>
 
 #include "core/base.hpp"
@@ -22,7 +23,7 @@ class [[nodiscard]] GoodsDemander {
         purchasing_ += myRequest_->entry.price * myRequest_->tradeAmount;
     }
     void endStep() {
-        myRequest_  = nullptr;
+        myRequest_.reset();
         isPosting_  = false;
         purchasing_ = Money{0.0};
     }
@@ -36,11 +37,11 @@ class [[nodiscard]] GoodsDemander {
     ) const -> bool;
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
-    pcg32                              rng_;
-    SafePtr<const world::GoodsRequest> myRequest_{nullptr};
-    bool                               isPosting_{false};
-    Money                              purchasing_{0.0};
-    const double                       mpc_;
-    const Step                         myPhase_;
+    pcg32                                     rng_;
+    std::optional<const world::GoodsRequest&> myRequest_{std::nullopt};
+    bool                                      isPosting_{false};
+    Money                                     purchasing_{0.0};
+    const double                              mpc_;
+    const Step                                myPhase_;
 };
 }  // namespace goods::demander

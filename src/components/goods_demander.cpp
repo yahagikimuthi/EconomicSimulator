@@ -55,6 +55,6 @@ void GoodsDemander::request(
     auto  it{
         pickedEntry.requestBox.emplace_back(GoodsQuantity{budget / pickedEntry.price}, pickedEntry)
     };
-    myRequest_ = &*it;
+    myRequest_ = *it;
 }
 }  // namespace goods::demander
