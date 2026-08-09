@@ -1,13 +1,14 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <core/values/labor.hpp>
+#include <optional>
 #include <pcg_random.hpp>
 
 #include "core/base.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/labor.hpp"
 #include "world/message.hpp"
 
 namespace goods::supplier {
@@ -85,12 +86,12 @@ class Trader {
     auto totalDemand() const -> GoodsQuantity POST(demand : demand >= GoodsQuantity{0.0}) {
         return ledger_.totalDemand;
     }
-    void endStep() { myEntry_ = nullptr, isPosting_ = false, ledger_.reset(); }
+    void endStep() { myEntry_.reset(), isPosting_ = false, ledger_.reset(); }
 
   private:
-    pcg32                      rng_;
-    SafePtr<world::GoodsEntry> myEntry_{nullptr};
-    bool                       isPosting_{false};
+    pcg32                             rng_;
+    std::optional<world::GoodsEntry&> myEntry_{std::nullopt};
+    bool                              isPosting_{false};
 
     struct {
         GoodsQuantity inventory{0.0};

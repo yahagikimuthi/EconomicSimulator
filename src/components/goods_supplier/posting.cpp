@@ -51,7 +51,7 @@ void Trader::post(
     isPosting_        = true;
     ledger_.inventory = supply;
     auto it{entryBox.emplace_back(pricePlan, supply)};
-    myEntry_ = &*it;
+    myEntry_ = *it;
 }
 
 void GoodsSupplier::post(

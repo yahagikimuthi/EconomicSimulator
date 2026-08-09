@@ -3,11 +3,11 @@
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <cassert>
-#include <core/values/goods.hpp>
 #include <functional>
 #include <pcg_random.hpp>
 #include <ranges>
 
+#include "core/values/goods.hpp"
 #include "world/message.hpp"
 
 namespace {
