@@ -57,4 +57,4 @@ class [[nodiscard]] Recruiter {
 };
 }  // namespace labor::demander
 
-#include "components/labor_demander/recruiter.inl"
+#include "src/components/labor_demander/recruiter.inl"

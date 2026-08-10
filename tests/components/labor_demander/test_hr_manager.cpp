@@ -12,7 +12,7 @@
 #include "tests/test_helper.hpp"
 #include "world/message.hpp"
 
-using namespace test::helper;
+using namespace test;
 
 namespace {
 template <typename T>
@@ -33,7 +33,7 @@ TEST_CASE("layOffsのテスト") {  // NOLINT
     };
 
     auto makeHRManager{[](Input& input) -> HRManager {
-        HRManager       manager{input.board};
+        HRManager       manager{std::move(input.board)};
         HRManagerTester tester{manager};
         tester.emptyRosterPool() = input.emptyRosterPool;
         return manager;
@@ -115,7 +115,7 @@ TEST_CASE("addRosterのテスト") {  // NOLINT
     };
 
     auto makeHRManager{[](Input& input) -> HRManager {
-        HRManager       manager{input.board};
+        HRManager       manager{std::move(input.board)};
         HRManagerTester tester{manager};
         tester.emptyRosterPool() = input.emptyRosterPool;
         return manager;
@@ -183,8 +183,8 @@ TEST_CASE("addRosterのテスト") {  // NOLINT
 
 TEST_CASE("sumWageのテスト") {
     using HRManager = HumanResourceManager;
-    auto makeHRManager{[](world::CompanyBoard& board) -> HRManager {
-        HRManager manager{board};
+    auto makeHRManager{[](world::CompanyBoard&& board) -> HRManager {
+        HRManager manager{std::move(board)};
         return manager;
     }};
 
@@ -201,7 +201,7 @@ TEST_CASE("sumWageのテスト") {
         world::Workspace workspace;
 
         auto board{makeDummyBoard(workspace)};
-        auto manager{makeHRManager(board)};
+        auto manager{makeHRManager(std::move(board))};
         Wage sumWage{manager.sumWage()};
         CHECK(equal(sumWage, Wage{306.0}));
     }
@@ -212,7 +212,7 @@ TEST_CASE("sumWageのテスト") {
         auto board{makeDummyBoard(workspace)};
         board.roster.at(1).isOccupied = false;
 
-        auto manager{makeHRManager(board)};
+        auto manager{makeHRManager(std::move(board))};
         Wage sumWage{manager.sumWage()};
         CHECK(equal(sumWage, Wage{204.0}));
     }

@@ -13,19 +13,52 @@
 #include "core/values/labor.hpp"
 
 namespace world {
-struct [[nodiscard]] Workspace {
+class [[nodiscard]] Workspace {
   public:
-    double firmProductPower{};
+    Workspace()  = default;
+    ~Workspace() = default;
+    Workspace(const Workspace& other);
+    auto operator=(const Workspace& other) -> Workspace&;
+    Workspace(Workspace&& other) noexcept;
+    auto operator=(Workspace&& other) noexcept -> Workspace&;
 
     void addInput(const double workerProductPower) {
-        totalInput_ += firmProductPower * workerProductPower;
+        const double input{firmProductPower * workerProductPower};
+        totalInput_.fetch_add(input);
     }
-    auto totalInput() const -> GoodsQuantity { return GoodsQuantity{totalInput_}; }
-    void resetInput() { totalInput_ = 0.0; }
+    auto totalInput() const -> GoodsQuantity { return GoodsQuantity{totalInput_.load()}; }
+    void resetInput() { totalInput_.store(0.0); }
+
+    double firmProductPower{};
 
   private:
     std::atomic<double> totalInput_;
 };
+
+inline Workspace::Workspace(const Workspace& other)
+    : firmProductPower{other.firmProductPower},
+      totalInput_{std::atomic<double>{other.totalInput_.load()}} {}
+inline auto Workspace::operator=(const Workspace& other) -> Workspace& {
+    if (this == &other) return *this;
+    firmProductPower = other.firmProductPower;
+    totalInput_.store(other.totalInput_.load());
+    return *this;
+}
+inline Workspace::Workspace(Workspace&& other) noexcept
+    : firmProductPower{other.firmProductPower},
+      totalInput_{std::atomic<double>{other.totalInput_.load()}} {
+    other.firmProductPower = 0.0;
+    other.totalInput_.store(0.0);
+}
+inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
+    if (this == &other) return *this;
+    firmProductPower = other.firmProductPower;
+    totalInput_.store(other.totalInput_.load());
+
+    other.firmProductPower = 0.0;
+    other.totalInput_.store(0.0);
+    return *this;
+}
 
 struct [[nodiscard]] CompanyBoard {
     const AgentID                                               firmId;

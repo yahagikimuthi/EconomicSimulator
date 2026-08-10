@@ -6,7 +6,7 @@
 
 #include "doctest.h"
 
-namespace test::helper {
+namespace test {
 inline auto makeSeed() -> std::uint64_t {
     static std::random_device rd{};
     return rd();
@@ -23,4 +23,4 @@ concept ValueType = requires(T t) {
 auto equal(ValueType auto input, ValueType auto expect) -> bool {
     return input.value() == doctest::Approx(expect.value());
 }
-}  // namespace test::helper
+}  // namespace test

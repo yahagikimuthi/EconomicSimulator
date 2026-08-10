@@ -36,7 +36,7 @@ auto HumanResourceManager::addRoster(const AgentID id, const Wage wage, world::W
 void HumanResourceManager::acceptResignation() {
     auto& resignationBox = companyBoard_.resignationBox;
     for (world::RosterEntry& resignEntry : resignationBox) {
-        ASSERT(not resignEntry.isOccupied);
+        ASSERT(resignEntry.isOccupied);
         resignEntry.isOccupied = false;
         emptyRosterPool_.emplace_back(resignEntry);
     }

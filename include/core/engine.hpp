@@ -63,8 +63,6 @@ class [[nodiscard]] Engine {
     std::vector<Firm>  firms_;
     std::vector<HHold> hholds_;
 
-    std::deque<world::CompanyBoard>             companyBoards_;
-    std::deque<world::Workspace>                workspaces_;
     tbb::concurrent_vector<world::LaborRequest> laborRequestBox_;
     tbb::concurrent_vector<world::GoodsEntry>   goodsEntryBox_;
 

@@ -11,7 +11,7 @@
 #include "helper.hpp"
 #include "tests/test_helper.hpp"
 
-using namespace test::helper;
+using test::equal;
 
 namespace labor::demander {
 class [[nodiscard]] RequestPlannerTester {
@@ -40,8 +40,8 @@ TEST_CASE("judgePlanのテスト") {  // NOLINT
         std::pair<Wage, Wage> nextWageRange;
     };
 
-    const std::uint64_t state{test::helper::makeSeed()};
-    const std::uint64_t stream{test::helper::makeSeed()};
+    const std::uint64_t state{test::makeSeed()};
+    const std::uint64_t stream{test::makeSeed()};
 
     pcg32 masterRng{state, stream};
     INFO("state: " << state);

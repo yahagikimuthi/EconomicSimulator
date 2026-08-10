@@ -108,9 +108,11 @@ class Trader {
 class [[nodiscard]] Producer {
   public:
     Producer(
-        world::Workspace& workspace, const double firmProductPower, const GoodsQuantity inventory
+        world::Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory
     )
-        : workspace_{workspace}, firmProductPower_{firmProductPower}, inventory_{inventory} {}
+        : workspace_{std::move(workspace)},
+          firmProductPower_{firmProductPower},
+          inventory_{inventory} {}
     auto product() const -> GoodsQuantity;
     auto calcDesiredEmploy(
         const GoodsQuantity targetSupply,
@@ -127,9 +129,9 @@ class [[nodiscard]] Producer {
     auto workspace() -> world::Workspace& { return workspace_; }
 
   private:
-    world::Workspace& workspace_;
-    const double      firmProductPower_;
-    GoodsQuantity     inventory_;
+    world::Workspace workspace_;
+    const double     firmProductPower_;
+    GoodsQuantity    inventory_;
 };
 
 class [[nodiscard]] GoodsSupplier {
@@ -139,8 +141,7 @@ class [[nodiscard]] GoodsSupplier {
     void post(const Money totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox);
     void trade() { trader_.trade(); }
     auto calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount
-        PRE(employeeCnt >= HeadCount{0.0}) POST(employ
-                                                : employ >= HeadCount{0.0});
+        PRE(employeeCnt >= HeadCount{0.0});
     void endStep(world::CensusDropBox& dropBox);
     auto sales() const -> Money { return trader_.sales(); }
     auto workspace() -> world::Workspace& { return producer_.workspace(); }

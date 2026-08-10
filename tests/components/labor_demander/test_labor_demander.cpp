@@ -5,7 +5,6 @@
 #include <optional>
 
 #include "components/labor_demander/recruiter.hpp"
-#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "doctest.h"
@@ -32,7 +31,7 @@ TEST_CASE("registerMemberのテスト") {
     struct Input {
         world::CompanyBoard                        board;
         bool                                       isPosting;
-        std::optional<world::LaborRequest>         myRequest;
+        std::optional<world::LaborRequest&>        myRequest;
         HeadCount                                  employing;
         std::vector<RefWrapper<world::LaborEntry>> offerApplicants;
     };
@@ -41,6 +40,14 @@ TEST_CASE("registerMemberのテスト") {
         std::size_t rosterSize;
         std::size_t emptyRosterPoolSize;
     };
+    auto makeDummyBoard{[](world::Workspace& workspace) -> world::CompanyBoard {
+        world::CompanyBoard board{AgentID{42}};
+        auto&               roster = board.roster;
+        roster.emplace_back(AgentID{0}, Wage{1.0}, board, workspace);
+        roster.emplace_back(AgentID{1}, Wage{2.0}, board, workspace);
+        roster.emplace_back(AgentID{2}, Wage{3.0}, board, workspace);
+        return board;
+    }};
     auto makeRecruiter{[](Input& input) -> Recruiter<DummyPlanner> {
         DummyPlanner    planner;
         Recruiter       recruiter{planner};
@@ -51,12 +58,29 @@ TEST_CASE("registerMemberのテスト") {
         tester.offerApplicants() = input.offerApplicants;
         return recruiter;
     }};
-    auto makeHrManager{[](Input& input) -> HRManager { return HRManager{input.board}; }};
+    auto makeHrManager{[](Input& input) -> HRManager { return HRManager{std::move(input.board)}; }};
     auto makeLaborRequest{[]() -> world::LaborRequest {
         world::LaborRequest request{AgentID{42}, Wage{250.0}};
         auto&               entryBox = request.entryBox;
         entryBox                     = {{AgentID{101}, 0.1, request}, {AgentID{102}, 0.2, request}};
         return request;
     }};
+
+    SUBCASE("正常系") {
+        world::Workspace    workspace;
+        world::LaborRequest request{AgentID{42}, Wage{250.0}};
+        request.entry(AgentID{101}, 1.0);
+        request.entry(AgentID{102}, 2.0);
+
+        Input input{
+            .board           = makeDummyBoard(workspace),
+            .isPosting       = true,
+            .myRequest       = request,
+            .employing       = HeadCount{10.0},
+            .offerApplicants = {}
+        };
+        auto& entryBox        = request.entryBox;
+        input.offerApplicants = {std::ref(entryBox.at(0)), std::ref(entryBox.at(1))};
+    }
 }
 }  // namespace labor::demander

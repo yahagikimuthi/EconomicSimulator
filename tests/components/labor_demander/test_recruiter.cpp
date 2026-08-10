@@ -12,7 +12,7 @@
 #include "tests/test_helper.hpp"
 #include "world/message.hpp"
 
-using namespace test::helper;
+using test::equal;
 
 namespace labor::demander {
 namespace {

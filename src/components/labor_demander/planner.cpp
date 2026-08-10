@@ -57,7 +57,7 @@ auto RequestPlanner::updateOfferRate(const HeadCount actualEmploy) const -> doub
     const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.offerAdjustVol, -1.0, 1.0))};
     const bool   shouldRaise{actualEmploy < plan_.employ};
     const double offerRate{param_.offerRate * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
-    return std::max(0.0, offerRate);
+    return std::max(1.0, offerRate);
 }
 
 void RequestPlanner::endStep(

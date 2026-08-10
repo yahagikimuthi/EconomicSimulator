@@ -88,20 +88,19 @@ namespace {
     return goods::supplier::Trader{rng};
 }
 
-[[nodiscard]] auto makeGoodsSupplierProducer(pcg32& masterRng, world::Workspace& workspace)
-    -> goods::supplier::Producer {
+[[nodiscard]] auto makeGoodsSupplierProducer(pcg32& masterRng) -> goods::supplier::Producer {
     const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
     const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
+    world::Workspace    workspace;
     workspace.firmProductPower = firmProductPower;
-    return goods::supplier::Producer{workspace, firmProductPower, inventory};
+    return goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
-[[nodiscard]] auto makeGoodsSupplier(pcg32& masterRng, world::Workspace& workspace)
-    -> goods::supplier::GoodsSupplier {
+[[nodiscard]] auto makeGoodsSupplier(pcg32& masterRng) -> goods::supplier::GoodsSupplier {
     return goods::supplier::GoodsSupplier{
         makeGoodsSupplierPlanner(masterRng),
         makeGoodsSupplierTrader(masterRng),
-        makeGoodsSupplierProducer(masterRng, workspace)
+        makeGoodsSupplierProducer(masterRng)
     };
 }
 
@@ -137,15 +136,15 @@ using LaborDemander =
     };
 }
 
-[[nodiscard]] auto makeLaborDemanderHumanResourceManager(world::CompanyBoard& companyBoard
+[[nodiscard]] auto makeLaborDemanderHumanResourceManager(const AgentID id
 ) -> labor::demander::HumanResourceManager {
-    return labor::demander::HumanResourceManager{companyBoard};
+    world::CompanyBoard companyBoard{id};
+    return labor::demander::HumanResourceManager{std::move(companyBoard)};
 }
 
-[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, world::CompanyBoard& companyBoard)
-    -> LaborDemander {
+[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id) -> LaborDemander {
     return LaborDemander{
-        makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(companyBoard)
+        makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id)
     };
 }
 
@@ -179,14 +178,12 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     }
     masterRng_ = {seed_.state, seed_.stream};
     firms_.reserve(config::agent_count::firm);
-    workspaces_.resize(config::agent_count::firm);
     for (const auto i : std::views::iota(0, config::agent_count::firm)) {
-        companyBoards_.emplace_back(AgentID{i});
         firms_.emplace_back(Firm{
             .index   = {AgentID{i}},
             .finance = makeFirmFinanceComponent(masterRng_),
-            .labor   = makeLaborDemander(masterRng_, companyBoards_[static_cast<std::size_t>(i)]),
-            .goods   = makeGoodsSupplier(masterRng_, workspaces_[static_cast<std::size_t>(i)])
+            .labor   = makeLaborDemander(masterRng_, AgentID{i}),
+            .goods   = makeGoodsSupplier(masterRng_)
         });
     }
 

@@ -11,7 +11,8 @@
 namespace labor::demander {
 class [[nodiscard]] HumanResourceManager {
   public:
-    HumanResourceManager(world::CompanyBoard& companyBoard) : companyBoard_{companyBoard} {}
+    HumanResourceManager(world::CompanyBoard&& companyBoard)
+        : companyBoard_{std::move(companyBoard)} {}
     auto addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
         -> world::RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0});
     void acceptResignation();
@@ -26,9 +27,9 @@ class [[nodiscard]] HumanResourceManager {
 
   private:
     template <typename T>
-    using refWrapper = std::reference_wrapper<T>;
-    world::CompanyBoard&                        companyBoard_;
-    std::vector<refWrapper<world::RosterEntry>> emptyRosterPool_;
+    using RefWrapper = std::reference_wrapper<T>;
+    world::CompanyBoard                         companyBoard_;
+    std::vector<RefWrapper<world::RosterEntry>> emptyRosterPool_;
 
     friend class HumanResourceManagerTester;
 };

@@ -5,6 +5,7 @@ struct LaborEntry;
 struct LaborRequest;
 struct GoodsRequest;
 struct GoodsEntry;
+class Workspace;
 class RosterEntry;
 struct CompanyBoard;
 struct CensusDropBox;
