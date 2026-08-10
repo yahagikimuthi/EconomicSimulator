@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <ranges>
 
 #include "doctest.h"
@@ -22,6 +23,7 @@ class [[nodiscard]] JobHunterTester {
     auto myEntries() -> std::vector<RefWrapper<world::LaborEntry>>& {
         return jobHunter_.myEntries_;
     }
+    auto acceptedEntry() -> std::optional<world::LaborEntry&>& { return jobHunter_.acceptedEntry_; }
 
   private:
     JobHunter& jobHunter_;
@@ -150,6 +152,110 @@ TEST_CASE("entryのテスト") {  // NOLINT
         CHECK(tester.isPosting() == expect.isPosting);
         CHECK(tester.myEntries().size() == expect.myEntriesSize);
         CHECK(makeEntrySheet.callCnt == expect.makeEntrySheetCallCnt);
+    }
+}
+
+TEST_CASE("acceptのテスト") {  // NOLINT
+    struct Input {
+        bool                                       isPosting;
+        std::vector<RefWrapper<world::LaborEntry>> myEntries;
+    };
+    auto makeJobHunter{[](Input& input) -> JobHunter {
+        JobHunter       jobHunter{pcg32{}};
+        JobHunterTester tester{jobHunter};
+        tester.isPosting() = input.isPosting;
+        tester.myEntries() = input.myEntries;
+        return jobHunter;
+    }};
+
+    SUBCASE("isPosting=falseの場合") {
+        Input input{.isPosting = false, .myEntries = {}};
+        auto  jobHunter{makeJobHunter(input)};
+        jobHunter.accept();
+
+        JobHunterTester tester{jobHunter};
+        CHECK(not tester.acceptedEntry());
+    }
+
+    SUBCASE("オファーが0件の場合") {
+        std::deque<world::LaborRequest> requestBox;
+        for (const auto i : std::views::iota(1, 4)) {
+            requestBox.emplace_back(AgentID{100 + i}, Wage{i * 100.0});
+            requestBox.back().entry(AgentID{42}, 1.0);
+        }
+        Input input{
+            .isPosting = true,
+            .myEntries =
+                {std::ref(requestBox.at(0).entryBox.back()),
+                 std::ref(requestBox.at(1).entryBox.back()),
+                 std::ref(requestBox.at(2).entryBox.back())}
+        };
+
+        auto jobHunter{makeJobHunter(input)};
+        jobHunter.accept();
+
+        JobHunterTester tester{jobHunter};
+        CHECK(not tester.acceptedEntry());
+        CHECK(std::ranges::all_of(
+            tester.myEntries(
+            ) | std::views::transform([](RefWrapper<world::LaborEntry> ref) -> world::LaborEntry& {
+                return ref.get();
+            }) | std::views::transform(&world::LaborEntry::isAccept),
+            [](const bool isAccept) -> bool { return not isAccept; }
+        ));
+    }
+
+    SUBCASE("単一オファーが存在する場合") {
+        std::deque<world::LaborRequest> requestBox;
+        for (const auto i : std::views::iota(1, 4)) {
+            requestBox.emplace_back(AgentID{100 + i}, Wage{i * 100.0});
+            requestBox.back().entry(AgentID{42}, 1.0);
+        }
+        Input input{
+            .isPosting = true,
+            .myEntries =
+                {std::ref(requestBox.at(0).entryBox.back()),
+                 std::ref(requestBox.at(1).entryBox.back()),
+                 std::ref(requestBox.at(2).entryBox.back())}
+        };
+        input.myEntries.at(1).get().isOffer = true;
+
+        auto jobHunter{makeJobHunter(input)};
+        jobHunter.accept();
+
+        JobHunterTester tester{jobHunter};
+        CHECK(tester.acceptedEntry());
+        CHECK(&*tester.acceptedEntry() == &tester.myEntries().at(1).get());
+        CHECK(tester.acceptedEntry()->isAccept);
+        CHECK(not tester.myEntries().at(0).get().isAccept);
+        CHECK(not tester.myEntries().at(2).get().isAccept);
+    }
+
+    SUBCASE("複数オファーが存在する場合") {
+        std::deque<world::LaborRequest> requestBox;
+        for (const auto i : std::views::iota(1, 4)) {
+            requestBox.emplace_back(AgentID{100 + i}, Wage{i * 100.0});
+            requestBox.back().entry(AgentID{42}, 1.0);
+        }
+        Input input{
+            .isPosting = true,
+            .myEntries =
+                {std::ref(requestBox.at(0).entryBox.back()),
+                 std::ref(requestBox.at(1).entryBox.back()),
+                 std::ref(requestBox.at(2).entryBox.back())}
+        };
+        input.myEntries.at(0).get().isOffer = true;
+        input.myEntries.at(2).get().isOffer = true;
+
+        auto jobHunter{makeJobHunter(input)};
+        jobHunter.accept();
+
+        JobHunterTester tester{jobHunter};
+        CHECK(tester.acceptedEntry());
+        CHECK(&*tester.acceptedEntry() == &tester.myEntries().at(0).get());
+        CHECK(tester.acceptedEntry()->isAccept);
+        CHECK(not tester.myEntries().at(1).get().isAccept);
+        CHECK(not tester.myEntries().at(2).get().isAccept);
     }
 }
 }  // namespace labor::supplier
