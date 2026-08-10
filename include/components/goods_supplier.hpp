@@ -4,6 +4,7 @@
 #include <optional>
 #include <pcg_random.hpp>
 
+#include "config.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
@@ -117,7 +118,8 @@ class [[nodiscard]] Producer {
     auto calcDesiredEmploy(
         const GoodsQuantity targetSupply,
         const GoodsQuantity lastSupply,
-        const HeadCount     employeeCnt
+        const HeadCount     employeeCnt,
+        const double        laborSupplierCnt = config::agent_count::hhold
     ) const -> HeadCount PRE(targetSupply >= GoodsQuantity{0.0})
                 PRE(lastSupply >= GoodsQuantity{0.0}) PRE(employeeCnt >= HeadCount{0.0});
     void endStep(const GoodsQuantity unsoldAmount, world::CensusDropBox& dropBox)

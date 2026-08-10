@@ -3,13 +3,15 @@
 #include <cassert>
 #include <cmath>
 
-#include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
 namespace goods::supplier {
 auto Producer::calcDesiredEmploy(
-    const GoodsQuantity targetSupply, const GoodsQuantity lastSupply, const HeadCount employeeCnt
+    const GoodsQuantity targetSupply,
+    const GoodsQuantity lastSupply,
+    const HeadCount     employeeCnt,
+    const double        laborSupplierCnt
 ) const -> HeadCount {
     const GoodsQuantity targetProduction{targetSupply - inventory_};
     const double        avgProductPower{
@@ -19,9 +21,7 @@ auto Producer::calcDesiredEmploy(
     const HeadCount desiredEmploy{
         (avgProductPower != 0.0) ? targetProduction.value() / avgProductPower : 1.0
     };
-    return HeadCount{
-        std::min(static_cast<double>(config::agent_count::hhold), std::ceil(desiredEmploy.value()))
-    };
+    return HeadCount{std::min(laborSupplierCnt, std::ceil(desiredEmploy.value()))};
 }
 
 auto GoodsSupplier::calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount {
