@@ -1,6 +1,10 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
+#include <memory>
+#include <numeric>
+#include <ranges>
 #include <vector>
 
 #include "core/base.hpp"
@@ -14,15 +18,52 @@ class [[nodiscard]] HumanResourceManager {
     HumanResourceManager(world::CompanyBoard&& companyBoard)
         : companyBoard_{std::move(companyBoard)} {}
     auto addRoster(const AgentID id, const Wage wage, world::Workspace& workspace)
-        -> world::RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0});
-    void acceptResignation();
-    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt >= HeadCount{0.0});
+        -> world::RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
+        if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
+        world::RosterEntry* newRoster = &emptyRosterPool_.back().get();
+        ASSERT(newRoster != nullptr);
+        std::destroy_at(newRoster);
+        std::construct_at(newRoster, id, wage, companyBoard_, workspace);
+        emptyRosterPool_.pop_back();
+        return *newRoster;
+    }
+
+    void acceptResignation() {
+        auto& resignationBox = companyBoard_.resignationBox;
+        for (world::RosterEntry& resignEntry : resignationBox) {
+            ASSERT(resignEntry.isOccupied);
+            resignEntry.isOccupied = false;
+            emptyRosterPool_.emplace_back(resignEntry);
+        }
+        resignationBox.clear();
+    }
+
+    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt >= HeadCount{0.0}) {
+        HeadCount currentLayOffs{0.0};
+        for (auto& entry : companyBoard_.roster) {
+            if (currentLayOffs >= layOffsCnt) break;
+            if (not entry.isOccupied) continue;
+            entry.isOccupied = false;
+            emptyRosterPool_.emplace_back(std::ref(entry));
+            ++currentLayOffs;
+        }
+    }
+
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
-    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0});
+
+    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+        using Entry = world::RosterEntry;
+        std::ranges::view auto wages{
+            companyBoard_.roster | std::views::filter(&Entry::isOccupied) |
+            std::views::transform([](const Entry& entry) -> double { return entry.wage.value(); })
+        };
+        return Wage{std::reduce(wages.begin(), wages.end())};
+    }
+
     void endStep() { companyBoard_.resignationBox.clear(); }
 
   private:
@@ -30,7 +71,5 @@ class [[nodiscard]] HumanResourceManager {
     using RefWrapper = std::reference_wrapper<T>;
     world::CompanyBoard                         companyBoard_;
     std::vector<RefWrapper<world::RosterEntry>> emptyRosterPool_;
-
-    friend class HumanResourceManagerTester;
 };
 }  // namespace labor::demander

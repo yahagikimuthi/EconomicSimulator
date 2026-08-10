@@ -4,7 +4,7 @@
 
 #include "components/common.hpp"
 #include "components/goods_supplier.hpp"
-#include "components/labor_demander/concepts.hpp"
+#include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
@@ -13,7 +13,7 @@ namespace labor {
 void adjustWorkforce(
     const agent_index::Component&                index,
     const goods::supplier::GoodsSupplier&        goodsSupplier,
-    demander::ILaborDemander auto&               laborDemander,
+    demander::LaborDemander&                     laborDemander,
     tbb::concurrent_vector<world::LaborRequest>& requestBox
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
@@ -32,29 +32,26 @@ void jobEntry(
     laborSupplier.entry(index.id(), requestBox);
 }
 
-template <demander::ILaborDemander T>
-void offer(T& laborDemander) {
-    laborDemander.offer();
-}
+void offer(demander::LaborDemander& laborDemander) { laborDemander.offer(); }
 
 void acceptOffer(supplier::LaborSupplier& laborSupplier) { laborSupplier.accept(); }
 
 void registerMember(
-    goods::supplier::GoodsSupplier& goodsSupplier, demander::ILaborDemander auto& laborDemander
+    goods::supplier::GoodsSupplier& goodsSupplier, demander::LaborDemander& laborDemander
 ) {
     laborDemander.registerMember(goodsSupplier.workspace());
 }
 
 void recordRosterEntry(supplier::LaborSupplier& laborSuppler) { laborSuppler.recordRosterEntry(); }
 
-void acceptResignation(demander::ILaborDemander auto& laborDemander) {
+void acceptResignation(demander::LaborDemander& laborDemander) {
     laborDemander.acceptResignation();
 }
 
 void endStep(
-    firm_finance::Component&       finance,
-    demander::ILaborDemander auto& laborDemander,
-    world::CensusDropBox&          dropBox
+    firm_finance::Component& finance,
+    demander::LaborDemander& laborDemander,
+    world::CensusDropBox&    dropBox
 ) {
     laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());

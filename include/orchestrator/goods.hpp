@@ -5,7 +5,7 @@
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
 #include "components/goods_supplier.hpp"
-#include "components/labor_demander/concepts.hpp"
+#include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/common.hpp"
 
@@ -13,9 +13,9 @@ namespace goods {
 void product(labor::supplier::LaborSupplier& laborSupplier) { laborSupplier.product(); }
 
 void postGoods(
-    supplier::GoodsSupplier&                    goodsSupplier,
-    const labor::demander::ILaborDemander auto& laborDemander,
-    tbb::concurrent_vector<world::GoodsEntry>&  entryBox
+    supplier::GoodsSupplier&                   goodsSupplier,
+    const labor::demander::LaborDemander&      laborDemander,
+    tbb::concurrent_vector<world::GoodsEntry>& entryBox
 ) {
     goodsSupplier.post(laborDemander.sumWage(), entryBox);
 }

@@ -2,17 +2,16 @@
 
 #include <tbb/concurrent_vector.h>
 
-#include "components/labor_demander/concepts.hpp"
 #include "components/labor_demander/hr_manager.hpp"
+#include "components/labor_demander/recruiter.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
 namespace labor::demander {
-template <IRecruiter T>
 class [[nodiscard]] LaborDemander {
   public:
-    LaborDemander(const T&& recruiter, const HumanResourceManager&& hrManager)
+    LaborDemander(const Recruiter&& recruiter, const HumanResourceManager&& hrManager)
         : recruiter_{recruiter}, hrManager_{hrManager} {}
     void post(
         const AgentID                                id,
@@ -43,7 +42,7 @@ class [[nodiscard]] LaborDemander {
     }
 
   private:
-    T                    recruiter_;
+    Recruiter            recruiter_;
     HumanResourceManager hrManager_;
 };
 }  // namespace labor::demander

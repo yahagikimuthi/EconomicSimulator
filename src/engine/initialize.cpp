@@ -127,14 +127,8 @@ namespace {
     };
 }
 
-using LaborDemander =
-    labor::demander::LaborDemander<labor::demander::Recruiter<labor::demander::RequestPlanner>>;
-
-[[nodiscard]] auto makeLaborDemanderRecruiter(pcg32& masterRng
-) -> labor::demander::Recruiter<labor::demander::RequestPlanner> {
-    return labor::demander::Recruiter<labor::demander::RequestPlanner>{
-        makeLaborDemanderRecruiterPlanner(masterRng)
-    };
+[[nodiscard]] auto makeLaborDemanderRecruiter(pcg32& masterRng) -> labor::demander::Recruiter {
+    return labor::demander::Recruiter{makeLaborDemanderRecruiterPlanner(masterRng)};
 }
 
 [[nodiscard]] auto makeLaborDemanderHumanResourceManager(const AgentID id
@@ -143,10 +137,9 @@ using LaborDemander =
     return labor::demander::HumanResourceManager{std::move(companyBoard)};
 }
 
-[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id) -> LaborDemander {
-    return LaborDemander{
-        makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id)
-    };
+[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id)
+    -> labor::demander::LaborDemander {
+    return {makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id)};
 }
 
 [[nodiscard]] auto makeLaborSupplierJobHunter(pcg32& masterRng) -> labor::supplier::JobHunter {
