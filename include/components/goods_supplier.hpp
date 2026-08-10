@@ -104,6 +104,8 @@ class Trader {
             totalDemand = GoodsQuantity{0.0};
         }
     } ledger_{};
+
+    friend class TraderTester;
 };
 
 class [[nodiscard]] Producer {

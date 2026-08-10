@@ -5,7 +5,6 @@
 #include <functional>
 #include <optional>
 
-#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "tests/components/labor_demander/test_helper.hpp"
@@ -41,11 +40,11 @@ TEST_CASE("postのテスト") {  // NOLINT
     };
 
     struct Expect {
-        bool                         isRecruiting;
-        bool                         isPosting;
-        std::size_t                  requestBoxSize;
-        SafePtr<world::LaborRequest> requestPtr;
-        HeadCount                    remainOfferNum;
+        bool                 isRecruiting;
+        bool                 isPosting;
+        std::size_t          requestBoxSize;
+        world::LaborRequest* requestPtr;
+        HeadCount            remainOfferNum;
     };
 
     auto makeRecruiter{[](const Input& input) -> Recruiter<PlannerStub> {
@@ -104,7 +103,7 @@ TEST_CASE("postのテスト") {  // NOLINT
         CHECK(tester.isRecruiting() == expect.isRecruiting);
         CHECK(tester.isPosting() == expect.isPosting);
         CHECK(input.requestBox.size() == expect.requestBoxSize);
-        CHECK(&*tester.myRequest() == expect.requestPtr.get());
+        CHECK(&*tester.myRequest() == expect.requestPtr);
         CHECK(equal(tester.remainOfferNum(), expect.remainOfferNum));
         CHECK(input.requestBox.back().firmID == input.id);
         CHECK(equal(input.requestBox.back().wage, input.wagePlan));
