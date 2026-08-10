@@ -1,10 +1,10 @@
 #pragma once
 
 #include <pcg_random.hpp>
-#include <world/message.hpp>
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
+#include "world/message.hpp"
 
 namespace agent_index {
 class [[nodiscard]] Component {
@@ -17,33 +17,34 @@ class [[nodiscard]] Component {
 };
 };  // namespace agent_index
 
-namespace firm_finance {
-class [[nodiscard]] Component {
+namespace finance {
+class [[nodiscard]] FinanceBaseComponent {
   public:
-    Component(const Money asset) : asset_{asset} {}
-     
+    FinanceBaseComponent(const Money asset) : asset_{asset} {}
     void assetPlus(const Money plus) { asset_ += plus; }
     auto asset() const -> Money { return asset_; }
+
+  protected:
+    Money asset_;
+};
+}  // namespace finance
+
+namespace firm_finance {
+class [[nodiscard]] Component : public finance::FinanceBaseComponent {
+  public:
+    using finance::FinanceBaseComponent::FinanceBaseComponent;
     void endStep(world::CensusDropBox& dropBox) const {
         dropBox.firmAssets.emplace_back(asset_.value());
     }
-
-  private:
-    Money asset_;
 };
 }  // namespace firm_finance
 
 namespace hhold_finance {
-class [[nodiscard]] Component {
+class [[nodiscard]] Component : public finance::FinanceBaseComponent {
   public:
-    Component(const Money asset): asset_{asset} {}
-    auto asset() const -> Money { return asset_; }
-    void assetPlus(const Money plus) { asset_ += plus; }
+    using finance::FinanceBaseComponent::FinanceBaseComponent;
     void endStep(world::CensusDropBox& dropBox) const {
         dropBox.hholdAssets.emplace_back(asset_.value());
     }
-
-  private:
-    Money asset_;
 };
 }  // namespace hhold_finance

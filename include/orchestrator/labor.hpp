@@ -5,7 +5,7 @@
 #include "components/common.hpp"
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander/concepts.hpp"
-#include "components/labor_supplier.hpp"
+#include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 

@@ -2,7 +2,7 @@
 #include <pcg_random.hpp>
 
 #include "components/goods_supplier.hpp"
-#include "components/labor_supplier.hpp"
+#include "components/labor_supplier/labor_supplier.hpp"
 
 using namespace helper;
 

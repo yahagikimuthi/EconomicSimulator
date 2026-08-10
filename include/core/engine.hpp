@@ -11,7 +11,7 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
-#include "components/labor_supplier.hpp"
+#include "components/labor_supplier/labor_supplier.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 

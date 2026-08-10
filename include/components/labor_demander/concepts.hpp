@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <functional>
 
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"

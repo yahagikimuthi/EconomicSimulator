@@ -6,7 +6,7 @@
 #include "components/goods_demander.hpp"
 #include "components/goods_supplier.hpp"
 #include "components/labor_demander/concepts.hpp"
-#include "components/labor_supplier.hpp"
+#include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/common.hpp"
 
 namespace goods {

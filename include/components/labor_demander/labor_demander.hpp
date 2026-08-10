@@ -45,8 +45,5 @@ class [[nodiscard]] LaborDemander {
   private:
     T                    recruiter_;
     HumanResourceManager hrManager_;
-
-    template <IRecruiter U>
-    friend class LaborDemanderTester;
 };
 }  // namespace labor::demander

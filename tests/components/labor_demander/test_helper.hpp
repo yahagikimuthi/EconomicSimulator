@@ -33,15 +33,4 @@ class [[nodiscard]] RecruiterTester {
   private:
     Recruiter<T>& recruiter_;
 };
-
-template <IRecruiter T>
-class [[nodiscard]] LaborDemanderTester {
-  public:
-    LaborDemanderTester(LaborDemander<T>& laborDemander) : laborDemander_{laborDemander} {}
-    auto recruiter() -> T& { return laborDemander_.recruiter_; }
-    auto hrManager() -> HumanResourceManager& { return laborDemander_.hrManager_; }
-
-  private:
-    LaborDemander<T>& laborDemander_;
-};
 }  // namespace labor::demander
