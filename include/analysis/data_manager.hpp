@@ -1,12 +1,14 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdlib>
 #include <filesystem>
 #include <highfive/H5DataType.hpp>
 #include <highfive/H5File.hpp>
 #include <iostream>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "config.hpp"
@@ -20,9 +22,7 @@ class [[nodiscard]] InputDataManager {
                   static_cast<std::string>(config::setting::simulationResultOutputPath)
               };
               const std::filesystem::path path{filepath};
-              if (path.has_parent_path()) {
-                  std::filesystem::create_directories(path.parent_path());
-              }
+              if (path.has_parent_path()) std::filesystem::create_directories(path.parent_path());
               return HighFive::File{filepath, HighFive::File::ReadOnly};
           }()} {
         if (not inFile_.isValid()) {
