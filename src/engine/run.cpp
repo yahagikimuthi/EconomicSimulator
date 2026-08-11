@@ -3,6 +3,7 @@
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <string>
+#include <string_view>
 
 #include "config.hpp"
 #include "orchestrator/consumer_goods.hpp"

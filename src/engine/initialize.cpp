@@ -99,8 +99,7 @@ namespace {
 ) -> consumer_goods::supplier::Producer {
     const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
     const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
-    world::Workspace    workspace;
-    workspace.firmProductPower = firmProductPower;
+    world::Workspace    workspace{firmProductPower};
     return consumer_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
@@ -152,8 +151,7 @@ namespace {
 ) -> production_goods::supplier::Producer {
     const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
     const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
-    world::Workspace    workspace;
-    workspace.firmProductPower = firmProductPower;
+    world::Workspace    workspace{firmProductPower};
     return production_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
@@ -274,9 +272,7 @@ Logger::Logger()
               static_cast<std::string>(config::setting::simulationResultOutputPath)
           };
           const std::filesystem::path path{filepath};
-          if (path.has_parent_path()) {
-              std::filesystem::create_directories(path.parent_path());
-          }
+          if (path.has_parent_path()) std::filesystem::create_directories(path.parent_path());
           return HighFive::File{
               filepath,
               HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate

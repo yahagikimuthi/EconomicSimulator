@@ -18,7 +18,7 @@ enum class MarketType : char { labor, consumerGoods, productionGoods };
 
 class [[nodiscard]] Workspace {
   public:
-    Workspace()  = default;
+    Workspace(const double power) : firmProductPower{power} {}
     ~Workspace() = default;
     Workspace(const Workspace& other);
     auto operator=(const Workspace& other) -> Workspace&;
@@ -32,36 +32,33 @@ class [[nodiscard]] Workspace {
     auto totalInput() const noexcept -> GoodsQuantity { return GoodsQuantity{totalInput_.load()}; }
     void resetInput() noexcept { totalInput_.store(0.0); }
 
-    double firmProductPower{};
-
   private:
+    double              firmProductPower;
     std::atomic<double> totalInput_;
 };
 
 inline Workspace::Workspace(const Workspace& other)
-    : firmProductPower{other.firmProductPower},
-      totalInput_{other.totalInput_.load(std::memory_order_relaxed)} {}
+    : firmProductPower{other.firmProductPower}, totalInput_{other.totalInput_.load()} {}
 inline auto Workspace::operator=(const Workspace& other) -> Workspace& {
     if (this == &other) return *this;
     firmProductPower = other.firmProductPower;
-    const double input{other.totalInput_.load(std::memory_order_relaxed)};
-    totalInput_.store(input, std::memory_order_relaxed);
+    const double input{other.totalInput_.load()};
+    totalInput_.store(input);
     return *this;
 }
 inline Workspace::Workspace(Workspace&& other) noexcept
-    : firmProductPower{other.firmProductPower},
-      totalInput_{other.totalInput_.load(std::memory_order_relaxed)} {
+    : firmProductPower{other.firmProductPower}, totalInput_{other.totalInput_.load()} {
     other.firmProductPower = 0.0;
-    other.totalInput_.store(0.0, std::memory_order_relaxed);
+    other.totalInput_.store(0.0);
 }
 inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     if (this == &other) return *this;
     firmProductPower = other.firmProductPower;
-    const double input{other.totalInput_.load(std::memory_order_relaxed)};
-    totalInput_.store(input, std::memory_order_relaxed);
+    const double input{other.totalInput_.load()};
+    totalInput_.store(input);
 
     other.firmProductPower = 0.0;
-    other.totalInput_.store(0.0, std::memory_order_relaxed);
+    other.totalInput_.store(0.0);
     return *this;
 }
 

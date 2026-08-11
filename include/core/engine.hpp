@@ -57,6 +57,7 @@ class [[nodiscard]] Engine {
 
   private:
     void runLabor();
+    void runProductionGoods();
     void runConsumerGoods();
     void update();
     void logging();
