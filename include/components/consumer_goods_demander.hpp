@@ -14,12 +14,14 @@
 
 namespace consumer_goods::demander::internal {
 [[nodiscard]] inline auto pickEntry(
-    pcg32&                                     rng,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const int                                  sampleCnt = config::goods_demander::goodsSampleCnt
-) -> world::GoodsEntry& {
-    auto toDouble{[](const world::GoodsEntry& entry) -> double { return entry.supply.value(); }};
-    std::reference_wrapper<world::GoodsEntry> betterEntry =
+    pcg32&                                             rng,
+    tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox,
+    const int sampleCnt = config::goods_demander::goodsSampleCnt
+) -> world::ConsumerGoodsEntry& {
+    auto toDouble{[](const world::ConsumerGoodsEntry& entry) -> double {
+        return entry.supply.value();
+    }};
+    std::reference_wrapper<world::ConsumerGoodsEntry> betterEntry =
         helper::discreteDistribution(entryBox, rng, toDouble);
 
     if (sampleCnt <= 1) return betterEntry.get();
@@ -40,7 +42,9 @@ class [[nodiscard]] ConsumerGoodsDemander {
         : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
 
     void request(
-        const Money asset, const Step step, tbb::concurrent_vector<world::GoodsEntry>& entryBox
+        const Money                                        asset,
+        const Step                                         step,
+        tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
     ) {
         if (isPass(asset, step, entryBox)) return;
         const Money budget{calcBudget(asset)};
@@ -65,9 +69,9 @@ class [[nodiscard]] ConsumerGoodsDemander {
 
   private:
     auto isPass(
-        const Money                                      asset,
-        const Step                                       step,
-        const tbb::concurrent_vector<world::GoodsEntry>& entryBox
+        const Money                                              asset,
+        const Step                                               step,
+        const tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
     ) const -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;
@@ -77,11 +81,11 @@ class [[nodiscard]] ConsumerGoodsDemander {
 
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
-    pcg32                                     rng_;
-    std::optional<const world::GoodsRequest&> myRequest_{std::nullopt};
-    bool                                      isPosting_{false};
-    Money                                     purchasing_{0.0};
-    const double                              mpc_;
-    const Step                                myPhase_;
+    pcg32                                             rng_;
+    std::optional<const world::ConsumerGoodsRequest&> myRequest_{std::nullopt};
+    bool                                              isPosting_{false};
+    Money                                             purchasing_{0.0};
+    const double                                      mpc_;
+    const Step                                        myPhase_;
 };
 }  // namespace consumer_goods::demander

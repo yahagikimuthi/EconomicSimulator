@@ -60,8 +60,8 @@ class [[nodiscard]] Engine {
     std::vector<Firm>  firms_;
     std::vector<HHold> hholds_;
 
-    tbb::concurrent_vector<world::LaborRequest> laborRequestBox_;
-    tbb::concurrent_vector<world::GoodsEntry>   goodsEntryBox_;
+    tbb::concurrent_vector<world::LaborRequest>       laborRequestBox_;
+    tbb::concurrent_vector<world::ConsumerGoodsEntry> goodsEntryBox_;
 
     world::CensusDropBox dropBox_;
 

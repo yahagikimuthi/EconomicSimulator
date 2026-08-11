@@ -13,12 +13,13 @@
 
 namespace consumer_goods::supplier::internal {
 [[nodiscard]] inline auto calcTotalDemand(
-    const tbb::concurrent_vector<world::GoodsRequest>& requestBox
+    const tbb::concurrent_vector<world::ConsumerGoodsRequest>& requestBox
 ) -> GoodsQuantity {
     const GoodsQuantity demand{std::ranges::fold_left(
-        requestBox | std::ranges::views::transform([](const world::GoodsRequest& req) -> double {
-            return req.amount.value();
-        }),
+        requestBox |
+            std::ranges::views::transform([](const world::ConsumerGoodsRequest& req) -> double {
+                return req.amount.value();
+            }),
         0.0,
         std::plus<>{}
     )};
@@ -27,19 +28,22 @@ namespace consumer_goods::supplier::internal {
 }
 
 void inline shuffleIdx(
-    tbb::concurrent_vector<world::GoodsRequest>&              requestBox,
-    std::vector<std::reference_wrapper<world::GoodsRequest>>& requests,
-    pcg32&                                                    rng
+    tbb::concurrent_vector<world::ConsumerGoodsRequest>&              requestBox,
+    std::vector<std::reference_wrapper<world::ConsumerGoodsRequest>>& requests,
+    pcg32&                                                            rng
 ) {
     requests.clear();
-    for (world::GoodsRequest& request : requestBox) requests.emplace_back(std::ref(request));
+    for (world::ConsumerGoodsRequest& request : requestBox)
+        requests.emplace_back(std::ref(request));
     std::ranges::shuffle(requests, rng);
 }
 
 void inline performRationedTrade(
-    const GoodsQuantity supply, pcg32& rng, tbb::concurrent_vector<world::GoodsRequest>& requestBox
+    const GoodsQuantity                                  supply,
+    pcg32&                                               rng,
+    tbb::concurrent_vector<world::ConsumerGoodsRequest>& requestBox
 ) {
-    static thread_local std::vector<std::reference_wrapper<world::GoodsRequest>> requests;
+    static thread_local std::vector<std::reference_wrapper<world::ConsumerGoodsRequest>> requests;
     shuffleIdx(requestBox, requests, rng);
 
     GoodsQuantity remainAmount{supply};
@@ -58,7 +62,7 @@ void inline performRationedTrade(
     std::unreachable();
 }
 
-void inline performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
+void inline performFullTrade(tbb::concurrent_vector<world::ConsumerGoodsRequest>& requestBox) {
     for (auto& request : requestBox) request.tradeAmount = request.amount;
 }
 }  // namespace consumer_goods::supplier::internal
@@ -68,9 +72,9 @@ class Trader {
   public:
     Trader(const pcg32 rng) : rng_{rng} {}
     void post(
-        const GoodsQuantity                        supply,
-        const Price                                pricePlan,
-        tbb::concurrent_vector<world::GoodsEntry>& entryBox
+        const GoodsQuantity                                supply,
+        const Price                                        pricePlan,
+        tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
     ) {
         if (supply == GoodsQuantity{0.0}) return;
         isPosting_        = true;
@@ -102,9 +106,9 @@ class Trader {
     void endStep() { myEntry_.reset(), isPosting_ = false, ledger_.reset(); }
 
   private:
-    pcg32                             rng_;
-    std::optional<world::GoodsEntry&> myEntry_{std::nullopt};
-    bool                              isPosting_{false};
+    pcg32                                     rng_;
+    std::optional<world::ConsumerGoodsEntry&> myEntry_{std::nullopt};
+    bool                                      isPosting_{false};
 
     struct {
         GoodsQuantity inventory{0.0};

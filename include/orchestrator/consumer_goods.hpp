@@ -13,19 +13,19 @@ namespace consumer_goods {
 void product(labor::supplier::LaborSupplier& laborSupplier) { laborSupplier.product(); }
 
 void postGoods(
-    supplier::ConsumerGoodsSupplier&           goodsSupplier,
-    const labor::demander::LaborDemander&      laborDemander,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox
+    supplier::ConsumerGoodsSupplier&                   goodsSupplier,
+    const labor::demander::LaborDemander&              laborDemander,
+    tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
 ) {
     goodsSupplier.post(laborDemander.sumWage(), entryBox);
 }
 
 void purchase(
-    const hhold_finance::Component&            finance,
-    demander::ConsumerGoodsDemander&           goodsDemander,
-    const labor::supplier::LaborSupplier&      laborSupplier,
-    tbb::concurrent_vector<world::GoodsEntry>& entryBox,
-    const Step                                 step
+    const hhold_finance::Component&                    finance,
+    demander::ConsumerGoodsDemander&                   goodsDemander,
+    const labor::supplier::LaborSupplier&              laborSupplier,
+    tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox,
+    const Step                                         step
 ) {
     goodsDemander.request(finance.asset() + laborSupplier.wage(), step, entryBox);
 }

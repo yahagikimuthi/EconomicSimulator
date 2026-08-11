@@ -3,8 +3,8 @@
 namespace world {
 struct LaborEntry;
 struct LaborRequest;
-struct GoodsRequest;
-struct GoodsEntry;
+struct ConsumerGoodsRequest;
+struct ConsumerGoodsEntry;
 class Workspace;
 class RosterEntry;
 struct CompanyBoard;
@@ -24,8 +24,8 @@ namespace labor::supplier {
 class LaborSupplier;
 }
 namespace goods::demander {
-class GoodsDemander;
+class ConsumerGoodsDemander;
 }
 namespace goods::supplier {
-class GoodsSupplier;
+class ConsumerGoodsSupplier;
 }  // namespace goods::supplier

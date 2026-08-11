@@ -18,7 +18,7 @@ class [[nodiscard]] ConsumerGoodsSupplier {
     ConsumerGoodsSupplier(const Planner&& planner, const Trader&& trader, const Producer&& producer)
         : planner_{planner}, trader_{trader}, producer_{producer} {}
 
-    void post(const Money totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox) {
+    void post(const Money totalCost, tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox) {
         const GoodsQuantity supply{producer_.product()};
         planner_.judgePlan(supply, totalCost);
         trader_.post(supply, planner_.pricePlan(), entryBox);
