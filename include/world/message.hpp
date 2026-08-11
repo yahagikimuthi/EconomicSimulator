@@ -138,6 +138,26 @@ struct [[nodiscard]] ConsumerGoodsEntry {
     tbb::concurrent_vector<ConsumerGoodsRequest> requestBox;
 };
 
+struct ProductionGoodsRequest {
+    const GoodsQuantity amount;
+    GoodsQuantity       tradeAmount{0.0};
+
+    const ProductionGoodsEntry& entry;
+    ProductionGoodsRequest(const GoodsQuantity Amount, const ProductionGoodsEntry& Entry)
+        : amount{Amount}, entry{Entry} {}
+};
+
+struct [[nodiscard]] ProductionGoodsEntry {
+    ProductionGoodsEntry(const Price Price, const GoodsQuantity Supply);
+    auto request(const GoodsQuantity amount) -> ProductionGoodsRequest& {
+        return *requestBox.emplace_back(amount, *this);
+    }
+
+    const Price                                    price;
+    const GoodsQuantity                            supply;
+    tbb::concurrent_vector<ProductionGoodsRequest> requestBox;
+};
+
 struct CensusDropBox {
     std::vector<double> firmAssets;
     std::vector<double> postedEmployments;
