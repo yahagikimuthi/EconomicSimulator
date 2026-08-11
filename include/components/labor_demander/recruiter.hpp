@@ -16,17 +16,16 @@
 #include "world/message.hpp"
 
 namespace labor::demander::internal {
-inline auto sortApplicants(
-    const HeadCount offer, tbb::concurrent_vector<world::LaborEntry>& entryBox
-) -> auto {
-    using EntryRef = std::reference_wrapper<world::LaborEntry>;
+inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEntry>& entryBox)
+    -> auto {
+    using EntryRef = std::reference_wrapper<LaborEntry>;
     static thread_local std::vector<EntryRef> applicants;
     applicants.clear();
     const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
-    for (world::LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
+    for (LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
     const bool isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
 
-    const auto toRawRef{[](EntryRef entryRef) -> world::LaborEntry& { return entryRef.get(); }};
+    const auto toRawRef{[](EntryRef entryRef) -> LaborEntry& { return entryRef.get(); }};
     if (not isOver) return applicants | std::views::transform(toRawRef);
 
     std::ranges::nth_element(
@@ -45,9 +44,9 @@ class [[nodiscard]] Recruiter {
     Recruiter(const RequestPlanner& planner) : planner_{planner} {}
 
     void post(
-        const AgentID                                id,
-        const HeadCount                              desiredEmploy,
-        tbb::concurrent_vector<world::LaborRequest>& requestBox
+        const AgentID                         id,
+        const HeadCount                       desiredEmploy,
+        tbb::concurrent_vector<LaborRequest>& requestBox
     ) PRE(desiredEmploy >= HeadCount{0.0}) {
         isRecruiting_ = true;
         planner_.judgePlan(desiredEmploy);
@@ -75,21 +74,21 @@ class [[nodiscard]] Recruiter {
     }
 
     void registerMember(AddRosterFn auto&& addRoster) {
-        using Entry = world::LaborEntry;
+        using Entry = LaborEntry;
         if (not isPosting_) return;
 
         HeadCount              employCnt{0.0};
         std::ranges::view auto acceptApplicants{
             offerApplicants_ | std::views::filter(&Entry::isAccept)
         };
-        for (world::LaborEntry& acceptApplicant : acceptApplicants) {
+        for (LaborEntry& acceptApplicant : acceptApplicants) {
             acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
             ++employCnt;
         }
         ledger_.employing += employCnt;
     }
 
-    void endStep(world::CensusDropBox& dropBox) {
+    void endStep(CensusDropBox& dropBox) {
         if (not isRecruiting_) return;
         planner_.endStep(dropBox, ledger_.employing, ledger_.applicantNum);
         myRequest_.reset();
@@ -103,10 +102,10 @@ class [[nodiscard]] Recruiter {
     template <typename U>
     using RefWrapper = std::reference_wrapper<U>;
 
-    RequestPlanner                             planner_;
-    std::optional<world::LaborRequest&>        myRequest_{std::nullopt};
-    std::vector<RefWrapper<world::LaborEntry>> offerApplicants_;
-    bool                                       isPosting_{false};
+    RequestPlanner                      planner_;
+    std::optional<LaborRequest&>        myRequest_{std::nullopt};
+    std::vector<RefWrapper<LaborEntry>> offerApplicants_;
+    bool                                isPosting_{false};
 
     struct {
         HeadCount remainOfferNum{0.0};

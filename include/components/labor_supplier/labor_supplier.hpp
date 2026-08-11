@@ -16,7 +16,7 @@ class Employment {
   public:
     Employment(const double productPower) : productPower_{productPower} {}
     auto isEmployed() const -> bool { return rosterEntry_.has_value(); }
-    void startWorking(world::RosterEntry& rosterEntry) {
+    void startWorking(RosterEntry& rosterEntry) {
         resign();
         rosterEntry_ = rosterEntry;
     }
@@ -26,24 +26,38 @@ class Employment {
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
-    void work() {
+    void work(const MarketPhase phase) {
         if (not isEmployed()) return;
-        rosterEntry_->addInput(productPower_);
+        if (shouldWork(phase)) rosterEntry_->addInput(productPower_);
     }
+
     auto productPower() const -> double { return productPower_; }
+
     void updateStatus() {
         if (not isEmployed()) return;
         if (not rosterEntry_->isOccupied) rosterEntry_.reset();
     }
 
   private:
+    auto shouldWork(const MarketPhase phase) const -> bool {
+        bool shouldWork{false};
+
+        const FirmType firmType{rosterEntry_->firmType()};
+        if (phase == MarketPhase::consumerGoods) {
+            shouldWork |= firmType == FirmType::consumerGoods;
+        } else if (phase == MarketPhase::productionGoods) {
+            shouldWork |= firmType == FirmType::productionGoods;
+        }
+        return shouldWork;
+    }
+
     void resign() {
         if (not isEmployed()) return;
         rosterEntry_->resign();
     }
 
-    std::optional<world::RosterEntry&> rosterEntry_{std::nullopt};
-    const double                       productPower_;
+    std::optional<RosterEntry&> rosterEntry_{std::nullopt};
+    const double                productPower_;
 };
 
 class LaborSupplier {
@@ -58,34 +72,39 @@ class LaborSupplier {
           jobHunter_{jobHunter},
           employment_{employment},
           jobSearchThreshold_{jobSearchThreshold} {}
-    void entry(const AgentID id, tbb::concurrent_vector<world::LaborRequest>& requestBox) {
+
+    void entry(const AgentID id, tbb::concurrent_vector<LaborRequest>& requestBox) {
         employment_.updateStatus();
         if (not shouldSearchJob()) return;
         if (requestBox.empty()) return;
 
-        using Request = world::LaborRequest;
+        using Request = LaborRequest;
         auto isAligned{[&](const Request& req) -> bool {
             if (req.firmID == employment_.contractFirmId()) return false;
             if (req.wage < employment_.wage()) return false;
             return true;
         }};
-        auto makeEntrySheet{[&](Request& req) -> world::LaborEntry& {
+        auto makeEntrySheet{[&](Request& req) -> LaborEntry& {
             return req.entry(id, employment_.productPower());
         }};
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }
 
     void accept() { jobHunter_.accept(); }
+
     void recordRosterEntry() {
-        const std::optional<world::LaborEntry&> acceptedEntry{jobHunter_.acceptedEntry()};
+        const std::optional<LaborEntry&> acceptedEntry{jobHunter_.acceptedEntry()};
         if (not acceptedEntry) return;
         employment_.startWorking(*acceptedEntry->rosterEntry);
     }
-    void endStep(world::CensusDropBox& dropBox) {
+
+    void endStep(CensusDropBox& dropBox) {
         dropBox.wages.emplace_back(wage().value());
         jobHunter_.endStep();
     }
-    void product() { employment_.work(); }
+
+    void product(const MarketPhase phase) { employment_.work(phase); }
+
     auto wage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(employment_.wage());
     }

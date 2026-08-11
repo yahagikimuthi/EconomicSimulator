@@ -8,11 +8,11 @@
 #include "config.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
+#include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
 #include "world/message.hpp"
 
 void foo() {}
-namespace core {
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
         if (currentStep_.value() == 600) {
@@ -63,20 +63,48 @@ void Engine::runLabor() {
     }
 }
 
-void runProductionGoods() {}
-
-void Engine::runConsumerGoods() {
+void Engine::runProductionGoods() {
     for (HHold& hhold : hholds_) {
-        consumer_goods::product(hhold.labor);
+        production_goods::product(hhold.labor, MarketPhase::productionGoods);
+    }
+
+    for (BtoBFirm& firm : BtoBFirms_) {
+        production_goods::postGoods(
+            firm.productionGoodsSupplier, firm.labor, productionGoodsEntryBox_
+        );
     }
 
     for (BtoCFirm& firm : BtoCFirms_) {
-        consumer_goods::postGoods(firm.consumerGoods, firm.labor, goodsEntryBox_);
+        production_goods::purchase(
+            firm.finance, firm.productionGoods, firm.labor, productionGoodsEntryBox_
+        );
+    }
+
+    for (BtoBFirm& firm : BtoBFirms_) {
+        production_goods::trade(firm.productionGoodsSupplier);
+    }
+
+    for (BtoCFirm& firm : BtoCFirms_) {
+        production_goods::afterTrade(firm.productionGoods);
+    }
+
+    for (BtoBFirm& firm : BtoBFirms_) {
+        production_goods::endStep(firm.finance, firm.productionGoodsDemander);
+    }
+}
+
+void Engine::runConsumerGoods() {
+    for (HHold& hhold : hholds_) {
+        consumer_goods::product(hhold.labor, MarketPhase::consumerGoods);
+    }
+
+    for (BtoCFirm& firm : BtoCFirms_) {
+        consumer_goods::postGoods(firm.consumerGoods, firm.labor, consumerGoodsEntryBox_);
     }
 
     for (HHold& hhold : hholds_) {
         consumer_goods::purchase(
-            hhold.finance, hhold.consumerGoods, hhold.labor, goodsEntryBox_, currentStep_
+            hhold.finance, hhold.consumerGoods, hhold.labor, consumerGoodsEntryBox_, currentStep_
         );
     }
 
@@ -110,12 +138,13 @@ void Engine::logging() {
 void Engine::reset() {
     dropBox_.clear();
     laborRequestBox_.clear();
-    goodsEntryBox_.clear();
+    productionGoodsEntryBox_.clear();
+    consumerGoodsEntryBox_.clear();
 }
 
 void Engine::check() const {}
 
-void Logger::save(const world::CensusDropBox& dropBox, const Step step) {
+void Logger::save(const CensusDropBox& dropBox, const Step step) {
     namespace name = config::save_name;
     std::string     groupPath{"/step_" + std::to_string(step.value())};
     HighFive::Group group{file_.createGroup(groupPath)};
@@ -134,4 +163,3 @@ void Logger::save(const world::CensusDropBox& dropBox, const Step step) {
     create(name::householdAssets, dropBox.hholdAssets);
     create(name::wages, dropBox.wages);
 }
-}  // namespace core

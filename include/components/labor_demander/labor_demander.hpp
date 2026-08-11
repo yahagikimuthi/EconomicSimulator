@@ -14,9 +14,9 @@ class [[nodiscard]] LaborDemander {
     LaborDemander(const Recruiter&& recruiter, const HumanResourceManager&& hrManager)
         : recruiter_{recruiter}, hrManager_{hrManager} {}
     void post(
-        const AgentID                                id,
-        const HeadCount                              desiredEmploy,
-        tbb::concurrent_vector<world::LaborRequest>& requestBox
+        const AgentID                         id,
+        const HeadCount                       desiredEmploy,
+        tbb::concurrent_vector<LaborRequest>& requestBox
     ) PRE(desiredEmploy > HeadCount{0.0}) {
         recruiter_.post(id, desiredEmploy, requestBox);
     }
@@ -24,8 +24,8 @@ class [[nodiscard]] LaborDemander {
     void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0}) {
         hrManager_.layOffs(layOffsCnt);
     }
-    void registerMember(world::Workspace& workspace) {
-        recruiter_.registerMember([&](const AgentID id, const Wage wage) -> world::RosterEntry& {
+    void registerMember(Workspace& workspace) {
+        recruiter_.registerMember([&](const AgentID id, const Wage wage) -> RosterEntry& {
             return hrManager_.addRoster(id, wage, workspace);
         });
     };
@@ -36,7 +36,7 @@ class [[nodiscard]] LaborDemander {
     auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(hrManager_.sumWage());
     }
-    void endStep(world::CensusDropBox& dropBox) {
+    void endStep(CensusDropBox& dropBox) {
         recruiter_.endStep(dropBox);
         hrManager_.endStep();
     }

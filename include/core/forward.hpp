@@ -1,6 +1,5 @@
 #pragma once
 
-namespace world {
 struct LaborEntry;
 struct LaborRequest;
 struct ConsumerGoodsRequest;
@@ -11,7 +10,6 @@ class Workspace;
 class RosterEntry;
 struct CompanyBoard;
 struct CensusDropBox;
-}  // namespace world
 
 namespace agent_index {
 class Component;

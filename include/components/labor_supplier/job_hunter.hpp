@@ -15,42 +15,41 @@
 
 namespace labor::supplier::internal {
 inline void pickSample(
-    tbb::concurrent_vector<world::LaborRequest>&              requestBox,
-    std::vector<std::reference_wrapper<world::LaborRequest>>& sampleRequests,
-    pcg32&                                                    rng,
-    const int                                                 sampleCnt
+    tbb::concurrent_vector<LaborRequest>&              requestBox,
+    std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
+    pcg32&                                             rng,
+    const int                                          sampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     sampleRequests.clear();
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
-        for (world::LaborRequest& request : requestBox)
-            sampleRequests.emplace_back(std::ref(request));
+        for (LaborRequest& request : requestBox) sampleRequests.emplace_back(std::ref(request));
         return;
     }
     std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), rng);
 }
 
 inline void sortSample(
-    std::vector<std::reference_wrapper<world::LaborRequest>>& sortRequests, const int entryCnt
+    std::vector<std::reference_wrapper<LaborRequest>>& sortRequests, const int entryCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
         sortRequests,
         sortRequests.begin() + static_cast<int>(k),
         std::ranges::greater{},
-        [](const std::reference_wrapper<world::LaborRequest>& requestRef) -> double {
+        [](const std::reference_wrapper<LaborRequest>& requestRef) -> double {
             return requestRef.get().wage.value();
         }
     );
 }
 
 [[nodiscard]] inline auto pickJobs(
-    tbb::concurrent_vector<world::LaborRequest>& requestBox,
-    pcg32&                                       rng,
-    const int                                    sampleCnt,
-    const int                                    entryCnt
+    tbb::concurrent_vector<LaborRequest>& requestBox,
+    pcg32&                                rng,
+    const int                             sampleCnt,
+    const int                             entryCnt
 ) -> std::ranges::view auto {
-    using Request = world::LaborRequest;
+    using Request = LaborRequest;
     static thread_local std::vector<std::reference_wrapper<Request>> sampleRequest;
     pickSample(requestBox, sampleRequest, rng, sampleCnt);
     sortSample(sampleRequest, entryCnt);
@@ -67,13 +66,13 @@ class JobHunter {
     JobHunter(const pcg32 rng) : rng_{rng} {}
 
     void entry(
-        IsAlignedFn auto&&                           isAligned,
-        MakeEntrySheetFn auto&&                      makeEntrySheet,
-        tbb::concurrent_vector<world::LaborRequest>& requestBox,
-        const int sampleCnt = config::labor_supplier::jobSampleCnt,
-        const int entryCnt  = config::labor_supplier::jobEntryCnt
+        IsAlignedFn auto&&                    isAligned,
+        MakeEntrySheetFn auto&&               makeEntrySheet,
+        tbb::concurrent_vector<LaborRequest>& requestBox,
+        const int                             sampleCnt = config::labor_supplier::jobSampleCnt,
+        const int                             entryCnt  = config::labor_supplier::jobEntryCnt
     ) PRE(entryCnt > 0) {
-        using Request = world::LaborRequest;
+        using Request = LaborRequest;
         std::ranges::view auto alignedRequests{
             internal::pickJobs(requestBox, rng_, sampleCnt, entryCnt) |
             std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
@@ -92,10 +91,10 @@ class JobHunter {
         acceptedEntry_        = acceptEntry;
     }
     void endStep() { myEntries_.clear(), acceptedEntry_.reset(), isPosting_ = false; }
-    auto acceptedEntry() -> std::optional<world::LaborEntry&> { return acceptedEntry_; }
+    auto acceptedEntry() -> std::optional<LaborEntry&> { return acceptedEntry_; }
 
   private:
-    using Entry = world::LaborEntry;
+    using Entry = LaborEntry;
     auto takeAcceptEntry() -> std::optional<Entry&> {
         std::ranges::view auto offered{
             myEntries_ | std::views::filter([](const std::reference_wrapper<Entry> entry) -> bool {
@@ -107,10 +106,10 @@ class JobHunter {
         return offered.front().get();
     }
 
-    mutable pcg32                                          rng_;
-    std::vector<std::reference_wrapper<world::LaborEntry>> myEntries_;
-    std::optional<world::LaborEntry&>                      acceptedEntry_{std::nullopt};
-    bool                                                   isPosting_{false};
+    mutable pcg32                                   rng_;
+    std::vector<std::reference_wrapper<LaborEntry>> myEntries_;
+    std::optional<LaborEntry&>                      acceptedEntry_{std::nullopt};
+    bool                                            isPosting_{false};
 
     friend class JobHunterTester;
 };

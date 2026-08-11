@@ -35,8 +35,7 @@ void inline shuffleIdx(
     pcg32&                                        rng
 ) {
     requests.clear();
-    for (world::ConsumerGoodsRequest& request : requestBox)
-        requests.emplace_back(std::ref(request));
+    for (ConsumerGoodsRequest& request : requestBox) requests.emplace_back(std::ref(request));
     std::ranges::shuffle(requests, rng);
 }
 

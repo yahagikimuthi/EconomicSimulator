@@ -9,11 +9,11 @@
 
 namespace production_goods::demander {
 class [[nodiscard]] ProductionGoodsDemander final
-    : public base_goods::demander::BaseGoodsDemander<world::ProductionGoodsRequest> {
+    : public base_goods::demander::BaseGoodsDemander<FirmType::productionGoods> {
   public:
-    using base_goods::demander::BaseGoodsDemander<world::ProductionGoodsRequest>::BaseGoodsDemander;
+    using base_goods::demander::BaseGoodsDemander<FirmType::productionGoods>::BaseGoodsDemander;
 
-    void request(const Money asset, tbb::concurrent_vector<world::ProductionGoodsEntry>& entryBox) {
+    void request(const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox) {
         if (isPass(asset, entryBox)) return;
         const Money budget{calcBudget(asset)};
         if (budget <= Money{0.0}) return;
@@ -23,9 +23,8 @@ class [[nodiscard]] ProductionGoodsDemander final
     }
 
   private:
-    auto isPass(
-        const Money asset, const tbb::concurrent_vector<world::ProductionGoodsEntry>& entryBox
-    ) const -> bool {
+    auto isPass(const Money asset, const tbb::concurrent_vector<ProductionGoodsEntry>& entryBox)
+        const -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;
         return false;

@@ -6,18 +6,16 @@
 
 namespace consumer_goods::demander {
 class [[nodiscard]] ConsumerGoodsDemander final
-    : public base_goods::demander::BaseGoodsDemander<world::ConsumerGoodsRequest> {
+    : public base_goods::demander::BaseGoodsDemander<FirmType::consumerGoods> {
   public:
     ConsumerGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-        : base_goods::demander::BaseGoodsDemander<world::ConsumerGoodsRequest>::BaseGoodsDemander(
+        : base_goods::demander::BaseGoodsDemander<FirmType::consumerGoods>::BaseGoodsDemander(
               rng, mpc
           ),
           myPhase_{myPhase} {}
 
     void request(
-        const Money                                        asset,
-        const Step                                         step,
-        tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
+        const Money asset, const Step step, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) {
         if (isPass(asset, step, entryBox)) return;
         const Money budget{calcBudget(asset)};
@@ -29,9 +27,9 @@ class [[nodiscard]] ConsumerGoodsDemander final
 
   private:
     auto isPass(
-        const Money                                              asset,
-        const Step                                               step,
-        const tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
+        const Money                                       asset,
+        const Step                                        step,
+        const tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) const -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;

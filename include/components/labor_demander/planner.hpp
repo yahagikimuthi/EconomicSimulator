@@ -50,9 +50,8 @@ class [[nodiscard]] RequestPlanner {
         return plan_.offer;
     }
 
-    void endStep(
-        world::CensusDropBox& dropBox, const HeadCount actualEmploy, const HeadCount applicantNum
-    ) PRE(actualEmploy >= HeadCount{0.0}) PRE(applicantNum >= HeadCount{0.0}) {
+    void endStep(CensusDropBox& dropBox, const HeadCount actualEmploy, const HeadCount applicantNum)
+        PRE(actualEmploy >= HeadCount{0.0}) PRE(applicantNum >= HeadCount{0.0}) {
         dropBox.postedEmployments.emplace_back(plan_.employ.value());
         log_ = {
             .wage         = plan_.wage,

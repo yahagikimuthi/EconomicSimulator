@@ -33,9 +33,7 @@ namespace firm_finance {
 class [[nodiscard]] Component : public finance::FinanceBaseComponent {
   public:
     using finance::FinanceBaseComponent::FinanceBaseComponent;
-    void endStep(world::CensusDropBox& dropBox) const {
-        dropBox.firmAssets.emplace_back(asset_.value());
-    }
+    void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
 }  // namespace firm_finance
 
@@ -43,8 +41,6 @@ namespace hhold_finance {
 class [[nodiscard]] Component : public finance::FinanceBaseComponent {
   public:
     using finance::FinanceBaseComponent::FinanceBaseComponent;
-    void endStep(world::CensusDropBox& dropBox) const {
-        dropBox.hholdAssets.emplace_back(asset_.value());
-    }
+    void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
 };
 }  // namespace hhold_finance

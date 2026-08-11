@@ -6,12 +6,12 @@
 
 namespace labor::supplier {
 template <typename T>
-concept IsAlignedFn = requires(T t, world::LaborRequest request) {
+concept IsAlignedFn = requires(T t, LaborRequest request) {
     { t(request) } -> std::same_as<bool>;
 };
 
 template <typename T>
-concept MakeEntrySheetFn = requires(T t, world::LaborRequest request) {
-    { t(request) } -> std::same_as<world::LaborEntry&>;
+concept MakeEntrySheetFn = requires(T t, LaborRequest request) {
+    { t(request) } -> std::same_as<LaborEntry&>;
 };
 }  // namespace labor::supplier

@@ -61,9 +61,7 @@ class [[nodiscard]] Planner {
     }
 
     void endStep(
-        const GoodsQuantity   totalDemand,
-        const GoodsQuantity   unsoldAmount,
-        world::CensusDropBox& dropBox
+        const GoodsQuantity totalDemand, const GoodsQuantity unsoldAmount, CensusDropBox& dropBox
     ) PRE(totalDemand >= GoodsQuantity{0.0}) PRE(unsoldAmount >= GoodsQuantity{0.0}) {
         dropBox.prices.emplace_back(plan_.price.value());
         dropBox.supplies.emplace_back(plan_.supply.value());

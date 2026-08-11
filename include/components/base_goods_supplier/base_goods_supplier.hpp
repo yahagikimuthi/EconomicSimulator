@@ -22,7 +22,7 @@ class [[nodiscard]] BaseGoodsSupplier {
     )
         : planner_{planner}, trader_{trader}, producer_{producer} {}
 
-    void post(const Money totalCost, tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox) {
+    void post(const Money totalCost, tbb::concurrent_vector<Entry>& entryBox) {
         const GoodsQuantity supply{producer_.product()};
         planner_.judgePlan(supply, totalCost);
         trader_.post(supply, planner_.pricePlan(), entryBox);
@@ -37,7 +37,7 @@ class [[nodiscard]] BaseGoodsSupplier {
         );
     }
 
-    void endStep(world::CensusDropBox& dropBox) {
+    void endStep(CensusDropBox& dropBox) {
         planner_.endStep(trader_.totalDemand(), trader_.inventory(), dropBox);
         producer_.endStep(trader_.inventory(), dropBox);
         trader_.endStep();
@@ -45,7 +45,7 @@ class [[nodiscard]] BaseGoodsSupplier {
 
     auto sales() const -> Money { return trader_.sales(); }
 
-    auto workspace() -> world::Workspace& { return producer_.workspace(); }
+    auto workspace() -> Workspace& { return producer_.workspace(); }
 
   protected:
     Planner       planner_;

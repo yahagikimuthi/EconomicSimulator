@@ -6,6 +6,7 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
 #include <iostream>
+#include <utility>
 
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
@@ -25,28 +26,6 @@
 #include "core/values/goods.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
-
-/*
-namespace {
-void createFirm(const int id, entt::registry& registry) {
-    entt::entity firm{registry.create()};
-    registry.emplace<agent_index::Component>(firm, id);
-    registry.emplace<firm_finance::Component>(firm);
-    registry.emplace<labor_demander::Component>(firm);
-    registry.emplace<goods_supplier::Component>(firm);
-    registry.emplace<FirmTag>(firm);
-}
-
-void createHHold(const int id, entt::registry& registry) {
-    entt::entity hhold{registry.create()};
-    registry.emplace<agent_index::Component>(hhold, id);
-    registry.emplace<hhold_finance::Component>(hhold);
-    registry.emplace<labor_supplier::Component>(hhold);
-    registry.emplace<goods_demander::Component>(hhold);
-    registry.emplace<HHoldTag>(hhold);
-}
-}  // namespace 1000,5000
-*/
 
 namespace {
 [[nodiscard]] auto makeFirmFinanceComponent(pcg32& masterRng) -> firm_finance::Component {
@@ -95,7 +74,7 @@ namespace {
 }
 
 [[nodiscard]] auto makeConsumerGoodsSupplierTrader(pcg32& masterRng
-) -> base_goods::supplier::Trader<world::ConsumerGoodsEntry> {
+) -> base_goods::supplier::Trader<ConsumerGoodsEntry> {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     return {rng};
 }
@@ -104,7 +83,7 @@ namespace {
 ) -> base_goods::supplier::Producer {
     const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
     const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
-    world::Workspace    workspace{firmProductPower};
+    Workspace           workspace{firmProductPower};
     return base_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
@@ -118,9 +97,9 @@ namespace {
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplierTrader(pcg32& masterRng
-) -> base_goods::supplier::Trader<world::ProductionGoodsEntry> {
+) -> base_goods::supplier::Trader<ProductionGoodsEntry> {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    return base_goods::supplier::Trader<world::ProductionGoodsEntry>{rng};
+    return base_goods::supplier::Trader<ProductionGoodsEntry>{rng};
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng
@@ -158,15 +137,17 @@ namespace {
     return labor::demander::Recruiter{makeLaborDemanderRecruiterPlanner(masterRng)};
 }
 
-[[nodiscard]] auto makeLaborDemanderHumanResourceManager(const AgentID id
-) -> labor::demander::HumanResourceManager {
-    world::CompanyBoard companyBoard{id};
+[[nodiscard]] auto makeLaborDemanderHumanResourceManager(const AgentID id, const FirmType firmType)
+    -> labor::demander::HumanResourceManager {
+    CompanyBoard companyBoard{id, firmType};
     return labor::demander::HumanResourceManager{std::move(companyBoard)};
 }
 
-[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id)
+[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id, const FirmType firmType)
     -> labor::demander::LaborDemander {
-    return {makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id)};
+    return {
+        makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id, firmType)
+    };
 }
 
 [[nodiscard]] auto makeLaborSupplierJobHunter(pcg32& masterRng) -> labor::supplier::JobHunter {
@@ -191,7 +172,6 @@ namespace {
 }
 }  // namespace
 
-namespace core {
 Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::generatePCG32Seed()} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";
@@ -203,9 +183,9 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     int agentId{};
     for (; agentId < config::agent_count::BtoCFirm; ++agentId) {
         BtoCFirms_.emplace_back(BtoCFirm{
-            .index           = {AgentID{agentId}},
-            .finance         = makeFirmFinanceComponent(masterRng_),
-            .labor           = makeLaborDemander(masterRng_, AgentID{agentId}),
+            .index   = {AgentID{agentId}},
+            .finance = makeFirmFinanceComponent(masterRng_),
+            .labor   = makeLaborDemander(masterRng_, AgentID{agentId}, FirmType::consumerGoods),
             .consumerGoods   = makeConsumerGoodsSupplier(masterRng_),
             .productionGoods = makeProductionGoodsDemander(masterRng_)
         });
@@ -214,9 +194,9 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     BtoBFirms_.reserve(config::agent_count::BtoBFirm);
     for (; agentId < config::agent_count::BtoBFirm; ++agentId) {
         BtoBFirms_.emplace_back(BtoBFirm{
-            .index                   = {AgentID{agentId}},
-            .finance                 = makeFirmFinanceComponent(masterRng_),
-            .labor                   = makeLaborDemander(masterRng_, AgentID{agentId}),
+            .index   = {AgentID{agentId}},
+            .finance = makeFirmFinanceComponent(masterRng_),
+            .labor   = makeLaborDemander(masterRng_, AgentID{agentId}, FirmType::productionGoods),
             .productionGoodsSupplier = makeProductionGoodsSupplier(masterRng_),
             .productionGoodsDemander = makeProductionGoodsDemander(masterRng_)
         });
@@ -246,4 +226,3 @@ Logger::Logger()
               HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
           };
       }()} {}
-}  // namespace core

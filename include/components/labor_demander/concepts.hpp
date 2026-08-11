@@ -9,6 +9,6 @@
 namespace labor::demander {
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
-    { f(id, wage) } -> std::same_as<world::RosterEntry&>;
+    { f(id, wage) } -> std::same_as<RosterEntry&>;
 };
 }  // namespace labor::demander

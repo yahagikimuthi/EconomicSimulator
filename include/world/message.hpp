@@ -3,7 +3,6 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 #include <deque>
-#include <functional>
 #include <optional>
 
 #include "config.hpp"
@@ -12,9 +11,9 @@
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
-namespace world {
+enum class FirmType : char { consumerGoods, productionGoods };
 
-enum class MarketType : char { labor, consumerGoods, productionGoods };
+enum class MarketPhase : char { labor, consumerGoods, productionGoods };
 
 class [[nodiscard]] Workspace {
   public:
@@ -64,10 +63,11 @@ inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
 
 struct [[nodiscard]] CompanyBoard {
     const AgentID                                               firmId;
+    const FirmType                                              firmType;
     std::deque<RosterEntry>                                     roster;
     tbb::concurrent_vector<std::reference_wrapper<RosterEntry>> resignationBox;
 
-    CompanyBoard(const AgentID Id) : firmId{Id} {}
+    CompanyBoard(const AgentID Id, const FirmType FirmType) : firmId{Id}, firmType{FirmType} {}
     void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) -> RosterEntry&;
 };
@@ -79,6 +79,7 @@ class [[nodiscard]] RosterEntry {
     void addInput(const double productPower) { workspace.addInput(productPower); }
     void resign() { companyBoard.resign(*this); }
     auto firmId() const -> AgentID { return companyBoard.firmId; }
+    auto firmType() const -> FirmType { return companyBoard.firmType; }
 
     const AgentID hholdId;
     const Wage    wage;
@@ -200,4 +201,3 @@ struct CensusDropBox {
         wages.clear();
     }
 };
-}  // namespace world

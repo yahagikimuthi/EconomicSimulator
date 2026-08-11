@@ -5,11 +5,13 @@
 #include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
+#include <type_traits>
 
 #include "components/base_concepts.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "helper.hpp"
+#include "world/message.hpp"
 
 namespace base_goods::demander::internal {
 template <EntryType Entry>
@@ -35,8 +37,11 @@ template <EntryType Entry>
 
 namespace base_goods::demander {
 
-template <RequestType T>
+template <FirmType T>
 class [[nodiscard]] BaseGoodsDemander {
+    using Request = std::
+        conditional_t<T == FirmType::consumerGoods, ConsumerGoodsRequest, ProductionGoodsRequest>;
+
   public:
     BaseGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}
 
@@ -56,10 +61,10 @@ class [[nodiscard]] BaseGoodsDemander {
   protected:
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
-    pcg32                   rng_;
-    std::optional<const T&> myRequest_{std::nullopt};
-    bool                    isPosting_{false};
-    Money                   purchasing_{0.0};
-    const double            mpc_;
+    pcg32                         rng_;
+    std::optional<const Request&> myRequest_{std::nullopt};
+    bool                          isPosting_{false};
+    Money                         purchasing_{0.0};
+    const double                  mpc_;
 };
 }  // namespace base_goods::demander

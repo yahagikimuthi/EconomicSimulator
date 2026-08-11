@@ -6,11 +6,10 @@
 
 namespace base_goods {
 template <typename T>
-concept EntryType =
-    (std::same_as<T, world::ConsumerGoodsEntry> or std::same_as<T, world::ProductionGoodsEntry>);
+concept EntryType = (std::same_as<T, ConsumerGoodsEntry> or std::same_as<T, ProductionGoodsEntry>);
 
 template <typename T>
-concept RequestType = (std::same_as<T, world::ConsumerGoodsRequest>) or
-                      std::same_as<T, world::ProductionGoodsRequest>;
+concept RequestType =
+    (std::same_as<T, ConsumerGoodsRequest>) or std::same_as<T, ProductionGoodsRequest>;
 
 }  // namespace base_goods

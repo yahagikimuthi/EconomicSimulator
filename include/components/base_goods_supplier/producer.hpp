@@ -11,9 +11,7 @@
 namespace base_goods::supplier {
 class [[nodiscard]] Producer {
   public:
-    Producer(
-        world::Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory
-    )
+    Producer(Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory)
         : workspace_{std::move(workspace)},
           firmProductPower_{firmProductPower},
           inventory_{inventory} {}
@@ -38,18 +36,18 @@ class [[nodiscard]] Producer {
         return HeadCount{std::min(laborSupplierCnt, std::ceil(desiredEmploy.value()))};
     }
 
-    void endStep(const GoodsQuantity unsoldAmount, world::CensusDropBox& dropBox)
+    void endStep(const GoodsQuantity unsoldAmount, CensusDropBox& dropBox)
         PRE(unsoldAmount >= GoodsQuantity{0.0}) {
         inventory_ = unsoldAmount;
         dropBox.inventories.emplace_back(inventory_.value());
         workspace_.resetInput();
     }
 
-    auto workspace() -> world::Workspace& { return workspace_; }
+    auto workspace() -> Workspace& { return workspace_; }
 
   private:
-    world::Workspace workspace_;
-    const double     firmProductPower_;
-    GoodsQuantity    inventory_;
+    Workspace     workspace_;
+    const double  firmProductPower_;
+    GoodsQuantity inventory_;
 };
 }  // namespace base_goods::supplier

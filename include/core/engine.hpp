@@ -15,7 +15,6 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace core {
 struct BtoCFirm {  // NOLINT
     agent_index::Component                              index;
     firm_finance::Component                             finance;
@@ -43,7 +42,7 @@ class [[nodiscard]] Logger {
   public:
     explicit Logger();
     auto isValid() const -> bool { return file_.isValid(); }
-    void save(const world::CensusDropBox& dropBox, const Step step);
+    void save(const CensusDropBox& dropBox, const Step step);
 
   private:
     HighFive::File file_;
@@ -66,16 +65,16 @@ class [[nodiscard]] Engine {
 
     auto makeSeed() -> std::uint64_t { return helper::makeSeed(masterRng_); }
 
-    Logger logger_;
-    // entt::registry     registry_;
+    Logger                logger_;
     std::vector<BtoCFirm> BtoCFirms_;
     std::vector<BtoBFirm> BtoBFirms_;
     std::vector<HHold>    hholds_;
 
-    tbb::concurrent_vector<world::LaborRequest>       laborRequestBox_;
-    tbb::concurrent_vector<world::ConsumerGoodsEntry> goodsEntryBox_;
+    tbb::concurrent_vector<LaborRequest>         laborRequestBox_;
+    tbb::concurrent_vector<ProductionGoodsEntry> productionGoodsEntryBox_;
+    tbb::concurrent_vector<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
 
-    world::CensusDropBox dropBox_;
+    CensusDropBox dropBox_;
 
     const Step totalStep_;
     Step       currentStep_{0};
@@ -83,4 +82,3 @@ class [[nodiscard]] Engine {
     const helper::PCG32Seed seed_;
     pcg32                   masterRng_;
 };
-}  // namespace core

@@ -14,7 +14,7 @@ void adjustWorkforce(
     const agent_index::Component&                          index,
     const consumer_goods::supplier::ConsumerGoodsSupplier& goodsSupplier,
     demander::LaborDemander&                               laborDemander,
-    tbb::concurrent_vector<world::LaborRequest>&           requestBox
+    tbb::concurrent_vector<LaborRequest>&                  requestBox
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
     if (desiredEmploy > HeadCount{0.0}) {
@@ -25,9 +25,9 @@ void adjustWorkforce(
 }
 
 void jobEntry(
-    const agent_index::Component&                index,
-    supplier::LaborSupplier&                     laborSupplier,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox
+    const agent_index::Component&         index,
+    supplier::LaborSupplier&              laborSupplier,
+    tbb::concurrent_vector<LaborRequest>& requestBox
 ) {
     laborSupplier.entry(index.id(), requestBox);
 }
@@ -50,9 +50,7 @@ void acceptResignation(demander::LaborDemander& laborDemander) {
 }
 
 void endStep(
-    firm_finance::Component& finance,
-    demander::LaborDemander& laborDemander,
-    world::CensusDropBox&    dropBox
+    firm_finance::Component& finance, demander::LaborDemander& laborDemander, CensusDropBox& dropBox
 ) {
     laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());
@@ -60,7 +58,7 @@ void endStep(
 void endStep(
     hhold_finance::Component& finance,
     supplier::LaborSupplier&  laborSupplier,
-    world::CensusDropBox&     dropBox
+    CensusDropBox&            dropBox
 ) {
     finance.assetPlus(laborSupplier.wage());
     laborSupplier.endStep(dropBox);
