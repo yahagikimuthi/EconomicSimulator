@@ -3,7 +3,7 @@
 #include <tbb/concurrent_vector.h>
 
 #include "components/common.hpp"
-#include "components/goods_supplier.hpp"
+#include "components/goods_supplier/goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/labor.hpp"

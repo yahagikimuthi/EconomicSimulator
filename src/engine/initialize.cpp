@@ -11,7 +11,10 @@
 
 #include "components/common.hpp"
 #include "components/goods_demander.hpp"
-#include "components/goods_supplier.hpp"
+#include "components/goods_supplier/goods_supplier.hpp"
+#include "components/goods_supplier/planner.hpp"
+#include "components/goods_supplier/producer.hpp"
+#include "components/goods_supplier/trader.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
