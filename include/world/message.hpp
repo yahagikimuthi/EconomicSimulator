@@ -11,6 +11,8 @@
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
+namespace abm {
+
 enum class Market : char { labor, consumerGoods, productionGoods };
 
 class [[nodiscard]] Workspace {
@@ -199,3 +201,4 @@ struct CensusDropBox {
         wages.clear();
     }
 };
+}  // namespace abm

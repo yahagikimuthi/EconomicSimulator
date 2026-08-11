@@ -8,6 +8,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
+namespace abm {
 class [[nodiscard]] LaborDemander {
   public:
     LaborDemander(
@@ -47,3 +48,4 @@ class [[nodiscard]] LaborDemander {
     labor::demander::Recruiter            recruiter_;
     labor::demander::HumanResourceManager hrManager_;
 };
+}  // namespace abm

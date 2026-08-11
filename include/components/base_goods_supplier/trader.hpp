@@ -11,8 +11,7 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 
-namespace base_goods::supplier::internal {
-
+namespace abm::base_goods::supplier {
 template <RequestType Request>
 [[nodiscard]] inline auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox
 ) -> GoodsQuantity {
@@ -65,9 +64,6 @@ template <RequestType Request>
 void inline performFullTrade(tbb::concurrent_vector<Request>& requestBox) {
     for (auto& request : requestBox) request.tradeAmount = request.amount;
 }
-}  // namespace base_goods::supplier::internal
-
-namespace base_goods::supplier {
 
 template <EntryType Entry>
 class Trader {
@@ -87,12 +83,12 @@ class Trader {
     void trade() {
         if (not isPosting_) return;
         auto&               requestBox = myEntry_->requestBox;
-        const GoodsQuantity totalDemand{internal::calcTotalDemand(requestBox)};
+        const GoodsQuantity totalDemand{calcTotalDemand(requestBox)};
         if (totalDemand == GoodsQuantity{0.0}) return;
         const bool          isExcessDemand{totalDemand > ledger_.inventory};
         const GoodsQuantity salesAmount{std::min(ledger_.inventory, totalDemand)};
-        isExcessDemand ? internal::performRationedTrade(myEntry_->supply, rng_, requestBox)
-                       : internal::performFullTrade(requestBox);
+        isExcessDemand ? performRationedTrade(myEntry_->supply, rng_, requestBox)
+                       : performFullTrade(requestBox);
         ledger_.totalDemand += totalDemand;
         ledger_.currentSales += myEntry_->price * salesAmount;
         ledger_.inventory -= salesAmount;
@@ -122,4 +118,4 @@ class Trader {
         }
     } ledger_{};
 };
-}  // namespace base_goods::supplier
+}  // namespace abm::base_goods::supplier

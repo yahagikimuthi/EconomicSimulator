@@ -6,9 +6,9 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor::demander {
+namespace abm::labor::demander {
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;
 };
-}  // namespace labor::demander
+}  // namespace abm::labor::demander

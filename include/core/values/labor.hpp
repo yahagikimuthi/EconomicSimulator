@@ -4,6 +4,7 @@
 
 #include "core/values/common.hpp"
 
+namespace abm {
 class [[nodiscard]] Wage {
   public:
     explicit Wage(const double value) : value_{value} {}
@@ -115,3 +116,4 @@ class [[nodiscard]] HeadCount {
 [[nodiscard]] inline auto operator/(Money lhs, HeadCount rhs) -> Wage PRE(rhs != HeadCount{0.0}) {
     return Wage{lhs.value() / rhs.value()};
 }
+}  // namespace abm

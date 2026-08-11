@@ -7,7 +7,7 @@
 #include "components/production_goods_supplier.hpp"
 #include "world/message.hpp"
 
-namespace production_goods {
+namespace abm::production_goods {
 void product(LaborSupplier& laborSupplier, const Market phase) { laborSupplier.product(phase); }
 
 void postGoods(
@@ -43,4 +43,4 @@ void endStep(firm_finance::Component& finance, ProductionGoodsDemander& goodsDem
     goodsDemander.endStep();
 }
 
-}  // namespace production_goods
+}  // namespace abm::production_goods

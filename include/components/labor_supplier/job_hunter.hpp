@@ -13,7 +13,7 @@
 #include "core/base.hpp"
 #include "world/message.hpp"
 
-namespace labor::supplier::internal {
+namespace abm::labor::supplier {
 inline void pickSample(
     tbb::concurrent_vector<LaborRequest>&              requestBox,
     std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
@@ -58,9 +58,6 @@ inline void sortSample(
                return reqRef.get();
            });
 }
-}  // namespace labor::supplier::internal
-
-namespace labor::supplier {
 class JobHunter {
   public:
     JobHunter(const pcg32 rng) : rng_{rng} {}
@@ -74,7 +71,7 @@ class JobHunter {
     ) PRE(entryCnt > 0) {
         using Request = LaborRequest;
         std::ranges::view auto alignedRequests{
-            internal::pickJobs(requestBox, rng_, sampleCnt, entryCnt) |
+            pickJobs(requestBox, rng_, sampleCnt, entryCnt) |
             std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
             std::views::take(entryCnt)
         };
@@ -113,4 +110,4 @@ class JobHunter {
 
     friend class JobHunterTester;
 };
-}  // namespace labor::supplier
+}  // namespace abm::labor::supplier

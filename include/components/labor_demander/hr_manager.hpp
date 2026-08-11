@@ -12,7 +12,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor::demander {
+namespace abm::labor::demander {
 class [[nodiscard]] HumanResourceManager {
   public:
     HumanResourceManager(CompanyBoard&& companyBoard) : companyBoard_{std::move(companyBoard)} {}
@@ -71,4 +71,4 @@ class [[nodiscard]] HumanResourceManager {
     CompanyBoard                         companyBoard_;
     std::vector<RefWrapper<RosterEntry>> emptyRosterPool_;
 };
-}  // namespace labor::demander
+}  // namespace abm::labor::demander

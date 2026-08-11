@@ -6,7 +6,7 @@
 #include "config.hpp"
 #include "pipeline.hpp"
 
-namespace analysis {
+namespace abm::analysis {
 [[nodiscard]] auto calcMean(const std::vector<double>& container, const double nanToNum = 0.0)
     -> double {
     if (container.empty()) return nanToNum;
@@ -35,4 +35,4 @@ void analysisData() {
 
     pipeline.execute();
 }
-}  // namespace analysis
+}  // namespace abm::analysis

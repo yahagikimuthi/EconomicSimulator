@@ -4,7 +4,7 @@
 
 #include "world/message.hpp"
 
-namespace base_goods {
+namespace abm::base_goods {
 template <typename T>
 concept EntryType = (std::same_as<T, ConsumerGoodsEntry> or std::same_as<T, ProductionGoodsEntry>);
 
@@ -12,4 +12,4 @@ template <typename T>
 concept RequestType =
     (std::same_as<T, ConsumerGoodsRequest>) or std::same_as<T, ProductionGoodsRequest>;
 
-}  // namespace base_goods
+}  // namespace abm::base_goods

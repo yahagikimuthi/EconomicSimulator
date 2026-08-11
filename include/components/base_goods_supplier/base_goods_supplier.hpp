@@ -13,6 +13,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
+namespace abm {
 template <Market SupplyGoodsType>
 class [[nodiscard]] BaseGoodsSupplier {
     using Entry = std::conditional_t<
@@ -58,3 +59,4 @@ class [[nodiscard]] BaseGoodsSupplier {
     base_goods::supplier::Trader<Entry> trader_;
     base_goods::supplier::Producer      producer_;
 };
+}  // namespace abm

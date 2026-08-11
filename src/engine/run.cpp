@@ -12,6 +12,7 @@
 #include "orchestrator/updates_loggings.hpp"
 #include "world/message.hpp"
 
+namespace abm {
 void foo() {}
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
@@ -163,3 +164,4 @@ void Logger::save(const CensusDropBox& dropBox, const Step step) {
     create(name::householdAssets, dropBox.hholdAssets);
     create(name::wages, dropBox.wages);
 }
+}  // namespace abm

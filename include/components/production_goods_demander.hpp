@@ -7,6 +7,7 @@
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
+namespace abm {
 class [[nodiscard]] ProductionGoodsDemander final
     : public BaseGoodsDemander<Market::productionGoods> {
   public:
@@ -29,3 +30,4 @@ class [[nodiscard]] ProductionGoodsDemander final
         return false;
     }
 };
+}  // namespace abm

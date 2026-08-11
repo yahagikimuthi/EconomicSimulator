@@ -13,7 +13,7 @@
 
 #include "config.hpp"
 
-namespace analysis {
+namespace abm::analysis {
 class [[nodiscard]] InputDataManager {
   public:
     InputDataManager()
@@ -106,4 +106,4 @@ class [[nodiscard]] OutputDataManager {
   private:
     HighFive::File outFile_;
 };
-}  // namespace analysis
+}  // namespace abm::analysis

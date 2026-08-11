@@ -27,6 +27,7 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
+namespace abm {
 namespace {
 [[nodiscard]] auto makeFirmFinanceComponent(pcg32& masterRng) -> firm_finance::Component {
     const Money asset{helper::rand(masterRng, 1000.0, 5000.0)};
@@ -223,3 +224,4 @@ Logger::Logger()
               HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
           };
       }()} {}
+}  // namespace abm

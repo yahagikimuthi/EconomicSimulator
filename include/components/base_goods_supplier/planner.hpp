@@ -8,16 +8,15 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace base_goods::supplier::internal {
+namespace abm::base_goods::supplier {
 [[nodiscard]] inline auto markupGuard(const double markup) -> double {
     return std::max(markup, config::goods_supplier::epsilonMarkup);
 }
+
 [[nodiscard]] inline auto priceGuard(const Price price) -> Price {
     return Price{std::max(price.value(), config::goods_supplier::epsilonPrice)};
 }
-}  // namespace base_goods::supplier::internal
 
-namespace base_goods::supplier {
 class [[nodiscard]] Planner {
   public:
     Planner(
@@ -79,7 +78,7 @@ class [[nodiscard]] Planner {
     auto calcMarkup() const -> double POST(markup : markup > 0.0) {
         const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.markupAdjustVol))};
         const double nextMarkup{log_.markup + (log_.isSold ? alpha : -alpha)};
-        return internal::markupGuard(nextMarkup);
+        return markupGuard(nextMarkup);
     }
 
     auto judgePrice(const GoodsQuantity supply, const double markup, const Money totalCost) const
@@ -90,7 +89,7 @@ class [[nodiscard]] Planner {
             (supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0
         };
         const Price price{avgCost.value() * (1.0 + markup)};
-        return internal::priceGuard(price);
+        return priceGuard(price);
     }
 
     auto updateDemandForecast(const GoodsQuantity totalDemand) const -> GoodsQuantity
@@ -128,4 +127,4 @@ class [[nodiscard]] Planner {
         const double demandForecastAdjustVol;
     } param_;
 };
-}  // namespace base_goods::supplier
+}  // namespace abm::base_goods::supplier

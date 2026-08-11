@@ -4,6 +4,7 @@
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
+namespace abm {
 class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Market::consumerGoods> {
   public:
     ConsumerGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
@@ -35,3 +36,4 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
 
     const Step myPhase_;
 };
+}  // namespace abm

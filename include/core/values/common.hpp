@@ -4,6 +4,8 @@
 
 #include "core/base.hpp"
 
+namespace abm {
+
 class [[nodiscard]] Money {
   public:
     explicit Money(const double value) : value_{value} {}
@@ -71,3 +73,4 @@ class [[nodiscard]] Step {
   private:
     int value_;
 };
+}  // namespace abm

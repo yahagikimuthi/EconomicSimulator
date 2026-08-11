@@ -5,6 +5,8 @@
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 
+namespace abm {
+
 class [[nodiscard]] Price {
   public:
     explicit Price(const double value) : value_{value} {}
@@ -110,3 +112,4 @@ class [[nodiscard]] GoodsQuantity {
     PRE(rhs != GoodsQuantity{0.0}) {
     return Price{lhs.value() / rhs.value()};
 }
+}  // namespace abm

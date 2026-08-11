@@ -11,7 +11,7 @@
 #include "config.hpp"
 #include "core/base.hpp"
 
-namespace helper {
+namespace abm::helper {
 struct PCG32Seed {
     const std::uint64_t state;
     const std::uint64_t stream;
@@ -89,4 +89,4 @@ template <std::ranges::range Container, typename Proj = std::identity>
     ASSERT(false && "runtime error");
     std::unreachable();
 }
-}  // namespace helper
+}  // namespace abm::helper

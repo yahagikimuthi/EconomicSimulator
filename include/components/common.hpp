@@ -6,7 +6,7 @@
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
-namespace agent_index {
+namespace abm::agent_index {
 class [[nodiscard]] Component {
   public:
     Component(const AgentID id) : id_{id} {}
@@ -15,9 +15,9 @@ class [[nodiscard]] Component {
   private:
     const AgentID id_;
 };
-};  // namespace agent_index
+};  // namespace abm::agent_index
 
-namespace finance {
+namespace abm::finance {
 class [[nodiscard]] FinanceBaseComponent {
   public:
     FinanceBaseComponent(const Money asset) : asset_{asset} {}
@@ -27,20 +27,20 @@ class [[nodiscard]] FinanceBaseComponent {
   protected:
     Money asset_;
 };
-}  // namespace finance
+}  // namespace abm::finance
 
-namespace firm_finance {
+namespace abm::firm_finance {
 class [[nodiscard]] Component : public finance::FinanceBaseComponent {
   public:
     using finance::FinanceBaseComponent::FinanceBaseComponent;
     void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
-}  // namespace firm_finance
+}  // namespace abm::firm_finance
 
-namespace hhold_finance {
+namespace abm::hhold_finance {
 class [[nodiscard]] Component : public finance::FinanceBaseComponent {
   public:
     using finance::FinanceBaseComponent::FinanceBaseComponent;
     void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
 };
-}  // namespace hhold_finance
+}  // namespace abm::hhold_finance

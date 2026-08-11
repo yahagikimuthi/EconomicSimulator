@@ -11,7 +11,7 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace labor::supplier {
+namespace abm::labor::supplier {
 class Employment {
   public:
     Employment(const double productPower) : productPower_{productPower} {}
@@ -48,7 +48,9 @@ class Employment {
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
     const double                productPower_;
 };
-}  // namespace labor::supplier
+}  // namespace abm::labor::supplier
+
+namespace abm {
 
 class LaborSupplier {
   public:
@@ -110,3 +112,4 @@ class LaborSupplier {
     labor::supplier::Employment employment_;
     const double                jobSearchThreshold_;
 };
+}  // namespace abm

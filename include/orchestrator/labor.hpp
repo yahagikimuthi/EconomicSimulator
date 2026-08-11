@@ -9,7 +9,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor {
+namespace abm::labor {
 void adjustWorkforce(
     const agent_index::Component&         index,
     const ConsumerGoodsSupplier&          goodsSupplier,
@@ -56,4 +56,4 @@ void endStep(
     finance.assetPlus(laborSupplier.wage());
     laborSupplier.endStep(dropBox);
 }
-}  // namespace labor
+}  // namespace abm::labor

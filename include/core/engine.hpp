@@ -15,6 +15,8 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
+namespace abm {
+
 struct BtoCFirm {  // NOLINT
     agent_index::Component  index;
     firm_finance::Component finance;
@@ -82,3 +84,4 @@ class [[nodiscard]] Engine {
     const helper::PCG32Seed seed_;
     pcg32                   masterRng_;
 };
+}  // namespace abm

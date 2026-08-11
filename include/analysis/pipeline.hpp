@@ -8,7 +8,7 @@
 #include "analysis/context_task.hpp"
 #include "analysis/data_manager.hpp"
 
-namespace analysis {
+namespace abm::analysis {
 
 class Pipeline {
   public:
@@ -56,4 +56,4 @@ class Pipeline {
     std::vector<std::string_view>             requireDatas_;
     std::vector<std::unique_ptr<IMetricTask>> tasks_;
 };
-}  // namespace analysis
+}  // namespace abm::analysis

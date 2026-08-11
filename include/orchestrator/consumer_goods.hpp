@@ -10,7 +10,7 @@
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
-namespace consumer_goods {
+namespace abm::consumer_goods {
 void product(LaborSupplier& laborSupplier, const Market phase) { laborSupplier.product(phase); }
 
 void postGoods(
@@ -46,4 +46,4 @@ void endStep(hhold_finance::Component& finance, ConsumerGoodsDemander& goodsDema
     finance.assetPlus(-goodsDemander.purchase());
     goodsDemander.endStep();
 }
-}  // namespace consumer_goods
+}  // namespace abm::consumer_goods

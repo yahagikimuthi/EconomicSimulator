@@ -15,7 +15,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor::demander::internal {
+namespace abm::labor::demander {
 inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEntry>& entryBox)
     -> auto {
     using EntryRef = std::reference_wrapper<LaborEntry>;
@@ -36,9 +36,7 @@ inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEn
     );
     return applicants | std::views::transform(toRawRef);
 }
-}  // namespace labor::demander::internal
 
-namespace labor::demander {
 class [[nodiscard]] Recruiter {
   public:
     Recruiter(const RequestPlanner& planner) : planner_{planner} {}
@@ -62,7 +60,7 @@ class [[nodiscard]] Recruiter {
         if (myRequest_->entryBox.empty()) return;
 
         auto applicants{
-            internal::sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox) |
+            sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox) |
             std::views::take(ledger_.remainOfferNum.value())
         };
         for (auto&& entry : applicants) {
@@ -121,4 +119,4 @@ class [[nodiscard]] Recruiter {
 
     bool isRecruiting_{false};
 };
-}  // namespace labor::demander
+}  // namespace abm::labor::demander

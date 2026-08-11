@@ -8,7 +8,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace base_goods::supplier {
+namespace abm::base_goods::supplier {
 class [[nodiscard]] Producer {
   public:
     Producer(Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory)
@@ -50,4 +50,4 @@ class [[nodiscard]] Producer {
     const double  firmProductPower_;
     GoodsQuantity inventory_;
 };
-}  // namespace base_goods::supplier
+}  // namespace abm::base_goods::supplier

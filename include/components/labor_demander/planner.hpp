@@ -7,13 +7,11 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace labor::demander::internal {
+namespace abm::labor::demander {
 [[nodiscard]] inline auto wageGuard(const Wage wage) -> Wage {
     return Wage{std::max(wage.value(), config::labor_demander::epsilonWage)};
 }
-}  // namespace labor::demander::internal
 
-namespace labor::demander {
 class [[nodiscard]] RequestPlanner {
   public:
     RequestPlanner(
@@ -69,7 +67,7 @@ class [[nodiscard]] RequestPlanner {
         const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.wageAdjustVol, -1.0, 1.0))
         };
         const Wage   nextWage{log_.wage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
-        return internal::wageGuard(nextWage);
+        return wageGuard(nextWage);
     }
 
     auto calcNextOffer(const HeadCount desiredEmploy) const -> HeadCount
@@ -109,4 +107,4 @@ class [[nodiscard]] RequestPlanner {
         const double offerAdjustVol;
     } param_;
 };
-}  // namespace labor::demander
+}  // namespace abm::labor::demander

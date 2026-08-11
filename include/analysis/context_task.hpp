@@ -10,7 +10,7 @@
 
 #include "analysis/data_manager.hpp"
 
-namespace analysis {
+namespace abm::analysis {
 
 class [[nodiscard]] DataContext {
   public:
@@ -83,4 +83,4 @@ class MetricTask final : public IMetricTask {
   private:
     const Logic logic_;
 };
-}  // namespace analysis
+}  // namespace abm::analysis
