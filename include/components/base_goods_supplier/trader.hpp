@@ -6,17 +6,25 @@
 #include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
+#include <type_traits>
 
-#include "components/base_concepts.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "world/message.hpp"
 
 namespace abm::base_goods::supplier {
-template <RequestType Request>
-[[nodiscard]] inline auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox
+template <typename T>
+concept EntryType = (std::same_as<T, ConsumerGoodsEntry> or std::same_as<T, ProductionGoodsEntry>);
+
+template <typename T>
+concept RequestType =
+    (std::same_as<T, ConsumerGoodsRequest>) or std::same_as<T, ProductionGoodsRequest>;
+
+template <RequestType T>
+[[nodiscard]] inline auto calcTotalDemand(const tbb::concurrent_vector<T>& requestBox
 ) -> GoodsQuantity {
     const GoodsQuantity demand{std::ranges::fold_left(
-        requestBox | std::ranges::views::transform([](const Request& req) -> double {
+        requestBox | std::ranges::views::transform([](const T& req) -> double {
             return req.amount.value();
         }),
         0.0,
@@ -26,22 +34,22 @@ template <RequestType Request>
     return demand;
 }
 
-template <RequestType Request>
+template <RequestType T>
 void inline shuffleIdx(
-    tbb::concurrent_vector<Request>&              requestBox,
-    std::vector<std::reference_wrapper<Request>>& requests,
-    pcg32&                                        rng
+    tbb::concurrent_vector<T>&              requestBox,
+    std::vector<std::reference_wrapper<T>>& requests,
+    pcg32&                                  rng
 ) {
     requests.clear();
-    for (Request& request : requestBox) requests.emplace_back(std::ref(request));
+    for (T& request : requestBox) requests.emplace_back(std::ref(request));
     std::ranges::shuffle(requests, rng);
 }
 
-template <RequestType Request>
+template <RequestType T>
 void inline performRationedTrade(
-    const GoodsQuantity supply, pcg32& rng, tbb::concurrent_vector<Request>& requestBox
+    const GoodsQuantity supply, pcg32& rng, tbb::concurrent_vector<T>& requestBox
 ) {
-    static thread_local std::vector<std::reference_wrapper<Request>> requests;
+    static thread_local std::vector<std::reference_wrapper<T>> requests;
     shuffleIdx(requestBox, requests, rng);
 
     GoodsQuantity remainAmount{supply};
@@ -60,13 +68,22 @@ void inline performRationedTrade(
     std::unreachable();
 }
 
-template <RequestType Request>
-void inline performFullTrade(tbb::concurrent_vector<Request>& requestBox) {
+template <RequestType T>
+void inline performFullTrade(tbb::concurrent_vector<T>& requestBox) {
     for (auto& request : requestBox) request.tradeAmount = request.amount;
 }
 
-template <EntryType Entry>
+template <Market SupplyGoodsType>
 class Trader {
+    using Entry = std::conditional<
+        SupplyGoodsType == Market::consumerGoods,
+        ConsumerGoodsEntry,
+        ProductionGoodsEntry>;
+    using Request = std::conditional<
+        SupplyGoodsType == Market::consumerGoods,
+        ConsumerGoodsRequest,
+        ProductionGoodsRequest>;
+
   public:
     Trader(const pcg32 rng) : rng_{rng} {}
 
