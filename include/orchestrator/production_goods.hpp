@@ -8,7 +8,7 @@
 #include "world/message.hpp"
 
 namespace production_goods {
-void product(labor::supplier::LaborSupplier& laborSupplier, const MarketPhase phase) {
+void product(labor::supplier::LaborSupplier& laborSupplier, const Market phase) {
     laborSupplier.product(phase);
 }
 

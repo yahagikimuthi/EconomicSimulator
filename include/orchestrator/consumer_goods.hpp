@@ -11,7 +11,7 @@
 #include "world/message.hpp"
 
 namespace consumer_goods {
-void product(labor::supplier::LaborSupplier& laborSupplier, const MarketPhase phase) {
+void product(labor::supplier::LaborSupplier& laborSupplier, const Market phase) {
     laborSupplier.product(phase);
 }
 

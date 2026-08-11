@@ -5,8 +5,8 @@
 
 namespace consumer_goods::supplier {
 class [[nodiscard]] ConsumerGoodsSupplier
-    : public base_goods::supplier::BaseGoodsSupplier<ConsumerGoodsEntry> {
+    : public base_goods::supplier::BaseGoodsSupplier<Market::consumerGoods> {
   public:
-    using base_goods::supplier::BaseGoodsSupplier<ConsumerGoodsEntry>::BaseGoodsSupplier;
+    using base_goods::supplier::BaseGoodsSupplier<Market::consumerGoods>::BaseGoodsSupplier;
 };
 }  // namespace consumer_goods::supplier

@@ -137,13 +137,13 @@ namespace {
     return labor::demander::Recruiter{makeLaborDemanderRecruiterPlanner(masterRng)};
 }
 
-[[nodiscard]] auto makeLaborDemanderHumanResourceManager(const AgentID id, const FirmType firmType)
+[[nodiscard]] auto makeLaborDemanderHumanResourceManager(const AgentID id, const Market firmType)
     -> labor::demander::HumanResourceManager {
     CompanyBoard companyBoard{id, firmType};
     return labor::demander::HumanResourceManager{std::move(companyBoard)};
 }
 
-[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id, const FirmType firmType)
+[[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id, const Market firmType)
     -> labor::demander::LaborDemander {
     return {
         makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id, firmType)
@@ -183,10 +183,10 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
     int agentId{};
     for (; agentId < config::agent_count::BtoCFirm; ++agentId) {
         BtoCFirms_.emplace_back(BtoCFirm{
-            .index   = {AgentID{agentId}},
-            .finance = makeFirmFinanceComponent(masterRng_),
-            .labor   = makeLaborDemander(masterRng_, AgentID{agentId}, FirmType::consumerGoods),
-            .consumerGoods   = makeConsumerGoodsSupplier(masterRng_),
+            .index         = {AgentID{agentId}},
+            .finance       = makeFirmFinanceComponent(masterRng_),
+            .labor         = makeLaborDemander(masterRng_, AgentID{agentId}, Market::consumerGoods),
+            .consumerGoods = makeConsumerGoodsSupplier(masterRng_),
             .productionGoods = makeProductionGoodsDemander(masterRng_)
         });
     }
@@ -196,7 +196,7 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
         BtoBFirms_.emplace_back(BtoBFirm{
             .index   = {AgentID{agentId}},
             .finance = makeFirmFinanceComponent(masterRng_),
-            .labor   = makeLaborDemander(masterRng_, AgentID{agentId}, FirmType::productionGoods),
+            .labor   = makeLaborDemander(masterRng_, AgentID{agentId}, Market::productionGoods),
             .productionGoodsSupplier = makeProductionGoodsSupplier(masterRng_),
             .productionGoodsDemander = makeProductionGoodsDemander(masterRng_)
         });

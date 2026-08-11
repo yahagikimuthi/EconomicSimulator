@@ -37,10 +37,12 @@ template <EntryType Entry>
 
 namespace base_goods::demander {
 
-template <FirmType T>
+template <Market DemandGoodsType>
 class [[nodiscard]] BaseGoodsDemander {
-    using Request = std::
-        conditional_t<T == FirmType::consumerGoods, ConsumerGoodsRequest, ProductionGoodsRequest>;
+    using Request = std::conditional_t<
+        DemandGoodsType == Market::consumerGoods,
+        ConsumerGoodsRequest,
+        ProductionGoodsRequest>;
 
   public:
     BaseGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}

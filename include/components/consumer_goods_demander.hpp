@@ -6,10 +6,10 @@
 
 namespace consumer_goods::demander {
 class [[nodiscard]] ConsumerGoodsDemander final
-    : public base_goods::demander::BaseGoodsDemander<FirmType::consumerGoods> {
+    : public base_goods::demander::BaseGoodsDemander<Market::consumerGoods> {
   public:
     ConsumerGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-        : base_goods::demander::BaseGoodsDemander<FirmType::consumerGoods>::BaseGoodsDemander(
+        : base_goods::demander::BaseGoodsDemander<Market::consumerGoods>::BaseGoodsDemander(
               rng, mpc
           ),
           myPhase_{myPhase} {}

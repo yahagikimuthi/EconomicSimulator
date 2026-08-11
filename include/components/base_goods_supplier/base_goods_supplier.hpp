@@ -2,8 +2,8 @@
 
 #include <tbb/concurrent_vector.h>
 #include <pcg_random.hpp>
+#include <type_traits>
 
-#include "components/base_concepts.hpp"
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
 #include "components/base_goods_supplier/trader.hpp"
@@ -14,8 +14,13 @@
 #include "world/message.hpp"
 
 namespace base_goods::supplier {
-template <EntryType Entry>
+template <Market SupplyGoodsType>
 class [[nodiscard]] BaseGoodsSupplier {
+    using Entry = std::conditional_t<
+        SupplyGoodsType == Market::consumerGoods,
+        ConsumerGoodsEntry,
+        ProductionGoodsEntry>;
+
   public:
     BaseGoodsSupplier(
         const Planner&& planner, const Trader<Entry>&& trader, const Producer&& producer

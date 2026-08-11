@@ -26,7 +26,7 @@ class Employment {
     auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
-    void work(const MarketPhase phase) {
+    void work(const Market phase) {
         if (not isEmployed()) return;
         if (shouldWork(phase)) rosterEntry_->addInput(productPower_);
     }
@@ -39,18 +39,7 @@ class Employment {
     }
 
   private:
-    auto shouldWork(const MarketPhase phase) const -> bool {
-        bool shouldWork{false};
-
-        const FirmType firmType{rosterEntry_->firmType()};
-        if (phase == MarketPhase::consumerGoods) {
-            shouldWork |= firmType == FirmType::consumerGoods;
-        } else if (phase == MarketPhase::productionGoods) {
-            shouldWork |= firmType == FirmType::productionGoods;
-        }
-        return shouldWork;
-    }
-
+    auto shouldWork(const Market phase) const -> bool { return rosterEntry_->firmType() == phase; }
     void resign() {
         if (not isEmployed()) return;
         rosterEntry_->resign();
@@ -103,7 +92,7 @@ class LaborSupplier {
         jobHunter_.endStep();
     }
 
-    void product(const MarketPhase phase) { employment_.work(phase); }
+    void product(const Market phase) { employment_.work(phase); }
 
     auto wage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(employment_.wage());

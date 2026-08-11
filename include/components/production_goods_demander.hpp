@@ -9,9 +9,9 @@
 
 namespace production_goods::demander {
 class [[nodiscard]] ProductionGoodsDemander final
-    : public base_goods::demander::BaseGoodsDemander<FirmType::productionGoods> {
+    : public base_goods::demander::BaseGoodsDemander<Market::productionGoods> {
   public:
-    using base_goods::demander::BaseGoodsDemander<FirmType::productionGoods>::BaseGoodsDemander;
+    using base_goods::demander::BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander;
 
     void request(const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox) {
         if (isPass(asset, entryBox)) return;

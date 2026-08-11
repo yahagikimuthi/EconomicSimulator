@@ -65,7 +65,7 @@ void Engine::runLabor() {
 
 void Engine::runProductionGoods() {
     for (HHold& hhold : hholds_) {
-        production_goods::product(hhold.labor, MarketPhase::productionGoods);
+        production_goods::product(hhold.labor, Market::productionGoods);
     }
 
     for (BtoBFirm& firm : BtoBFirms_) {
@@ -95,7 +95,7 @@ void Engine::runProductionGoods() {
 
 void Engine::runConsumerGoods() {
     for (HHold& hhold : hholds_) {
-        consumer_goods::product(hhold.labor, MarketPhase::consumerGoods);
+        consumer_goods::product(hhold.labor, Market::consumerGoods);
     }
 
     for (BtoCFirm& firm : BtoCFirms_) {

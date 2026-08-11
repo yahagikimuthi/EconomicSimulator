@@ -10,7 +10,6 @@
 #include "components/base_concepts.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "world/message.hpp"
 
 namespace base_goods::supplier::internal {
 
@@ -35,7 +34,7 @@ void inline shuffleIdx(
     pcg32&                                        rng
 ) {
     requests.clear();
-    for (ConsumerGoodsRequest& request : requestBox) requests.emplace_back(std::ref(request));
+    for (Request& request : requestBox) requests.emplace_back(std::ref(request));
     std::ranges::shuffle(requests, rng);
 }
 
