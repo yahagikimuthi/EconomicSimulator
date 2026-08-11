@@ -1,6 +1,6 @@
+#include "components/production_goods_supplier/planner.hpp"
+#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "core/engine.hpp"
-
-#include <cassert>
 
 #include <cstdlib>
 #include <filesystem>
@@ -21,6 +21,7 @@
 #include "components/labor_demander/recruiter.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
+#include "components/production_goods_demander.hpp"
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "helper.hpp"
@@ -112,6 +113,59 @@ namespace {
     };
 }
 
+[[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng
+) -> production_goods::demander::ProductionGoodsDemander {
+    const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    const double mpc{helper::rand(masterRng, 0.7, 0.9)};
+    return {rng, mpc};
+}
+
+[[nodiscard]] auto makeProductionGoodsSupplierPlanner(pcg32& masterRng
+) -> production_goods::supplier::Planner {
+    const pcg32         rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    const double        lastMarkup{helper::rand(masterRng, 0.1, 0.3)};
+    const GoodsQuantity lastSupply{helper::rand(masterRng, 4.0, 15.0)};
+    const GoodsQuantity demandForecast{helper::rand(masterRng, 5.0, 20.0)};
+    const bool          isSold{helper::rand(masterRng) < 0.5};
+    const double        targetInvRatio{helper::rand(masterRng, 0.1, 0.2)};
+    const double        markupAdjustVol{helper::rand(masterRng, 0.01, 0.02)};
+    const double        demandForecastAdjustVol{helper::rand(masterRng, 0.1, 0.4)};
+    return production_goods::supplier::Planner{
+        rng,
+        lastMarkup,
+        lastSupply,
+        demandForecast,
+        isSold,
+        targetInvRatio,
+        markupAdjustVol,
+        demandForecastAdjustVol
+    };
+}
+
+[[nodiscard]] auto makeProductionGoodsSupplierTrader(pcg32& masterRng
+) -> production_goods::supplier::Trader {
+    const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    return production_goods::supplier::Trader{rng};
+}
+
+[[nodiscard]] auto makeProductionGoodsSupplierProducer(pcg32& masterRng
+) -> production_goods::supplier::Producer {
+    const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
+    const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
+    world::Workspace    workspace;
+    workspace.firmProductPower = firmProductPower;
+    return production_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
+}
+
+[[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng
+) -> production_goods::supplier::ProductionGoodsSupplier {
+    return {
+        makeProductionGoodsSupplierPlanner(masterRng),
+        makeProductionGoodsSupplierTrader(masterRng),
+        makeProductionGoodsSupplierProducer(masterRng)
+    };
+}
+
 [[nodiscard]] auto makeLaborDemanderRecruiterPlanner(pcg32& masterRng
 ) -> labor::demander::RequestPlanner {
     const pcg32     rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
@@ -178,23 +232,37 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
         std::abort();
     }
     masterRng_ = {seed_.state, seed_.stream};
-    firms_.reserve(config::agent_count::firm);
-    for (const auto i : std::views::iota(0, config::agent_count::firm)) {
-        firms_.emplace_back(Firm{
-            .index   = {AgentID{i}},
-            .finance = makeFirmFinanceComponent(masterRng_),
-            .labor   = makeLaborDemander(masterRng_, AgentID{i}),
-            .goods   = makeConsumerGoodsSupplier(masterRng_)
+
+    BtoCFirms_.reserve(config::agent_count::BtoCFirm);
+    int agentId{};
+    for (; agentId < config::agent_count::BtoCFirm; ++agentId) {
+        BtoCFirms_.emplace_back(BtoCFirm{
+            .index           = {AgentID{agentId}},
+            .finance         = makeFirmFinanceComponent(masterRng_),
+            .labor           = makeLaborDemander(masterRng_, AgentID{agentId}),
+            .consumerGoods   = makeConsumerGoodsSupplier(masterRng_),
+            .productionGoods = makeProductionGoodsDemander(masterRng_)
+        });
+    }
+
+    BtoBFirms_.reserve(config::agent_count::BtoBFirm);
+    for (; agentId < config::agent_count::BtoBFirm; ++agentId) {
+        BtoBFirms_.emplace_back(BtoBFirm{
+            .index                   = {AgentID{agentId}},
+            .finance                 = makeFirmFinanceComponent(masterRng_),
+            .labor                   = makeLaborDemander(masterRng_, AgentID{agentId}),
+            .productionGoodsSupplier = makeProductionGoodsSupplier(masterRng_),
+            .productionGoodsDemander = makeProductionGoodsDemander(masterRng_)
         });
     }
 
     hholds_.reserve(config::agent_count::hhold);
-    for (const auto i : std::views::iota(0, config::agent_count::hhold)) {
+    for (; agentId < config::agent_count::hhold; ++agentId) {
         HHold hhold{
-            .index   = {AgentID{i}},
-            .finance = makeHHoldFinanceComponent(masterRng_),
-            .labor   = makeLaborSupplier(masterRng_),
-            .goods   = makeConsumerGoodsDemander(masterRng_, i)
+            .index         = {AgentID{agentId}},
+            .finance       = makeHHoldFinanceComponent(masterRng_),
+            .labor         = makeLaborSupplier(masterRng_),
+            .consumerGoods = makeConsumerGoodsDemander(masterRng_, agentId)
         };
         hholds_.push_back(hhold);
     }

@@ -13,6 +13,9 @@
 #include "core/values/labor.hpp"
 
 namespace world {
+
+enum class MarketType : char { labor, consumerGoods, productionGoods };
+
 class [[nodiscard]] Workspace {
   public:
     Workspace()  = default;
@@ -22,12 +25,12 @@ class [[nodiscard]] Workspace {
     Workspace(Workspace&& other) noexcept;
     auto operator=(Workspace&& other) noexcept -> Workspace&;
 
-    void addInput(const double workerProductPower) {
+    void addInput(const double workerProductPower) noexcept {
         const double input{firmProductPower * workerProductPower};
         totalInput_.fetch_add(input);
     }
-    auto totalInput() const -> GoodsQuantity { return GoodsQuantity{totalInput_.load()}; }
-    void resetInput() { totalInput_.store(0.0); }
+    auto totalInput() const noexcept -> GoodsQuantity { return GoodsQuantity{totalInput_.load()}; }
+    void resetInput() noexcept { totalInput_.store(0.0); }
 
     double firmProductPower{};
 
@@ -37,26 +40,28 @@ class [[nodiscard]] Workspace {
 
 inline Workspace::Workspace(const Workspace& other)
     : firmProductPower{other.firmProductPower},
-      totalInput_{std::atomic<double>{other.totalInput_.load()}} {}
+      totalInput_{other.totalInput_.load(std::memory_order_relaxed)} {}
 inline auto Workspace::operator=(const Workspace& other) -> Workspace& {
     if (this == &other) return *this;
     firmProductPower = other.firmProductPower;
-    totalInput_.store(other.totalInput_.load());
+    const double input{other.totalInput_.load(std::memory_order_relaxed)};
+    totalInput_.store(input, std::memory_order_relaxed);
     return *this;
 }
 inline Workspace::Workspace(Workspace&& other) noexcept
     : firmProductPower{other.firmProductPower},
-      totalInput_{std::atomic<double>{other.totalInput_.load()}} {
+      totalInput_{other.totalInput_.load(std::memory_order_relaxed)} {
     other.firmProductPower = 0.0;
-    other.totalInput_.store(0.0);
+    other.totalInput_.store(0.0, std::memory_order_relaxed);
 }
 inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     if (this == &other) return *this;
     firmProductPower = other.firmProductPower;
-    totalInput_.store(other.totalInput_.load());
+    const double input{other.totalInput_.load(std::memory_order_relaxed)};
+    totalInput_.store(input, std::memory_order_relaxed);
 
     other.firmProductPower = 0.0;
-    other.totalInput_.store(0.0);
+    other.totalInput_.store(0.0, std::memory_order_relaxed);
     return *this;
 }
 
@@ -65,8 +70,8 @@ struct [[nodiscard]] CompanyBoard {
     std::deque<RosterEntry>                                     roster;
     tbb::concurrent_vector<std::reference_wrapper<RosterEntry>> resignationBox;
 
-    void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
     CompanyBoard(const AgentID Id) : firmId{Id} {}
+    void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) -> RosterEntry&;
 };
 
@@ -171,7 +176,7 @@ struct CensusDropBox {
     std::vector<double> wages;
 
     CensusDropBox() {
-        constexpr std::size_t firmCnt{static_cast<std::size_t>(config::agent_count::firm)};
+        constexpr std::size_t firmCnt{static_cast<std::size_t>(config::agent_count::BtoCFirm)};
         constexpr std::size_t hholdCnt{static_cast<std::size_t>(config::agent_count::hhold)};
         firmAssets.reserve(firmCnt);
         postedEmployments.reserve(firmCnt);

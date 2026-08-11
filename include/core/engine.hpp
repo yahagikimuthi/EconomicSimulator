@@ -10,24 +10,34 @@
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
+#include "components/production_goods_demander.hpp"
+#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace core {
-struct Firm {  // NOLINT
-    agent_index::Component                          index;
-    firm_finance::Component                         finance;
-    labor::demander::LaborDemander                  labor;
-    consumer_goods::supplier::ConsumerGoodsSupplier goods;
+struct BtoCFirm {  // NOLINT
+    agent_index::Component                              index;
+    firm_finance::Component                             finance;
+    labor::demander::LaborDemander                      labor;
+    consumer_goods::supplier::ConsumerGoodsSupplier     consumerGoods;
+    production_goods::demander::ProductionGoodsDemander productionGoods;
 };
+
+struct BtoBFirm {  // NOLINT
+    agent_index::Component                              index;
+    firm_finance::Component                             finance;
+    labor::demander::LaborDemander                      labor;
+    production_goods::supplier::ProductionGoodsSupplier productionGoodsSupplier;
+    production_goods::demander::ProductionGoodsDemander productionGoodsDemander;
+};
+
 struct HHold {  // NOLINT
     agent_index::Component                          index;
     hhold_finance::Component                        finance;
     labor::supplier::LaborSupplier                  labor;
-    consumer_goods::demander::ConsumerGoodsDemander goods;
+    consumer_goods::demander::ConsumerGoodsDemander consumerGoods;
 };
-struct HHoldTag {};
-struct FirmTag {};
 
 class [[nodiscard]] Logger {
   public:
@@ -47,7 +57,7 @@ class [[nodiscard]] Engine {
 
   private:
     void runLabor();
-    void runGoods();
+    void runConsumerGoods();
     void update();
     void logging();
     void reset();
@@ -57,8 +67,9 @@ class [[nodiscard]] Engine {
 
     Logger logger_;
     // entt::registry     registry_;
-    std::vector<Firm>  firms_;
-    std::vector<HHold> hholds_;
+    std::vector<BtoCFirm> BtoCFirms_;
+    std::vector<BtoBFirm> BtoBFirms_;
+    std::vector<HHold>    hholds_;
 
     tbb::concurrent_vector<world::LaborRequest>       laborRequestBox_;
     tbb::concurrent_vector<world::ConsumerGoodsEntry> goodsEntryBox_;

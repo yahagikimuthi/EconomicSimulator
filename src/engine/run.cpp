@@ -18,7 +18,7 @@ void Engine::run() {
             foo();
         }
         runLabor();
-        runGoods();
+        runConsumerGoods();
         logging();
         check();
         reset();
@@ -26,15 +26,15 @@ void Engine::run() {
 }
 
 void Engine::runLabor() {
-    for (Firm& firm : firms_) {
-        labor::adjustWorkforce(firm.index, firm.goods, firm.labor, laborRequestBox_);
+    for (BtoCFirm& firm : BtoCFirms_) {
+        labor::adjustWorkforce(firm.index, firm.consumerGoods, firm.labor, laborRequestBox_);
     }
 
     for (HHold& hhold : hholds_) {
         labor::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
     }
 
-    for (Firm& firm : firms_) {
+    for (BtoCFirm& firm : BtoCFirms_) {
         labor::offer(firm.labor);
     }
 
@@ -42,19 +42,19 @@ void Engine::runLabor() {
         labor::acceptOffer(hhold.labor);
     }
 
-    for (Firm& firm : firms_) {
-        labor::registerMember(firm.goods, firm.labor);
+    for (BtoCFirm& firm : BtoCFirms_) {
+        labor::registerMember(firm.consumerGoods, firm.labor);
     }
 
     for (HHold& hhold : hholds_) {
         labor::recordRosterEntry(hhold.labor);
     }
 
-    for (Firm& firm : firms_) {
+    for (BtoCFirm& firm : BtoCFirms_) {
         labor::acceptResignation(firm.labor);
     }
 
-    for (Firm& firm : firms_) {
+    for (BtoCFirm& firm : BtoCFirms_) {
         labor::endStep(firm.finance, firm.labor, dropBox_);
     }
     for (HHold& hhold : hholds_) {
@@ -62,40 +62,42 @@ void Engine::runLabor() {
     }
 }
 
-void Engine::runGoods() {
+void runProductionGoods() {}
+
+void Engine::runConsumerGoods() {
     for (HHold& hhold : hholds_) {
         consumer_goods::product(hhold.labor);
     }
 
-    for (Firm& firm : firms_) {
-        consumer_goods::postGoods(firm.goods, firm.labor, goodsEntryBox_);
+    for (BtoCFirm& firm : BtoCFirms_) {
+        consumer_goods::postGoods(firm.consumerGoods, firm.labor, goodsEntryBox_);
     }
 
     for (HHold& hhold : hholds_) {
         consumer_goods::purchase(
-            hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_, currentStep_
+            hhold.finance, hhold.consumerGoods, hhold.labor, goodsEntryBox_, currentStep_
         );
     }
 
-    for (Firm& firm : firms_) {
-        consumer_goods::trade(firm.goods);
+    for (BtoCFirm& firm : BtoCFirms_) {
+        consumer_goods::trade(firm.consumerGoods);
     }
 
     for (HHold& hhold : hholds_) {
-        consumer_goods::afterTrade(hhold.goods);
+        consumer_goods::afterTrade(hhold.consumerGoods);
     }
 
-    for (Firm& firm : firms_) {
-        consumer_goods::endStep(firm.finance, firm.goods, dropBox_);
+    for (BtoCFirm& firm : BtoCFirms_) {
+        consumer_goods::endStep(firm.finance, firm.consumerGoods, dropBox_);
     }
 
     for (HHold& hhold : hholds_) {
-        consumer_goods::endStep(hhold.finance, hhold.goods);
+        consumer_goods::endStep(hhold.finance, hhold.consumerGoods);
     }
 }
 
 void Engine::logging() {
-    for (Firm& firm : firms_) {
+    for (BtoCFirm& firm : BtoCFirms_) {
         firm_finance::logging(dropBox_, firm.finance);
     }
     for (HHold& hhold : hholds_) {

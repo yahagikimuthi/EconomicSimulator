@@ -40,16 +40,14 @@ namespace production_goods::demander::internal {
 namespace production_goods::demander {
 class [[nodiscard]] ProductionGoodsDemander {
   public:
-    ProductionGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-        : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
+    ProductionGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}
 
     void request(
         const GoodsQuantity                                  desiredAmount,
         const Money                                          asset,
-        const Step                                           step,
         tbb::concurrent_vector<world::ProductionGoodsEntry>& entryBox
     ) {
-        if (isPass(asset, step, entryBox)) return;
+        if (isPass(asset, entryBox)) return;
         const Money budget{calcBudget(asset)};
         if (budget <= Money{0.0}) return;
         isPosting_                      = true;
@@ -75,14 +73,11 @@ class [[nodiscard]] ProductionGoodsDemander {
 
   private:
     auto isPass(
-        const Money                                                asset,
-        const Step                                                 step,
-        const tbb::concurrent_vector<world::ProductionGoodsEntry>& entryBox
+        const Money asset, const tbb::concurrent_vector<world::ProductionGoodsEntry>& entryBox
     ) const -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;
-        const Step dayOfWeek{step % config::goods_demander::maxPurchaseFrequency};
-        return dayOfWeek != myPhase_;
+        return false;
     }
 
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
@@ -92,6 +87,5 @@ class [[nodiscard]] ProductionGoodsDemander {
     bool                                                isPosting_{false};
     Money                                               purchasing_{0.0};
     const double                                        mpc_;
-    const Step                                          myPhase_;
 };
 }  // namespace production_goods::demander
