@@ -13,7 +13,7 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace base_goods::demander::internal {
+namespace base_goods::demander {
 template <EntryType Entry>
 [[nodiscard]] inline auto pickEntry(
     pcg32&                         rng,
@@ -33,9 +33,7 @@ template <EntryType Entry>
     }
     return betterEntry.get();
 }
-}  // namespace base_goods::demander::internal
-
-namespace base_goods::demander {
+}  // namespace base_goods::demander
 
 template <Market DemandGoodsType>
 class [[nodiscard]] BaseGoodsDemander {
@@ -69,4 +67,3 @@ class [[nodiscard]] BaseGoodsDemander {
     Money                         purchasing_{0.0};
     const double                  mpc_;
 };
-}  // namespace base_goods::demander

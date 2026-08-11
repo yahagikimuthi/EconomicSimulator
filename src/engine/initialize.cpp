@@ -38,15 +38,14 @@ namespace {
 }
 
 [[nodiscard]] auto makeConsumerGoodsDemander(pcg32& masterRng, const int instanceCnt)
-    -> consumer_goods::demander::ConsumerGoodsDemander {
+    -> ConsumerGoodsDemander {
     const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double mpc{helper::rand(masterRng, 0.7, 0.9)};
     const Step   myPhase{instanceCnt % config::goods_demander::maxPurchaseFrequency};
-    return consumer_goods::demander::ConsumerGoodsDemander{rng, mpc, myPhase};
+    return ConsumerGoodsDemander{rng, mpc, myPhase};
 }
 
-[[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng
-) -> production_goods::demander::ProductionGoodsDemander {
+[[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng) -> ProductionGoodsDemander {
     const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double mpc{helper::rand(masterRng, 0.7, 0.9)};
     return {rng, mpc};
@@ -87,9 +86,8 @@ namespace {
     return base_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
-[[nodiscard]] auto makeConsumerGoodsSupplier(pcg32& masterRng
-) -> consumer_goods::supplier::ConsumerGoodsSupplier {
-    return consumer_goods::supplier::ConsumerGoodsSupplier{
+[[nodiscard]] auto makeConsumerGoodsSupplier(pcg32& masterRng) -> ConsumerGoodsSupplier {
+    return ConsumerGoodsSupplier{
         makeBaseGoodsSupplierPlanner(masterRng),
         makeConsumerGoodsSupplierTrader(masterRng),
         makeBaseGoodsSupplierProducer(masterRng)
@@ -102,8 +100,7 @@ namespace {
     return base_goods::supplier::Trader<ProductionGoodsEntry>{rng};
 }
 
-[[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng
-) -> production_goods::supplier::ProductionGoodsSupplier {
+[[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng) -> ProductionGoodsSupplier {
     return {
         makeBaseGoodsSupplierPlanner(masterRng),
         makeProductionGoodsSupplierTrader(masterRng),
@@ -144,7 +141,7 @@ namespace {
 }
 
 [[nodiscard]] auto makeLaborDemander(pcg32& masterRng, const AgentID id, const Market firmType)
-    -> labor::demander::LaborDemander {
+    -> LaborDemander {
     return {
         makeLaborDemanderRecruiter(masterRng), makeLaborDemanderHumanResourceManager(id, firmType)
     };
@@ -160,10 +157,10 @@ namespace {
     return labor::supplier::Employment{productPower};
 }
 
-[[nodiscard]] auto makeLaborSupplier(pcg32& masterRng) -> labor::supplier::LaborSupplier {
+[[nodiscard]] auto makeLaborSupplier(pcg32& masterRng) -> LaborSupplier {
     const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double jobSearchThreshold{helper::rand(masterRng, 0.01, 0.05)};
-    return labor::supplier::LaborSupplier{
+    return LaborSupplier{
         rng,
         makeLaborSupplierJobHunter(masterRng),
         makeLaborSupplierEmployment(masterRng),

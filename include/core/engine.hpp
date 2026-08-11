@@ -16,26 +16,26 @@
 #include "world/message.hpp"
 
 struct BtoCFirm {  // NOLINT
-    agent_index::Component                              index;
-    firm_finance::Component                             finance;
-    labor::demander::LaborDemander                      labor;
-    consumer_goods::supplier::ConsumerGoodsSupplier     consumerGoods;
-    production_goods::demander::ProductionGoodsDemander productionGoods;
+    agent_index::Component  index;
+    firm_finance::Component finance;
+    LaborDemander           labor;
+    ConsumerGoodsSupplier   consumerGoods;
+    ProductionGoodsDemander productionGoods;
 };
 
 struct BtoBFirm {  // NOLINT
-    agent_index::Component                              index;
-    firm_finance::Component                             finance;
-    labor::demander::LaborDemander                      labor;
-    production_goods::supplier::ProductionGoodsSupplier productionGoodsSupplier;
-    production_goods::demander::ProductionGoodsDemander productionGoodsDemander;
+    agent_index::Component  index;
+    firm_finance::Component finance;
+    LaborDemander           labor;
+    ProductionGoodsSupplier productionGoodsSupplier;
+    ProductionGoodsDemander productionGoodsDemander;
 };
 
 struct HHold {  // NOLINT
-    agent_index::Component                          index;
-    hhold_finance::Component                        finance;
-    labor::supplier::LaborSupplier                  labor;
-    consumer_goods::demander::ConsumerGoodsDemander consumerGoods;
+    agent_index::Component   index;
+    hhold_finance::Component finance;
+    LaborSupplier            labor;
+    ConsumerGoodsDemander    consumerGoods;
 };
 
 class [[nodiscard]] Logger {

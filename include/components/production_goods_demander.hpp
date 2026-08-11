@@ -7,18 +7,17 @@
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
-namespace production_goods::demander {
 class [[nodiscard]] ProductionGoodsDemander final
-    : public base_goods::demander::BaseGoodsDemander<Market::productionGoods> {
+    : public BaseGoodsDemander<Market::productionGoods> {
   public:
-    using base_goods::demander::BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander;
+    using BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander;
 
     void request(const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox) {
         if (isPass(asset, entryBox)) return;
         const Money budget{calcBudget(asset)};
         if (budget <= Money{0.0}) return;
         isPosting_        = true;
-        auto& pickedEntry = base_goods::demander::internal::pickEntry(rng_, entryBox);
+        auto& pickedEntry = base_goods::demander::pickEntry(rng_, entryBox);
         myRequest_        = pickedEntry.request(GoodsQuantity{budget / pickedEntry.price});
     }
 
@@ -30,4 +29,3 @@ class [[nodiscard]] ProductionGoodsDemander final
         return false;
     }
 };
-}  // namespace production_goods::demander

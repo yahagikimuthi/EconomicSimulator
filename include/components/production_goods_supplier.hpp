@@ -3,10 +3,7 @@
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "world/message.hpp"
 
-namespace production_goods::supplier {
-class [[nodiscard]] ProductionGoodsSupplier
-    : public base_goods::supplier::BaseGoodsSupplier<Market::productionGoods> {
+class [[nodiscard]] ProductionGoodsSupplier : public BaseGoodsSupplier<Market::productionGoods> {
   public:
-    using base_goods::supplier::BaseGoodsSupplier<Market::productionGoods>::BaseGoodsSupplier;
+    using BaseGoodsSupplier<Market::productionGoods>::BaseGoodsSupplier;
 };
-}  // namespace production_goods::supplier

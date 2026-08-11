@@ -13,7 +13,6 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace base_goods::supplier {
 template <Market SupplyGoodsType>
 class [[nodiscard]] BaseGoodsSupplier {
     using Entry = std::conditional_t<
@@ -23,7 +22,9 @@ class [[nodiscard]] BaseGoodsSupplier {
 
   public:
     BaseGoodsSupplier(
-        const Planner&& planner, const Trader<Entry>&& trader, const Producer&& producer
+        const base_goods::supplier::Planner&&       planner,
+        const base_goods::supplier::Trader<Entry>&& trader,
+        const base_goods::supplier::Producer&&      producer
     )
         : planner_{planner}, trader_{trader}, producer_{producer} {}
 
@@ -53,8 +54,7 @@ class [[nodiscard]] BaseGoodsSupplier {
     auto workspace() -> Workspace& { return producer_.workspace(); }
 
   protected:
-    Planner       planner_;
-    Trader<Entry> trader_;
-    Producer      producer_;
+    base_goods::supplier::Planner       planner_;
+    base_goods::supplier::Trader<Entry> trader_;
+    base_goods::supplier::Producer      producer_;
 };
-}  // namespace base_goods::supplier

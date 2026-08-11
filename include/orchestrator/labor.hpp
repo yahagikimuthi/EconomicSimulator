@@ -11,10 +11,10 @@
 
 namespace labor {
 void adjustWorkforce(
-    const agent_index::Component&                          index,
-    const consumer_goods::supplier::ConsumerGoodsSupplier& goodsSupplier,
-    demander::LaborDemander&                               laborDemander,
-    tbb::concurrent_vector<LaborRequest>&                  requestBox
+    const agent_index::Component&         index,
+    const ConsumerGoodsSupplier&          goodsSupplier,
+    LaborDemander&                        laborDemander,
+    tbb::concurrent_vector<LaborRequest>& requestBox
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
     if (desiredEmploy > HeadCount{0.0}) {
@@ -26,39 +26,32 @@ void adjustWorkforce(
 
 void jobEntry(
     const agent_index::Component&         index,
-    supplier::LaborSupplier&              laborSupplier,
+    LaborSupplier&                        laborSupplier,
     tbb::concurrent_vector<LaborRequest>& requestBox
 ) {
     laborSupplier.entry(index.id(), requestBox);
 }
 
-void offer(demander::LaborDemander& laborDemander) { laborDemander.offer(); }
+void offer(LaborDemander& laborDemander) { laborDemander.offer(); }
 
-void acceptOffer(supplier::LaborSupplier& laborSupplier) { laborSupplier.accept(); }
+void acceptOffer(LaborSupplier& laborSupplier) { laborSupplier.accept(); }
 
-void registerMember(
-    consumer_goods::supplier::ConsumerGoodsSupplier& goodsSupplier,
-    demander::LaborDemander&                         laborDemander
-) {
+void registerMember(ConsumerGoodsSupplier& goodsSupplier, LaborDemander& laborDemander) {
     laborDemander.registerMember(goodsSupplier.workspace());
 }
 
-void recordRosterEntry(supplier::LaborSupplier& laborSuppler) { laborSuppler.recordRosterEntry(); }
+void recordRosterEntry(LaborSupplier& laborSuppler) { laborSuppler.recordRosterEntry(); }
 
-void acceptResignation(demander::LaborDemander& laborDemander) {
-    laborDemander.acceptResignation();
-}
+void acceptResignation(LaborDemander& laborDemander) { laborDemander.acceptResignation(); }
 
 void endStep(
-    firm_finance::Component& finance, demander::LaborDemander& laborDemander, CensusDropBox& dropBox
+    firm_finance::Component& finance, LaborDemander& laborDemander, CensusDropBox& dropBox
 ) {
     laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());
 }
 void endStep(
-    hhold_finance::Component& finance,
-    supplier::LaborSupplier&  laborSupplier,
-    CensusDropBox&            dropBox
+    hhold_finance::Component& finance, LaborSupplier& laborSupplier, CensusDropBox& dropBox
 ) {
     finance.assetPlus(laborSupplier.wage());
     laborSupplier.endStep(dropBox);

@@ -8,10 +8,12 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace labor::demander {
 class [[nodiscard]] LaborDemander {
   public:
-    LaborDemander(const Recruiter&& recruiter, const HumanResourceManager&& hrManager)
+    LaborDemander(
+        const labor::demander::Recruiter&&            recruiter,
+        const labor::demander::HumanResourceManager&& hrManager
+    )
         : recruiter_{recruiter}, hrManager_{hrManager} {}
     void post(
         const AgentID                         id,
@@ -42,7 +44,6 @@ class [[nodiscard]] LaborDemander {
     }
 
   private:
-    Recruiter            recruiter_;
-    HumanResourceManager hrManager_;
+    labor::demander::Recruiter            recruiter_;
+    labor::demander::HumanResourceManager hrManager_;
 };
-}  // namespace labor::demander

@@ -4,14 +4,10 @@
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
-namespace consumer_goods::demander {
-class [[nodiscard]] ConsumerGoodsDemander final
-    : public base_goods::demander::BaseGoodsDemander<Market::consumerGoods> {
+class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Market::consumerGoods> {
   public:
     ConsumerGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-        : base_goods::demander::BaseGoodsDemander<Market::consumerGoods>::BaseGoodsDemander(
-              rng, mpc
-          ),
+        : BaseGoodsDemander<Market::consumerGoods>::BaseGoodsDemander(rng, mpc),
           myPhase_{myPhase} {}
 
     void request(
@@ -21,7 +17,7 @@ class [[nodiscard]] ConsumerGoodsDemander final
         const Money budget{calcBudget(asset)};
         if (budget <= Money{0.0}) return;
         isPosting_        = true;
-        auto& pickedEntry = base_goods::demander::internal::pickEntry(rng_, entryBox);
+        auto& pickedEntry = base_goods::demander::pickEntry(rng_, entryBox);
         myRequest_        = pickedEntry.request(GoodsQuantity{budget / pickedEntry.price});
     }
 
@@ -39,4 +35,3 @@ class [[nodiscard]] ConsumerGoodsDemander final
 
     const Step myPhase_;
 };
-}  // namespace consumer_goods::demander

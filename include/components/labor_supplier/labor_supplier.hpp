@@ -48,14 +48,15 @@ class Employment {
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
     const double                productPower_;
 };
+}  // namespace labor::supplier
 
 class LaborSupplier {
   public:
     LaborSupplier(
-        const pcg32        rng,
-        const JobHunter&&  jobHunter,
-        const Employment&& employment,
-        const double       jobSearchThreshold
+        const pcg32                         rng,
+        const labor::supplier::JobHunter&&  jobHunter,
+        const labor::supplier::Employment&& employment,
+        const double                        jobSearchThreshold
     )
         : rng_{rng},
           jobHunter_{jobHunter},
@@ -104,9 +105,8 @@ class LaborSupplier {
         return helper::rand(rng_) < jobSearchThreshold_;
     }
 
-    mutable pcg32 rng_;
-    JobHunter     jobHunter_;
-    Employment    employment_;
-    const double  jobSearchThreshold_;
+    mutable pcg32               rng_;
+    labor::supplier::JobHunter  jobHunter_;
+    labor::supplier::Employment employment_;
+    const double                jobSearchThreshold_;
 };
-}  // namespace labor::supplier

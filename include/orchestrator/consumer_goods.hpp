@@ -11,13 +11,11 @@
 #include "world/message.hpp"
 
 namespace consumer_goods {
-void product(labor::supplier::LaborSupplier& laborSupplier, const Market phase) {
-    laborSupplier.product(phase);
-}
+void product(LaborSupplier& laborSupplier, const Market phase) { laborSupplier.product(phase); }
 
 void postGoods(
-    supplier::ConsumerGoodsSupplier&            goodsSupplier,
-    const labor::demander::LaborDemander&       laborDemander,
+    ConsumerGoodsSupplier&                      goodsSupplier,
+    const LaborDemander&                        laborDemander,
     tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
 ) {
     goodsSupplier.post(laborDemander.sumWage(), entryBox);
@@ -25,28 +23,26 @@ void postGoods(
 
 void purchase(
     const hhold_finance::Component&             finance,
-    demander::ConsumerGoodsDemander&            goodsDemander,
-    const labor::supplier::LaborSupplier&       laborSupplier,
+    ConsumerGoodsDemander&                      goodsDemander,
+    const LaborSupplier&                        laborSupplier,
     tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox,
     const Step                                  step
 ) {
     goodsDemander.request(finance.asset() + laborSupplier.wage(), step, entryBox);
 }
 
-void trade(supplier::ConsumerGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
+void trade(ConsumerGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
 
-void afterTrade(demander::ConsumerGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
+void afterTrade(ConsumerGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
 
 void endStep(
-    firm_finance::Component&         finance,
-    supplier::ConsumerGoodsSupplier& goodsSupplier,
-    CensusDropBox&                   dropBox
+    firm_finance::Component& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
 ) {
     finance.assetPlus(goodsSupplier.sales());
     goodsSupplier.endStep(dropBox);
 }
 
-void endStep(hhold_finance::Component& finance, demander::ConsumerGoodsDemander& goodsDemander) {
+void endStep(hhold_finance::Component& finance, ConsumerGoodsDemander& goodsDemander) {
     finance.assetPlus(-goodsDemander.purchase());
     goodsDemander.endStep();
 }

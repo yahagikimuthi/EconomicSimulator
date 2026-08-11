@@ -8,13 +8,11 @@
 #include "world/message.hpp"
 
 namespace production_goods {
-void product(labor::supplier::LaborSupplier& laborSupplier, const Market phase) {
-    laborSupplier.product(phase);
-}
+void product(LaborSupplier& laborSupplier, const Market phase) { laborSupplier.product(phase); }
 
 void postGoods(
-    supplier::ProductionGoodsSupplier&            goodsSupplier,
-    const labor::demander::LaborDemander&         laborDemander,
+    ProductionGoodsSupplier&                      goodsSupplier,
+    const LaborDemander&                          laborDemander,
     tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
 ) {
     goodsSupplier.post(laborDemander.sumWage(), entryBox);
@@ -22,27 +20,25 @@ void postGoods(
 
 void purchase(
     const firm_finance::Component&                finance,
-    demander::ProductionGoodsDemander&            goodsDemander,
-    const labor::demander::LaborDemander&         laborSupplier,
+    ProductionGoodsDemander&                      goodsDemander,
+    const LaborDemander&                          laborSupplier,
     tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
 ) {
     goodsDemander.request(finance.asset() - laborSupplier.sumWage(), entryBox);
 }
 
-void trade(supplier::ProductionGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
+void trade(ProductionGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
 
-void afterTrade(demander::ProductionGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
+void afterTrade(ProductionGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
 
 void endStep(
-    firm_finance::Component&           finance,
-    supplier::ProductionGoodsSupplier& goodsSupplier,
-    CensusDropBox&                     dropBox
+    firm_finance::Component& finance, ProductionGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
 ) {
     finance.assetPlus(goodsSupplier.sales());
     goodsSupplier.endStep(dropBox);
 }
 
-void endStep(firm_finance::Component& finance, demander::ProductionGoodsDemander& goodsDemander) {
+void endStep(firm_finance::Component& finance, ProductionGoodsDemander& goodsDemander) {
     finance.assetPlus(-goodsDemander.purchase());
     goodsDemander.endStep();
 }
