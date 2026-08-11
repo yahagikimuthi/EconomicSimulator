@@ -1,28 +1,17 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <concepts>
 #include <functional>
 #include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
 
+#include "components/base_concepts.hpp"
 #include "core/base.hpp"
-#include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "helper.hpp"
-#include "world/message.hpp"
 
 namespace base_goods::demander::internal {
-
-template <typename T>
-concept EntryType =
-    (std::same_as<T, world::ConsumerGoodsEntry> or std::same_as<T, world::ProductionGoodsEntry>);
-
-template <typename T>
-concept RequestType = (std::same_as<T, world::ConsumerGoodsRequest>) or
-                      std::same_as<T, world::ProductionGoodsRequest>;
-
 template <EntryType Entry>
 [[nodiscard]] inline auto pickEntry(
     pcg32&                         rng,
@@ -46,7 +35,7 @@ template <EntryType Entry>
 
 namespace base_goods::demander {
 
-template <internal::RequestType T>
+template <RequestType T>
 class [[nodiscard]] BaseGoodsDemander {
   public:
     BaseGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}

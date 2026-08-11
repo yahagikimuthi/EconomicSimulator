@@ -1,5 +1,3 @@
-#include "components/production_goods_supplier/planner.hpp"
-#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "core/engine.hpp"
 
 #include <cstdlib>
@@ -9,12 +7,12 @@
 #include <highfive/H5PropertyList.hpp>
 #include <iostream>
 
+#include "components/base_goods_supplier/planner.hpp"
+#include "components/base_goods_supplier/producer.hpp"
+#include "components/base_goods_supplier/trader.hpp"
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
-#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
-#include "components/consumer_goods_supplier/planner.hpp"
-#include "components/consumer_goods_supplier/producer.hpp"
-#include "components/consumer_goods_supplier/trader.hpp"
+#include "components/consumer_goods_supplier.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
@@ -22,6 +20,7 @@
 #include "components/labor_supplier/job_hunter.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
+#include "components/production_goods_supplier.hpp"
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "helper.hpp"
@@ -67,8 +66,14 @@ namespace {
     return consumer_goods::demander::ConsumerGoodsDemander{rng, mpc, myPhase};
 }
 
-[[nodiscard]] auto makeConsumerGoodsSupplierPlanner(pcg32& masterRng
-) -> consumer_goods::supplier::Planner {
+[[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng
+) -> production_goods::demander::ProductionGoodsDemander {
+    const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    const double mpc{helper::rand(masterRng, 0.7, 0.9)};
+    return {rng, mpc};
+}
+
+[[nodiscard]] auto makeBaseGoodsSupplierPlanner(pcg32& masterRng) -> base_goods::supplier::Planner {
     const pcg32         rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double        lastMarkup{helper::rand(masterRng, 0.1, 0.3)};
     const GoodsQuantity lastSupply{helper::rand(masterRng, 4.0, 15.0)};
@@ -77,7 +82,7 @@ namespace {
     const double        targetInvRatio{helper::rand(masterRng, 0.1, 0.2)};
     const double        markupAdjustVol{helper::rand(masterRng, 0.01, 0.02)};
     const double        demandForecastAdjustVol{helper::rand(masterRng, 0.1, 0.4)};
-    return consumer_goods::supplier::Planner{
+    return base_goods::supplier::Planner{
         rng,
         lastMarkup,
         lastSupply,
@@ -90,77 +95,40 @@ namespace {
 }
 
 [[nodiscard]] auto makeConsumerGoodsSupplierTrader(pcg32& masterRng
-) -> consumer_goods::supplier::Trader {
+) -> base_goods::supplier::Trader<world::ConsumerGoodsEntry> {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    return consumer_goods::supplier::Trader{rng};
+    return {rng};
 }
 
-[[nodiscard]] auto makeConsumerGoodsSupplierProducer(pcg32& masterRng
-) -> consumer_goods::supplier::Producer {
+[[nodiscard]] auto makeBaseGoodsSupplierProducer(pcg32& masterRng
+) -> base_goods::supplier::Producer {
     const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
     const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
     world::Workspace    workspace{firmProductPower};
-    return consumer_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
+    return base_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
 [[nodiscard]] auto makeConsumerGoodsSupplier(pcg32& masterRng
 ) -> consumer_goods::supplier::ConsumerGoodsSupplier {
     return consumer_goods::supplier::ConsumerGoodsSupplier{
-        makeConsumerGoodsSupplierPlanner(masterRng),
+        makeBaseGoodsSupplierPlanner(masterRng),
         makeConsumerGoodsSupplierTrader(masterRng),
-        makeConsumerGoodsSupplierProducer(masterRng)
-    };
-}
-
-[[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng
-) -> production_goods::demander::ProductionGoodsDemander {
-    const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    const double mpc{helper::rand(masterRng, 0.7, 0.9)};
-    return {rng, mpc};
-}
-
-[[nodiscard]] auto makeProductionGoodsSupplierPlanner(pcg32& masterRng
-) -> production_goods::supplier::Planner {
-    const pcg32         rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    const double        lastMarkup{helper::rand(masterRng, 0.1, 0.3)};
-    const GoodsQuantity lastSupply{helper::rand(masterRng, 4.0, 15.0)};
-    const GoodsQuantity demandForecast{helper::rand(masterRng, 5.0, 20.0)};
-    const bool          isSold{helper::rand(masterRng) < 0.5};
-    const double        targetInvRatio{helper::rand(masterRng, 0.1, 0.2)};
-    const double        markupAdjustVol{helper::rand(masterRng, 0.01, 0.02)};
-    const double        demandForecastAdjustVol{helper::rand(masterRng, 0.1, 0.4)};
-    return production_goods::supplier::Planner{
-        rng,
-        lastMarkup,
-        lastSupply,
-        demandForecast,
-        isSold,
-        targetInvRatio,
-        markupAdjustVol,
-        demandForecastAdjustVol
+        makeBaseGoodsSupplierProducer(masterRng)
     };
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplierTrader(pcg32& masterRng
-) -> production_goods::supplier::Trader {
+) -> base_goods::supplier::Trader<world::ProductionGoodsEntry> {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    return production_goods::supplier::Trader{rng};
-}
-
-[[nodiscard]] auto makeProductionGoodsSupplierProducer(pcg32& masterRng
-) -> production_goods::supplier::Producer {
-    const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
-    const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
-    world::Workspace    workspace{firmProductPower};
-    return production_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
+    return base_goods::supplier::Trader<world::ProductionGoodsEntry>{rng};
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng
 ) -> production_goods::supplier::ProductionGoodsSupplier {
     return {
-        makeProductionGoodsSupplierPlanner(masterRng),
+        makeBaseGoodsSupplierPlanner(masterRng),
         makeProductionGoodsSupplierTrader(masterRng),
-        makeProductionGoodsSupplierProducer(masterRng)
+        makeBaseGoodsSupplierProducer(masterRng)
     };
 }
 
