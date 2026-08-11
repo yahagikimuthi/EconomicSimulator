@@ -19,6 +19,10 @@ template <typename T>
 concept EntryType =
     (std::same_as<T, world::ConsumerGoodsEntry> or std::same_as<T, world::ProductionGoodsEntry>);
 
+template <typename T>
+concept RequestType = (std::same_as<T, world::ConsumerGoodsRequest>) or
+                      std::same_as<T, world::ProductionGoodsRequest>;
+
 template <EntryType Entry>
 [[nodiscard]] inline auto pickEntry(
     pcg32&                         rng,
@@ -41,20 +45,11 @@ template <EntryType Entry>
 }  // namespace base_goods::demander::internal
 
 namespace base_goods::demander {
+
+template <internal::RequestType T>
 class [[nodiscard]] BaseGoodsDemander {
   public:
-    BaseGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-        : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
-
-    template <internal::EntryType Entry>
-    void request(const Money asset, const Step step, tbb::concurrent_vector<Entry>& entryBox) {
-        if (isPass(asset, step, entryBox)) return;
-        const Money budget{calcBudget(asset)};
-        if (budget <= Money{0.0}) return;
-        isPosting_        = true;
-        auto& pickedEntry = internal::pickEntry(rng_, entryBox);
-        myRequest_        = pickedEntry.request(GoodsQuantity{budget / pickedEntry.price});
-    }
+    BaseGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}
 
     void afterTrade() {
         if (not isPosting_) return;
@@ -70,24 +65,12 @@ class [[nodiscard]] BaseGoodsDemander {
     auto purchase() const -> Money POST(money : money >= Money{0.0}) { return purchasing_; }
 
   protected:
-    auto isPass(
-        const Money                                              asset,
-        const Step                                               step,
-        const tbb::concurrent_vector<world::ConsumerGoodsEntry>& entryBox
-    ) const -> bool {
-        if (asset <= Money{0.0}) return true;
-        if (entryBox.empty()) return true;
-        const Step dayOfWeek{step % config::goods_demander::maxPurchaseFrequency};
-        return dayOfWeek != myPhase_;
-    }
-
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
-    pcg32                                             rng_;
-    std::optional<const world::ConsumerGoodsRequest&> myRequest_{std::nullopt};
-    bool                                              isPosting_{false};
-    Money                                             purchasing_{0.0};
-    const double                                      mpc_;
-    const Step                                        myPhase_;
+    pcg32                   rng_;
+    std::optional<const T&> myRequest_{std::nullopt};
+    bool                    isPosting_{false};
+    Money                   purchasing_{0.0};
+    const double            mpc_;
 };
 }  // namespace base_goods::demander
