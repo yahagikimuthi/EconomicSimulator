@@ -7,7 +7,7 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace goods::supplier {
+namespace consumer_goods::supplier {
 class [[nodiscard]] Producer {
   public:
     Producer(
@@ -51,4 +51,4 @@ class [[nodiscard]] Producer {
     const double     firmProductPower_;
     GoodsQuantity    inventory_;
 };
-}  // namespace goods::supplier
+}  // namespace consumer_goods::supplier

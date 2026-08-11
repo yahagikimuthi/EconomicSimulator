@@ -3,19 +3,19 @@
 #include <tbb/concurrent_vector.h>
 #include <pcg_random.hpp>
 
-#include "components/goods_supplier/planner.hpp"
-#include "components/goods_supplier/producer.hpp"
-#include "components/goods_supplier/trader.hpp"
+#include "components/consumer_goods_supplier/planner.hpp"
+#include "components/consumer_goods_supplier/producer.hpp"
+#include "components/consumer_goods_supplier/trader.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace goods::supplier {
-class [[nodiscard]] GoodsSupplier {
+namespace consumer_goods::supplier {
+class [[nodiscard]] ConsumerGoodsSupplier {
   public:
-    GoodsSupplier(const Planner&& planner, const Trader&& trader, const Producer&& producer)
+    ConsumerGoodsSupplier(const Planner&& planner, const Trader&& trader, const Producer&& producer)
         : planner_{planner}, trader_{trader}, producer_{producer} {}
 
     void post(const Money totalCost, tbb::concurrent_vector<world::GoodsEntry>& entryBox) {
@@ -48,4 +48,4 @@ class [[nodiscard]] GoodsSupplier {
     Trader   trader_;
     Producer producer_;
 };
-}  // namespace goods::supplier
+}  // namespace consumer_goods::supplier

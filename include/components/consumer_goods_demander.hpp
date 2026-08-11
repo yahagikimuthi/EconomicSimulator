@@ -12,7 +12,7 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace goods::demander::internal {
+namespace consumer_goods::demander::internal {
 [[nodiscard]] inline auto pickEntry(
     pcg32&                                     rng,
     tbb::concurrent_vector<world::GoodsEntry>& entryBox,
@@ -31,12 +31,12 @@ namespace goods::demander::internal {
     }
     return betterEntry.get();
 }
-}  // namespace goods::demander::internal
+}  // namespace consumer_goods::demander::internal
 
-namespace goods::demander {
-class [[nodiscard]] GoodsDemander {
+namespace consumer_goods::demander {
+class [[nodiscard]] ConsumerGoodsDemander {
   public:
-    GoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
+    ConsumerGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
         : rng_{rng}, mpc_{mpc}, myPhase_{myPhase} {}
 
     void request(
@@ -84,4 +84,4 @@ class [[nodiscard]] GoodsDemander {
     const double                              mpc_;
     const Step                                myPhase_;
 };
-}  // namespace goods::demander
+}  // namespace consumer_goods::demander

@@ -3,7 +3,7 @@
 #include <tbb/concurrent_vector.h>
 
 #include "components/common.hpp"
-#include "components/goods_supplier/goods_supplier.hpp"
+#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/labor.hpp"
@@ -11,10 +11,10 @@
 
 namespace labor {
 void adjustWorkforce(
-    const agent_index::Component&                index,
-    const goods::supplier::GoodsSupplier&        goodsSupplier,
-    demander::LaborDemander&                     laborDemander,
-    tbb::concurrent_vector<world::LaborRequest>& requestBox
+    const agent_index::Component&                          index,
+    const consumer_goods::supplier::ConsumerGoodsSupplier& goodsSupplier,
+    demander::LaborDemander&                               laborDemander,
+    tbb::concurrent_vector<world::LaborRequest>&           requestBox
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
     if (desiredEmploy > HeadCount{0.0}) {
@@ -37,7 +37,8 @@ void offer(demander::LaborDemander& laborDemander) { laborDemander.offer(); }
 void acceptOffer(supplier::LaborSupplier& laborSupplier) { laborSupplier.accept(); }
 
 void registerMember(
-    goods::supplier::GoodsSupplier& goodsSupplier, demander::LaborDemander& laborDemander
+    consumer_goods::supplier::ConsumerGoodsSupplier& goodsSupplier,
+    demander::LaborDemander&                         laborDemander
 ) {
     laborDemander.registerMember(goodsSupplier.workspace());
 }

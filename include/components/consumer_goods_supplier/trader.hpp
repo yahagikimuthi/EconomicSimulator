@@ -11,7 +11,7 @@
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
-namespace goods::supplier::internal {
+namespace consumer_goods::supplier::internal {
 [[nodiscard]] inline auto calcTotalDemand(
     const tbb::concurrent_vector<world::GoodsRequest>& requestBox
 ) -> GoodsQuantity {
@@ -61,9 +61,9 @@ void inline performRationedTrade(
 void inline performFullTrade(tbb::concurrent_vector<world::GoodsRequest>& requestBox) {
     for (auto& request : requestBox) request.tradeAmount = request.amount;
 }
-}  // namespace goods::supplier::internal
+}  // namespace consumer_goods::supplier::internal
 
-namespace goods::supplier {
+namespace consumer_goods::supplier {
 class Trader {
   public:
     Trader(const pcg32 rng) : rng_{rng} {}
@@ -119,4 +119,4 @@ class Trader {
 
     friend class TraderTester;
 };
-}  // namespace goods::supplier
+}  // namespace consumer_goods::supplier

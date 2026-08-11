@@ -10,11 +10,11 @@
 #include <iostream>
 
 #include "components/common.hpp"
-#include "components/goods_demander.hpp"
-#include "components/goods_supplier/goods_supplier.hpp"
-#include "components/goods_supplier/planner.hpp"
-#include "components/goods_supplier/producer.hpp"
-#include "components/goods_supplier/trader.hpp"
+#include "components/consumer_goods_demander.hpp"
+#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/consumer_goods_supplier/planner.hpp"
+#include "components/consumer_goods_supplier/producer.hpp"
+#include "components/consumer_goods_supplier/trader.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
@@ -58,15 +58,16 @@ namespace {
     return hhold_finance::Component{asset};
 }
 
-[[nodiscard]] auto makeGoodsDemander(pcg32& masterRng, const int instanceCnt)
-    -> goods::demander::GoodsDemander {
+[[nodiscard]] auto makeConsumerGoodsDemander(pcg32& masterRng, const int instanceCnt)
+    -> consumer_goods::demander::ConsumerGoodsDemander {
     const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double mpc{helper::rand(masterRng, 0.7, 0.9)};
     const Step   myPhase{instanceCnt % config::goods_demander::maxPurchaseFrequency};
-    return goods::demander::GoodsDemander{rng, mpc, myPhase};
+    return consumer_goods::demander::ConsumerGoodsDemander{rng, mpc, myPhase};
 }
 
-[[nodiscard]] auto makeGoodsSupplierPlanner(pcg32& masterRng) -> goods::supplier::Planner {
+[[nodiscard]] auto makeConsumerGoodsSupplierPlanner(pcg32& masterRng
+) -> consumer_goods::supplier::Planner {
     const pcg32         rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double        lastMarkup{helper::rand(masterRng, 0.1, 0.3)};
     const GoodsQuantity lastSupply{helper::rand(masterRng, 4.0, 15.0)};
@@ -75,7 +76,7 @@ namespace {
     const double        targetInvRatio{helper::rand(masterRng, 0.1, 0.2)};
     const double        markupAdjustVol{helper::rand(masterRng, 0.01, 0.02)};
     const double        demandForecastAdjustVol{helper::rand(masterRng, 0.1, 0.4)};
-    return goods::supplier::Planner{
+    return consumer_goods::supplier::Planner{
         rng,
         lastMarkup,
         lastSupply,
@@ -87,24 +88,27 @@ namespace {
     };
 }
 
-[[nodiscard]] auto makeGoodsSupplierTrader(pcg32& masterRng) -> goods::supplier::Trader {
+[[nodiscard]] auto makeConsumerGoodsSupplierTrader(pcg32& masterRng
+) -> consumer_goods::supplier::Trader {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    return goods::supplier::Trader{rng};
+    return consumer_goods::supplier::Trader{rng};
 }
 
-[[nodiscard]] auto makeGoodsSupplierProducer(pcg32& masterRng) -> goods::supplier::Producer {
+[[nodiscard]] auto makeConsumerGoodsSupplierProducer(pcg32& masterRng
+) -> consumer_goods::supplier::Producer {
     const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
     const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
     world::Workspace    workspace;
     workspace.firmProductPower = firmProductPower;
-    return goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
+    return consumer_goods::supplier::Producer{std::move(workspace), firmProductPower, inventory};
 }
 
-[[nodiscard]] auto makeGoodsSupplier(pcg32& masterRng) -> goods::supplier::GoodsSupplier {
-    return goods::supplier::GoodsSupplier{
-        makeGoodsSupplierPlanner(masterRng),
-        makeGoodsSupplierTrader(masterRng),
-        makeGoodsSupplierProducer(masterRng)
+[[nodiscard]] auto makeConsumerGoodsSupplier(pcg32& masterRng
+) -> consumer_goods::supplier::ConsumerGoodsSupplier {
+    return consumer_goods::supplier::ConsumerGoodsSupplier{
+        makeConsumerGoodsSupplierPlanner(masterRng),
+        makeConsumerGoodsSupplierTrader(masterRng),
+        makeConsumerGoodsSupplierProducer(masterRng)
     };
 }
 
@@ -180,7 +184,7 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
             .index   = {AgentID{i}},
             .finance = makeFirmFinanceComponent(masterRng_),
             .labor   = makeLaborDemander(masterRng_, AgentID{i}),
-            .goods   = makeGoodsSupplier(masterRng_)
+            .goods   = makeConsumerGoodsSupplier(masterRng_)
         });
     }
 
@@ -190,7 +194,7 @@ Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::gener
             .index   = {AgentID{i}},
             .finance = makeHHoldFinanceComponent(masterRng_),
             .labor   = makeLaborSupplier(masterRng_),
-            .goods   = makeGoodsDemander(masterRng_, i)
+            .goods   = makeConsumerGoodsDemander(masterRng_, i)
         };
         hholds_.push_back(hhold);
     }

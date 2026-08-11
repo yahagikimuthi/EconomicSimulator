@@ -6,8 +6,8 @@
 #include <highfive/H5File.hpp>
 
 #include "components/common.hpp"
-#include "components/goods_demander.hpp"
-#include "components/goods_supplier/goods_supplier.hpp"
+#include "components/consumer_goods_demander.hpp"
+#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "helper.hpp"
@@ -15,16 +15,16 @@
 
 namespace core {
 struct Firm {  // NOLINT
-    agent_index::Component         index;
-    firm_finance::Component        finance;
-    labor::demander::LaborDemander labor;
-    goods::supplier::GoodsSupplier goods;
+    agent_index::Component                          index;
+    firm_finance::Component                         finance;
+    labor::demander::LaborDemander                  labor;
+    consumer_goods::supplier::ConsumerGoodsSupplier goods;
 };
 struct HHold {  // NOLINT
-    agent_index::Component         index;
-    hhold_finance::Component       finance;
-    labor::supplier::LaborSupplier labor;
-    goods::demander::GoodsDemander goods;
+    agent_index::Component                          index;
+    hhold_finance::Component                        finance;
+    labor::supplier::LaborSupplier                  labor;
+    consumer_goods::demander::ConsumerGoodsDemander goods;
 };
 struct HHoldTag {};
 struct FirmTag {};

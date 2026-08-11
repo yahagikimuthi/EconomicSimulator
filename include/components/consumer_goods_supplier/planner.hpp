@@ -8,16 +8,16 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace goods::supplier::internal {
+namespace consumer_goods::supplier::internal {
 [[nodiscard]] inline auto markupGuard(const double markup) -> double {
     return std::max(markup, config::goods_supplier::epsilonMarkup);
 }
 [[nodiscard]] inline auto priceGuard(const Price price) -> Price {
     return Price{std::max(price.value(), config::goods_supplier::epsilonPrice)};
 }
-}  // namespace goods::supplier::internal
+}  // namespace consumer_goods::supplier::internal
 
-namespace goods::supplier {
+namespace consumer_goods::supplier {
 class [[nodiscard]] Planner {
   public:
     Planner(
@@ -130,4 +130,4 @@ class [[nodiscard]] Planner {
         const double demandForecastAdjustVol;
     } param_;
 };
-}  // namespace goods::supplier
+}  // namespace consumer_goods::supplier

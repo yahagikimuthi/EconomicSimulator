@@ -5,7 +5,7 @@
 #include <string>
 
 #include "config.hpp"
-#include "orchestrator/goods.hpp"
+#include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
 #include "orchestrator/updates_loggings.hpp"
 #include "world/message.hpp"
@@ -64,31 +64,33 @@ void Engine::runLabor() {
 
 void Engine::runGoods() {
     for (HHold& hhold : hholds_) {
-        goods::product(hhold.labor);
+        consumer_goods::product(hhold.labor);
     }
 
     for (Firm& firm : firms_) {
-        goods::postGoods(firm.goods, firm.labor, goodsEntryBox_);
+        consumer_goods::postGoods(firm.goods, firm.labor, goodsEntryBox_);
     }
 
     for (HHold& hhold : hholds_) {
-        goods::purchase(hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_, currentStep_);
+        consumer_goods::purchase(
+            hhold.finance, hhold.goods, hhold.labor, goodsEntryBox_, currentStep_
+        );
     }
 
     for (Firm& firm : firms_) {
-        goods::trade(firm.goods);
+        consumer_goods::trade(firm.goods);
     }
 
     for (HHold& hhold : hholds_) {
-        goods::afterTrade(hhold.goods);
+        consumer_goods::afterTrade(hhold.goods);
     }
 
     for (Firm& firm : firms_) {
-        goods::endStep(firm.finance, firm.goods, dropBox_);
+        consumer_goods::endStep(firm.finance, firm.goods, dropBox_);
     }
 
     for (HHold& hhold : hholds_) {
-        goods::endStep(hhold.finance, hhold.goods);
+        consumer_goods::endStep(hhold.finance, hhold.goods);
     }
 }
 
