@@ -16,6 +16,7 @@ class [[nodiscard]] LaborDemander {
         const labor::demander::HumanResourceManager&& hrManager
     )
         : recruiter_{recruiter}, hrManager_{hrManager} {}
+
     void post(
         const AgentID                         id,
         const HeadCount                       desiredEmploy,
@@ -23,22 +24,29 @@ class [[nodiscard]] LaborDemander {
     ) PRE(desiredEmploy > HeadCount{0.0}) {
         recruiter_.post(id, desiredEmploy, requestBox);
     }
+
     void offer() { recruiter_.offer(); }
+
     void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0}) {
         hrManager_.layOffs(layOffsCnt);
     }
+
     void registerMember(Workspace& workspace) {
         recruiter_.registerMember([&](const AgentID id, const Wage wage) -> RosterEntry& {
             return hrManager_.addRoster(id, wage, workspace);
         });
     };
+
     void acceptResignation() { hrManager_.acceptResignation(); }
+
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         return hrManager_.employeeCnt();
     }
+
     auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(hrManager_.sumWage());
     }
+
     void endStep(CensusDropBox& dropBox) {
         recruiter_.endStep(dropBox);
         hrManager_.endStep();

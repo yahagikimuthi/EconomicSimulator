@@ -1,40 +1,13 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <functional>
 #include <optional>
 #include <pcg_random.hpp>
-#include <ranges>
 #include <type_traits>
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
-#include "helper.hpp"
 #include "world/message.hpp"
-
-namespace abm::base_goods::demander {
-template <typename T>
-concept EntryType = (std::same_as<T, ConsumerGoodsEntry> or std::same_as<T, ProductionGoodsEntry>);
-
-template <EntryType T>
-[[nodiscard]] inline auto pickEntry(
-    pcg32&                     rng,
-    tbb::concurrent_vector<T>& entryBox,
-    const int                  sampleCnt = config::goods_demander::goodsSampleCnt
-) -> T& {
-    auto toDouble{[](const T& entry) -> double { return entry.supply.value(); }};
-    std::reference_wrapper<T> betterEntry = helper::discreteDistribution(entryBox, rng, toDouble);
-
-    if (sampleCnt <= 1) return betterEntry.get();
-
-    for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
-        auto& sampleEntry = helper::discreteDistribution(entryBox, rng, toDouble);
-        if (betterEntry.get().price <= sampleEntry.price) continue;
-        betterEntry = std::ref(sampleEntry);
-    }
-    return betterEntry.get();
-}
-}  // namespace abm::base_goods::demander
 
 namespace abm {
 template <Market DemandGoodsType>
@@ -63,7 +36,7 @@ class [[nodiscard]] BaseGoodsDemander {
   protected:
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
-    pcg32                         rng_;
+    mutable pcg32                 rng_;
     std::optional<const Request&> myRequest_{std::nullopt};
     bool                          isPosting_{false};
     Money                         purchasing_{0.0};

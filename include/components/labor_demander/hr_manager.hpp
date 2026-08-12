@@ -5,6 +5,7 @@
 #include <memory>
 #include <numeric>
 #include <ranges>
+#include <utility>
 #include <vector>
 
 #include "core/base.hpp"
@@ -16,6 +17,7 @@ namespace abm::labor::demander {
 class [[nodiscard]] HumanResourceManager {
   public:
     HumanResourceManager(CompanyBoard&& companyBoard) : companyBoard_{std::move(companyBoard)} {}
+
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);

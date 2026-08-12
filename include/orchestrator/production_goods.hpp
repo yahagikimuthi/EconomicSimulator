@@ -19,12 +19,13 @@ void postGoods(
 }
 
 void purchase(
+    const AgentIndex                              index,
     const FirmFinance&                            finance,
     ProductionGoodsDemander&                      goodsDemander,
     const LaborDemander&                          laborSupplier,
     tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
 ) {
-    goodsDemander.request(finance.asset() - laborSupplier.sumWage(), entryBox);
+    goodsDemander.request(index.id(), finance.asset() - laborSupplier.sumWage(), entryBox);
 }
 
 void trade(ProductionGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }

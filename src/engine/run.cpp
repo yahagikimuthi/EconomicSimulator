@@ -75,6 +75,12 @@ void Engine::runProductionGoods() {
         );
     }
 
+    for (BtoBFirm& firm : BtoBFirms_) {
+        production_goods::purchase(
+            firm.finance, firm.productionGoodsDemander, firm.labor, productionGoodsEntryBox_
+        );
+    }
+
     for (BtoCFirm& firm : BtoCFirms_) {
         production_goods::purchase(
             firm.finance, firm.productionGoods, firm.labor, productionGoodsEntryBox_
@@ -83,6 +89,10 @@ void Engine::runProductionGoods() {
 
     for (BtoBFirm& firm : BtoBFirms_) {
         production_goods::trade(firm.productionGoodsSupplier);
+    }
+
+    for (BtoBFirm& firm : BtoBFirms_) {
+        production_goods::afterTrade(firm.productionGoodsDemander);
     }
 
     for (BtoCFirm& firm : BtoCFirms_) {

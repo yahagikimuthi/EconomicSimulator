@@ -151,12 +151,13 @@ struct ProductionGoodsRequest {
 };
 
 struct [[nodiscard]] ProductionGoodsEntry {
-    ProductionGoodsEntry(const Price Price, const GoodsQuantity Supply)
-        : price{Price}, supply{Supply} {}
+    ProductionGoodsEntry(const AgentID Id, const Price Price, const GoodsQuantity Supply)
+        : id{Id}, price{Price}, supply{Supply} {}
     auto request(const GoodsQuantity amount) -> ProductionGoodsRequest& {
         return *requestBox.emplace_back(amount, *this);
     }
 
+    const AgentID                                  id;
     const Price                                    price;
     const GoodsQuantity                            supply;
     tbb::concurrent_vector<ProductionGoodsRequest> requestBox;

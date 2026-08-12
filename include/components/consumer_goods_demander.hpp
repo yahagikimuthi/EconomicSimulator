@@ -1,7 +1,15 @@
 #pragma once
 
+#include <tbb/concurrent_vector.h>
+#include <functional>
+#include <pcg_random.hpp>
+#include <ranges>
+
 #include "components/base_goods_demander.hpp"
+#include "config.hpp"
 #include "core/values/common.hpp"
+#include "core/values/goods.hpp"
+#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm {
@@ -18,7 +26,7 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
         const Money budget{calcBudget(asset)};
         if (budget <= Money{0.0}) return;
         isPosting_        = true;
-        auto& pickedEntry = base_goods::demander::pickEntry(rng_, entryBox);
+        auto& pickedEntry = pickEntry(entryBox);
         myRequest_        = pickedEntry.request(GoodsQuantity{budget / pickedEntry.price});
     }
 
@@ -32,6 +40,25 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
         if (entryBox.empty()) return true;
         const Step dayOfWeek{step % config::goods_demander::maxPurchaseFrequency};
         return dayOfWeek != myPhase_;
+    }
+
+    auto pickEntry(
+        tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox,
+        const int sampleCnt = config::goods_demander::goodsSampleCnt
+    ) const -> ConsumerGoodsEntry& {
+        using Entry = ConsumerGoodsEntry;
+        auto toDouble{[](const Entry& entry) -> double { return entry.supply.value(); }};
+        std::reference_wrapper<Entry> betterEntry =
+            helper::discreteDistribution(entryBox, rng_, toDouble);
+
+        if (sampleCnt <= 1) return betterEntry.get();
+
+        for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
+            auto& sampleEntry = helper::discreteDistribution(entryBox, rng_, toDouble);
+            if (betterEntry.get().price <= sampleEntry.price) continue;
+            betterEntry = std::ref(sampleEntry);
+        }
+        return betterEntry.get();
     }
 
     const Step myPhase_;
