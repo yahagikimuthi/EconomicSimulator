@@ -23,9 +23,9 @@ class [[nodiscard]] BaseGoodsSupplier {
 
   public:
     BaseGoodsSupplier(
-        const base_goods::supplier::Planner&&       planner,
-        const base_goods::supplier::Trader<Entry>&& trader,
-        const base_goods::supplier::Producer&&      producer
+        const base_goods::supplier::Planner&&                 planner,
+        const base_goods::supplier::Trader<SupplyGoodsType>&& trader,
+        const base_goods::supplier::Producer&&                producer
     )
         : planner_{planner}, trader_{trader}, producer_{producer} {}
 
@@ -55,8 +55,8 @@ class [[nodiscard]] BaseGoodsSupplier {
     auto workspace() -> Workspace& { return producer_.workspace(); }
 
   protected:
-    base_goods::supplier::Planner       planner_;
-    base_goods::supplier::Trader<Entry> trader_;
-    base_goods::supplier::Producer      producer_;
+    base_goods::supplier::Planner                 planner_;
+    base_goods::supplier::Trader<SupplyGoodsType> trader_;
+    base_goods::supplier::Producer                producer_;
 };
 }  // namespace abm

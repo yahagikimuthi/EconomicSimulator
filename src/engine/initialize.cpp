@@ -74,7 +74,7 @@ namespace {
 }
 
 [[nodiscard]] auto makeConsumerGoodsSupplierTrader(pcg32& masterRng
-) -> base_goods::supplier::Trader<ConsumerGoodsEntry> {
+) -> base_goods::supplier::Trader<Market::consumerGoods> {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     return {rng};
 }
@@ -96,9 +96,9 @@ namespace {
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplierTrader(pcg32& masterRng
-) -> base_goods::supplier::Trader<ProductionGoodsEntry> {
+) -> base_goods::supplier::Trader<Market::productionGoods> {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    return base_goods::supplier::Trader<ProductionGoodsEntry>{rng};
+    return base_goods::supplier::Trader<Market::productionGoods>{rng};
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng) -> ProductionGoodsSupplier {

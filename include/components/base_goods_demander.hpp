@@ -7,22 +7,20 @@
 #include <ranges>
 #include <type_traits>
 
-#include "components/base_concepts.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm::base_goods::demander {
-template <EntryType Entry>
+template <typename T>
 [[nodiscard]] inline auto pickEntry(
-    pcg32&                         rng,
-    tbb::concurrent_vector<Entry>& entryBox,
-    const int                      sampleCnt = config::goods_demander::goodsSampleCnt
-) -> Entry& {
-    auto toDouble{[](const Entry& entry) -> double { return entry.supply.value(); }};
-    std::reference_wrapper<Entry> betterEntry =
-        helper::discreteDistribution(entryBox, rng, toDouble);
+    pcg32&                     rng,
+    tbb::concurrent_vector<T>& entryBox,
+    const int                  sampleCnt = config::goods_demander::goodsSampleCnt
+) -> T& {
+    auto toDouble{[](const T& entry) -> double { return entry.supply.value(); }};
+    std::reference_wrapper<T> betterEntry = helper::discreteDistribution(entryBox, rng, toDouble);
 
     if (sampleCnt <= 1) return betterEntry.get();
 
@@ -36,7 +34,6 @@ template <EntryType Entry>
 }  // namespace abm::base_goods::demander
 
 namespace abm {
-
 template <Market DemandGoodsType>
 class [[nodiscard]] BaseGoodsDemander {
     using Request = std::conditional_t<

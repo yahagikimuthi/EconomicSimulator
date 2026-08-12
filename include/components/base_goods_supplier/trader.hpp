@@ -75,11 +75,11 @@ void inline performFullTrade(tbb::concurrent_vector<T>& requestBox) {
 
 template <Market SupplyGoodsType>
 class Trader {
-    using Entry = std::conditional<
+    using Entry = std::conditional_t<
         SupplyGoodsType == Market::consumerGoods,
         ConsumerGoodsEntry,
         ProductionGoodsEntry>;
-    using Request = std::conditional<
+    using Request = std::conditional_t<
         SupplyGoodsType == Market::consumerGoods,
         ConsumerGoodsRequest,
         ProductionGoodsRequest>;
