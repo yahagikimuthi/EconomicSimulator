@@ -14,9 +14,6 @@
 
 namespace abm::base_goods::supplier {
 template <typename T>
-concept EntryType = (std::same_as<T, ConsumerGoodsEntry> or std::same_as<T, ProductionGoodsEntry>);
-
-template <typename T>
 concept RequestType =
     (std::same_as<T, ConsumerGoodsRequest>) or std::same_as<T, ProductionGoodsRequest>;
 

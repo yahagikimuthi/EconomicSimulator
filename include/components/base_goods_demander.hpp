@@ -14,6 +14,9 @@
 
 namespace abm::base_goods::demander {
 template <typename T>
+concept EntryType = (std::same_as<T, ConsumerGoodsEntry> or std::same_as<T, ProductionGoodsEntry>);
+
+template <EntryType T>
 [[nodiscard]] inline auto pickEntry(
     pcg32&                     rng,
     tbb::concurrent_vector<T>& entryBox,

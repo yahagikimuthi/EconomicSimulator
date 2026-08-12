@@ -22,7 +22,7 @@ void postGoods(
 }
 
 void purchase(
-    const hhold_finance::Component&             finance,
+    const HHoldFinance&                         finance,
     ConsumerGoodsDemander&                      goodsDemander,
     const LaborSupplier&                        laborSupplier,
     tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox,
@@ -35,14 +35,12 @@ void trade(ConsumerGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
 
 void afterTrade(ConsumerGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
 
-void endStep(
-    firm_finance::Component& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
-) {
+void endStep(FirmFinance& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox) {
     finance.assetPlus(goodsSupplier.sales());
     goodsSupplier.endStep(dropBox);
 }
 
-void endStep(hhold_finance::Component& finance, ConsumerGoodsDemander& goodsDemander) {
+void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) {
     finance.assetPlus(-goodsDemander.purchase());
     goodsDemander.endStep();
 }

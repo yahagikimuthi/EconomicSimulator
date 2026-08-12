@@ -29,13 +29,13 @@
 
 namespace abm {
 namespace {
-[[nodiscard]] auto makeFirmFinanceComponent(pcg32& masterRng) -> firm_finance::Component {
+[[nodiscard]] auto makeFirmFinanceComponent(pcg32& masterRng) -> FirmFinance {
     const Money asset{helper::rand(masterRng, 1000.0, 5000.0)};
-    return firm_finance::Component{asset};
+    return FirmFinance{asset};
 }
-[[nodiscard]] auto makeHHoldFinanceComponent(pcg32& masterRng) -> hhold_finance::Component {
+[[nodiscard]] auto makeHHoldFinanceComponent(pcg32& masterRng) -> HHoldFinance {
     const Money asset{helper::rand(masterRng, 100.0, 500.0)};
-    return hhold_finance::Component{asset};
+    return HHoldFinance{asset};
 }
 
 [[nodiscard]] auto makeConsumerGoodsDemander(pcg32& masterRng, const int instanceCnt)

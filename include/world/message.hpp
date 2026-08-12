@@ -151,7 +151,8 @@ struct ProductionGoodsRequest {
 };
 
 struct [[nodiscard]] ProductionGoodsEntry {
-    ProductionGoodsEntry(const Price Price, const GoodsQuantity Supply);
+    ProductionGoodsEntry(const Price Price, const GoodsQuantity Supply)
+        : price{Price}, supply{Supply} {}
     auto request(const GoodsQuantity amount) -> ProductionGoodsRequest& {
         return *requestBox.emplace_back(amount, *this);
     }

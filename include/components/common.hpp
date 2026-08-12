@@ -6,41 +6,35 @@
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
-namespace abm::agent_index {
-class [[nodiscard]] Component {
+namespace abm {
+class [[nodiscard]] AgentIndex {
   public:
-    Component(const AgentID id) : id_{id} {}
+    AgentIndex(const AgentID id) : id_{id} {}
     auto id() const -> AgentID POST(id : id >= AgentID{0}) { return id_; }
 
   private:
     const AgentID id_;
 };
-};  // namespace abm::agent_index
 
-namespace abm::finance {
-class [[nodiscard]] FinanceBaseComponent {
+class [[nodiscard]] BaseFinance {
   public:
-    FinanceBaseComponent(const Money asset) : asset_{asset} {}
+    BaseFinance(const Money asset) : asset_{asset} {}
     void assetPlus(const Money plus) { asset_ += plus; }
     auto asset() const -> Money { return asset_; }
 
   protected:
     Money asset_;
 };
-}  // namespace abm::finance
 
-namespace abm::firm_finance {
-class [[nodiscard]] Component : public finance::FinanceBaseComponent {
+class [[nodiscard]] FirmFinance : public BaseFinance {
   public:
-    using finance::FinanceBaseComponent::FinanceBaseComponent;
+    using BaseFinance::BaseFinance;
     void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
-}  // namespace abm::firm_finance
 
-namespace abm::hhold_finance {
-class [[nodiscard]] Component : public finance::FinanceBaseComponent {
+class [[nodiscard]] HHoldFinance : public BaseFinance {
   public:
-    using finance::FinanceBaseComponent::FinanceBaseComponent;
+    using BaseFinance::BaseFinance;
     void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
 };
-}  // namespace abm::hhold_finance
+}  // namespace abm

@@ -18,26 +18,26 @@
 namespace abm {
 
 struct BtoCFirm {  // NOLINT
-    agent_index::Component  index;
-    firm_finance::Component finance;
+    AgentIndex              index;
+    FirmFinance             finance;
     LaborDemander           labor;
     ConsumerGoodsSupplier   consumerGoods;
     ProductionGoodsDemander productionGoods;
 };
 
 struct BtoBFirm {  // NOLINT
-    agent_index::Component  index;
-    firm_finance::Component finance;
+    AgentIndex              index;
+    FirmFinance             finance;
     LaborDemander           labor;
     ProductionGoodsSupplier productionGoodsSupplier;
     ProductionGoodsDemander productionGoodsDemander;
 };
 
 struct HHold {  // NOLINT
-    agent_index::Component   index;
-    hhold_finance::Component finance;
-    LaborSupplier            labor;
-    ConsumerGoodsDemander    consumerGoods;
+    AgentIndex            index;
+    HHoldFinance          finance;
+    LaborSupplier         labor;
+    ConsumerGoodsDemander consumerGoods;
 };
 
 class [[nodiscard]] Logger {

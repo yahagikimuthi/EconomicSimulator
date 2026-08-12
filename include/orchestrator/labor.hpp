@@ -11,7 +11,7 @@
 
 namespace abm::labor {
 void adjustWorkforce(
-    const agent_index::Component&         index,
+    const AgentIndex&                     index,
     const ConsumerGoodsSupplier&          goodsSupplier,
     LaborDemander&                        laborDemander,
     tbb::concurrent_vector<LaborRequest>& requestBox
@@ -25,7 +25,7 @@ void adjustWorkforce(
 }
 
 void jobEntry(
-    const agent_index::Component&         index,
+    const AgentIndex&                     index,
     LaborSupplier&                        laborSupplier,
     tbb::concurrent_vector<LaborRequest>& requestBox
 ) {
@@ -44,15 +44,11 @@ void recordRosterEntry(LaborSupplier& laborSuppler) { laborSuppler.recordRosterE
 
 void acceptResignation(LaborDemander& laborDemander) { laborDemander.acceptResignation(); }
 
-void endStep(
-    firm_finance::Component& finance, LaborDemander& laborDemander, CensusDropBox& dropBox
-) {
+void endStep(FirmFinance& finance, LaborDemander& laborDemander, CensusDropBox& dropBox) {
     laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());
 }
-void endStep(
-    hhold_finance::Component& finance, LaborSupplier& laborSupplier, CensusDropBox& dropBox
-) {
+void endStep(HHoldFinance& finance, LaborSupplier& laborSupplier, CensusDropBox& dropBox) {
     finance.assetPlus(laborSupplier.wage());
     laborSupplier.endStep(dropBox);
 }
