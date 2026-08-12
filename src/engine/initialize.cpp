@@ -13,7 +13,7 @@
 #include "components/base_goods_supplier/trader.hpp"
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
-#include "components/consumer_goods_supplier.hpp"
+#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
@@ -21,7 +21,7 @@
 #include "components/labor_supplier/job_hunter.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
-#include "components/production_goods_supplier.hpp"
+#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "helper.hpp"
@@ -74,7 +74,7 @@ namespace {
 }
 
 [[nodiscard]] auto makeConsumerGoodsSupplierTrader(pcg32& masterRng
-) -> base_goods::supplier::Trader<Market::consumerGoods> {
+) -> consumer_goods::supplier::Trader {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     return {rng};
 }
@@ -96,9 +96,9 @@ namespace {
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplierTrader(pcg32& masterRng
-) -> base_goods::supplier::Trader<Market::productionGoods> {
+) -> production_goods::supplier::Trader {
     const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    return base_goods::supplier::Trader<Market::productionGoods>{rng};
+    return production_goods::supplier::Trader{rng};
 }
 
 [[nodiscard]] auto makeProductionGoodsSupplier(pcg32& masterRng) -> ProductionGoodsSupplier {

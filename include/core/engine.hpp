@@ -7,11 +7,11 @@
 
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
-#include "components/consumer_goods_supplier.hpp"
+#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
-#include "components/production_goods_supplier.hpp"
+#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 

@@ -71,19 +71,23 @@ void Engine::runProductionGoods() {
 
     for (BtoBFirm& firm : BtoBFirms_) {
         production_goods::postGoods(
-            firm.productionGoodsSupplier, firm.labor, productionGoodsEntryBox_
+            firm.index, firm.productionGoodsSupplier, firm.labor, productionGoodsEntryBox_
         );
     }
 
     for (BtoBFirm& firm : BtoBFirms_) {
         production_goods::purchase(
-            firm.finance, firm.productionGoodsDemander, firm.labor, productionGoodsEntryBox_
+            firm.index,
+            firm.finance,
+            firm.productionGoodsDemander,
+            firm.labor,
+            productionGoodsEntryBox_
         );
     }
 
     for (BtoCFirm& firm : BtoCFirms_) {
         production_goods::purchase(
-            firm.finance, firm.productionGoods, firm.labor, productionGoodsEntryBox_
+            firm.index, firm.finance, firm.productionGoods, firm.labor, productionGoodsEntryBox_
         );
     }
 

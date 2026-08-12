@@ -4,18 +4,19 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
-#include "components/production_goods_supplier.hpp"
+#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "world/message.hpp"
 
 namespace abm::production_goods {
 void product(LaborSupplier& laborSupplier, const Market phase) { laborSupplier.product(phase); }
 
 void postGoods(
+    const AgentIndex&                             index,
     ProductionGoodsSupplier&                      goodsSupplier,
     const LaborDemander&                          laborDemander,
     tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
 ) {
-    goodsSupplier.post(laborDemander.sumWage(), entryBox);
+    goodsSupplier.post(index.id(), laborDemander.sumWage(), entryBox);
 }
 
 void purchase(
