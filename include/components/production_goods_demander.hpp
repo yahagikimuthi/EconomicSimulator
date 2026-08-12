@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <functional>
 #include <optional>
+#include <pcg_random.hpp>
 #include <ranges>
 
 #include "components/base_goods_demander.hpp"
@@ -38,7 +39,8 @@ namespace abm {
 class [[nodiscard]] ProductionGoodsDemander final
     : public BaseGoodsDemander<Market::productionGoods> {
   public:
-    using BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander;
+    ProductionGoodsDemander(const pcg32 rng, const double mpc)
+        : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, mpc) {}
 
     void request(
         const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox

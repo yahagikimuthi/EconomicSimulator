@@ -27,8 +27,6 @@ class Trader {
         ProductionGoodsRequest>;
 
   public:
-    Trader(const pcg32 rng) : rng_{rng} {}
-
     void trade() {
         if (not isPosting_) return;
         auto&               requestBox = myEntry_->requestBox;
@@ -56,6 +54,8 @@ class Trader {
     void endStep() { myEntry_.reset(), isPosting_ = false, ledger_.reset(); }
 
   protected:
+    Trader(const pcg32 rng) : rng_{rng} {}
+
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox
     ) -> GoodsQuantity {
         const GoodsQuantity demand{std::ranges::fold_left(

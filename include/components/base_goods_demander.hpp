@@ -18,8 +18,6 @@ class [[nodiscard]] BaseGoodsDemander {
         ProductionGoodsRequest>;
 
   public:
-    BaseGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}
-
     void afterTrade() {
         if (not isPosting_) return;
         purchasing_ += myRequest_->entry.price * myRequest_->tradeAmount;
@@ -34,6 +32,8 @@ class [[nodiscard]] BaseGoodsDemander {
     auto purchase() const -> Money POST(money : money >= Money{0.0}) { return purchasing_; }
 
   protected:
+    BaseGoodsDemander(const pcg32 rng, const double mpc) : rng_{rng}, mpc_{mpc} {}
+
     auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
     mutable pcg32                 rng_;
