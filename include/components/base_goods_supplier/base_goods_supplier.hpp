@@ -2,6 +2,8 @@
 
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
+#include "core/values/labor.hpp"
+#include "world/message.hpp"
 
 namespace abm {
 template <Market SupplyGoodsType>

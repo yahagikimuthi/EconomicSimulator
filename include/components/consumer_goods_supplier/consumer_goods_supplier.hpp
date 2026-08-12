@@ -1,9 +1,14 @@
 #pragma once
 
+#include <tbb/concurrent_vector.h>
+#include <utility>
+
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
 #include "components/consumer_goods_supplier/trader.hpp"
+#include "core/values/common.hpp"
+#include "core/values/goods.hpp"
 #include "world/message.hpp"
 
 namespace abm {

@@ -4,6 +4,7 @@
 #include <pcg_random.hpp>
 
 #include "core/base.hpp"
+#include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"

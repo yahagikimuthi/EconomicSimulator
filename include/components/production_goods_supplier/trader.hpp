@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 
 #include "components/base_goods_supplier/trader.hpp"
+#include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 

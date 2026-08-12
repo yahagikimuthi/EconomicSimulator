@@ -1,11 +1,16 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <functional>
+#include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
 #include <type_traits>
+#include <utility>
+#include <vector>
 
 #include "core/base.hpp"
+#include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
