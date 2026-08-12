@@ -10,3 +10,4 @@ outputs/
 scripts/__pycache__/
 *.md
 .github/
+core.*
