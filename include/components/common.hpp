@@ -18,23 +18,23 @@ class [[nodiscard]] AgentIndex {
 
 class [[nodiscard]] BaseFinance {
   public:
-    BaseFinance(const Money asset) : asset_{asset} {}
     void assetPlus(const Money plus) { asset_ += plus; }
     auto asset() const -> Money { return asset_; }
 
   protected:
+    BaseFinance(const Money asset) : asset_{asset} {}
     Money asset_;
 };
 
 class [[nodiscard]] FirmFinance : public BaseFinance {
   public:
-    using BaseFinance::BaseFinance;
+    FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
 
 class [[nodiscard]] HHoldFinance : public BaseFinance {
   public:
-    using BaseFinance::BaseFinance;
+    HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
 };
 }  // namespace abm

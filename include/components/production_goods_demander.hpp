@@ -13,28 +13,6 @@
 #include "helper.hpp"
 #include "world/message.hpp"
 
-namespace abm::production_goods::demander {
-[[nodiscard]] inline auto pickEntry(
-    pcg32&                                        rng,
-    tbb::concurrent_vector<ProductionGoodsEntry>& entryBox,
-    const int                                     sampleCnt = config::goods_demander::goodsSampleCnt
-) -> ProductionGoodsEntry& {
-    using Entry = ProductionGoodsEntry;
-    auto toDouble{[](const Entry& entry) -> double { return entry.supply.value(); }};
-    std::reference_wrapper<Entry> betterEntry =
-        helper::discreteDistribution(entryBox, rng, toDouble);
-
-    if (sampleCnt <= 1) return betterEntry.get();
-
-    for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
-        auto& sampleEntry = helper::discreteDistribution(entryBox, rng, toDouble);
-        if (betterEntry.get().price <= sampleEntry.price) continue;
-        betterEntry = std::ref(sampleEntry);
-    }
-    return betterEntry.get();
-}
-}  // namespace abm::production_goods::demander
-
 namespace abm {
 class [[nodiscard]] ProductionGoodsDemander final
     : public BaseGoodsDemander<Market::productionGoods> {
@@ -54,6 +32,22 @@ class [[nodiscard]] ProductionGoodsDemander final
         if (not pickedEntry) return;
         myRequest_ = pickedEntry->request(GoodsQuantity{budget / pickedEntry->price});
     }
+
+    void afterTrade() {
+        if (not isPosting_) return;
+        if (not myRequest_) return;
+        ledger_.purchasing += myRequest_->entry.price * myRequest_->tradeAmount;
+        ledger_.amount += myRequest_->tradeAmount;
+    }
+
+    void endStep() {
+        myRequest_.reset();
+        isPosting_ = false;
+        ledger_.reset();
+    }
+
+    auto purchase() const -> Money POST(money : money >= Money{0.0}) { return ledger_.purchasing; }
+    auto purchaseAmount() const -> GoodsQuantity { return ledger_.amount; }
 
   private:
     auto isPass(const Money asset, const tbb::concurrent_vector<ProductionGoodsEntry>& entryBox)
@@ -90,5 +84,11 @@ class [[nodiscard]] ProductionGoodsDemander final
         if (not existingEntry) return true;
         return sampleEntry.price <= existingEntry->price;
     }
+
+    struct {
+        Money         purchasing{0.0};
+        GoodsQuantity amount{0.0};
+        void          reset() { purchasing = Money{0.0}, amount = GoodsQuantity{0.0}; }
+    } ledger_;
 };
 }  // namespace abm

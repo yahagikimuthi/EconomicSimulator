@@ -12,12 +12,11 @@
 #include "core/values/labor.hpp"
 
 namespace abm {
-
 enum class Market : char { labor, consumerGoods, productionGoods };
 
 class [[nodiscard]] Workspace {
   public:
-    Workspace(const double power) : firmProductPower{power} {}
+    Workspace(const double power) : firmProductPower_{power} {}
     ~Workspace() = default;
     Workspace(const Workspace& other);
     auto operator=(const Workspace& other) -> Workspace&;
@@ -25,38 +24,38 @@ class [[nodiscard]] Workspace {
     auto operator=(Workspace&& other) noexcept -> Workspace&;
 
     void addInput(const double workerProductPower) noexcept {
-        const double input{firmProductPower * workerProductPower};
+        const double input{firmProductPower_ * workerProductPower};
         totalInput_.fetch_add(input);
     }
     auto totalInput() const noexcept -> GoodsQuantity { return GoodsQuantity{totalInput_.load()}; }
     void resetInput() noexcept { totalInput_.store(0.0); }
 
   private:
-    double              firmProductPower;
+    double              firmProductPower_;
     std::atomic<double> totalInput_;
 };
 
 inline Workspace::Workspace(const Workspace& other)
-    : firmProductPower{other.firmProductPower}, totalInput_{other.totalInput_.load()} {}
+    : firmProductPower_{other.firmProductPower_}, totalInput_{other.totalInput_.load()} {}
 inline auto Workspace::operator=(const Workspace& other) -> Workspace& {
     if (this == &other) return *this;
-    firmProductPower = other.firmProductPower;
+    firmProductPower_ = other.firmProductPower_;
     const double input{other.totalInput_.load()};
     totalInput_.store(input);
     return *this;
 }
 inline Workspace::Workspace(Workspace&& other) noexcept
-    : firmProductPower{other.firmProductPower}, totalInput_{other.totalInput_.load()} {
-    other.firmProductPower = 0.0;
+    : firmProductPower_{other.firmProductPower_}, totalInput_{other.totalInput_.load()} {
+    other.firmProductPower_ = 0.0;
     other.totalInput_.store(0.0);
 }
 inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     if (this == &other) return *this;
-    firmProductPower = other.firmProductPower;
+    firmProductPower_ = other.firmProductPower_;
     const double input{other.totalInput_.load()};
     totalInput_.store(input);
 
-    other.firmProductPower = 0.0;
+    other.firmProductPower_ = 0.0;
     other.totalInput_.store(0.0);
     return *this;
 }

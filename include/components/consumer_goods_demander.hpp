@@ -7,6 +7,7 @@
 
 #include "components/base_goods_demander.hpp"
 #include "config.hpp"
+#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "helper.hpp"
@@ -29,6 +30,19 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
         auto& pickedEntry = pickEntry(entryBox);
         myRequest_        = pickedEntry.request(GoodsQuantity{budget / pickedEntry.price});
     }
+
+    void afterTrade() {
+        if (not isPosting_) return;
+        purchasing_ += myRequest_->entry.price * myRequest_->tradeAmount;
+    }
+
+    void endStep() {
+        myRequest_.reset();
+        isPosting_  = false;
+        purchasing_ = Money{0.0};
+    }
+
+    auto purchase() const -> Money POST(money : money >= Money{0.0}) { return purchasing_; }
 
   private:
     auto isPass(
@@ -61,6 +75,7 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
         return betterEntry.get();
     }
 
+    Money      purchasing_{0.0};
     const Step myPhase_;
 };
 }  // namespace abm
