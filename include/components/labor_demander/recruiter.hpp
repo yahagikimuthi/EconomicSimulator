@@ -35,6 +35,26 @@ inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEn
     return applicants | std::views::transform(toRawRef);
 }
 
+class [[nodiscard]] OfferApplicants {
+    template <typename T>
+    using RefWrap = std::reference_wrapper<T>;
+
+  public:
+    OfferApplicants() = default;
+
+    void add(LaborEntry& entry) { applicants_.emplace_back(std::ref(entry)); }
+    void clear() { applicants_.clear(); }
+    auto offerAcceptedApplicants() -> std::ranges::view auto {
+        return applicants_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
+                   return ref.get();
+               }) |
+               std::views::filter(&LaborEntry::isAccept);
+    }
+
+  private:
+    std::vector<RefWrap<LaborEntry>> applicants_;
+};
+
 class [[nodiscard]] Offerer {
     template <typename T>
     using RefWrap = std::reference_wrapper<T>;
@@ -54,17 +74,14 @@ class [[nodiscard]] Offerer {
 
         for (auto&& entry : applicants) {
             entry.isOffer = true;
-            offerApplicants_.emplace_back(std::ref(entry));
+            offerApplicants_.add(entry);
             ledgerManager_.decrementRemainOfferNum();
         }
         ledgerManager_.addApplicant(HeadCount{request.entryBox.size()});
     }
 
     auto offerAcceptedApplicants() -> std::ranges::view auto {
-        return offerApplicants_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
-                   return ref.get();
-               }) |
-               std::views::filter(&LaborEntry::isAccept);
+        return offerApplicants_.offerAcceptedApplicants();
     }
 
     void reset() {
@@ -95,8 +112,8 @@ class [[nodiscard]] Offerer {
         HeadCount applicantNum_{0.0};
     } ledgerManager_;
 
-    std::vector<RefWrap<LaborEntry>> offerApplicants_;
-    HeadCount                        lastApplicantNum_;
+    OfferApplicants offerApplicants_;
+    HeadCount       lastApplicantNum_;
 };
 
 class [[nodiscard]] Recruiter {
