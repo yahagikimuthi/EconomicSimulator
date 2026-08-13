@@ -90,10 +90,8 @@ class Trader {
 
     pcg32                 rng_;
     std::optional<Entry&> myEntry_{std::nullopt};
+    LedgerManager         ledgerManager_;
     bool                  isPosting_{false};
-
-    PostingInfo   postingInfo_;
-    LedgerManager ledgerManager_;
 
   private:
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox

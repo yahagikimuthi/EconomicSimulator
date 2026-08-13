@@ -11,4 +11,15 @@ template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;
 };
+
+struct PostingInfo {
+    const Wage      wage;
+    const HeadCount targetEmploy;
+    const HeadCount offerNum;
+};
+
+struct RecruitmentResult {
+    const HeadCount targetEmploy;
+    const HeadCount offerNum;
+};
 }  // namespace abm::labor::demander

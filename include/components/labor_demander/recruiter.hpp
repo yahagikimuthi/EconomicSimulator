@@ -8,8 +8,7 @@
 #include <ranges>
 #include <vector>
 
-#include "components/labor_demander/concepts.hpp"
-#include "components/labor_demander/planner.hpp"
+#include "components/labor_demander/util.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
@@ -37,86 +36,126 @@ inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEn
     return applicants | std::views::transform(toRawRef);
 }
 
+class [[nodiscard]] Offerer {
+    template <typename T>
+    using RefWrap = std::reference_wrapper<T>;
+
+  public:
+    Offerer(const HeadCount lastApplicants) : lastApplicantNum_{lastApplicants} {}
+
+    void startWorking(const HeadCount offerPlan) { ledgerManager_.makeNewPage(offerPlan); }
+
+    void offer(LaborRequest& request) {
+        if (request.entryBox.empty()) return;
+
+        std::ranges::view auto applicants{
+            sortApplicants(ledgerManager_.remainOfferNum(), request.entryBox) |
+            std::views::take(ledgerManager_.remainOfferNum().value())
+        };
+
+        for (auto&& entry : applicants) {
+            entry.isOffer = true;
+            offerApplicants_.emplace_back(std::ref(entry));
+            ledgerManager_.decrementRemainOfferNum();
+        }
+        ledgerManager_.addApplicant(HeadCount{request.entryBox.size()});
+    }
+
+    auto offerAcceptedApplicants() -> std::ranges::view auto {
+        return offerApplicants_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
+                   return ref.get();
+               }) |
+               std::views::filter(&LaborEntry::isAccept);
+    }
+
+    void reset() {
+        lastApplicantNum_ = ledgerManager_.applicantNum();
+        ledgerManager_.reset();
+        offerApplicants_.clear();
+    }
+
+    auto lastApplicantNum() const -> HeadCount { return lastApplicantNum_; }
+
+  private:
+    class [[nodiscard]] {
+      public:
+        void makeNewPage(const HeadCount offerPlan) { offerPlan_ = offerPlan; }
+        auto remainOfferNum() const -> HeadCount { return remainOfferNum_; }
+        void decrementRemainOfferNum() { --remainOfferNum_; }
+        void addApplicant(HeadCount add) { applicantNum_ += add; }
+        auto applicantNum() const -> HeadCount { return applicantNum_; }
+        void reset() {
+            offerPlan_      = HeadCount{0.0};
+            remainOfferNum_ = HeadCount{0.0};
+            applicantNum_   = HeadCount{0.0};
+        }
+
+      private:
+        HeadCount offerPlan_{0.0};
+        HeadCount remainOfferNum_{0.0};
+        HeadCount applicantNum_{0.0};
+    } ledgerManager_;
+
+    std::vector<RefWrap<LaborEntry>> offerApplicants_;
+    HeadCount                        lastApplicantNum_;
+};
+
 class [[nodiscard]] Recruiter {
   public:
-    Recruiter(const RequestPlanner& planner) : planner_{planner} {}
-
+    Recruiter(Offerer&& offerer) : offerer_{std::move(offerer)} {}
     void post(
-        const AgentID                         id,
-        const HeadCount                       desiredEmploy,
-        tbb::concurrent_vector<LaborRequest>& requestBox
+        const AgentID id, const PostingInfo info, tbb::concurrent_vector<LaborRequest>& requestBox
     ) PRE(desiredEmploy >= HeadCount{0.0}) {
-        isRecruiting_ = true;
-        planner_.judgePlan(desiredEmploy);
-        if (planner_.offerPlan() == HeadCount{0.0}) return;
-        isPosting_             = true;
-        ledger_.remainOfferNum = planner_.offerPlan();
-        auto it{requestBox.emplace_back(id, planner_.wagePlan())};
+        if (info.offerNum == HeadCount{0.0}) return;
+        isPosting_ = true;
+        offerer_.startWorking(info.offerNum);
+        auto it{requestBox.emplace_back(id, info.wage)};
         myRequest_ = *it;
     }
 
     void offer() {
         if (not isPosting_) return;
-        if (myRequest_->entryBox.empty()) return;
-
-        auto applicants{
-            sortApplicants(ledger_.remainOfferNum, myRequest_->entryBox) |
-            std::views::take(ledger_.remainOfferNum.value())
-        };
-        for (auto&& entry : applicants) {
-            entry.isOffer = true;
-            offerApplicants_.emplace_back(std::ref(entry));
-            --ledger_.remainOfferNum;
-        }
-        ledger_.applicantNum += HeadCount{static_cast<double>(myRequest_->entryBox.size())};
+        offerer_.offer(*myRequest_);
     }
 
     void registerMember(AddRosterFn auto&& addRoster) {
-        using Entry = LaborEntry;
         if (not isPosting_) return;
 
         HeadCount              employCnt{0.0};
-        std::ranges::view auto acceptApplicants{
-            offerApplicants_ | std::views::filter(&Entry::isAccept)
-        };
+        std::ranges::view auto acceptApplicants{offerer_.offerAcceptedApplicants()};
         for (LaborEntry& acceptApplicant : acceptApplicants) {
             acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
             ++employCnt;
         }
-        ledger_.employing += employCnt;
+        ledgerManager_.addEmploying(employCnt);
     }
 
-    void endStep(CensusDropBox& dropBox) {
-        if (not isRecruiting_) return;
-        planner_.endStep(dropBox, ledger_.employing, ledger_.applicantNum);
+    void endStep() {
         myRequest_.reset();
-        offerApplicants_.clear();
+        ledgerManager_.reset();
+        offerer_.reset();
         isPosting_ = false;
-        ledger_.reset();
-        isRecruiting_ = false;
     }
+
+    auto lastApplicantNum() const -> HeadCount { return offerer_.lastApplicantNum(); }
+    auto employing() const -> HeadCount { return ledgerManager_.employing(); }
 
   private:
     template <typename U>
     using RefWrapper = std::reference_wrapper<U>;
 
-    RequestPlanner                      planner_;
-    std::optional<LaborRequest&>        myRequest_{std::nullopt};
-    std::vector<RefWrapper<LaborEntry>> offerApplicants_;
-    bool                                isPosting_{false};
+    std::optional<LaborRequest&> myRequest_{std::nullopt};
+    class {
+      public:
+        void addEmploying(HeadCount add) { employing_ += add; }
+        void reset() { employing_ = HeadCount{0.0}; }
+        auto employing() const -> HeadCount { return employing_; }
 
-    struct {
-        HeadCount remainOfferNum{0.0};
-        HeadCount applicantNum{0.0};
-        HeadCount employing{0.0};
+      private:
+        HeadCount employing_{0.0};
+    } ledgerManager_;
 
-        void reset() {
-            remainOfferNum = HeadCount{0.0};
-            applicantNum   = HeadCount{0.0};
-            employing      = HeadCount{0.0};
-        }
-    } ledger_{};
-
-    bool isRecruiting_{false};
+    Offerer offerer_;
+    bool    isPosting_{false};
 };
 }  // namespace abm::labor::demander

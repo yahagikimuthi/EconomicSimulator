@@ -65,8 +65,6 @@ class [[nodiscard]] HumanResourceManager {
         return Wage{std::reduce(wages.begin(), wages.end())};
     }
 
-    void endStep() { companyBoard_.resignationBox.clear(); }
-
   private:
     template <typename T>
     using RefWrapper = std::reference_wrapper<T>;

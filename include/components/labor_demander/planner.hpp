@@ -3,6 +3,7 @@
 #include <cmath>
 #include <pcg_random.hpp>
 
+#include "components/labor_demander/util.hpp"
 #include "core/values/labor.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
@@ -12,106 +13,113 @@ namespace abm::labor::demander {
     return Wage{std::max(wage.value(), config::labor_demander::epsilonWage)};
 }
 
-class WagePlanner {
+class [[nodiscard]] WagePlanner {
   public:
-    WagePlanner();
+    WagePlanner(const pcg32 rng, const Wage log, const double adjustVol)
+        : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
 
-  private:
-};
-
-class [[nodiscard]] RequestPlanner {
-  public:
-    RequestPlanner(
-        const pcg32     rng,
-        const Wage      lastWage,
-        const HeadCount lastEmploy,
-        const HeadCount lastOfferPlan,
-        const HeadCount lastApplicantNum,
-        const double    offerRate,
-        const double    wageAdjustVol,
-        const double    offerAdjustVol
-    )
-        : rng_{rng},
-          log_{
-              .wage         = lastWage,
-              .actualEmploy = lastEmploy,
-              .offerPlan    = lastOfferPlan,
-              .applicantNum = lastApplicantNum
-          },
-          param_{
-              .offerRate      = offerRate,
-              .wageAdjustVol  = wageAdjustVol,
-              .offerAdjustVol = offerAdjustVol
-          } {}
-
-    void judgePlan(const HeadCount desiredEmploy) {
-        plan_ = {
-            .wage = calcNextWage(), .employ = desiredEmploy, .offer = calcNextOffer(desiredEmploy)
-        };
+    auto judgeWage(const bool shouldRaise) -> Wage {
+        const Wage nextWage{calcWage(shouldRaise)};
+        plan_ = nextWage;
+        return nextWage;
     }
 
-    auto wagePlan() const -> Wage POST(wage : wage > Wage{0.0}) { return plan_.wage; }
-    auto offerPlan() const -> HeadCount POST(employ : employ >= HeadCount{0.0}) {
-        return plan_.offer;
-    }
-
-    void endStep(CensusDropBox& dropBox, const HeadCount actualEmploy, const HeadCount applicantNum)
-        PRE(actualEmploy >= HeadCount{0.0}) PRE(applicantNum >= HeadCount{0.0}) {
-        dropBox.postedEmployments.emplace_back(plan_.employ.value());
-        log_ = {
-            .wage         = plan_.wage,
-            .actualEmploy = actualEmploy,
-            .offerPlan    = plan_.offer,
-            .applicantNum = applicantNum
-        };
-        param_.offerRate = updateOfferRate(actualEmploy);
-        plan_.reset();
+    void endStep(CensusDropBox& dropBox) {
+        dropBox.wages.emplace_back(plan_.value());
+        log_  = plan_;
+        plan_ = Wage{0.0};
     }
 
   private:
-    auto calcNextWage() const -> Wage POST(wage : wage > Wage{0.0}) {
-        const bool   shouldRaiseWage{log_.applicantNum < log_.offerPlan};
-        const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.wageAdjustVol, -1.0, 1.0))
-        };
-        const Wage   nextWage{log_.wage * (shouldRaiseWage ? 1.0 + alpha : 1.0 - alpha)};
+    auto calcWage(const bool shouldRaise) const -> Wage {
+        const double alpha{std::abs(helper::randNormal(rng_, 0.0, adjustVol_, -1.0, 1.0))};
+        const Wage   nextWage{log_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(nextWage);
     }
 
-    auto calcNextOffer(const HeadCount desiredEmploy) const -> HeadCount
-        POST(offer
-             : offer >= HeadCount{0.0}) {
-        const HeadCount offer{desiredEmploy * (1.0 + param_.offerRate)};
+    mutable pcg32 rng_;
+    Wage          plan_{0.0};
+    Wage          log_;
+    const double  adjustVol_;
+};
+
+class [[nodiscard]] OfferRateManager {
+  public:
+    OfferRateManager(const pcg32 rng, const double offerRate, const double adjustVol)
+        : rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
+
+    auto offerNum(const HeadCount desiredEmploy) const -> HeadCount {
+        const HeadCount offer{desiredEmploy * (1.0 + offerRate_)};
         return HeadCount{
             std::min(static_cast<double>(config::agent_count::hhold), std::ceil(offer.value()))
         };
     }
-    auto updateOfferRate(const HeadCount actualEmploy) const -> double POST(rate : rate > 0.0) {
-        const double alpha{std::abs(helper::randNormal(rng_, 0.0, param_.offerAdjustVol, -1.0, 1.0))
-        };
-        const bool   shouldRaise{actualEmploy < plan_.employ};
-        const double offerRate{param_.offerRate * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
-        return std::max(1.0, offerRate);
+
+    void update(const HeadCount employPlan, const HeadCount actualEmploy) {
+        offerRate_ = updateOfferRate(employPlan, actualEmploy);
+    }
+
+  private:
+    auto updateOfferRate(const HeadCount employPlan, const HeadCount actualEmploy) const -> double {
+        const double alpha{std::abs(helper::randNormal(rng_, 0.0, adjustVol_, -1.0, 1.0))};
+        const bool   shouldRaise{actualEmploy < employPlan};
+        const double nextRate{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        return std::max(1.0, nextRate);
     }
 
     mutable pcg32 rng_;
-    struct {
-        Wage      wage{0.0};
-        HeadCount employ{0.0};
-        HeadCount offer{0.0};
-        void      reset() { wage = Wage{0.0}, employ = HeadCount{0.0}, offer = HeadCount{0.0}; }
-    } plan_{};
+    double        offerRate_;
+    const double  adjustVol_;
+};
 
-    struct {
-        Wage      wage;
-        HeadCount actualEmploy;
-        HeadCount offerPlan;
-        HeadCount applicantNum;
-    } log_;
+class [[nodiscard]] OfferPlanner {
+  public:
+    OfferPlanner(HeadCount log, const OfferRateManager offerRateManager)
+        : log_{log}, offerRateManager_{offerRateManager} {}
 
-    struct {
-        double       offerRate;
-        const double wageAdjustVol;
-        const double offerAdjustVol;
-    } param_;
+    auto judgeOffer(const HeadCount desiredEmploy) -> HeadCount {
+        return offerRateManager_.offerNum(desiredEmploy);
+    }
+
+    auto shouldRaiseWage(const HeadCount applicantNum) const -> bool { return applicantNum < log_; }
+
+    void endStep(const HeadCount employPlan, const HeadCount actualEmploy) {
+        log_ = plan_;
+        offerRateManager_.update(employPlan, actualEmploy);
+        plan_ = HeadCount{0.0};
+    }
+
+  private:
+    HeadCount        plan_{0.0};
+    HeadCount        log_;
+    OfferRateManager offerRateManager_;
+};
+
+class [[nodiscard]] RequestPlanner {
+  public:
+    RequestPlanner(const WagePlanner wagePlanner, const OfferPlanner offerPlanner)
+        : wagePlanner_{wagePlanner}, offerPlanner_{offerPlanner} {}
+
+    auto judgePlan(const HeadCount desiredEmploy, const HeadCount lastApplicantNum) -> PostingInfo {
+        const bool shouldRaiseWage{offerPlanner_.shouldRaiseWage(lastApplicantNum)};
+        employPlan_ = desiredEmploy;
+        return {
+            .wage         = wagePlanner_.judgeWage(shouldRaiseWage),
+            .targetEmploy = desiredEmploy,
+            .offerNum     = offerPlanner_.judgeOffer(desiredEmploy)
+        };
+    }
+
+    void endStep(CensusDropBox& dropBox, const HeadCount actualEmploy)
+        PRE(actualEmploy >= HeadCount{0.0}) PRE(applicantNum >= HeadCount{0.0}) {
+        dropBox.postedEmployments.emplace_back(employPlan_.value());
+        wagePlanner_.endStep(dropBox);
+        offerPlanner_.endStep(employPlan_, actualEmploy);
+    }
+
+  private:
+    HeadCount    employPlan_{0.0};
+    WagePlanner  wagePlanner_;
+    OfferPlanner offerPlanner_;
 };
 }  // namespace abm::labor::demander

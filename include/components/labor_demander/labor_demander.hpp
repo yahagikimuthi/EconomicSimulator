@@ -3,7 +3,9 @@
 #include <tbb/concurrent_vector.h>
 
 #include "components/labor_demander/hr_manager.hpp"
+#include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
+#include "components/labor_demander/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
@@ -12,17 +14,22 @@ namespace abm {
 class [[nodiscard]] LaborDemander {
   public:
     LaborDemander(
+        const labor::demander::RequestPlanner&&       offerPlanner,
         const labor::demander::Recruiter&&            recruiter,
         const labor::demander::HumanResourceManager&& hrManager
     )
-        : recruiter_{recruiter}, hrManager_{hrManager} {}
+        : requestPlanner_{offerPlanner}, recruiter_{recruiter}, hrManager_{hrManager} {}
 
     void post(
         const AgentID                         id,
         const HeadCount                       desiredEmploy,
         tbb::concurrent_vector<LaborRequest>& requestBox
     ) PRE(desiredEmploy > HeadCount{0.0}) {
-        recruiter_.post(id, desiredEmploy, requestBox);
+        isRecruiting_ = true;
+        const labor::demander::PostingInfo info{
+            requestPlanner_.judgePlan(desiredEmploy, recruiter_.lastApplicantNum())
+        };
+        recruiter_.post(id, info, requestBox);
     }
 
     void offer() { recruiter_.offer(); }
@@ -48,11 +55,14 @@ class [[nodiscard]] LaborDemander {
     }
 
     void endStep(CensusDropBox& dropBox) {
-        recruiter_.endStep(dropBox);
-        hrManager_.endStep();
+        if (not isRecruiting_) return;
+        requestPlanner_.endStep(dropBox, recruiter_.employing());
+        recruiter_.endStep();
     }
 
   private:
+    bool                                  isRecruiting_{false};
+    labor::demander::RequestPlanner       requestPlanner_;
     labor::demander::Recruiter            recruiter_;
     labor::demander::HumanResourceManager hrManager_;
 };
