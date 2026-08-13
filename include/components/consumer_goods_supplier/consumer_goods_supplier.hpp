@@ -4,9 +4,11 @@
 #include <utility>
 
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
+#include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
 #include "components/consumer_goods_supplier/trader.hpp"
+#include "components/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
@@ -23,19 +25,19 @@ class [[nodiscard]] ConsumerGoodsSupplier final : public BaseGoodsSupplier<Marke
 
     void post(const Money totalCost, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox) {
         const GoodsQuantity supply{producer_.product()};
-        const Price         nextPrice{planner_.judgePlan(supply, totalCost)};
-        trader_.post(supply, nextPrice, entryBox);
+        trader_.post(planner_.judgePlan(supply, totalCost), entryBox);
     }
 
     void trade() { trader_.trade(); }
 
-    void endStep(CensusDropBox& dropBox) {
-        planner_.endStep(trader_.totalDemand(), trader_.inventory(), dropBox);
-        producer_.endStep(trader_.inventory(), dropBox);
+    void endStep(internal::AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
+        using namespace base_goods::supplier;
+        const TradingResult result{trader_.tradingResult()};
+        assetPlus(result.sales);
+        planner_.endStep(result.totalDemand, result.supply - result.soldAmount, dropBox);
+        producer_.endStep(result.supply - result.soldAmount, dropBox);
         trader_.endStep();
     }
-
-    auto sales() const -> Money { return trader_.sales(); }
 
   private:
     consumer_goods::supplier::Trader trader_;

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <pcg_random.hpp>
 
+#include "components/base_goods_supplier/common.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
@@ -109,12 +110,12 @@ class [[nodiscard]] Planner {
           markupPlanner_{markupPlanner},
           demandForecastManager_{demandForecastManager} {}
 
-    auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> Price
+    auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> PostingInfo
         PRE(supply >= GoodsQuantity{0.0}) PRE(totalCost >= Money{0.0}) {
         const double markup{markupPlanner_.judgeMarkup(log_.isSold)};
         const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
         supplyPlan_ = supply;
-        return price;
+        return {.price = price, .supply = supply};
     }
 
     auto lastSupply() const -> GoodsQuantity POST(supply : supply >= GoodsQuantity{0.0}) {

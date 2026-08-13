@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <pcg_random.hpp>
 
+#include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trader.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
@@ -13,14 +14,13 @@ class Trader final : public base_goods::supplier::Trader<Market::consumerGoods> 
     Trader(const pcg32 rng) : base_goods::supplier::Trader<Market::consumerGoods>::Trader(rng) {}
 
     void post(
-        const GoodsQuantity                         supply,
-        const Price                                 pricePlan,
+        const base_goods::supplier::PostingInfo     postingInfo,
         tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) {
-        if (supply == GoodsQuantity{0.0}) return;
-        isPosting_        = true;
-        ledger_.inventory = supply;
-        auto it{entryBox.emplace_back(pricePlan, supply)};
+        if (postingInfo.supply == GoodsQuantity{0.0}) return;
+        isPosting_ = true;
+        ledgerManager_.makeNewPage(postingInfo.supply);
+        auto it{entryBox.emplace_back(postingInfo.price, postingInfo.supply)};
         myEntry_ = *it;
     }
 };

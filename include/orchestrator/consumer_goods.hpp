@@ -36,8 +36,7 @@ void trade(ConsumerGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
 void afterTrade(ConsumerGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
 
 void endStep(FirmFinance& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox) {
-    finance.assetPlus(goodsSupplier.sales());
-    goodsSupplier.endStep(dropBox);
+    goodsSupplier.endStep([&](const Money sales) -> void { finance.assetPlus(sales); }, dropBox);
 }
 
 void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) {

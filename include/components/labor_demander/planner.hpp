@@ -12,6 +12,13 @@ namespace abm::labor::demander {
     return Wage{std::max(wage.value(), config::labor_demander::epsilonWage)};
 }
 
+class WagePlanner {
+  public:
+    WagePlanner();
+
+  private:
+};
+
 class [[nodiscard]] RequestPlanner {
   public:
     RequestPlanner(

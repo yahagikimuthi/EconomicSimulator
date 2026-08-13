@@ -3,7 +3,9 @@
 #include <tbb/concurrent_vector.h>
 
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
+#include "components/base_goods_supplier/common.hpp"
 #include "components/production_goods_supplier/trader.hpp"
+#include "components/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
@@ -26,18 +28,19 @@ class [[nodiscard]] ProductionGoodsSupplier final
         tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
         const GoodsQuantity supply{producer_.product()};
-        trader_.post(id, supply, planner_.judgePlan(supply, totalCost), entryBox);
+        trader_.post(id, planner_.judgePlan(supply, totalCost), entryBox);
     }
 
     void trade() { trader_.trade(); }
 
-    void endStep(CensusDropBox& dropBox) {
-        planner_.endStep(trader_.totalDemand(), trader_.inventory(), dropBox);
-        producer_.endStep(trader_.inventory(), dropBox);
+    void endStep(internal::AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
+        using namespace base_goods::supplier;
+        const TradingResult result{trader_.tradingResult()};
+        assetPlus(result.sales);
+        planner_.endStep(result.totalDemand, result.supply - result.soldAmount, dropBox);
+        producer_.endStep(result.supply - result.soldAmount, dropBox);
         trader_.endStep();
     }
-
-    auto sales() const -> Money { return trader_.sales(); }
 
   private:
     production_goods::supplier::Trader trader_;

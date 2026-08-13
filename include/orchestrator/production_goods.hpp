@@ -34,8 +34,7 @@ void trade(ProductionGoodsSupplier& goodsSupplier) { goodsSupplier.trade(); }
 void afterTrade(ProductionGoodsDemander& goodsDemander) { goodsDemander.afterTrade(); }
 
 void endStep(FirmFinance& finance, ProductionGoodsSupplier& goodsSupplier, CensusDropBox& dropBox) {
-    finance.assetPlus(goodsSupplier.sales());
-    goodsSupplier.endStep(dropBox);
+    goodsSupplier.endStep([&](Money sales) -> void { finance.assetPlus(sales); }, dropBox);
 }
 
 void endStep(FirmFinance& finance, ProductionGoodsDemander& goodsDemander) {

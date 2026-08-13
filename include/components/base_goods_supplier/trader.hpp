@@ -9,12 +9,54 @@
 #include <utility>
 #include <vector>
 
+#include "components/base_goods_supplier/common.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
 namespace abm::base_goods::supplier {
+class LedgerManager {
+  public:
+    LedgerManager() = default;
+
+    void makeNewPage(const GoodsQuantity supply) { supply_ = supply; }
+
+    void add(const Price price, GoodsQuantity salesAmount) {
+        inventory_ -= salesAmount;
+        currentSales_ += price * salesAmount;
+        totalDemand_ += salesAmount;
+    }
+
+    void reset() {
+        supply_       = GoodsQuantity{0.0};
+        inventory_    = GoodsQuantity{0.0};
+        currentSales_ = Money{0.0};
+        totalDemand_  = GoodsQuantity{0.0};
+    }
+
+    auto isExcessDemand(const GoodsQuantity demand) const -> bool { return demand >= inventory_; }
+
+    auto salesAmount(const GoodsQuantity demand) -> GoodsQuantity {
+        return isExcessDemand(demand) ? inventory_ : demand;
+    }
+
+    auto tradingResult() const -> TradingResult {
+        return {
+            .supply      = supply_,
+            .soldAmount  = supply_ - inventory_,
+            .totalDemand = totalDemand_,
+            .sales       = currentSales_
+        };
+    }
+
+  private:
+    GoodsQuantity supply_{0.0};
+    GoodsQuantity inventory_{0.0};
+    Money         currentSales_{0.0};
+    GoodsQuantity totalDemand_{0.0};
+};
+
 template <Market SupplyGoodsType>
 class Trader {
     using Entry = std::conditional_t<
@@ -32,30 +74,28 @@ class Trader {
         auto&               requestBox = myEntry_->requestBox;
         const GoodsQuantity totalDemand{calcTotalDemand(requestBox)};
         if (totalDemand == GoodsQuantity{0.0}) return;
-        const bool          isExcessDemand{totalDemand > ledger_.inventory};
-        const GoodsQuantity salesAmount{std::min(ledger_.inventory, totalDemand)};
-        isExcessDemand ? performRationedTrade(myEntry_->supply, rng_, requestBox)
-                       : performFullTrade(requestBox);
-        ledger_.totalDemand += totalDemand;
-        ledger_.currentSales += myEntry_->price * salesAmount;
-        ledger_.inventory -= salesAmount;
+        const GoodsQuantity salesAmount{ledgerManager_.salesAmount(totalDemand)};
+        ledgerManager_.isExcessDemand(totalDemand)
+            ? performRationedTrade(myEntry_->supply, rng_, requestBox)
+            : performFullTrade(requestBox);
+        ledgerManager_.add(myEntry_->price, salesAmount);
     }
 
-    auto inventory() const -> GoodsQuantity POST(inv : inv >= GoodsQuantity{0.0}) {
-        return ledger_.inventory;
-    }
+    auto tradingResult() const -> TradingResult { return ledgerManager_.tradingResult(); }
 
-    auto sales() const -> Money POST(sales : sales >= Money{0.0}) { return ledger_.currentSales; }
-
-    auto totalDemand() const -> GoodsQuantity POST(demand : demand >= GoodsQuantity{0.0}) {
-        return ledger_.totalDemand;
-    }
-
-    void endStep() { myEntry_.reset(), isPosting_ = false, ledger_.reset(); }
+    void endStep() { myEntry_.reset(), isPosting_ = false, ledgerManager_.reset(); }
 
   protected:
     Trader(const pcg32 rng) : rng_{rng} {}
 
+    pcg32                 rng_;
+    std::optional<Entry&> myEntry_{std::nullopt};
+    bool                  isPosting_{false};
+
+    PostingInfo   postingInfo_;
+    LedgerManager ledgerManager_;
+
+  private:
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox
     ) -> GoodsQuantity {
         const GoodsQuantity demand{std::ranges::fold_left(
@@ -104,20 +144,5 @@ class Trader {
     static void performFullTrade(tbb::concurrent_vector<Request>& requestBox) {
         for (auto& request : requestBox) request.tradeAmount = request.amount;
     }
-
-    pcg32                 rng_;
-    std::optional<Entry&> myEntry_{std::nullopt};
-    bool                  isPosting_{false};
-
-    struct {
-        GoodsQuantity inventory{0.0};
-        Money         currentSales{0.0};
-        GoodsQuantity totalDemand{0.0};
-
-        void reset() {
-            inventory = GoodsQuantity{0.0}, currentSales = Money{0.0},
-            totalDemand = GoodsQuantity{0.0};
-        }
-    } ledger_{};
 };
 }  // namespace abm::base_goods::supplier
