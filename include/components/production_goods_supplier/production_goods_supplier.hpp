@@ -26,8 +26,7 @@ class [[nodiscard]] ProductionGoodsSupplier final
         tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
         const GoodsQuantity supply{producer_.product()};
-        planner_.judgePlan(supply, totalCost);
-        trader_.post(id, supply, planner_.pricePlan(), entryBox);
+        trader_.post(id, supply, planner_.judgePlan(supply, totalCost), entryBox);
     }
 
     void trade() { trader_.trade(); }

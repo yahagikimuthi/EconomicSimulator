@@ -23,8 +23,8 @@ class [[nodiscard]] ConsumerGoodsSupplier final : public BaseGoodsSupplier<Marke
 
     void post(const Money totalCost, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox) {
         const GoodsQuantity supply{producer_.product()};
-        planner_.judgePlan(supply, totalCost);
-        trader_.post(supply, planner_.pricePlan(), entryBox);
+        const Price         nextPrice{planner_.judgePlan(supply, totalCost)};
+        trader_.post(supply, nextPrice, entryBox);
     }
 
     void trade() { trader_.trade(); }
