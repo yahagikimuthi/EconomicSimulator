@@ -5,9 +5,9 @@
 #include "world/message.hpp"
 
 namespace abm::labor::supplier {
-template <typename T>
-concept IsAlignedFn = requires(T t, LaborRequest request) {
-    { t(request) } -> std::same_as<bool>;
+template <typename F>
+concept IsAlignedFn = requires(F f, LaborRequest request) {
+    { f(request) } -> std::same_as<bool>;
 };
 
 template <typename T>

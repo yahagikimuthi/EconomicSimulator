@@ -1,3 +1,4 @@
+#include "components/base_goods_demander.hpp"
 #include "core/engine.hpp"
 
 #include <cstdlib>
@@ -41,8 +42,9 @@ using namespace helper;
     -> ConsumerGoodsDemander {
     const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
     const double mpc{helper::rand(masterRng, 0.7, 0.9)};
-    const Step   myPhase{instanceCnt % config::goods_demander::maxPurchaseFrequency};
-    return ConsumerGoodsDemander{rng, mpc, myPhase};
+    const base_goods::demander::BudgetCalculator budgetCalculator{mpc};
+    const Step myPhase{instanceCnt % config::goods_demander::maxPurchaseFrequency};
+    return ConsumerGoodsDemander{rng, budgetCalculator, myPhase};
 }
 
 [[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng) -> ProductionGoodsDemander {

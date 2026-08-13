@@ -59,6 +59,9 @@ class LedgerManager {
 
 template <Market SupplyGoodsType>
 class Trader {
+    static_assert(
+        SupplyGoodsType == Market::consumerGoods or SupplyGoodsType == Market::productionGoods
+    );
     using Entry = std::conditional_t<
         SupplyGoodsType == Market::consumerGoods,
         ConsumerGoodsEntry,

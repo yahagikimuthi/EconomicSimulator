@@ -16,15 +16,19 @@
 namespace abm {
 class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Market::consumerGoods> {
   public:
-    ConsumerGoodsDemander(const pcg32 rng, const double mpc, const Step myPhase)
-        : BaseGoodsDemander<Market::consumerGoods>::BaseGoodsDemander(rng, mpc),
+    ConsumerGoodsDemander(
+        const pcg32                                  rng,
+        const base_goods::demander::BudgetCalculator budgetCalculator,
+        const Step                                   myPhase
+    )
+        : BaseGoodsDemander<Market::consumerGoods>::BaseGoodsDemander(rng, budgetCalculator),
           myPhase_{myPhase} {}
 
     void request(
         const Money asset, const Step step, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) {
         if (isPass(asset, step, entryBox)) return;
-        const Money budget{calcBudget(asset)};
+        const Money budget{budgetCalculator_.calcBudget(asset)};
         if (budget <= Money{0.0}) return;
         isPosting_        = true;
         auto& pickedEntry = pickEntry(entryBox);

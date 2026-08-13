@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "components/labor_demander/util.hpp"
-#include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"

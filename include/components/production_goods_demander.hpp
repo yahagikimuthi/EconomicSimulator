@@ -17,15 +17,17 @@ namespace abm {
 class [[nodiscard]] ProductionGoodsDemander final
     : public BaseGoodsDemander<Market::productionGoods> {
   public:
-    ProductionGoodsDemander(const pcg32 rng, const double mpc)
-        : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, mpc) {}
+    ProductionGoodsDemander(
+        const pcg32 rng, const base_goods::demander::BudgetCalculator budgetCalculator
+    )
+        : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, budgetCalculator) {}
 
     void request(
         const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
         using Entry = ProductionGoodsEntry;
         if (isPass(asset, entryBox)) return;
-        const Money budget{calcBudget(asset)};
+        const Money budget{budgetCalculator_.calcBudget(asset)};
         if (budget <= Money{0.0}) return;
         isPosting_                              = true;
         const std::optional<Entry&> pickedEntry = pickEntry(id, entryBox);
