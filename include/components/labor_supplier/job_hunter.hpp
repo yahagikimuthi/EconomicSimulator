@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <functional>
 #include <iterator>
+#include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
 
@@ -58,7 +59,27 @@ inline void sortSample(
                return reqRef.get();
            });
 }
-class JobHunter {
+
+class [[nodiscard]] MyEntries {
+    template <typename T>
+    using RefWrap = std::reference_wrapper<T>;
+
+  public:
+    MyEntries() = default;
+    void add(LaborEntry& entry) { entries_.emplace_back(std::ref(entry)); }
+    void clear() { entries_.clear(); }
+    auto takeOfferedEntry() -> std::ranges::view auto {
+        return entries_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
+                   return ref.get();
+               }) |
+               std::views::filter(&LaborEntry::isOffer);
+    }
+
+  private:
+    std::vector<RefWrap<LaborEntry>> entries_;
+};
+
+class [[nodiscard]] JobHunter {
   public:
     JobHunter(const pcg32 rng) : rng_{rng} {}
 
@@ -77,7 +98,7 @@ class JobHunter {
         };
         if (alignedRequests.empty()) return;
         isPosting_ = true;
-        for (auto&& request : alignedRequests) myEntries_.emplace_back(makeEntrySheet(request));
+        for (auto&& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
     }
 
     void accept() {
@@ -93,21 +114,14 @@ class JobHunter {
   private:
     using Entry = LaborEntry;
     auto takeAcceptEntry() -> std::optional<Entry&> {
-        std::ranges::view auto offered{
-            myEntries_ | std::views::filter([](const std::reference_wrapper<Entry> entry) -> bool {
-                return entry.get().isOffer;
-            }) |
-            std::views::take(1)
-        };
+        std::ranges::view auto offered{myEntries_.takeOfferedEntry() | std::views::take(1)};
         if (offered.empty()) return std::nullopt;
-        return offered.front().get();
+        return offered.front();
     }
 
-    mutable pcg32                                   rng_;
-    std::vector<std::reference_wrapper<LaborEntry>> myEntries_;
-    std::optional<LaborEntry&>                      acceptedEntry_{std::nullopt};
-    bool                                            isPosting_{false};
-
-    friend class JobHunterTester;
+    mutable pcg32              rng_;
+    MyEntries                  myEntries_;
+    std::optional<LaborEntry&> acceptedEntry_{std::nullopt};
+    bool                       isPosting_{false};
 };
 }  // namespace abm::labor::supplier

@@ -51,7 +51,6 @@ class Employment {
 }  // namespace abm::labor::supplier
 
 namespace abm {
-
 class LaborSupplier {
   public:
     LaborSupplier(
