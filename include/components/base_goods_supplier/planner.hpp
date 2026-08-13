@@ -78,6 +78,27 @@ class [[nodiscard]] PricePlanner {
     Price plan_{0.0};
 };
 
+class PostingInfoPlanner {
+  public:
+    PostingInfoPlanner(MarkupPlanner markupPlanner) : markupPlanner_{markupPlanner} {}
+
+    auto judgePlan(const GoodsQuantity supply, const Money totalCost, const bool isSold)
+        -> PostingInfo {
+        const double markup{markupPlanner_.judgeMarkup(isSold)};
+        const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
+        return {.price = price, .supply = supply};
+    }
+
+    void endStep(CensusDropBox& dropBox) {
+        markupPlanner_.endStep(dropBox);
+        pricePlanner_.endStep(dropBox);
+    }
+
+  private:
+    MarkupPlanner markupPlanner_;
+    PricePlanner  pricePlanner_;
+};
+
 class [[nodiscard]] DemandForecastManager {
   public:
     DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
@@ -102,20 +123,18 @@ class [[nodiscard]] Planner {
         const GoodsQuantity         lastSupply,
         const bool                  isSold,
         const double                targetInvRatio,
-        const MarkupPlanner         markupPlanner,
+        const PostingInfoPlanner    postingPlanner,
         const DemandForecastManager demandForecastManager
     )
         : log_{.supply = lastSupply, .isSold = isSold},
           targetInvRatio_{targetInvRatio},
-          markupPlanner_{markupPlanner},
+          postingPlanner_{postingPlanner},
           demandForecastManager_{demandForecastManager} {}
 
     auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> PostingInfo
         PRE(supply >= GoodsQuantity{0.0}) PRE(totalCost >= Money{0.0}) {
-        const double markup{markupPlanner_.judgeMarkup(log_.isSold)};
-        const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
         supplyPlan_ = supply;
-        return {.price = price, .supply = supply};
+        return postingPlanner_.judgePlan(supply, totalCost, log_.isSold);
     }
 
     auto lastSupply() const -> GoodsQuantity POST(supply : supply >= GoodsQuantity{0.0}) {
@@ -130,8 +149,7 @@ class [[nodiscard]] Planner {
         const GoodsQuantity totalDemand, const GoodsQuantity unsoldAmount, CensusDropBox& dropBox
     ) PRE(totalDemand >= GoodsQuantity{0.0}) PRE(unsoldAmount >= GoodsQuantity{0.0}) {
         dropBox.supplies.emplace_back(supplyPlan_.value());
-        markupPlanner_.endStep(dropBox);
-        pricePlanner_.endStep(dropBox);
+        postingPlanner_.endStep(dropBox);
         demandForecastManager_.update(totalDemand);
         log_        = {.supply = supplyPlan_, .isSold = isSold(unsoldAmount)};
         supplyPlan_ = GoodsQuantity{0.0};
@@ -153,8 +171,7 @@ class [[nodiscard]] Planner {
 
     const double targetInvRatio_;
 
-    MarkupPlanner         markupPlanner_;
-    PricePlanner          pricePlanner_;
+    PostingInfoPlanner    postingPlanner_;
     DemandForecastManager demandForecastManager_;
 };
 }  // namespace abm::base_goods::supplier

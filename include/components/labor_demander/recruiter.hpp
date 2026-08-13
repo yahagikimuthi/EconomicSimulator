@@ -105,7 +105,7 @@ class [[nodiscard]] Recruiter {
     Recruiter(Offerer&& offerer) : offerer_{std::move(offerer)} {}
     void post(
         const AgentID id, const PostingInfo info, tbb::concurrent_vector<LaborRequest>& requestBox
-    ) PRE(desiredEmploy >= HeadCount{0.0}) {
+    ) {
         if (info.offerNum == HeadCount{0.0}) return;
         isPosting_ = true;
         offerer_.startWorking(info.offerNum);

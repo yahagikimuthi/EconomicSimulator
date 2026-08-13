@@ -95,31 +95,45 @@ class [[nodiscard]] OfferPlanner {
     OfferRateManager offerRateManager_;
 };
 
-class [[nodiscard]] RequestPlanner {
+class [[nodiscard]] PostingInfoPlanner {
   public:
-    RequestPlanner(const WagePlanner wagePlanner, const OfferPlanner offerPlanner)
+    PostingInfoPlanner(const WagePlanner wagePlanner, const OfferPlanner offerPlanner)
         : wagePlanner_{wagePlanner}, offerPlanner_{offerPlanner} {}
 
     auto judgePlan(const HeadCount desiredEmploy, const HeadCount lastApplicantNum) -> PostingInfo {
-        const bool shouldRaiseWage{offerPlanner_.shouldRaiseWage(lastApplicantNum)};
-        employPlan_ = desiredEmploy;
         return {
-            .wage         = wagePlanner_.judgeWage(shouldRaiseWage),
-            .targetEmploy = desiredEmploy,
-            .offerNum     = offerPlanner_.judgeOffer(desiredEmploy)
+            .wage     = wagePlanner_.judgeWage(offerPlanner_.shouldRaiseWage(lastApplicantNum)),
+            .offerNum = offerPlanner_.judgeOffer(desiredEmploy)
         };
     }
 
-    void endStep(CensusDropBox& dropBox, const HeadCount actualEmploy)
-        PRE(actualEmploy >= HeadCount{0.0}) PRE(applicantNum >= HeadCount{0.0}) {
-        dropBox.postedEmployments.emplace_back(employPlan_.value());
+    void endStep(CensusDropBox& dropBox, const HeadCount employPlan, const HeadCount actualEmploy) {
         wagePlanner_.endStep(dropBox);
-        offerPlanner_.endStep(employPlan_, actualEmploy);
+        offerPlanner_.endStep(employPlan, actualEmploy);
     }
 
   private:
-    HeadCount    employPlan_{0.0};
     WagePlanner  wagePlanner_;
     OfferPlanner offerPlanner_;
+};
+
+class [[nodiscard]] RequestPlanner {
+  public:
+    RequestPlanner(const PostingInfoPlanner postingPlanner) : postingPlanner_{postingPlanner} {}
+
+    auto judgePlan(const HeadCount desiredEmploy, const HeadCount lastApplicantNum) -> PostingInfo {
+        employPlan_ = desiredEmploy;
+        return postingPlanner_.judgePlan(desiredEmploy, lastApplicantNum);
+    }
+
+    void endStep(CensusDropBox& dropBox, const HeadCount actualEmploy)
+        PRE(actualEmploy >= HeadCount{0.0}) {
+        dropBox.postedEmployments.emplace_back(employPlan_.value());
+        postingPlanner_.endStep(dropBox, employPlan_, actualEmploy);
+    }
+
+  private:
+    HeadCount          employPlan_{0.0};
+    PostingInfoPlanner postingPlanner_;
 };
 }  // namespace abm::labor::demander

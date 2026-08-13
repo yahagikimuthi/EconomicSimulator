@@ -14,7 +14,6 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
 
 struct PostingInfo {
     const Wage      wage;
-    const HeadCount targetEmploy;
     const HeadCount offerNum;
 };
 
