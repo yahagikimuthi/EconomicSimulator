@@ -14,6 +14,27 @@
 #include "world/message.hpp"
 
 namespace abm::labor::demander {
+
+class [[nodiscard]] EmptyRosterPool {
+    template <typename T>
+    using RefWrap = std::reference_wrapper<T>;
+
+  public:
+    EmptyRosterPool() = default;
+
+    auto size() const -> std::size_t { return pool_.size(); }
+    auto empty() const -> bool { return size() == 0UZ; }
+    auto popBackEntry() -> RosterEntry& {
+        RosterEntry& out = pool_.back().get();
+        pool_.pop_back();
+        return out;
+    }
+    void add(RosterEntry& entry) { pool_.emplace_back(std::ref(entry)); }
+
+  private:
+    std::vector<RefWrap<RosterEntry>> pool_;
+};
+
 class [[nodiscard]] HumanResourceManager {
   public:
     HumanResourceManager(CompanyBoard&& companyBoard) : companyBoard_{std::move(companyBoard)} {}
@@ -21,11 +42,10 @@ class [[nodiscard]] HumanResourceManager {
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
-        RosterEntry* newRoster = &emptyRosterPool_.back().get();
+        RosterEntry* newRoster = &emptyRosterPool_.popBackEntry();
         ASSERT(newRoster != nullptr);
         std::destroy_at(newRoster);
         std::construct_at(newRoster, id, wage, companyBoard_, workspace);
-        emptyRosterPool_.pop_back();
         return *newRoster;
     }
 
@@ -34,7 +54,7 @@ class [[nodiscard]] HumanResourceManager {
         for (RosterEntry& resignEntry : resignationBox) {
             ASSERT(resignEntry.isOccupied);
             resignEntry.isOccupied = false;
-            emptyRosterPool_.emplace_back(resignEntry);
+            emptyRosterPool_.add(resignEntry);
         }
         resignationBox.clear();
     }
@@ -45,7 +65,7 @@ class [[nodiscard]] HumanResourceManager {
             if (currentLayOffs >= layOffsCnt) break;
             if (not entry.isOccupied) continue;
             entry.isOccupied = false;
-            emptyRosterPool_.emplace_back(std::ref(entry));
+            emptyRosterPool_.add(entry);
             ++currentLayOffs;
         }
     }
@@ -68,7 +88,7 @@ class [[nodiscard]] HumanResourceManager {
   private:
     template <typename T>
     using RefWrapper = std::reference_wrapper<T>;
-    CompanyBoard                         companyBoard_;
-    std::vector<RefWrapper<RosterEntry>> emptyRosterPool_;
+    CompanyBoard    companyBoard_;
+    EmptyRosterPool emptyRosterPool_;
 };
 }  // namespace abm::labor::demander
