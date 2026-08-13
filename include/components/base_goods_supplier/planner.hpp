@@ -163,14 +163,11 @@ class [[nodiscard]] Planner {
     }
 
     GoodsQuantity supplyPlan_{0.0};
-
     struct {
         GoodsQuantity supply;
         bool          isSold;
     } log_;
-
-    const double targetInvRatio_;
-
+    const double          targetInvRatio_;
     PostingInfoPlanner    postingPlanner_;
     DemandForecastManager demandForecastManager_;
 };

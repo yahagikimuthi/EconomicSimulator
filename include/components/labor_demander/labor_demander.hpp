@@ -61,9 +61,9 @@ class [[nodiscard]] LaborDemander {
     }
 
   private:
-    bool                                  isRecruiting_{false};
     labor::demander::RequestPlanner       requestPlanner_;
     labor::demander::Recruiter            recruiter_;
     labor::demander::HumanResourceManager hrManager_;
+    bool                                  isRecruiting_{false};
 };
 }  // namespace abm

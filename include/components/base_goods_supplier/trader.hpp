@@ -71,6 +71,9 @@ class Trader {
         ConsumerGoodsRequest,
         ProductionGoodsRequest>;
 
+    template <typename T>
+    using RefWrap = std::reference_wrapper<T>;
+
   public:
     void trade() {
         if (not isPosting_) return;
@@ -111,9 +114,9 @@ class Trader {
     }
 
     static void shuffleIdx(
-        tbb::concurrent_vector<Request>&              requestBox,
-        std::vector<std::reference_wrapper<Request>>& requests,
-        pcg32&                                        rng
+        tbb::concurrent_vector<Request>& requestBox,
+        std::vector<RefWrap<Request>>&   requests,
+        pcg32&                           rng
     ) {
         requests.clear();
         for (Request& request : requestBox) requests.emplace_back(std::ref(request));
@@ -123,7 +126,7 @@ class Trader {
     static void performRationedTrade(
         const GoodsQuantity supply, pcg32& rng, tbb::concurrent_vector<Request>& requestBox
     ) {
-        static thread_local std::vector<std::reference_wrapper<Request>> requests;
+        static thread_local std::vector<RefWrap<Request>> requests;
         shuffleIdx(requestBox, requests, rng);
 
         GoodsQuantity remainAmount{supply};

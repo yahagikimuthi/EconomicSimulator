@@ -1,4 +1,3 @@
-#include "components/base_goods_demander.hpp"
 #include "core/engine.hpp"
 
 #include <cstdlib>
@@ -9,6 +8,7 @@
 #include <iostream>
 #include <utility>
 
+#include "components/base_goods_demander.hpp"
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
 #include "components/common.hpp"
@@ -30,26 +30,26 @@
 namespace abm {
 using namespace helper;
 [[nodiscard]] auto makeFirmFinanceComponent(pcg32& masterRng) -> FirmFinance {
-    const Money asset{helper::rand(masterRng, 1000.0, 5000.0)};
+    const Money asset{rand(masterRng, 1000.0, 5000.0)};
     return FirmFinance{asset};
 }
 [[nodiscard]] auto makeHHoldFinanceComponent(pcg32& masterRng) -> HHoldFinance {
-    const Money asset{helper::rand(masterRng, 100.0, 500.0)};
+    const Money asset{rand(masterRng, 100.0, 500.0)};
     return HHoldFinance{asset};
 }
 
 [[nodiscard]] auto makeConsumerGoodsDemander(pcg32& masterRng, const int instanceCnt)
     -> ConsumerGoodsDemander {
-    const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    const double mpc{helper::rand(masterRng, 0.7, 0.9)};
+    const pcg32                                  rng{makeSeed(masterRng), makeSeed(masterRng)};
+    const double                                 mpc{rand(masterRng, 0.7, 0.9)};
     const base_goods::demander::BudgetCalculator budgetCalculator{mpc};
     const Step myPhase{instanceCnt % config::goods_demander::maxPurchaseFrequency};
     return ConsumerGoodsDemander{rng, budgetCalculator, myPhase};
 }
 
 [[nodiscard]] auto makeProductionGoodsDemander(pcg32& masterRng) -> ProductionGoodsDemander {
-    const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    const double mpc{helper::rand(masterRng, 0.7, 0.9)};
+    const pcg32  rng{makeSeed(masterRng), makeSeed(masterRng)};
+    const double mpc{rand(masterRng, 0.7, 0.9)};
     return {rng, mpc};
 }
 
@@ -63,16 +63,16 @@ namespace base_goods::supplier {
 }
 
 [[nodiscard]] auto makeDemandForecastManager(pcg32& masterRng) -> DemandForecastManager {
-    const double adjustVol{helper::rand(masterRng, 0.1, 0.4)};
+    const double adjustVol{rand(masterRng, 0.1, 0.4)};
     return {adjustVol};
 }
 
 [[nodiscard]] auto makePlanner(pcg32& masterRng) -> Planner {
-    const pcg32         rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    const GoodsQuantity lastSupply{helper::rand(masterRng, 4.0, 15.0)};
-    const GoodsQuantity demandForecast{helper::rand(masterRng, 5.0, 20.0)};
-    const bool          isSold{helper::rand(masterRng) < 0.5};
-    const double        targetInvRatio{helper::rand(masterRng, 0.1, 0.2)};
+    const pcg32         rng{makeSeed(masterRng), makeSeed(masterRng)};
+    const GoodsQuantity lastSupply{rand(masterRng, 4.0, 15.0)};
+    const GoodsQuantity demandForecast{rand(masterRng, 5.0, 20.0)};
+    const bool          isSold{rand(masterRng) < 0.5};
+    const double        targetInvRatio{rand(masterRng, 0.1, 0.2)};
     return {
         lastSupply,
         isSold,
@@ -83,8 +83,8 @@ namespace base_goods::supplier {
 }
 
 [[nodiscard]] auto makeProducer(pcg32& masterRng) -> Producer {
-    const double        firmProductPower{helper::rand(masterRng, 0.5, 2.0)};
-    const GoodsQuantity inventory{helper::rand(masterRng, 0.5, 2.0)};
+    const double        firmProductPower{rand(masterRng, 0.5, 2.0)};
+    const GoodsQuantity inventory{rand(masterRng, 0.5, 2.0)};
     Workspace           workspace{firmProductPower};
     return Producer{std::move(workspace), firmProductPower, inventory};
 }
@@ -92,7 +92,7 @@ namespace base_goods::supplier {
 
 namespace consumer_goods::supplier {
 [[nodiscard]] auto makeTrader(pcg32& masterRng) -> Trader {
-    const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    const pcg32 rng{makeSeed(masterRng), makeSeed(masterRng)};
     return {rng};
 }
 
@@ -107,7 +107,7 @@ namespace consumer_goods::supplier {
 
 namespace production_goods::supplier {
 [[nodiscard]] auto makeTrader(pcg32& masterRng) -> Trader {
-    const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    const pcg32 rng{makeSeed(masterRng), makeSeed(masterRng)};
     return {rng};
 }
 
@@ -149,7 +149,7 @@ namespace labor::demander {
 }
 
 [[nodiscard]] auto makeOfferer(pcg32& masterRng) -> Offerer {
-    const HeadCount applicantNum{helper::randInt(masterRng, 10, 20)};
+    const HeadCount applicantNum{randInt(masterRng, 10, 20)};
     return {applicantNum};
 }
 
@@ -171,25 +171,25 @@ namespace labor::demander {
 
 namespace labor::supplier {
 [[nodiscard]] auto makeJobHunter(pcg32& masterRng) -> JobHunter {
-    const pcg32 rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
+    const pcg32 rng{makeSeed(masterRng), makeSeed(masterRng)};
     return JobHunter{rng};
 }
 
 [[nodiscard]] auto makeEmployment(pcg32& masterRng) -> Employment {
-    const double productPower{helper::randNormal(masterRng, 1.0, 1.0 / 3.0, 0.0, 2.0)};
+    const double productPower{randNormal(masterRng, 1.0, 1.0 / 3.0, 0.0, 2.0)};
     return Employment{productPower};
 }
 
 [[nodiscard]] auto make(pcg32& masterRng) -> LaborSupplier {
-    const pcg32  rng{helper::makeSeed(masterRng), helper::makeSeed(masterRng)};
-    const double jobSearchThreshold{helper::rand(masterRng, 0.01, 0.05)};
+    const pcg32  rng{makeSeed(masterRng), makeSeed(masterRng)};
+    const double jobSearchThreshold{rand(masterRng, 0.01, 0.05)};
     return LaborSupplier{
         rng, makeJobHunter(masterRng), makeEmployment(masterRng), jobSearchThreshold
     };
 }
 }  // namespace labor::supplier
 
-Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{helper::generatePCG32Seed()} {
+Engine::Engine(const int totalStep) : totalStep_{totalStep}, seed_{generatePCG32Seed()} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";
         std::abort();

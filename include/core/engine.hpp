@@ -1,7 +1,6 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <cstdint>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 
@@ -64,8 +63,6 @@ class [[nodiscard]] Engine {
     void logging();
     void reset();
     void check() const;
-
-    auto makeSeed() -> std::uint64_t { return helper::makeSeed(masterRng_); }
 
     Logger                logger_;
     std::vector<BtoCFirm> BtoCFirms_;

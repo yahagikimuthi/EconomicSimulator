@@ -133,7 +133,7 @@ class [[nodiscard]] RequestPlanner {
     }
 
   private:
-    HeadCount          employPlan_{0.0};
     PostingInfoPlanner postingPlanner_;
+    HeadCount          employPlan_{0.0};
 };
 }  // namespace abm::labor::demander
