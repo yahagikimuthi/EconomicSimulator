@@ -12,13 +12,71 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;
 };
 
-struct PostingInfo {
-    const Wage      wage;
-    const HeadCount offerNum;
+struct RecruitPlan {
+    Wage      wage;
+    HeadCount employ;
+    HeadCount offer;
 };
 
 struct RecruitmentResult {
-    const HeadCount targetEmploy;
-    const HeadCount offerNum;
+    HeadCount applicants;
+    HeadCount employ;
+};
+
+class [[nodiscard]] RecruitPlanMemory {
+  public:
+    RecruitPlanMemory(
+        const Wage lastWage, const HeadCount lastEmployPlan, const HeadCount lastOfferPlan
+    )
+        : lastPlan_{.wage = lastWage, .employ = lastEmployPlan, .offer = lastOfferPlan} {}
+    void memorize(const RecruitPlan& newPlan) { currentPlan_ = newPlan; }
+    auto rememberLog() const -> const RecruitPlan& { return lastPlan_; }
+    void endStep(CensusDropBox& dropBox) {
+        dropBox.postedEmployments.emplace_back(currentPlan_.employ.value());
+        lastPlan_    = currentPlan_;
+        currentPlan_ = {.wage = Wage{0.0}, .employ = HeadCount{0.0}, .offer = HeadCount{0.0}};
+    }
+
+  private:
+    RecruitPlan lastPlan_;
+    RecruitPlan currentPlan_{.wage = Wage{0.0}, .employ = HeadCount{0.0}, .offer = HeadCount{0.0}};
+};
+
+class [[nodiscard]] RecruitResultMemory {
+  public:
+    RecruitResultMemory(const HeadCount lastApplicants, const HeadCount lastEmploy)
+        : lastResult_{.applicants = lastApplicants, .employ = lastEmploy} {}
+    void memorize(const RecruitmentResult& result) { currentResult_ = result; }
+    auto rememberLog() const -> const RecruitmentResult& { return lastResult_; }
+    void endStep() {
+        lastResult_    = currentResult_;
+        currentResult_ = {.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
+    }
+
+  private:
+    RecruitmentResult lastResult_;
+    RecruitmentResult currentResult_{.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
+};
+
+class [[nodiscard]] Memory {
+  public:
+    Memory(const RecruitPlanMemory& planMemory, const RecruitResultMemory& resultMemory)
+        : planMemory_{planMemory}, resultMemory_{resultMemory} {}
+
+    void memorize(const RecruitPlan& newRecruitPlan) { planMemory_.memorize(newRecruitPlan); }
+    void memorize(const RecruitmentResult& result) { resultMemory_.memorize(result); }
+    auto rememberLastRecruitPlan() const -> const RecruitPlan& { return planMemory_.rememberLog(); }
+    auto rememberLastRecruitResult() const -> const RecruitmentResult& {
+        return resultMemory_.rememberLog();
+        ;
+    }
+    void endStep(CensusDropBox& dropBox) {
+        planMemory_.endStep(dropBox);
+        resultMemory_.endStep();
+    }
+
+  private:
+    RecruitPlanMemory   planMemory_;
+    RecruitResultMemory resultMemory_;
 };
 }  // namespace abm::labor::demander

@@ -15,20 +15,21 @@ class [[nodiscard]] LaborDemander {
   public:
     LaborDemander(
         const labor::demander::RequestPlanner&&       offerPlanner,
-        const labor::demander::Recruiter&&            recruiter,
-        const labor::demander::HumanResourceManager&& hrManager
+        const labor::demander::HumanResourceManager&& hrManager,
+        const labor::demander::Memory&                memory
     )
-        : requestPlanner_{offerPlanner}, recruiter_{recruiter}, hrManager_{hrManager} {}
+        : requestPlanner_{offerPlanner}, hrManager_{hrManager}, memory_{memory} {}
 
     void post(
         const AgentID                         id,
         const HeadCount                       desiredEmploy,
         tbb::concurrent_vector<LaborRequest>& requestBox
-    ) PRE(desiredEmploy > HeadCount{0.0}) {
+    ) PRE(desiredEmploy >= HeadCount{0.0}) {
         isRecruiting_ = true;
-        const labor::demander::PostingInfo info{
-            requestPlanner_.judgePlan(desiredEmploy, recruiter_.lastApplicantNum())
-        };
+        const labor::demander::RecruitPlan info{requestPlanner_.judgePlan(
+            memory_.rememberLastRecruitPlan(), memory_.rememberLastRecruitResult(), desiredEmploy
+        )};
+        memory_.memorize(info);
         recruiter_.post(id, info, requestBox);
     }
 
@@ -56,14 +57,16 @@ class [[nodiscard]] LaborDemander {
 
     void endStep(CensusDropBox& dropBox) {
         if (not isRecruiting_) return;
-        requestPlanner_.endStep(dropBox, recruiter_.employing());
+        memory_.memorize(recruiter_.publishResult());
         recruiter_.endStep();
+        memory_.endStep(dropBox);
     }
 
   private:
     labor::demander::RequestPlanner       requestPlanner_;
     labor::demander::Recruiter            recruiter_;
     labor::demander::HumanResourceManager hrManager_;
+    labor::demander::Memory               memory_;
     bool                                  isRecruiting_{false};
 };
 }  // namespace abm

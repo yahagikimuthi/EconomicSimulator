@@ -31,7 +31,7 @@ class [[nodiscard]] ProductionGoodsSupplier final : public BaseGoodsSupplier {
 
     void trade() { trader_.trade(); }
 
-    void endStep(internal::AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
+    void endStep(detail::AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
         using namespace base_goods::supplier;
         const TradingResult result{trader_.tradingResult()};
         assetPlus(result.sales);

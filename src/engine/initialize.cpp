@@ -17,13 +17,14 @@
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
-#include "components/labor_demander/recruiter.hpp"
+#include "components/labor_demander/util.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "config.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/labor.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
@@ -123,37 +124,20 @@ namespace production_goods::supplier {
 namespace labor::demander {
 [[nodiscard]] auto makeWagePlanner(pcg32& masterRng) -> WagePlanner {
     const pcg32  rng{makeSeed(masterRng), makeSeed(masterRng)};
-    const Wage   log{rand(masterRng, 10.0, 50.0)};
     const double adjustVol{rand(masterRng, 0.01, 0.1)};
-    return {rng, log, adjustVol};
+    return {rng, adjustVol};
 }
 
-[[nodiscard]] auto makeOfferRateManager(pcg32& masterRng) -> OfferRateManager {
+[[nodiscard]] auto makeOfferPlanner(pcg32& masterRng) -> OfferPlanner {
     const pcg32  rng{makeSeed(masterRng), makeSeed(masterRng)};
     const double offerRate{rand(masterRng)};
     const double adjustVol{rand(masterRng, 0.3, 0.5)};
     return {rng, offerRate, adjustVol};
 }
 
-[[nodiscard]] auto makeOfferPlanner(pcg32& masterRng) -> OfferPlanner {
-    const HeadCount log{randInt(masterRng, 10, 20)};
-    return {log, makeOfferRateManager(masterRng)};
-}
-
-[[nodiscard]] auto makePostingInfoPlanner(pcg32& masterRng) -> PostingInfoPlanner {
-    return {makeWagePlanner(masterRng), makeOfferPlanner(masterRng)};
-}
-
 [[nodiscard]] auto makePlanner(pcg32& masterRng) -> RequestPlanner {
-    return RequestPlanner{makePostingInfoPlanner(masterRng)};
+    return RequestPlanner{makeWagePlanner(masterRng), makeOfferPlanner(masterRng)};
 }
-
-[[nodiscard]] auto makeOfferer(pcg32& masterRng) -> Offerer {
-    const HeadCount applicantNum{randInt(masterRng, 10, 20)};
-    return {applicantNum};
-}
-
-[[nodiscard]] auto makeRecruiter(pcg32& masterRng) -> Recruiter { return {makeOfferer(masterRng)}; }
 
 [[nodiscard]] auto makeHumanResourceManager(const AgentID id, const Market firmType)
     -> HumanResourceManager {
@@ -161,11 +145,26 @@ namespace labor::demander {
     return HumanResourceManager{std::move(companyBoard)};
 }
 
+[[nodiscard]] auto makePlanMemory(pcg32& masterRng) -> RecruitPlanMemory {
+    const Wage      wage{rand(masterRng, 10.0, 50.0)};
+    const HeadCount employ{randInt(masterRng, 10, 20)};
+    const HeadCount offer{randInt(masterRng, 10, 20)};
+    return {wage, employ, offer};
+}
+
+[[nodiscard]] auto makeResultMemory(pcg32& masterRng) -> RecruitResultMemory {
+    const HeadCount lastApplicants{randInt(masterRng, 10, 20)};
+    const HeadCount lastEmploy{randInt(masterRng, 5, 15)};
+    return {lastApplicants, lastEmploy};
+}
+
+[[nodiscard]] auto makeMemory(pcg32& masterRng) -> Memory {
+    return {makePlanMemory(masterRng), makeResultMemory(masterRng)};
+}
+
 [[nodiscard]] auto make(pcg32& masterRng, const AgentID id, const Market firmType)
     -> LaborDemander {
-    return {
-        makePlanner(masterRng), makeRecruiter(masterRng), makeHumanResourceManager(id, firmType)
-    };
+    return {makePlanner(masterRng), makeHumanResourceManager(id, firmType), makeMemory(masterRng)};
 }
 }  // namespace labor::demander
 

@@ -25,6 +25,7 @@ class [[nodiscard]] EmptyRosterPool {
     auto size() const -> std::size_t { return pool_.size(); }
     auto empty() const -> bool { return size() == 0UZ; }
     auto popBackEntry() -> RosterEntry& {
+        ASSERT(not empty());
         RosterEntry& out = pool_.back().get();
         pool_.pop_back();
         return out;
@@ -86,8 +87,6 @@ class [[nodiscard]] HumanResourceManager {
     }
 
   private:
-    template <typename T>
-    using RefWrapper = std::reference_wrapper<T>;
     CompanyBoard    companyBoard_;
     EmptyRosterPool emptyRosterPool_;
 };

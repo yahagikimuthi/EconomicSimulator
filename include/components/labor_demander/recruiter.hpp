@@ -55,123 +55,92 @@ class [[nodiscard]] OfferApplicants {
     std::vector<RefWrap<LaborEntry>> applicants_;
 };
 
-class [[nodiscard]] Offerer {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
+class [[nodiscard]] LedgerManager {
   public:
-    Offerer(const HeadCount lastApplicants) : lastApplicantNum_{lastApplicants} {}
+    LedgerManager() = default;
 
-    void startWorking(const HeadCount offerPlan) { ledgerManager_.makeNewPage(offerPlan); }
+    void makeNewPage(const HeadCount offerPlan) { offerPlan_ = offerPlan; }
+    auto remainOffer() const -> HeadCount { return remainOffer_; }
+    auto applicants() const -> HeadCount { return applicants_; }
+    void countUpOffer() { --remainOffer_; }
+    void addApplicants(const HeadCount add) { applicants_ += add; }
+    void addEmploy(const HeadCount add) { employ_ = add; }
+    auto publishResult() const -> RecruitmentResult {
+        return {.applicants = applicants_, .employ = employ_};
+    }
+    void reset() {
+        offerPlan_   = HeadCount{0.0};
+        remainOffer_ = HeadCount{0.0};
+        applicants_  = HeadCount{0.0};
+        employ_      = HeadCount{0.0};
+    }
 
-    void offer(LaborRequest& request) {
-        if (request.entryBox.empty()) return;
+  private:
+    HeadCount offerPlan_{0.0};
+    HeadCount remainOffer_{0.0};
+    HeadCount applicants_{0.0};
+    HeadCount employ_{0.0};
+};
+
+class [[nodiscard]] Recruiter {
+  public:
+    Recruiter() = default;
+
+    void post(
+        const AgentID id, const RecruitPlan& plan, tbb::concurrent_vector<LaborRequest>& requestBox
+    ) {
+        if (plan.offer == HeadCount{0.0}) return;
+        isPosting_ = true;
+        auto it{requestBox.emplace_back(id, plan.wage)};
+        myRequest_ = *it;
+        ledger_.makeNewPage(plan.offer);
+    }
+
+    void offer() {
+        if (not isPosting_) return;
+        if (myRequest_->entryBox.empty()) return;
 
         std::ranges::view auto applicants{
-            sortApplicants(ledgerManager_.remainOfferNum(), request.entryBox) |
-            std::views::take(ledgerManager_.remainOfferNum().value())
+            sortApplicants(ledger_.remainOffer(), myRequest_->entryBox) |
+            std::views::take(ledger_.remainOffer().value())
         };
 
         for (auto&& entry : applicants) {
             entry.isOffer = true;
             offerApplicants_.add(entry);
-            ledgerManager_.decrementRemainOfferNum();
+            ledger_.countUpOffer();
         }
-        ledgerManager_.addApplicant(HeadCount{request.entryBox.size()});
-    }
-
-    auto offerAcceptedApplicants() -> std::ranges::view auto {
-        return offerApplicants_.offerAcceptedApplicants();
-    }
-
-    void reset() {
-        lastApplicantNum_ = ledgerManager_.applicantNum();
-        ledgerManager_.reset();
-        offerApplicants_.clear();
-    }
-
-    auto lastApplicantNum() const -> HeadCount { return lastApplicantNum_; }
-
-  private:
-    class [[nodiscard]] {
-      public:
-        void makeNewPage(const HeadCount offerPlan) { offerPlan_ = offerPlan; }
-        auto remainOfferNum() const -> HeadCount { return remainOfferNum_; }
-        void decrementRemainOfferNum() { --remainOfferNum_; }
-        void addApplicant(HeadCount add) { applicantNum_ += add; }
-        auto applicantNum() const -> HeadCount { return applicantNum_; }
-        void reset() {
-            offerPlan_      = HeadCount{0.0};
-            remainOfferNum_ = HeadCount{0.0};
-            applicantNum_   = HeadCount{0.0};
-        }
-
-      private:
-        HeadCount offerPlan_{0.0};
-        HeadCount remainOfferNum_{0.0};
-        HeadCount applicantNum_{0.0};
-    } ledgerManager_;
-
-    OfferApplicants offerApplicants_;
-    HeadCount       lastApplicantNum_;
-};
-
-class [[nodiscard]] Recruiter {
-  public:
-    Recruiter(Offerer&& offerer) : offerer_{std::move(offerer)} {}
-    void post(
-        const AgentID id, const PostingInfo info, tbb::concurrent_vector<LaborRequest>& requestBox
-    ) {
-        if (info.offerNum == HeadCount{0.0}) return;
-        isPosting_ = true;
-        offerer_.startWorking(info.offerNum);
-        auto it{requestBox.emplace_back(id, info.wage)};
-        myRequest_ = *it;
-    }
-
-    void offer() {
-        if (not isPosting_) return;
-        offerer_.offer(*myRequest_);
+        ledger_.addApplicants(HeadCount{myRequest_->entryBox.size()});
     }
 
     void registerMember(AddRosterFn auto&& addRoster) {
         if (not isPosting_) return;
 
         HeadCount              employCnt{0.0};
-        std::ranges::view auto acceptApplicants{offerer_.offerAcceptedApplicants()};
+        std::ranges::view auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
         for (LaborEntry& acceptApplicant : acceptApplicants) {
             acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
             ++employCnt;
         }
-        ledgerManager_.addEmploying(employCnt);
+        ledger_.addEmploy(employCnt);
     }
+
+    auto publishResult() const -> RecruitmentResult { return ledger_.publishResult(); }
 
     void endStep() {
         myRequest_.reset();
-        ledgerManager_.reset();
-        offerer_.reset();
+        ledger_.reset();
+        offerApplicants_.clear();
         isPosting_ = false;
     }
-
-    auto lastApplicantNum() const -> HeadCount { return offerer_.lastApplicantNum(); }
-    auto employing() const -> HeadCount { return ledgerManager_.employing(); }
 
   private:
     template <typename U>
     using RefWrapper = std::reference_wrapper<U>;
 
     std::optional<LaborRequest&> myRequest_{std::nullopt};
-    class {
-      public:
-        void addEmploying(HeadCount add) { employing_ += add; }
-        void reset() { employing_ = HeadCount{0.0}; }
-        auto employing() const -> HeadCount { return employing_; }
-
-      private:
-        HeadCount employing_{0.0};
-    } ledgerManager_;
-
-    Offerer offerer_;
-    bool    isPosting_{false};
+    LedgerManager                ledger_;
+    OfferApplicants              offerApplicants_;
+    bool                         isPosting_{false};
 };
 }  // namespace abm::labor::demander
