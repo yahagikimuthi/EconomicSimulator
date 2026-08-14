@@ -48,25 +48,32 @@ class Employment {
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
     const double                productPower_;
 };
+
+class [[nodiscard]] JobSearchThreshold {
+  public:
+    JobSearchThreshold(const pcg32 rng, const double threshold)
+        : rng_{rng}, threshold_{threshold} {}
+    auto shouldSearch() const -> bool { return threshold_ < helper::rand(rng_); }
+
+  private:
+    mutable pcg32 rng_;
+    const double  threshold_;
+};
 }  // namespace abm::labor::supplier
 
 namespace abm {
 class LaborSupplier {
   public:
     LaborSupplier(
-        const pcg32                         rng,
-        const labor::supplier::JobHunter&&  jobHunter,
-        const labor::supplier::Employment&& employment,
-        const double                        jobSearchThreshold
+        const labor::supplier::JobHunter&&        jobHunter,
+        const labor::supplier::Employment&&       employment,
+        const labor::supplier::JobSearchThreshold jobSearchThreshold
     )
-        : rng_{rng},
-          jobHunter_{jobHunter},
-          employment_{employment},
-          jobSearchThreshold_{jobSearchThreshold} {}
+        : jobHunter_{jobHunter}, employment_{employment}, jobSearchThreshold_{jobSearchThreshold} {}
 
     void entry(const AgentID id, tbb::concurrent_vector<LaborRequest>& requestBox) {
         employment_.updateStatus();
-        if (not shouldSearchJob()) return;
+        if (not jobSearchThreshold_.shouldSearch()) return;
         if (requestBox.empty()) return;
 
         using Request = LaborRequest;
@@ -101,14 +108,8 @@ class LaborSupplier {
     }
 
   private:
-    auto shouldSearchJob() const -> bool {
-        if (not employment_.isEmployed()) return true;
-        return helper::rand(rng_) < jobSearchThreshold_;
-    }
-
-    mutable pcg32               rng_;
-    labor::supplier::JobHunter  jobHunter_;
-    labor::supplier::Employment employment_;
-    const double                jobSearchThreshold_;
+    labor::supplier::JobHunter          jobHunter_;
+    labor::supplier::Employment         employment_;
+    labor::supplier::JobSearchThreshold jobSearchThreshold_;
 };
 }  // namespace abm

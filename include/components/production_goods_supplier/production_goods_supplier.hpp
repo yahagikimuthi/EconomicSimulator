@@ -11,16 +11,14 @@
 #include "world/message.hpp"
 
 namespace abm {
-class [[nodiscard]] ProductionGoodsSupplier final
-    : public BaseGoodsSupplier<Market::productionGoods> {
+class [[nodiscard]] ProductionGoodsSupplier final : public BaseGoodsSupplier {
   public:
     ProductionGoodsSupplier(
         const base_goods::supplier::Planner&      planner,
         const production_goods::supplier::Trader& trader,
         base_goods::supplier::Producer&&          producer
     )
-        : BaseGoodsSupplier<Market::productionGoods>(planner, std::move(producer)),
-          trader_{trader} {}
+        : BaseGoodsSupplier(planner, std::move(producer)), trader_{trader} {}
 
     void post(
         const AgentID                                 id,

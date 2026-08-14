@@ -180,11 +180,16 @@ namespace labor::supplier {
     return Employment{productPower};
 }
 
-[[nodiscard]] auto make(pcg32& masterRng) -> LaborSupplier {
+[[nodiscard]] auto makeJobSearchThreshold(pcg32& masterRng) -> JobSearchThreshold {
     const pcg32  rng{makeSeed(masterRng), makeSeed(masterRng)};
     const double jobSearchThreshold{rand(masterRng, 0.01, 0.05)};
+    return {rng, jobSearchThreshold};
+}
+
+[[nodiscard]] auto make(pcg32& masterRng) -> LaborSupplier {
+    const pcg32 rng{makeSeed(masterRng), makeSeed(masterRng)};
     return LaborSupplier{
-        rng, makeJobHunter(masterRng), makeEmployment(masterRng), jobSearchThreshold
+        makeJobHunter(masterRng), makeEmployment(masterRng), makeJobSearchThreshold(masterRng)
     };
 }
 }  // namespace labor::supplier

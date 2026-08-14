@@ -14,14 +14,14 @@
 #include "world/message.hpp"
 
 namespace abm {
-class [[nodiscard]] ConsumerGoodsSupplier final : public BaseGoodsSupplier<Market::consumerGoods> {
+class [[nodiscard]] ConsumerGoodsSupplier final : public BaseGoodsSupplier {
   public:
     ConsumerGoodsSupplier(
         const base_goods::supplier::Planner&    planner,
         const consumer_goods::supplier::Trader& trader,
         base_goods::supplier::Producer&&        producer
     )
-        : BaseGoodsSupplier<Market::consumerGoods>(planner, std::move(producer)), trader_{trader} {}
+        : BaseGoodsSupplier(planner, std::move(producer)), trader_{trader} {}
 
     void post(const Money totalCost, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox) {
         const GoodsQuantity supply{producer_.product()};

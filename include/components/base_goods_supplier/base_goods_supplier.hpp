@@ -6,7 +6,6 @@
 #include "world/message.hpp"
 
 namespace abm {
-template <Market SupplyGoodsType>
 class [[nodiscard]] BaseGoodsSupplier {
   public:
     auto calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount
