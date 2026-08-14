@@ -5,8 +5,8 @@
 #include <pcg_random.hpp>
 
 #include "components/labor_demander/util.hpp"
+#include "components/util.hpp"
 #include "core/values/labor.hpp"
-#include "helper.hpp"
 
 namespace abm::labor::demander {
 class [[nodiscard]] WagePlanner {
@@ -23,7 +23,7 @@ class [[nodiscard]] WagePlanner {
 
   private:
     auto calcWage(const bool shouldRaise, const Wage& lastWage) const -> Wage {
-        const double alpha{std::abs(helper::randNormal(rng_, 0.0, adjustVol_, -1.0, 1.0))};
+        const double alpha{rng_.randNormal(0.0, adjustVol_, -1.0, 1.0)};
         const Wage   nextWage{lastWage * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(nextWage);
     }
@@ -36,8 +36,8 @@ class [[nodiscard]] WagePlanner {
         return Wage{std::max(wage.value(), std::numeric_limits<double>::epsilon())};
     }
 
-    mutable pcg32 rng_;
-    const double  adjustVol_;
+    mutable detail::RandomGenerator rng_;
+    const double                    adjustVol_;
 };
 
 class [[nodiscard]] OfferPlanner {
@@ -56,15 +56,15 @@ class [[nodiscard]] OfferPlanner {
 
   private:
     auto updateOfferRate(const HeadCount employPlan, const HeadCount actualEmploy) const -> double {
-        const double alpha{std::abs(helper::randNormal(rng_, 0.0, adjustVol_, -1.0, 1.0))};
+        const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0))};
         const bool   shouldRaise{actualEmploy < employPlan};
         const double next{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
         return std::max(1.0, next);
     }
 
-    mutable pcg32 rng_;
-    double        offerRate_;
-    const double  adjustVol_;
+    mutable detail::RandomGenerator rng_;
+    double                          offerRate_;
+    const double                    adjustVol_;
 };
 
 class [[nodiscard]] RequestPlanner {

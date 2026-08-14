@@ -135,9 +135,6 @@ class [[nodiscard]] Recruiter {
     }
 
   private:
-    template <typename U>
-    using RefWrapper = std::reference_wrapper<U>;
-
     std::optional<LaborRequest&> myRequest_{std::nullopt};
     LedgerManager                ledger_;
     OfferApplicants              offerApplicants_;

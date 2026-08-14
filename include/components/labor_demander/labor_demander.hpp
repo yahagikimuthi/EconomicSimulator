@@ -24,13 +24,13 @@ class [[nodiscard]] LaborDemander {
         const AgentID                         id,
         const HeadCount                       desiredEmploy,
         tbb::concurrent_vector<LaborRequest>& requestBox
-    ) PRE(desiredEmploy >= HeadCount{0.0}) {
+    ) PRE(desiredEmploy > HeadCount{0.0}) {
         isRecruiting_ = true;
-        const labor::demander::RecruitPlan info{requestPlanner_.judgePlan(
+        const labor::demander::RecruitPlan plan{requestPlanner_.judgePlan(
             memory_.rememberLastRecruitPlan(), memory_.rememberLastRecruitResult(), desiredEmploy
         )};
-        memory_.memorize(info);
-        recruiter_.post(id, info, requestBox);
+        memory_.memorize(plan);
+        recruiter_.post(id, plan, requestBox);
     }
 
     void offer() { recruiter_.offer(); }

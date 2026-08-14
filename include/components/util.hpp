@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <concepts>
+#include <cstdint>
 #include <limits>
 #include <pcg_random.hpp>
 #include <random>
@@ -38,6 +39,8 @@ class [[nodiscard]] RandomGenerator {
         std::uniform_int_distribution<int> dist{min, limit};
         return dist(rng_);
     }
+
+    auto makeSeed() -> std::uint64_t { return (static_cast<std::uint64_t>(rng_()) << 32) | rng_(); }
 
   private:
     pcg32 rng_;
