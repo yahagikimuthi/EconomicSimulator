@@ -33,7 +33,7 @@ class [[nodiscard]] ProductionGoodsSupplier final : public BaseGoodsSupplier {
 
     void endStep(detail::AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
         using namespace base_goods::supplier;
-        const TradingResult result{trader_.tradingResult()};
+        const TradeResult result{trader_.tradingResult()};
         assetPlus(result.sales);
         planner_.endStep(result.totalDemand, result.supply - result.soldAmount, dropBox);
         producer_.endStep(result.supply - result.soldAmount, dropBox);

@@ -51,7 +51,7 @@ class [[nodiscard]] OfferPlanner {
         const HeadCount          desiredEmploy
     ) -> HeadCount {
         offerRate_ = updateOfferRate(lastPlan.employ, lastRecruitment.employ);
-        return desiredEmploy * offerRate_;
+        return desiredEmploy * (1.0 + offerRate_);
     }
 
   private:
@@ -59,7 +59,7 @@ class [[nodiscard]] OfferPlanner {
         const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0))};
         const bool   shouldRaise{actualEmploy < employPlan};
         const double next{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
-        return std::max(1.0, next);
+        return std::max(0.0, next);
     }
 
     mutable detail::RandomGenerator rng_;

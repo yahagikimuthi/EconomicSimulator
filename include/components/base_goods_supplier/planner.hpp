@@ -83,7 +83,7 @@ class PostingInfoPlanner {
     PostingInfoPlanner(MarkupPlanner markupPlanner) : markupPlanner_{markupPlanner} {}
 
     auto judgePlan(const GoodsQuantity supply, const Money totalCost, const bool isSold)
-        -> PostingInfo {
+        -> TradePlan {
         const double markup{markupPlanner_.judgeMarkup(isSold)};
         const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
         return {.price = price, .supply = supply};
@@ -131,7 +131,7 @@ class [[nodiscard]] Planner {
           postingPlanner_{postingPlanner},
           demandForecastManager_{demandForecastManager} {}
 
-    auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> PostingInfo
+    auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> TradePlan
         PRE(supply >= GoodsQuantity{0.0}) PRE(totalCost >= Money{0.0}) {
         supplyPlan_ = supply;
         return postingPlanner_.judgePlan(supply, totalCost, log_.isSold);
