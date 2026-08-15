@@ -1,8 +1,10 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstdint>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <random>
 
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
@@ -12,7 +14,7 @@
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "components/util.hpp"
-#include "helper.hpp"
+#include "config.hpp"
 #include "world/message.hpp"
 
 namespace abm {
@@ -50,6 +52,11 @@ class [[nodiscard]] Logger {
     HighFive::File file_;
 };
 
+struct PCG32Seed {
+    const std::uint64_t state;
+    const std::uint64_t stream;
+};
+
 class [[nodiscard]] Engine {
   public:
     explicit Engine(const int totalStep);
@@ -79,7 +86,19 @@ class [[nodiscard]] Engine {
     const Step totalStep_;
     Step       currentStep_{0};
 
-    const helper::PCG32Seed seed_;
+    const PCG32Seed         seed_;
     detail::RandomGenerator rng_;
+
+    static auto generateSeed() -> PCG32Seed {
+        if (not config::setting::useRuntimeRandomSeed)
+            return {
+                .state = config::setting::fixedSeedState, .stream = config::setting::fixedSeedStream
+            };
+
+        std::random_device  rd;
+        const std::uint64_t state{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
+        const std::uint64_t stream{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
+        return {.state = state, .stream = stream};
+    }
 };
 }  // namespace abm

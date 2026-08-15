@@ -26,11 +26,9 @@
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
-#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm {
-using namespace helper;
 using detail::RandomGenerator;
 [[nodiscard]] auto makeFirmFinanceComponent(RandomGenerator& masterRng) -> FirmFinance {
     const Money asset{masterRng.rand(1000.0, 5000.0)};
@@ -59,7 +57,6 @@ using detail::RandomGenerator;
 
 namespace base_goods::supplier {
 [[nodiscard]] auto makeMarkupPlanner(RandomGenerator& masterRng) -> MarkupPlanner {
-    using namespace helper;
     const RandomGenerator rng{{masterRng.makeUint64(), masterRng.makeUint64()}};
     const double          log{masterRng.rand(0.1, 0.3)};
     const double          adjustVol{masterRng.rand(0.1, 0.4)};
@@ -197,9 +194,7 @@ namespace labor::supplier {
 }  // namespace labor::supplier
 
 Engine::Engine(const int totalStep)
-    : totalStep_{totalStep},
-      seed_{helper::generatePCG32Seed()},
-      rng_{pcg32{seed_.state, seed_.stream}} {
+    : totalStep_{totalStep}, seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";
         std::abort();
