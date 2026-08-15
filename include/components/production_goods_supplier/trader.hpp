@@ -16,7 +16,7 @@ class Trader final : public base_goods::supplier::Trader<Market::productionGoods
 
     void post(
         const AgentID                                 id,
-        const base_goods::supplier::PostingInfo       postingInfo,
+        const base_goods::supplier::TradePlan         postingInfo,
         tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
         const auto [pricePlan, supply] = postingInfo;

@@ -55,18 +55,24 @@ class [[nodiscard]] OfferApplicants {
     std::vector<RefWrap<LaborEntry>> applicants_;
 };
 
+struct OfferResult {
+    const HeadCount offer;
+    const HeadCount applicants;
+};
+
 class [[nodiscard]] Ledger {
   public:
     Ledger() = default;
 
     void makeNewPage(const HeadCount offerPlan) {
-        offerPlan_   = offerPlan;
+        remainOffer_ = offerPlan;
         wasPageMade_ = true;
     }
     auto remainOffer() const -> HeadCount { return remainOffer_; }
-    auto applicants() const -> HeadCount { return applicants_; }
-    void countUpOffer() { --remainOffer_; }
-    void addApplicants(const HeadCount add) { applicants_ += add; }
+    void readOfferResult(const OfferResult result) {
+        remainOffer_ -= result.offer;
+        applicants_ += result.applicants;
+    }
     void addEmploy(const HeadCount add) { employ_ = add; }
     auto publishResult() const -> std::optional<RecruitmentResult> {
         if (not wasPageMade_) return std::nullopt;
@@ -74,7 +80,6 @@ class [[nodiscard]] Ledger {
     }
     void reset() {
         if (not wasPageMade_) return;
-        offerPlan_   = HeadCount{0.0};
         remainOffer_ = HeadCount{0.0};
         applicants_  = HeadCount{0.0};
         employ_      = HeadCount{0.0};
@@ -93,18 +98,13 @@ class [[nodiscard]] Recruiter {
   public:
     Recruiter() = default;
 
-    void post(
-        const AgentID id, const RecruitPlan& plan, tbb::concurrent_vector<LaborRequest>& requestBox
-    ) {
-        if (plan.offer == HeadCount{0.0}) return;
-        isPosting_ = true;
-        auto it{requestBox.emplace_back(id, plan.wage)};
-        myRequest_ = *it;
+    void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) {
         ledger_.makeNewPage(plan.offer);
+        if (plan.offer == HeadCount{0.0}) return;
+        myRequest_ = laborMarket.request(id, plan.wage, plan.offer);
     }
 
     void offer() {
-        if (not isPosting_) return;
         if (myRequest_->entryBox.empty()) return;
 
         std::ranges::view auto applicants{
@@ -112,17 +112,18 @@ class [[nodiscard]] Recruiter {
             std::views::take(ledger_.remainOffer().value())
         };
 
+        HeadCount offerCnt{0.0};
         for (auto& entry : applicants) {
             entry.isOffer = true;
             offerApplicants_.add(entry);
-            ledger_.countUpOffer();
+            ++offerCnt;
         }
-        ledger_.addApplicants(HeadCount{myRequest_->entryBox.size()});
+        ledger_.readOfferResult(
+            {.offer = offerCnt, .applicants = HeadCount{myRequest_->entryBox.size()}}
+        );
     }
 
     void registerMember(AddRosterFn auto&& addRoster) {
-        if (not isPosting_) return;
-
         HeadCount              employCnt{0.0};
         std::ranges::view auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
         for (LaborEntry& acceptApplicant : acceptApplicants) {
@@ -140,13 +141,11 @@ class [[nodiscard]] Recruiter {
         myRequest_.reset();
         ledger_.reset();
         offerApplicants_.clear();
-        isPosting_ = false;
     }
 
   private:
     std::optional<LaborRequest&> myRequest_{std::nullopt};
     Ledger                       ledger_;
     OfferApplicants              offerApplicants_;
-    bool                         isPosting_{false};
 };
 }  // namespace abm::labor::demander

@@ -119,6 +119,25 @@ struct [[nodiscard]] LaborRequest {
     tbb::concurrent_vector<LaborEntry> entryBox;
 };
 
+class [[nodiscard]] LaborMarket {
+  public:
+    LaborMarket() = default;
+    auto requestBox() -> tbb::concurrent_vector<LaborRequest>& { return requestBox_; }
+    auto request(const AgentID id, const Wage wage, const HeadCount offerPlan)
+        -> LaborRequest& PRE(offerPlan >= HeadCount{0.0}) {
+        if (offerPlan == HeadCount{0.0}) return *invalidRequests_.emplace_back(id, wage);
+        return *requestBox_.emplace_back(id, wage);
+    }
+    void clear() {
+        requestBox_.clear();
+        invalidRequests_.clear();
+    }
+
+  private:
+    tbb::concurrent_vector<LaborRequest> requestBox_;
+    tbb::concurrent_vector<LaborRequest> invalidRequests_;
+};
+
 struct ConsumerGoodsRequest {
     const GoodsQuantity amount;
     GoodsQuantity       tradeAmount{0.0};

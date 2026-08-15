@@ -29,11 +29,11 @@ void Engine::run() {
 
 void Engine::runLabor() {
     for (BtoCFirm& firm : BtoCFirms_) {
-        labor::adjustWorkforce(firm.index, firm.consumerGoods, firm.labor, laborRequestBox_);
+        labor::adjustWorkforce(firm.index, firm.consumerGoods, firm.labor, laborMarket_);
     }
 
     for (HHold& hhold : hholds_) {
-        labor::jobEntry(hhold.index, hhold.labor, laborRequestBox_);
+        labor::jobEntry(hhold.index, hhold.labor, laborMarket_.requestBox());
     }
 
     for (BtoCFirm& firm : BtoCFirms_) {
@@ -152,7 +152,7 @@ void Engine::logging() {
 
 void Engine::reset() {
     dropBox_.clear();
-    laborRequestBox_.clear();
+    laborMarket_.clear();
     productionGoodsEntryBox_.clear();
     consumerGoodsEntryBox_.clear();
 }

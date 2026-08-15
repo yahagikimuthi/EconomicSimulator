@@ -140,9 +140,9 @@ namespace labor::demander {
 }
 
 [[nodiscard]] auto makeHumanResourceManager(const AgentID id, const Market firmType)
-    -> HumanResourceManager {
+    -> HumanResource {
     CompanyBoard companyBoard{id, firmType};
-    return HumanResourceManager{std::move(companyBoard)};
+    return HumanResource{std::move(companyBoard)};
 }
 
 [[nodiscard]] auto makePlanMemory(pcg32& masterRng) -> RecruitPlanMemory {

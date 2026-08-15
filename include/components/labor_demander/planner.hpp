@@ -11,23 +11,17 @@
 namespace abm::labor::demander {
 class [[nodiscard]] WagePlanner {
   public:
-    WagePlanner(const pcg32 rng, const double adjustVol) : rng_{rng}, adjustVol_{adjustVol} {}
+    WagePlanner(const detail::RandomGenerator rng, const double adjustVol)
+        : rng_{rng}, adjustVol_{adjustVol} {}
 
-    auto judgeWage(const RecruitPlan& lastPlan, const RecruitmentResult& lastRecruitment) const
-        -> Wage {
-        const Wage nextWage{
-            calcWage(shouldRaise(lastPlan.offer, lastRecruitment.applicants), lastPlan.wage)
-        };
-        return nextWage;
-    }
-
-  private:
-    auto calcWage(const bool shouldRaise, const Wage& lastWage) const -> Wage {
+    auto judgeWage(const RecruitPlan& lastPlan, const RecruitmentResult& lastResult) const -> Wage {
         const double alpha{rng_.randNormal(0.0, adjustVol_, -1.0, 1.0)};
-        const Wage   nextWage{lastWage * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        const bool   raise{shouldRaise(lastPlan.offer, lastResult.applicants)};
+        const Wage   nextWage{lastPlan.wage * (raise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(nextWage);
     }
 
+  private:
     static auto shouldRaise(const HeadCount offerPlan, const HeadCount applicants) -> bool {
         return applicants < offerPlan;
     }
@@ -42,15 +36,15 @@ class [[nodiscard]] WagePlanner {
 
 class [[nodiscard]] OfferPlanner {
   public:
-    OfferPlanner(const pcg32 rng, const double offerRate, const double adjustVol)
+    OfferPlanner(const detail::RandomGenerator rng, const double offerRate, const double adjustVol)
         : rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
 
-    auto judgeOffer(
+    auto judgePlan(
         const RecruitPlan&       lastPlan,
-        const RecruitmentResult& lastRecruitment,
+        const RecruitmentResult& lastResult,
         const HeadCount          desiredEmploy
     ) -> HeadCount {
-        offerRate_ = calcOfferRate(lastPlan.employ, lastRecruitment.employ);
+        offerRate_ = calcOfferRate(lastPlan.employ, lastResult.employ);
         return desiredEmploy * (1.0 + offerRate_);
     }
 
@@ -74,13 +68,13 @@ class [[nodiscard]] RequestPlanner {
 
     auto judgePlan(
         const RecruitPlan&       lastPlan,
-        const RecruitmentResult& lastRecruitment,
+        const RecruitmentResult& lastResult,
         const HeadCount          desiredEmploy
     ) -> RecruitPlan {
         return {
-            .wage   = wagePlanner_.judgeWage(lastPlan, lastRecruitment),
+            .wage   = wagePlanner_.judgeWage(lastPlan, lastResult),
             .employ = desiredEmploy,
-            .offer  = offerPlanner_.judgeOffer(lastPlan, lastRecruitment, desiredEmploy)
+            .offer  = offerPlanner_.judgePlan(lastPlan, lastResult, desiredEmploy)
         };
     }
 

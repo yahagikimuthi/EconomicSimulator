@@ -52,8 +52,8 @@ class [[nodiscard]] RecruitResultMemory {
   public:
     RecruitResultMemory(const HeadCount lastApplicants, const HeadCount lastEmploy)
         : lastResult_{.applicants = lastApplicants, .employ = lastEmploy} {}
-    void memorize(const RecruitmentResult& result) {
-        currentResult_ = result;
+    void memorize(const RecruitmentResult& newResult) {
+        currentResult_ = newResult;
         wasMemorized_  = true;
     }
     auto rememberLog() const -> const RecruitmentResult& { return lastResult_; }
@@ -75,12 +75,11 @@ class [[nodiscard]] Memory {
     Memory(const RecruitPlanMemory& planMemory, const RecruitResultMemory& resultMemory)
         : planMemory_{planMemory}, resultMemory_{resultMemory} {}
 
-    void memorize(const RecruitPlan& newRecruitPlan) { planMemory_.memorize(newRecruitPlan); }
-    void memorize(const RecruitmentResult& result) { resultMemory_.memorize(result); }
+    void memorize(const RecruitPlan& newPlan) { planMemory_.memorize(newPlan); }
+    void memorize(const RecruitmentResult& newResult) { resultMemory_.memorize(newResult); }
     auto rememberLastRecruitPlan() const -> const RecruitPlan& { return planMemory_.rememberLog(); }
     auto rememberLastRecruitResult() const -> const RecruitmentResult& {
         return resultMemory_.rememberLog();
-        ;
     }
     void endStep(CensusDropBox& dropBox) {
         planMemory_.endStep(dropBox);

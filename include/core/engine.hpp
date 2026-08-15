@@ -69,7 +69,7 @@ class [[nodiscard]] Engine {
     std::vector<BtoBFirm> BtoBFirms_;
     std::vector<HHold>    hholds_;
 
-    tbb::concurrent_vector<LaborRequest>         laborRequestBox_;
+    LaborMarket                                  laborMarket_;
     tbb::concurrent_vector<ProductionGoodsEntry> productionGoodsEntryBox_;
     tbb::concurrent_vector<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
 

@@ -11,3 +11,4 @@ scripts/__pycache__/
 *.md
 .github/
 core.*
+uml/

@@ -26,9 +26,9 @@ class [[nodiscard]] EmptyRosterPool {
     auto empty() const -> bool { return size() == 0UZ; }
     auto popBackEntry() -> RosterEntry& {
         ASSERT(not empty());
-        RosterEntry& out = pool_.back().get();
+        RosterEntry& back = pool_.back().get();
         pool_.pop_back();
-        return out;
+        return back;
     }
     void add(RosterEntry& entry) { pool_.emplace_back(std::ref(entry)); }
 
@@ -36,9 +36,9 @@ class [[nodiscard]] EmptyRosterPool {
     std::vector<RefWrap<RosterEntry>> pool_;
 };
 
-class [[nodiscard]] HumanResourceManager {
+class [[nodiscard]] HumanResource {
   public:
-    HumanResourceManager(CompanyBoard&& companyBoard) : companyBoard_{std::move(companyBoard)} {}
+    HumanResource(CompanyBoard&& companyBoard) : companyBoard_{std::move(companyBoard)} {}
 
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {

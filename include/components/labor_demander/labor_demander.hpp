@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <optional>
 
 #include "components/labor_demander/hr_manager.hpp"
@@ -15,44 +14,41 @@ namespace abm {
 class [[nodiscard]] LaborDemander {
   public:
     LaborDemander(
-        const labor::demander::RequestPlanner&        offerPlanner,
-        const labor::demander::HumanResourceManager&& hrManager,
-        const labor::demander::Memory&                memory
+        const labor::demander::RequestPlanner& offerPlanner,
+        const labor::demander::HumanResource&& humanResource,
+        const labor::demander::Memory&         memory
     )
-        : requestPlanner_{offerPlanner}, hrManager_{hrManager}, memory_{memory} {}
+        : requestPlanner_{offerPlanner}, humanResource_{humanResource}, memory_{memory} {}
 
-    void post(
-        const AgentID                         id,
-        const HeadCount                       desiredEmploy,
-        tbb::concurrent_vector<LaborRequest>& requestBox
-    ) PRE(desiredEmploy > HeadCount{0.0}) {
+    void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket)
+        PRE(desiredEmploy > HeadCount{0.0}) {
         const labor::demander::RecruitPlan plan{requestPlanner_.judgePlan(
             memory_.rememberLastRecruitPlan(), memory_.rememberLastRecruitResult(), desiredEmploy
         )};
         memory_.memorize(plan);
-        recruiter_.post(id, plan, requestBox);
+        recruiter_.post(id, plan, laborMarket);
     }
 
     void offer() { recruiter_.offer(); }
 
     void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0}) {
-        hrManager_.layOffs(layOffsCnt);
+        humanResource_.layOffs(layOffsCnt);
     }
 
     void registerMember(Workspace& workspace) {
         recruiter_.registerMember([&](const AgentID id, const Wage wage) -> RosterEntry& {
-            return hrManager_.addRoster(id, wage, workspace);
+            return humanResource_.addRoster(id, wage, workspace);
         });
     };
 
-    void acceptResignation() { hrManager_.acceptResignation(); }
+    void acceptResignation() { humanResource_.acceptResignation(); }
 
     auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
-        return hrManager_.employeeCnt();
+        return humanResource_.employeeCnt();
     }
 
     auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
-        return static_cast<Money>(hrManager_.sumWage());
+        return static_cast<Money>(humanResource_.sumWage());
     }
 
     void endStep(CensusDropBox& dropBox) {
@@ -66,9 +62,9 @@ class [[nodiscard]] LaborDemander {
     }
 
   private:
-    labor::demander::RequestPlanner       requestPlanner_;
-    labor::demander::Recruiter            recruiter_;
-    labor::demander::HumanResourceManager hrManager_;
-    labor::demander::Memory               memory_;
+    labor::demander::RequestPlanner requestPlanner_;
+    labor::demander::Recruiter      recruiter_;
+    labor::demander::HumanResource  humanResource_;
+    labor::demander::Memory         memory_;
 };
 }  // namespace abm

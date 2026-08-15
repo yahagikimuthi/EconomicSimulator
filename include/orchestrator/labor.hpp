@@ -11,14 +11,14 @@
 
 namespace abm::labor {
 void adjustWorkforce(
-    const AgentIndex&                     index,
-    const ConsumerGoodsSupplier&          goodsSupplier,
-    LaborDemander&                        laborDemander,
-    tbb::concurrent_vector<LaborRequest>& requestBox
+    const AgentIndex&            index,
+    const ConsumerGoodsSupplier& goodsSupplier,
+    LaborDemander&               laborDemander,
+    LaborMarket&                 laborMarket
 ) {
     const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
     if (desiredEmploy > HeadCount{0.0}) {
-        laborDemander.post(index.id(), desiredEmploy, requestBox);
+        laborDemander.post(index.id(), desiredEmploy, laborMarket);
     } else if (desiredEmploy < HeadCount{0.0}) {
         laborDemander.layOffs(-desiredEmploy);
     }
