@@ -136,20 +136,14 @@ class [[nodiscard]] LaborMarket {
         std::ranges::subrange_kind::sized>;
 
     LaborMarket() = default;
-    auto requestBox() -> RequestBoxT { return validRequests_; }
-    auto request(const AgentID id, const Wage wage, const HeadCount offerPlan)
-        -> LaborRequest& PRE(offerPlan >= HeadCount{0.0}) {
-        if (offerPlan == HeadCount{0.0}) return *invalidRequests_.emplace_back(id, wage);
-        return *validRequests_.emplace_back(id, wage);
+    auto requestBox() -> RequestBoxT { return requestBox_; }
+    auto request(const AgentID id, const Wage wage) -> LaborRequest& {
+        return *requestBox_.emplace_back(id, wage);
     }
-    void clear() {
-        validRequests_.clear();
-        invalidRequests_.clear();
-    }
+    void clear() { requestBox_.clear(); }
 
   private:
-    tbb::concurrent_vector<LaborRequest> validRequests_;
-    tbb::concurrent_vector<LaborRequest> invalidRequests_;
+    tbb::concurrent_vector<LaborRequest> requestBox_;
 };
 
 struct ConsumerGoodsRequest {

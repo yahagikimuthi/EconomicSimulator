@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <ranges>
 #include <utility>
@@ -104,13 +105,31 @@ class [[nodiscard]] Ledger {
     bool      wasPageMade_{false};
 };
 
+class [[nodiscard]] MarketMediator {
+  public:
+    MarketMediator(const AgentID id, LaborMarket& market)
+        : id_{id}, nullRequest_{id_, Wage{1.0}}, market_{market} {}
+
+    auto entry(const RecruitPlan& plan) -> LaborRequest& {
+        if (plan.offer > HeadCount{0.0}) return market_.request(id_, plan.wage);
+        std::destroy_at(&nullRequest_);
+        std::construct_at(&nullRequest_, id_, plan.wage);
+        return nullRequest_;
+    }
+
+  private:
+    const AgentID id_;
+    LaborRequest  nullRequest_;
+    LaborMarket&  market_;
+};
+
 class [[nodiscard]] Recruiter {
   public:
     Recruiter() = default;
 
     void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) {
         ledger_.makeNewPage(plan.offer);
-        myRequest_ = laborMarket.request(id, plan.wage, plan.offer);
+        myRequest_ = laborMarket.request(id, plan.wage);
     }
 
     void offer() {
