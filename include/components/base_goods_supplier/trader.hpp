@@ -41,7 +41,7 @@ class LedgerManager {
         return isExcessDemand(demand) ? inventory_ : demand;
     }
 
-    auto tradingResult() const -> TradingResult {
+    auto tradingResult() const -> TradeResult {
         return {
             .supply      = supply_,
             .soldAmount  = supply_ - inventory_,
@@ -87,7 +87,7 @@ class Trader {
         ledgerManager_.add(myEntry_->price, salesAmount);
     }
 
-    auto tradingResult() const -> TradingResult { return ledgerManager_.tradingResult(); }
+    auto tradingResult() const -> TradeResult { return ledgerManager_.tradingResult(); }
 
     void endStep() { myEntry_.reset(), isPosting_ = false, ledgerManager_.reset(); }
 

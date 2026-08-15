@@ -14,7 +14,7 @@ class Trader final : public base_goods::supplier::Trader<Market::consumerGoods> 
     Trader(const pcg32 rng) : base_goods::supplier::Trader<Market::consumerGoods>::Trader(rng) {}
 
     void post(
-        const base_goods::supplier::PostingInfo     postingInfo,
+        const base_goods::supplier::TradePlan       postingInfo,
         tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) {
         if (postingInfo.supply == GoodsQuantity{0.0}) return;
