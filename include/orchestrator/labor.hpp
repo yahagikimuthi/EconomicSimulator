@@ -24,12 +24,8 @@ void adjustWorkforce(
     }
 }
 
-void jobEntry(
-    const AgentIndex&                     index,
-    LaborSupplier&                        laborSupplier,
-    tbb::concurrent_vector<LaborRequest>& requestBox
-) {
-    laborSupplier.entry(index.id(), requestBox);
+void jobEntry(const AgentIndex& index, LaborSupplier& laborSupplier, LaborMarket& laborMarket) {
+    laborSupplier.entry(index.id(), laborMarket.requestBox());
 }
 
 void offer(LaborDemander& laborDemander) { laborDemander.offer(); }

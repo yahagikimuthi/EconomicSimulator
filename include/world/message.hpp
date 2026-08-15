@@ -4,8 +4,8 @@
 #include <atomic>
 #include <deque>
 #include <optional>
+#include <ranges>
 
-#include "components/util.hpp"
 #include "config.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
@@ -110,11 +110,16 @@ struct LaborEntry {
 };
 
 struct [[nodiscard]] LaborRequest {
+    using EntryBoxT = std::ranges::subrange<
+        tbb::concurrent_vector<LaborEntry>::iterator,
+        tbb::concurrent_vector<LaborEntry>::iterator,
+        std::ranges::subrange_kind::sized>;
+
     LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
     auto entry(const AgentID id, const double productPower) -> LaborEntry& {
         return *entryBox_.emplace_back(id, productPower, *this);
     }
-    auto entryBox() -> tbb::concurrent_vector<LaborEntry> { return entryBox_; }
+    auto entryBox() -> EntryBoxT { return entryBox_; }
 
     const AgentID firmID;
     const Wage    wage;
@@ -125,8 +130,13 @@ struct [[nodiscard]] LaborRequest {
 
 class [[nodiscard]] LaborMarket {
   public:
+    using RequestBoxT = std::ranges::subrange<
+        tbb::concurrent_vector<LaborRequest>::iterator,
+        tbb::concurrent_vector<LaborRequest>::iterator,
+        std::ranges::subrange_kind::sized>;
+
     LaborMarket() = default;
-    auto requestBox() -> tbb::concurrent_vector<LaborRequest>& { return requestBox_; }
+    auto requestBox() -> RequestBoxT { return requestBox_; }
     auto request(const AgentID id, const Wage wage, const HeadCount offerPlan)
         -> LaborRequest& PRE(offerPlan >= HeadCount{0.0}) {
         if (offerPlan == HeadCount{0.0}) return *invalidRequests_.emplace_back(id, wage);

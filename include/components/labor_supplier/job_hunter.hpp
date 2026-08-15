@@ -17,7 +17,7 @@
 
 namespace abm::labor::supplier {
 inline void pickSample(
-    tbb::concurrent_vector<LaborRequest>&              requestBox,
+    LaborMarket::RequestBoxT&                          requestBox,
     std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
     pcg32&                                             rng,
     const int                                          sampleCnt
@@ -46,10 +46,7 @@ inline void sortSample(
 }
 
 [[nodiscard]] inline auto pickJobs(
-    tbb::concurrent_vector<LaborRequest>& requestBox,
-    pcg32&                                rng,
-    const int                             sampleCnt,
-    const int                             entryCnt
+    LaborMarket::RequestBoxT requestBox, pcg32& rng, const int sampleCnt, const int entryCnt
 ) -> std::ranges::view auto {
     using Request = LaborRequest;
     static thread_local std::vector<std::reference_wrapper<Request>> sampleRequest;
@@ -85,11 +82,11 @@ class [[nodiscard]] JobHunter {
     JobHunter(const detail::RandomGenerator rng) : rng_{rng} {}
 
     void entry(
-        IsAlignedFn auto&&                    isAligned,
-        MakeEntrySheetFn auto&&               makeEntrySheet,
-        tbb::concurrent_vector<LaborRequest>& requestBox,
-        const int                             sampleCnt = config::labor_supplier::jobSampleCnt,
-        const int                             entryCnt  = config::labor_supplier::jobEntryCnt
+        IsAlignedFn auto&&              isAligned,
+        MakeEntrySheetFn auto&&         makeEntrySheet,
+        const LaborMarket::RequestBoxT& requestBox,
+        const int                       sampleCnt = config::labor_supplier::jobSampleCnt,
+        const int                       entryCnt  = config::labor_supplier::jobEntryCnt
     ) PRE(entryCnt > 0) {
         using Request = LaborRequest;
         std::ranges::view auto alignedRequests{

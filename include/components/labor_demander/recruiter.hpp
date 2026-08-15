@@ -14,7 +14,7 @@
 #include "world/message.hpp"
 
 namespace abm::labor::demander {
-inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEntry> entryBox)
+inline auto sortApplicants(const HeadCount offer, LaborRequest::EntryBoxT entryBox)
     -> std::ranges::view auto {
     using EntryRef = std::reference_wrapper<LaborEntry>;
     static thread_local std::vector<EntryRef> applicants;

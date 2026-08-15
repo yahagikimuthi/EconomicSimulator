@@ -33,7 +33,7 @@ void Engine::runLabor() {
     }
 
     for (HHold& hhold : hholds_) {
-        labor::jobEntry(hhold.index, hhold.labor, laborMarket_.requestBox());
+        labor::jobEntry(hhold.index, hhold.labor, laborMarket_);
     }
 
     for (BtoCFirm& firm : BtoCFirms_) {

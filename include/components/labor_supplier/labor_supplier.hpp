@@ -71,7 +71,7 @@ class LaborSupplier {
     )
         : jobHunter_{jobHunter}, employment_{employment}, jobSearchThreshold_{jobSearchThreshold} {}
 
-    void entry(const AgentID id, tbb::concurrent_vector<LaborRequest>& requestBox) {
+    void entry(const AgentID id, LaborMarket::RequestBoxT requestBox) {
         employment_.updateStatus();
         if (not jobSearchThreshold_.shouldSearch()) return;
         if (requestBox.empty()) return;
