@@ -17,7 +17,7 @@ namespace abm {
 class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Market::consumerGoods> {
   public:
     ConsumerGoodsDemander(
-        const detail::RandomGenerator                rng,
+        const RandomGenerator                        rng,
         const base_goods::demander::BudgetCalculator budgetCalculator,
         const Step                                   myPhase
     )

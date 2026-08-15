@@ -21,7 +21,7 @@ namespace abm::base_goods::supplier {
 
 class [[nodiscard]] MarkupPlanner {
   public:
-    MarkupPlanner(const detail::RandomGenerator rng, const double log, const double adjustVol)
+    MarkupPlanner(const RandomGenerator rng, const double log, const double adjustVol)
         : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
 
     auto judgeMarkup(const bool isSold) -> double {
@@ -43,10 +43,10 @@ class [[nodiscard]] MarkupPlanner {
         return markupGuard(nextMarkup);
     }
 
-    mutable detail::RandomGenerator rng_;
-    double                          log_;
-    double                          plan_{};
-    const double                    adjustVol_;
+    mutable RandomGenerator rng_;
+    double                  log_;
+    double                  plan_{};
+    const double            adjustVol_;
 };
 
 class [[nodiscard]] PricePlanner {

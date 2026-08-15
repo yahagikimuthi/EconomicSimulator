@@ -29,7 +29,6 @@
 #include "world/message.hpp"
 
 namespace abm {
-using detail::RandomGenerator;
 [[nodiscard]] auto makeFirmFinanceComponent(RandomGenerator& masterRng) -> FirmFinance {
     const Money asset{masterRng.rand(1000.0, 5000.0)};
     return FirmFinance{asset};

@@ -32,12 +32,11 @@ class [[nodiscard]] BaseGoodsDemander {
 
   protected:
     BaseGoodsDemander(
-        const detail::RandomGenerator                rng,
-        const base_goods::demander::BudgetCalculator budgetCalculator
+        const RandomGenerator rng, const base_goods::demander::BudgetCalculator budgetCalculator
     )
         : rng_{rng}, budgetCalculator_{budgetCalculator} {}
 
-    mutable detail::RandomGenerator        rng_;
+    mutable RandomGenerator                rng_;
     std::optional<const Request&>          myRequest_{std::nullopt};
     bool                                   isPosting_{false};
     base_goods::demander::BudgetCalculator budgetCalculator_;

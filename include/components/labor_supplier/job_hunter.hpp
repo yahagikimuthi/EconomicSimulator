@@ -19,7 +19,7 @@ namespace abm::labor::supplier {
 inline void pickSample(
     LaborMarket::RequestBoxT&                          requestBox,
     std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
-    detail::RandomGenerator&                           rng,
+    RandomGenerator&                                   rng,
     const int                                          sampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
@@ -47,7 +47,7 @@ inline void sortSample(
 
 [[nodiscard]] inline auto pickJobs(
     LaborMarket::RequestBoxT requestBox,
-    detail::RandomGenerator& rng,
+    RandomGenerator&         rng,
     const int                sampleCnt,
     const int                entryCnt
 ) -> std::ranges::view auto {
@@ -82,7 +82,7 @@ class [[nodiscard]] MyEntries {
 
 class [[nodiscard]] JobHunter {
   public:
-    JobHunter(const detail::RandomGenerator rng) : rng_{rng} {}
+    JobHunter(const RandomGenerator rng) : rng_{rng} {}
 
     void entry(
         IsAlignedFn auto&&              isAligned,
@@ -120,9 +120,9 @@ class [[nodiscard]] JobHunter {
         return offered.front();
     }
 
-    mutable detail::RandomGenerator rng_;
-    MyEntries                       myEntries_;
-    std::optional<LaborEntry&>      acceptedEntry_{std::nullopt};
-    bool                            isPosting_{false};
+    mutable RandomGenerator    rng_;
+    MyEntries                  myEntries_;
+    std::optional<LaborEntry&> acceptedEntry_{std::nullopt};
+    bool                       isPosting_{false};
 };
 }  // namespace abm::labor::supplier

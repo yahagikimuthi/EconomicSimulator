@@ -11,7 +11,7 @@
 namespace abm::labor::demander {
 class [[nodiscard]] WagePlanner {
   public:
-    WagePlanner(const detail::RandomGenerator rng, const double adjustVol)
+    WagePlanner(const RandomGenerator rng, const double adjustVol)
         : rng_{rng}, adjustVol_{adjustVol} {}
 
     auto judgeWage(const RecruitPlan& lastPlan, const RecruitResult& lastResult) const -> Wage {
@@ -30,13 +30,13 @@ class [[nodiscard]] WagePlanner {
         return Wage{std::max(wage.value(), std::numeric_limits<double>::epsilon())};
     }
 
-    mutable detail::RandomGenerator rng_;
-    const double                    adjustVol_;
+    mutable RandomGenerator rng_;
+    const double            adjustVol_;
 };
 
 class [[nodiscard]] OfferPlanner {
   public:
-    OfferPlanner(const detail::RandomGenerator rng, const double offerRate, const double adjustVol)
+    OfferPlanner(const RandomGenerator rng, const double offerRate, const double adjustVol)
         : rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
 
     auto judgePlan(
@@ -54,9 +54,9 @@ class [[nodiscard]] OfferPlanner {
         return std::max(0.0, next);
     }
 
-    mutable detail::RandomGenerator rng_;
-    double                          offerRate_;
-    const double                    adjustVol_;
+    mutable RandomGenerator rng_;
+    double                  offerRate_;
+    const double            adjustVol_;
 };
 
 class [[nodiscard]] RequestPlanner {

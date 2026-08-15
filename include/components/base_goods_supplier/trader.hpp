@@ -91,12 +91,12 @@ class Trader {
     void endStep() { myEntry_.reset(), isPosting_ = false, ledgerManager_.reset(); }
 
   protected:
-    Trader(const detail::RandomGenerator rng) : rng_{rng} {}
+    Trader(const RandomGenerator rng) : rng_{rng} {}
 
-    mutable detail::RandomGenerator rng_;
-    std::optional<Entry&>           myEntry_{std::nullopt};
-    LedgerManager                   ledgerManager_;
-    bool                            isPosting_{false};
+    mutable RandomGenerator rng_;
+    std::optional<Entry&>   myEntry_{std::nullopt};
+    LedgerManager           ledgerManager_;
+    bool                    isPosting_{false};
 
   private:
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox

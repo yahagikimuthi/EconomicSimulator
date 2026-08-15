@@ -18,8 +18,7 @@ class [[nodiscard]] ProductionGoodsDemander final
     : public BaseGoodsDemander<Market::productionGoods> {
   public:
     ProductionGoodsDemander(
-        const detail::RandomGenerator                rng,
-        const base_goods::demander::BudgetCalculator budgetCalculator
+        const RandomGenerator rng, const base_goods::demander::BudgetCalculator budgetCalculator
     )
         : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, budgetCalculator) {}
 

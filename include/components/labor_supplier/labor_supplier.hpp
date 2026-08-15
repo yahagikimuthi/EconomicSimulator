@@ -51,13 +51,13 @@ class Employment {
 
 class [[nodiscard]] JobSearchThreshold {
   public:
-    JobSearchThreshold(const detail::RandomGenerator rng, const double threshold)
+    JobSearchThreshold(const RandomGenerator rng, const double threshold)
         : rng_{rng}, threshold_{threshold} {}
     auto shouldSearch() const -> bool { return threshold_ < rng_.rand(); }
 
   private:
-    mutable detail::RandomGenerator rng_;
-    const double                    threshold_;
+    mutable RandomGenerator rng_;
+    const double            threshold_;
 };
 }  // namespace abm::labor::supplier
 

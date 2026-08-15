@@ -30,7 +30,7 @@ class [[nodiscard]] ConsumerGoodsSupplier final : public BaseGoodsSupplier {
 
     void trade() { trader_.trade(); }
 
-    void endStep(detail::AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
+    void endStep(AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
         using namespace base_goods::supplier;
         const TradeResult result{trader_.tradingResult()};
         assetPlus(result.sales);

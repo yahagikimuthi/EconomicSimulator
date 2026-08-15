@@ -86,8 +86,8 @@ class [[nodiscard]] Engine {
     const Step totalStep_;
     Step       currentStep_{0};
 
-    const PCG32Seed         seed_;
-    detail::RandomGenerator rng_;
+    const PCG32Seed seed_;
+    RandomGenerator rng_;
 
     static auto generateSeed() -> PCG32Seed {
         if (not config::setting::useRuntimeRandomSeed)

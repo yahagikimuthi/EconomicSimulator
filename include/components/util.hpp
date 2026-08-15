@@ -1,9 +1,9 @@
 #pragma once
 
-#include <oneapi/tbb/concurrent_vector.h>
 #include <algorithm>
 #include <concepts>
 #include <cstdint>
+#include <functional>
 #include <iterator>
 #include <limits>
 #include <pcg_random.hpp>
@@ -11,9 +11,10 @@
 #include <ranges>
 #include <utility>
 
+#include "core/base.hpp"
 #include "core/values/common.hpp"
 
-namespace abm::detail {
+namespace abm {
 template <typename F>
 concept AssetPlusFn = requires(F f, const Money money) {
     { f(money) } -> std::same_as<void>;
@@ -93,4 +94,4 @@ class [[nodiscard]] RandomGenerator {
   private:
     pcg32 rng_;
 };
-}  // namespace abm::detail
+}  // namespace abm

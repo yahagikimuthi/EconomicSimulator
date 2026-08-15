@@ -12,7 +12,7 @@
 namespace abm::consumer_goods::supplier {
 class Trader final : public base_goods::supplier::Trader<Market::consumerGoods> {
   public:
-    Trader(const detail::RandomGenerator rng)
+    Trader(const RandomGenerator rng)
         : base_goods::supplier::Trader<Market::consumerGoods>::Trader(rng) {}
 
     void post(
