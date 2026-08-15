@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
+#include "components/util.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
@@ -80,7 +81,7 @@ class Trader {
         if (totalDemand == GoodsQuantity{0.0}) return;
         const GoodsQuantity salesAmount{ledgerManager_.salesAmount(totalDemand)};
         ledgerManager_.isExcessDemand(totalDemand)
-            ? performRationedTrade(myEntry_->supply, rng_, requestBox)
+            ? performRationedTrade(myEntry_->supply, rng_.get(), requestBox)
             : performFullTrade(requestBox);
         ledgerManager_.add(myEntry_->price, salesAmount);
     }
@@ -90,12 +91,12 @@ class Trader {
     void endStep() { myEntry_.reset(), isPosting_ = false, ledgerManager_.reset(); }
 
   protected:
-    Trader(const pcg32 rng) : rng_{rng} {}
+    Trader(const detail::RandomGenerator rng) : rng_{rng} {}
 
-    pcg32                 rng_;
-    std::optional<Entry&> myEntry_{std::nullopt};
-    LedgerManager         ledgerManager_;
-    bool                  isPosting_{false};
+    detail::RandomGenerator rng_;
+    std::optional<Entry&>   myEntry_{std::nullopt};
+    LedgerManager           ledgerManager_;
+    bool                    isPosting_{false};
 
   private:
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox

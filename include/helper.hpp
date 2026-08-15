@@ -1,9 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <concepts>
 #include <functional>
-#include <limits>
 #include <pcg_random.hpp>
 #include <random>
 #include <utility>
@@ -33,31 +31,6 @@ struct PCG32Seed {
 
 [[nodiscard]] constexpr auto makeSeed(pcg32& rng) -> std::uint64_t {
     return (static_cast<std::uint64_t>(rng()) << 32 | rng());
-}
-
-[[nodiscard]] constexpr auto rand(
-    std::uniform_random_bit_generator auto& rng, const double min = 0.0, const double max = 1.0
-) -> double {
-    std::uniform_real_distribution<double> dist{min, max};
-    return dist(rng);
-}
-
-[[nodiscard]] constexpr auto randInt(
-    std::uniform_random_bit_generator auto& rng, const int min, const int max
-) -> int PRE(min <= max) {
-    std::uniform_int_distribution<int> dist{min, max};
-    return dist(rng);
-}
-
-[[nodiscard]] constexpr auto randNormal(
-    std::uniform_random_bit_generator auto& rng,
-    const double                            mean   = 0.0,
-    const double                            stddev = 1.0,
-    const double                            min    = -std::numeric_limits<double>::infinity(),
-    const double                            max    = std::numeric_limits<double>::infinity()
-) -> double PRE(stddev != 0.0) PRE(min <= max) {
-    std::normal_distribution<double> dist{mean, stddev};
-    return std::clamp(dist(rng), min, max);
 }
 
 template <std::ranges::range Container, typename Proj = std::identity>

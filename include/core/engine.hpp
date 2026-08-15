@@ -11,6 +11,7 @@
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
+#include "components/util.hpp"
 #include "helper.hpp"
 #include "world/message.hpp"
 
@@ -79,6 +80,6 @@ class [[nodiscard]] Engine {
     Step       currentStep_{0};
 
     const helper::PCG32Seed seed_;
-    pcg32                   masterRng_;
+    detail::RandomGenerator rng_;
 };
 }  // namespace abm

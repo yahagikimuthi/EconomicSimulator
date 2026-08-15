@@ -4,10 +4,10 @@
 #include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
+#include "components/util.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm::base_goods::supplier {
@@ -21,7 +21,7 @@ namespace abm::base_goods::supplier {
 
 class [[nodiscard]] MarkupPlanner {
   public:
-    MarkupPlanner(const pcg32 rng, const double log, const double adjustVol)
+    MarkupPlanner(const detail::RandomGenerator rng, const double log, const double adjustVol)
         : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
 
     auto judgeMarkup(const bool isSold) -> double {
@@ -38,15 +38,15 @@ class [[nodiscard]] MarkupPlanner {
 
   private:
     auto calcMarkup(const bool isSold) const -> double POST(markup : markup > 0.0) {
-        const double alpha{std::abs(helper::randNormal(rng_, 0.0, adjustVol_))};
+        const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_))};
         const double nextMarkup{log_ + (isSold ? alpha : -alpha)};
         return markupGuard(nextMarkup);
     }
 
-    mutable pcg32 rng_;
-    double        log_;
-    double        plan_{};
-    const double  adjustVol_;
+    mutable detail::RandomGenerator rng_;
+    double                          log_;
+    double                          plan_{};
+    const double                    adjustVol_;
 };
 
 class [[nodiscard]] PricePlanner {

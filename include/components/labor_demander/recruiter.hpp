@@ -14,8 +14,8 @@
 #include "world/message.hpp"
 
 namespace abm::labor::demander {
-inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEntry>& entryBox)
-    -> auto {
+inline auto sortApplicants(const HeadCount offer, tbb::concurrent_vector<LaborEntry> entryBox)
+    -> std::ranges::view auto {
     using EntryRef = std::reference_wrapper<LaborEntry>;
     static thread_local std::vector<EntryRef> applicants;
     applicants.clear();
@@ -68,16 +68,25 @@ class [[nodiscard]] Ledger {
         remainOffer_ = offerPlan;
         wasPageMade_ = true;
     }
-    auto remainOffer() const -> HeadCount { return remainOffer_; }
-    void readOfferResult(const OfferResult result) {
+
+    auto remainOffer() const -> HeadCount { return wasPageMade_ ? remainOffer_ : HeadCount{0.0}; }
+
+    void readOfferResult(const OfferResult& result) {
+        if (not wasPageMade_) return;
         remainOffer_ -= result.offer;
         applicants_ += result.applicants;
     }
-    void addEmploy(const HeadCount add) { employ_ = add; }
-    auto publishResult() const -> std::optional<RecruitmentResult> {
-        if (not wasPageMade_) return std::nullopt;
-        return RecruitmentResult{.applicants = applicants_, .employ = employ_};
+
+    void addEmploy(const HeadCount add) {
+        if (not wasPageMade_) return;
+        employ_ = add;
     }
+
+    auto publishResult() const -> std::optional<RecruitResult> {
+        if (not wasPageMade_) return std::nullopt;
+        return RecruitResult{.applicants = applicants_, .employ = employ_};
+    }
+
     void reset() {
         if (not wasPageMade_) return;
         remainOffer_ = HeadCount{0.0};
@@ -100,15 +109,14 @@ class [[nodiscard]] Recruiter {
 
     void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) {
         ledger_.makeNewPage(plan.offer);
-        if (plan.offer == HeadCount{0.0}) return;
         myRequest_ = laborMarket.request(id, plan.wage, plan.offer);
     }
 
     void offer() {
-        if (myRequest_->entryBox.empty()) return;
+        if (myRequest_->entryBox().empty()) return;
 
         std::ranges::view auto applicants{
-            sortApplicants(ledger_.remainOffer(), myRequest_->entryBox) |
+            sortApplicants(ledger_.remainOffer(), myRequest_->entryBox()) |
             std::views::take(ledger_.remainOffer().value())
         };
 
@@ -119,7 +127,7 @@ class [[nodiscard]] Recruiter {
             ++offerCnt;
         }
         ledger_.readOfferResult(
-            {.offer = offerCnt, .applicants = HeadCount{myRequest_->entryBox.size()}}
+            {.offer = offerCnt, .applicants = HeadCount{myRequest_->entryBox().size()}}
         );
     }
 
@@ -133,9 +141,7 @@ class [[nodiscard]] Recruiter {
         ledger_.addEmploy(employCnt);
     }
 
-    auto publishResult() const -> std::optional<RecruitmentResult> {
-        return ledger_.publishResult();
-    }
+    auto publishResult() const -> std::optional<RecruitResult> { return ledger_.publishResult(); }
 
     void endStep() {
         myRequest_.reset();

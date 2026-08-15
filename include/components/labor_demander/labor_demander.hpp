@@ -53,7 +53,7 @@ class [[nodiscard]] LaborDemander {
 
     void endStep(CensusDropBox& dropBox) {
         using namespace labor::demander;
-        std::optional<RecruitmentResult> result{recruiter_.publishResult()};
+        std::optional<RecruitResult> result{recruiter_.publishResult()};
         if (result) {
             memory_.memorize(*result);
         }

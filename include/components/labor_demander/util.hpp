@@ -18,7 +18,7 @@ struct RecruitPlan {
     HeadCount offer;
 };
 
-struct RecruitmentResult {
+struct RecruitResult {
     HeadCount applicants;
     HeadCount employ;
 };
@@ -52,11 +52,11 @@ class [[nodiscard]] RecruitResultMemory {
   public:
     RecruitResultMemory(const HeadCount lastApplicants, const HeadCount lastEmploy)
         : lastResult_{.applicants = lastApplicants, .employ = lastEmploy} {}
-    void memorize(const RecruitmentResult& newResult) {
+    void memorize(const RecruitResult& newResult) {
         currentResult_ = newResult;
         wasMemorized_  = true;
     }
-    auto rememberLog() const -> const RecruitmentResult& { return lastResult_; }
+    auto rememberLog() const -> const RecruitResult& { return lastResult_; }
     void endStep() {
         if (not wasMemorized_) return;
         lastResult_    = currentResult_;
@@ -65,9 +65,9 @@ class [[nodiscard]] RecruitResultMemory {
     }
 
   private:
-    RecruitmentResult lastResult_;
-    RecruitmentResult currentResult_{.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
-    bool              wasMemorized_{false};
+    RecruitResult lastResult_;
+    RecruitResult currentResult_{.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
+    bool          wasMemorized_{false};
 };
 
 class [[nodiscard]] Memory {
@@ -76,9 +76,9 @@ class [[nodiscard]] Memory {
         : planMemory_{planMemory}, resultMemory_{resultMemory} {}
 
     void memorize(const RecruitPlan& newPlan) { planMemory_.memorize(newPlan); }
-    void memorize(const RecruitmentResult& newResult) { resultMemory_.memorize(newResult); }
+    void memorize(const RecruitResult& newResult) { resultMemory_.memorize(newResult); }
     auto rememberLastRecruitPlan() const -> const RecruitPlan& { return planMemory_.rememberLog(); }
-    auto rememberLastRecruitResult() const -> const RecruitmentResult& {
+    auto rememberLastRecruitResult() const -> const RecruitResult& {
         return resultMemory_.rememberLog();
     }
     void endStep(CensusDropBox& dropBox) {

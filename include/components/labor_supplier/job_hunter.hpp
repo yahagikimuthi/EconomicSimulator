@@ -10,6 +10,7 @@
 #include <ranges>
 
 #include "components/labor_supplier/concepts.hpp"
+#include "components/util.hpp"
 #include "config.hpp"
 #include "core/base.hpp"
 #include "world/message.hpp"
@@ -81,7 +82,7 @@ class [[nodiscard]] MyEntries {
 
 class [[nodiscard]] JobHunter {
   public:
-    JobHunter(const pcg32 rng) : rng_{rng} {}
+    JobHunter(const detail::RandomGenerator rng) : rng_{rng} {}
 
     void entry(
         IsAlignedFn auto&&                    isAligned,
@@ -92,7 +93,7 @@ class [[nodiscard]] JobHunter {
     ) PRE(entryCnt > 0) {
         using Request = LaborRequest;
         std::ranges::view auto alignedRequests{
-            pickJobs(requestBox, rng_, sampleCnt, entryCnt) |
+            pickJobs(requestBox, rng_.get(), sampleCnt, entryCnt) |
             std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
             std::views::take(entryCnt)
         };
@@ -119,9 +120,9 @@ class [[nodiscard]] JobHunter {
         return offered.front();
     }
 
-    mutable pcg32              rng_;
-    MyEntries                  myEntries_;
-    std::optional<LaborEntry&> acceptedEntry_{std::nullopt};
-    bool                       isPosting_{false};
+    mutable detail::RandomGenerator rng_;
+    MyEntries                       myEntries_;
+    std::optional<LaborEntry&>      acceptedEntry_{std::nullopt};
+    bool                            isPosting_{false};
 };
 }  // namespace abm::labor::supplier

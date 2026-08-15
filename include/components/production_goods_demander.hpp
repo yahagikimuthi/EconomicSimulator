@@ -7,10 +7,10 @@
 #include <ranges>
 
 #include "components/base_goods_demander.hpp"
+#include "components/util.hpp"
 #include "config.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm {
@@ -18,12 +18,13 @@ class [[nodiscard]] ProductionGoodsDemander final
     : public BaseGoodsDemander<Market::productionGoods> {
   public:
     ProductionGoodsDemander(
-        const pcg32 rng, const base_goods::demander::BudgetCalculator budgetCalculator
+        const detail::RandomGenerator                rng,
+        const base_goods::demander::BudgetCalculator budgetCalculator
     )
         : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, budgetCalculator) {}
 
     void request(
-        const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
+        const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry> entryBox
     ) {
         using Entry = ProductionGoodsEntry;
         if (isPass(asset, entryBox)) return;
@@ -60,8 +61,8 @@ class [[nodiscard]] ProductionGoodsDemander final
     }
 
     auto pickEntry(
-        const AgentID                                 id,
-        tbb::concurrent_vector<ProductionGoodsEntry>& entryBox,
+        const AgentID                                id,
+        tbb::concurrent_vector<ProductionGoodsEntry> entryBox,
         const int sampleCnt = config::goods_demander::goodsSampleCnt
     ) const -> std::optional<ProductionGoodsEntry&> {
         using Entry = ProductionGoodsEntry;
@@ -69,7 +70,7 @@ class [[nodiscard]] ProductionGoodsDemander final
         std::optional<Entry&> betterEntry{std::nullopt};
 
         for (const auto _ : std::views::iota(0, sampleCnt)) {
-            auto&      sampleEntry = helper::discreteDistribution(entryBox, rng_, toDouble);
+            auto&      sampleEntry = rng_.discreteDistribution(entryBox, toDouble);
             const bool isAdopt{shouldAdopt(id, betterEntry, sampleEntry)};
             if (not isAdopt) continue;
             betterEntry = std::ref(sampleEntry);

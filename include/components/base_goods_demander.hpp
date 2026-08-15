@@ -5,6 +5,7 @@
 #include <pcg_random.hpp>
 #include <type_traits>
 
+#include "components/util.hpp"
 #include "core/values/common.hpp"
 #include "world/message.hpp"
 
@@ -31,11 +32,12 @@ class [[nodiscard]] BaseGoodsDemander {
 
   protected:
     BaseGoodsDemander(
-        const pcg32 rng, const base_goods::demander::BudgetCalculator budgetCalculator
+        const detail::RandomGenerator                rng,
+        const base_goods::demander::BudgetCalculator budgetCalculator
     )
         : rng_{rng}, budgetCalculator_{budgetCalculator} {}
 
-    mutable pcg32                          rng_;
+    mutable detail::RandomGenerator        rng_;
     std::optional<const Request&>          myRequest_{std::nullopt};
     bool                                   isPosting_{false};
     base_goods::demander::BudgetCalculator budgetCalculator_;

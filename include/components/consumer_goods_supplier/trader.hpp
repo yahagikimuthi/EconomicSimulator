@@ -5,13 +5,15 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trader.hpp"
+#include "components/util.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
 
 namespace abm::consumer_goods::supplier {
 class Trader final : public base_goods::supplier::Trader<Market::consumerGoods> {
   public:
-    Trader(const pcg32 rng) : base_goods::supplier::Trader<Market::consumerGoods>::Trader(rng) {}
+    Trader(const detail::RandomGenerator rng)
+        : base_goods::supplier::Trader<Market::consumerGoods>::Trader(rng) {}
 
     void post(
         const base_goods::supplier::TradePlan       postingInfo,

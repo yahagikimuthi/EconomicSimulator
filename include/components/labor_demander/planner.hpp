@@ -14,7 +14,7 @@ class [[nodiscard]] WagePlanner {
     WagePlanner(const detail::RandomGenerator rng, const double adjustVol)
         : rng_{rng}, adjustVol_{adjustVol} {}
 
-    auto judgeWage(const RecruitPlan& lastPlan, const RecruitmentResult& lastResult) const -> Wage {
+    auto judgeWage(const RecruitPlan& lastPlan, const RecruitResult& lastResult) const -> Wage {
         const double alpha{rng_.randNormal(0.0, adjustVol_, -1.0, 1.0)};
         const bool   raise{shouldRaise(lastPlan.offer, lastResult.applicants)};
         const Wage   nextWage{lastPlan.wage * (raise ? 1.0 + alpha : 1.0 - alpha)};
@@ -40,9 +40,7 @@ class [[nodiscard]] OfferPlanner {
         : rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
 
     auto judgePlan(
-        const RecruitPlan&       lastPlan,
-        const RecruitmentResult& lastResult,
-        const HeadCount          desiredEmploy
+        const RecruitPlan& lastPlan, const RecruitResult& lastResult, const HeadCount desiredEmploy
     ) -> HeadCount {
         offerRate_ = calcOfferRate(lastPlan.employ, lastResult.employ);
         return desiredEmploy * (1.0 + offerRate_);
@@ -67,9 +65,7 @@ class [[nodiscard]] RequestPlanner {
         : wagePlanner_{wagePlanner}, offerPlanner_{offerPlanner} {}
 
     auto judgePlan(
-        const RecruitPlan&       lastPlan,
-        const RecruitmentResult& lastResult,
-        const HeadCount          desiredEmploy
+        const RecruitPlan& lastPlan, const RecruitResult& lastResult, const HeadCount desiredEmploy
     ) -> RecruitPlan {
         return {
             .wage   = wagePlanner_.judgeWage(lastPlan, lastResult),

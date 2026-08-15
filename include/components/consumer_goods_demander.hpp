@@ -6,18 +6,18 @@
 #include <ranges>
 
 #include "components/base_goods_demander.hpp"
+#include "components/util.hpp"
 #include "config.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm {
 class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Market::consumerGoods> {
   public:
     ConsumerGoodsDemander(
-        const pcg32                                  rng,
+        const detail::RandomGenerator                rng,
         const base_goods::demander::BudgetCalculator budgetCalculator,
         const Step                                   myPhase
     )
@@ -25,7 +25,7 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
           myPhase_{myPhase} {}
 
     void request(
-        const Money asset, const Step step, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
+        const Money asset, const Step step, tbb::concurrent_vector<ConsumerGoodsEntry> entryBox
     ) {
         if (isPass(asset, step, entryBox)) return;
         const Money budget{budgetCalculator_.calcBudget(asset)};
@@ -50,9 +50,9 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
 
   private:
     auto isPass(
-        const Money                                       asset,
-        const Step                                        step,
-        const tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
+        const Money                                      asset,
+        const Step                                       step,
+        const tbb::concurrent_vector<ConsumerGoodsEntry> entryBox
     ) const -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;
@@ -61,18 +61,18 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
     }
 
     auto pickEntry(
-        tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox,
+        tbb::concurrent_vector<ConsumerGoodsEntry> entryBox,
         const int sampleCnt = config::goods_demander::goodsSampleCnt
     ) const -> ConsumerGoodsEntry& {
         using Entry = ConsumerGoodsEntry;
+
         auto toDouble{[](const Entry& entry) -> double { return entry.supply.value(); }};
-        std::reference_wrapper<Entry> betterEntry =
-            helper::discreteDistribution(entryBox, rng_, toDouble);
+        std::reference_wrapper<Entry> betterEntry = rng_.discreteDistribution(entryBox, toDouble);
 
         if (sampleCnt <= 1) return betterEntry.get();
 
         for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
-            auto& sampleEntry = helper::discreteDistribution(entryBox, rng_, toDouble);
+            auto& sampleEntry = rng_.discreteDistribution(entryBox, toDouble);
             if (betterEntry.get().price <= sampleEntry.price) continue;
             betterEntry = std::ref(sampleEntry);
         }

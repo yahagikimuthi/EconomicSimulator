@@ -5,6 +5,7 @@
 #include <deque>
 #include <optional>
 
+#include "components/util.hpp"
 #include "config.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
@@ -111,12 +112,15 @@ struct LaborEntry {
 struct [[nodiscard]] LaborRequest {
     LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
     auto entry(const AgentID id, const double productPower) -> LaborEntry& {
-        return *entryBox.emplace_back(id, productPower, *this);
+        return *entryBox_.emplace_back(id, productPower, *this);
     }
+    auto entryBox() -> tbb::concurrent_vector<LaborEntry> { return entryBox_; }
 
-    const AgentID                      firmID;
-    const Wage                         wage;
-    tbb::concurrent_vector<LaborEntry> entryBox;
+    const AgentID firmID;
+    const Wage    wage;
+
+  private:
+    tbb::concurrent_vector<LaborEntry> entryBox_;
 };
 
 class [[nodiscard]] LaborMarket {

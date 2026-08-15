@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "components/labor_supplier/job_hunter.hpp"
+#include "components/util.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
-#include "helper.hpp"
 #include "world/message.hpp"
 
 namespace abm::labor::supplier {
@@ -51,13 +51,13 @@ class Employment {
 
 class [[nodiscard]] JobSearchThreshold {
   public:
-    JobSearchThreshold(const pcg32 rng, const double threshold)
+    JobSearchThreshold(const detail::RandomGenerator rng, const double threshold)
         : rng_{rng}, threshold_{threshold} {}
-    auto shouldSearch() const -> bool { return threshold_ < helper::rand(rng_); }
+    auto shouldSearch() const -> bool { return threshold_ < rng_.rand(); }
 
   private:
-    mutable pcg32 rng_;
-    const double  threshold_;
+    mutable detail::RandomGenerator rng_;
+    const double                    threshold_;
 };
 }  // namespace abm::labor::supplier
 

@@ -5,6 +5,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trader.hpp"
+#include "components/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "world/message.hpp"
@@ -12,7 +13,8 @@
 namespace abm::production_goods::supplier {
 class Trader final : public base_goods::supplier::Trader<Market::productionGoods> {
   public:
-    Trader(const pcg32 rng) : base_goods::supplier::Trader<Market::productionGoods>::Trader(rng) {}
+    Trader(const detail::RandomGenerator rng)
+        : base_goods::supplier::Trader<Market::productionGoods>::Trader(rng) {}
 
     void post(
         const AgentID                                 id,
