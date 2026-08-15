@@ -6,9 +6,9 @@
 #include <vector>
 
 #include "components/labor_supplier/job_hunter.hpp"
-#include "components/util.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
+#include "util.hpp"
 #include "world/message.hpp"
 
 namespace abm::labor::supplier {

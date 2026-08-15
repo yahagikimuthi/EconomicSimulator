@@ -5,8 +5,8 @@
 #include <pcg_random.hpp>
 #include <type_traits>
 
-#include "components/util.hpp"
 #include "core/values/common.hpp"
+#include "util.hpp"
 #include "world/message.hpp"
 
 namespace abm::base_goods::demander {

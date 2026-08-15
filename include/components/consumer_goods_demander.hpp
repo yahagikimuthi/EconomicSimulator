@@ -6,11 +6,11 @@
 #include <ranges>
 
 #include "components/base_goods_demander.hpp"
-#include "components/util.hpp"
 #include "config.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "util.hpp"
 #include "world/message.hpp"
 
 namespace abm {

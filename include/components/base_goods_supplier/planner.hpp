@@ -4,7 +4,7 @@
 #include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
-#include "components/util.hpp"
+#include "util.hpp"
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"

@@ -10,9 +10,9 @@
 #include <ranges>
 
 #include "components/labor_supplier/concepts.hpp"
-#include "components/util.hpp"
 #include "config.hpp"
 #include "core/base.hpp"
+#include "util.hpp"
 #include "world/message.hpp"
 
 namespace abm::labor::supplier {

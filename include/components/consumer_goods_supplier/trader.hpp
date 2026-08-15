@@ -5,8 +5,8 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trader.hpp"
-#include "components/util.hpp"
 #include "core/values/goods.hpp"
+#include "util.hpp"
 #include "world/message.hpp"
 
 namespace abm::consumer_goods::supplier {

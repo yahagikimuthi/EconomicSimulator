@@ -22,10 +22,10 @@
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
-#include "components/util.hpp"
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
+#include "util.hpp"
 #include "world/message.hpp"
 
 namespace abm {

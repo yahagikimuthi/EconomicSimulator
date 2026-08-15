@@ -5,8 +5,8 @@
 #include <pcg_random.hpp>
 
 #include "components/labor_demander/util.hpp"
-#include "components/util.hpp"
 #include "core/values/labor.hpp"
+#include "util.hpp"
 
 namespace abm::labor::demander {
 class [[nodiscard]] WagePlanner {
