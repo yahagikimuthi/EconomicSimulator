@@ -40,7 +40,9 @@ class [[nodiscard]] RandomGenerator {
         return dist(rng_);
     }
 
-    auto makeSeed() -> std::uint64_t { return (static_cast<std::uint64_t>(rng_()) << 32) | rng_(); }
+    auto makeUint64() -> std::uint64_t {
+        return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
+    }
 
   private:
     pcg32 rng_;

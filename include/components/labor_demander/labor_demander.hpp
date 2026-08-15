@@ -15,7 +15,7 @@ namespace abm {
 class [[nodiscard]] LaborDemander {
   public:
     LaborDemander(
-        const labor::demander::RequestPlanner&&       offerPlanner,
+        const labor::demander::RequestPlanner&        offerPlanner,
         const labor::demander::HumanResourceManager&& hrManager,
         const labor::demander::Memory&                memory
     )

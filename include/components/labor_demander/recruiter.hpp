@@ -55,9 +55,9 @@ class [[nodiscard]] OfferApplicants {
     std::vector<RefWrap<LaborEntry>> applicants_;
 };
 
-class [[nodiscard]] LedgerManager {
+class [[nodiscard]] Ledger {
   public:
-    LedgerManager() = default;
+    Ledger() = default;
 
     void makeNewPage(const HeadCount offerPlan) {
         offerPlan_   = offerPlan;
@@ -112,7 +112,7 @@ class [[nodiscard]] Recruiter {
             std::views::take(ledger_.remainOffer().value())
         };
 
-        for (auto&& entry : applicants) {
+        for (auto& entry : applicants) {
             entry.isOffer = true;
             offerApplicants_.add(entry);
             ledger_.countUpOffer();
@@ -145,7 +145,7 @@ class [[nodiscard]] Recruiter {
 
   private:
     std::optional<LaborRequest&> myRequest_{std::nullopt};
-    LedgerManager                ledger_;
+    Ledger                       ledger_;
     OfferApplicants              offerApplicants_;
     bool                         isPosting_{false};
 };

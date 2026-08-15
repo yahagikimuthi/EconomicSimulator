@@ -50,12 +50,12 @@ class [[nodiscard]] OfferPlanner {
         const RecruitmentResult& lastRecruitment,
         const HeadCount          desiredEmploy
     ) -> HeadCount {
-        offerRate_ = updateOfferRate(lastPlan.employ, lastRecruitment.employ);
+        offerRate_ = calcOfferRate(lastPlan.employ, lastRecruitment.employ);
         return desiredEmploy * (1.0 + offerRate_);
     }
 
   private:
-    auto updateOfferRate(const HeadCount employPlan, const HeadCount actualEmploy) const -> double {
+    auto calcOfferRate(const HeadCount employPlan, const HeadCount actualEmploy) const -> double {
         const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0))};
         const bool   shouldRaise{actualEmploy < employPlan};
         const double next{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
