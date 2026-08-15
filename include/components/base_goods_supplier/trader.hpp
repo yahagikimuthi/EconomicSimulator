@@ -81,7 +81,7 @@ class Trader {
         if (totalDemand == GoodsQuantity{0.0}) return;
         const GoodsQuantity salesAmount{ledgerManager_.salesAmount(totalDemand)};
         ledgerManager_.isExcessDemand(totalDemand)
-            ? performRationedTrade(myEntry_->supply, rng_.get(), requestBox)
+            ? performRationedTrade(myEntry_->supply, requestBox)
             : performFullTrade(requestBox);
         ledgerManager_.add(myEntry_->price, salesAmount);
     }
@@ -93,10 +93,10 @@ class Trader {
   protected:
     Trader(const detail::RandomGenerator rng) : rng_{rng} {}
 
-    detail::RandomGenerator rng_;
-    std::optional<Entry&>   myEntry_{std::nullopt};
-    LedgerManager           ledgerManager_;
-    bool                    isPosting_{false};
+    mutable detail::RandomGenerator rng_;
+    std::optional<Entry&>           myEntry_{std::nullopt};
+    LedgerManager                   ledgerManager_;
+    bool                            isPosting_{false};
 
   private:
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox
@@ -112,21 +112,19 @@ class Trader {
         return demand;
     }
 
-    static void shuffleIdx(
-        tbb::concurrent_vector<Request>& requestBox,
-        std::vector<RefWrap<Request>>&   requests,
-        pcg32&                           rng
-    ) {
+    void shuffleIdx(
+        tbb::concurrent_vector<Request>& requestBox, std::vector<RefWrap<Request>>& requests
+    ) const {
         requests.clear();
         for (Request& request : requestBox) requests.emplace_back(std::ref(request));
-        std::ranges::shuffle(requests, rng);
+        rng_.shuffle(requests);
     }
 
-    static void performRationedTrade(
-        const GoodsQuantity supply, pcg32& rng, tbb::concurrent_vector<Request>& requestBox
-    ) {
+    void performRationedTrade(
+        const GoodsQuantity supply, tbb::concurrent_vector<Request>& requestBox
+    ) const {
         static thread_local std::vector<RefWrap<Request>> requests;
-        shuffleIdx(requestBox, requests, rng);
+        shuffleIdx(requestBox, requests);
 
         GoodsQuantity remainAmount{supply};
         for (auto requestRef : requests) {

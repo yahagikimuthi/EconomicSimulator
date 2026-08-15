@@ -4,9 +4,12 @@
 #include <algorithm>
 #include <concepts>
 #include <cstdint>
+#include <iterator>
 #include <limits>
 #include <pcg_random.hpp>
 #include <random>
+#include <ranges>
+#include <utility>
 
 #include "core/values/common.hpp"
 
@@ -69,11 +72,23 @@ class [[nodiscard]] RandomGenerator {
         std::unreachable();
     }
 
+    template <typename Container>
+        requires requires(Container&& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
+    void shuffle(Container&& c) {
+        std::ranges::shuffle(std::forward<Container>(c), rng_);
+    }
+
+    template <std::ranges::input_range InputRange, std::weakly_incrementable OutputIterator>
+        requires requires(InputRange range, OutputIterator outIt, int n, pcg32 rng) {
+            std::ranges::sample(range, outIt, n, rng);
+        }
+    void sample(InputRange&& range, OutputIterator outIt, const int n) {
+        std::ranges::sample(std::forward<InputRange>(range), outIt, n, rng_);
+    }
+
     auto makeUint64() -> std::uint64_t {
         return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
     }
-
-    auto get() -> pcg32& { return rng_; }
 
   private:
     pcg32 rng_;

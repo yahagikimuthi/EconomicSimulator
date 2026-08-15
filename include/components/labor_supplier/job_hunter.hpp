@@ -19,7 +19,7 @@ namespace abm::labor::supplier {
 inline void pickSample(
     LaborMarket::RequestBoxT&                          requestBox,
     std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
-    pcg32&                                             rng,
+    detail::RandomGenerator&                           rng,
     const int                                          sampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
@@ -28,7 +28,7 @@ inline void pickSample(
         for (LaborRequest& request : requestBox) sampleRequests.emplace_back(std::ref(request));
         return;
     }
-    std::ranges::sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k), rng);
+    rng.sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k));
 }
 
 inline void sortSample(
@@ -46,7 +46,10 @@ inline void sortSample(
 }
 
 [[nodiscard]] inline auto pickJobs(
-    LaborMarket::RequestBoxT requestBox, pcg32& rng, const int sampleCnt, const int entryCnt
+    LaborMarket::RequestBoxT requestBox,
+    detail::RandomGenerator& rng,
+    const int                sampleCnt,
+    const int                entryCnt
 ) -> std::ranges::view auto {
     using Request = LaborRequest;
     static thread_local std::vector<std::reference_wrapper<Request>> sampleRequest;
@@ -90,7 +93,7 @@ class [[nodiscard]] JobHunter {
     ) PRE(entryCnt > 0) {
         using Request = LaborRequest;
         std::ranges::view auto alignedRequests{
-            pickJobs(requestBox, rng_.get(), sampleCnt, entryCnt) |
+            pickJobs(requestBox, rng_, sampleCnt, entryCnt) |
             std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
             std::views::take(entryCnt)
         };
