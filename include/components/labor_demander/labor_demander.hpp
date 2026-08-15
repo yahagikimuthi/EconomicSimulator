@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <optional>
 
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/planner.hpp"
@@ -25,7 +26,6 @@ class [[nodiscard]] LaborDemander {
         const HeadCount                       desiredEmploy,
         tbb::concurrent_vector<LaborRequest>& requestBox
     ) PRE(desiredEmploy > HeadCount{0.0}) {
-        isRecruiting_ = true;
         const labor::demander::RecruitPlan plan{requestPlanner_.judgePlan(
             memory_.rememberLastRecruitPlan(), memory_.rememberLastRecruitResult(), desiredEmploy
         )};
@@ -56,8 +56,11 @@ class [[nodiscard]] LaborDemander {
     }
 
     void endStep(CensusDropBox& dropBox) {
-        if (not isRecruiting_) return;
-        memory_.memorize(recruiter_.publishResult());
+        using namespace labor::demander;
+        std::optional<RecruitmentResult> result{recruiter_.publishResult()};
+        if (result) {
+            memory_.memorize(*result);
+        }
         recruiter_.endStep();
         memory_.endStep(dropBox);
     }
@@ -67,6 +70,5 @@ class [[nodiscard]] LaborDemander {
     labor::demander::Recruiter            recruiter_;
     labor::demander::HumanResourceManager hrManager_;
     labor::demander::Memory               memory_;
-    bool                                  isRecruiting_{false};
 };
 }  // namespace abm

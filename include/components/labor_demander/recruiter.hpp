@@ -59,20 +59,26 @@ class [[nodiscard]] LedgerManager {
   public:
     LedgerManager() = default;
 
-    void makeNewPage(const HeadCount offerPlan) { offerPlan_ = offerPlan; }
+    void makeNewPage(const HeadCount offerPlan) {
+        offerPlan_   = offerPlan;
+        wasPageMade_ = true;
+    }
     auto remainOffer() const -> HeadCount { return remainOffer_; }
     auto applicants() const -> HeadCount { return applicants_; }
     void countUpOffer() { --remainOffer_; }
     void addApplicants(const HeadCount add) { applicants_ += add; }
     void addEmploy(const HeadCount add) { employ_ = add; }
-    auto publishResult() const -> RecruitmentResult {
-        return {.applicants = applicants_, .employ = employ_};
+    auto publishResult() const -> std::optional<RecruitmentResult> {
+        if (not wasPageMade_) return std::nullopt;
+        return RecruitmentResult{.applicants = applicants_, .employ = employ_};
     }
     void reset() {
+        if (not wasPageMade_) return;
         offerPlan_   = HeadCount{0.0};
         remainOffer_ = HeadCount{0.0};
         applicants_  = HeadCount{0.0};
         employ_      = HeadCount{0.0};
+        wasPageMade_ = false;
     }
 
   private:
@@ -80,6 +86,7 @@ class [[nodiscard]] LedgerManager {
     HeadCount remainOffer_{0.0};
     HeadCount applicants_{0.0};
     HeadCount employ_{0.0};
+    bool      wasPageMade_{false};
 };
 
 class [[nodiscard]] Recruiter {
@@ -125,7 +132,9 @@ class [[nodiscard]] Recruiter {
         ledger_.addEmploy(employCnt);
     }
 
-    auto publishResult() const -> RecruitmentResult { return ledger_.publishResult(); }
+    auto publishResult() const -> std::optional<RecruitmentResult> {
+        return ledger_.publishResult();
+    }
 
     void endStep() {
         myRequest_.reset();
