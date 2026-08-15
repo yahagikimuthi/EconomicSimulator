@@ -48,23 +48,20 @@ class [[nodiscard]] RandomGenerator {
     template <std::ranges::range Container, typename Proj = std::identity>
         requires requires(Container container, Proj proj) {
             { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
-            { *container.begin() } -> std::same_as<typename Container::value_type&>;
         }
-    auto discreteDistribution(Container& container, Proj proj = {}) -> Container::value_type& {
+    auto discreteDistribution(Container&& container, Proj&& proj = {}) -> decltype(auto) {
         double total{0.0};
-        for (const auto& elem : container) {
-            const double weight = std::invoke(proj, elem);
+        for (const auto& elem : std::forward<Container>(container)) {
+            const double weight = std::invoke(std::forward<Proj>(proj), elem);
             ASSERT(weight >= 0.0 && "weight is required >= 0");
             total += weight;
         }
         ASSERT(total >= 0.0 && "total is required >= 0");
 
-        std::uniform_real_distribution<double> dist{0.0, total};
-
         const double target{rand(0.0, total)};
         double       currentCnt{0.0};
-        for (auto& elem : container) {
-            currentCnt += std::invoke(proj, elem);
+        for (auto& elem : std::forward<Container>(container)) {
+            currentCnt += std::invoke(std::forward<Proj>(proj), elem);
             if (currentCnt >= target) {
                 return elem;
             }
@@ -73,18 +70,18 @@ class [[nodiscard]] RandomGenerator {
         std::unreachable();
     }
 
-    template <typename Container>
-        requires requires(Container&& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
+    template <std::ranges::random_access_range Container>
+        requires requires(Container& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
     void shuffle(Container&& c) {
         std::ranges::shuffle(std::forward<Container>(c), rng_);
     }
 
-    template <std::ranges::input_range InputRange, std::weakly_incrementable OutputIterator>
-        requires requires(InputRange range, OutputIterator outIt, int n, pcg32 rng) {
+    template <std::ranges::input_range Range, std::weakly_incrementable Out>
+        requires requires(Range& range, Out outIt, int n, pcg32 rng) {
             std::ranges::sample(range, outIt, n, rng);
         }
-    void sample(InputRange&& range, OutputIterator outIt, const int n) {
-        std::ranges::sample(std::forward<InputRange>(range), outIt, n, rng_);
+    void sample(Range&& r, Out out, const int n) {
+        std::ranges::sample(std::forward<Range>(r), out, n, rng_);
     }
 
     auto makeUint64() -> std::uint64_t {

@@ -2,10 +2,10 @@
 
 #include <optional>
 
+#include "components/labor_demander/common.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
-#include "components/labor_demander/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"

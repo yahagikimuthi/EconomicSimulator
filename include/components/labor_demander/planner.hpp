@@ -4,7 +4,7 @@
 #include <limits>
 #include <pcg_random.hpp>
 
-#include "components/labor_demander/util.hpp"
+#include "components/labor_demander/common.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
 

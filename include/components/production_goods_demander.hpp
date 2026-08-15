@@ -23,7 +23,7 @@ class [[nodiscard]] ProductionGoodsDemander final
         : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, budgetCalculator) {}
 
     void request(
-        const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry> entryBox
+        const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
         using Entry = ProductionGoodsEntry;
         if (isPass(asset, entryBox)) return;

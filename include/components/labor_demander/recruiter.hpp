@@ -6,9 +6,10 @@
 #include <functional>
 #include <optional>
 #include <ranges>
+#include <utility>
 #include <vector>
 
-#include "components/labor_demander/util.hpp"
+#include "components/labor_demander/common.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
@@ -131,11 +132,13 @@ class [[nodiscard]] Recruiter {
         );
     }
 
-    void registerMember(AddRosterFn auto&& addRoster) {
+    template <AddRosterFn F>
+    void registerMember(F&& addRoster) {
         HeadCount              employCnt{0.0};
         std::ranges::view auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
         for (LaborEntry& acceptApplicant : acceptApplicants) {
-            acceptApplicant.rosterEntry = addRoster(acceptApplicant.hholdID, myRequest_->wage);
+            acceptApplicant.rosterEntry =
+                std::forward<F>(addRoster)(acceptApplicant.hholdID, myRequest_->wage);
             ++employCnt;
         }
         ledger_.addEmploy(employCnt);
