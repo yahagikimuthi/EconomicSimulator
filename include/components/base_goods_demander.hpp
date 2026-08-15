@@ -22,11 +22,8 @@ class BudgetCalculator {
 
 namespace abm {
 template <Market DemandGoodsType>
+    requires(DemandGoodsType != Market::labor)
 class [[nodiscard]] BaseGoodsDemander {
-    static_assert(
-        DemandGoodsType == Market::consumerGoods or DemandGoodsType == Market::productionGoods
-    );
-
     using Request = std::conditional_t<
         DemandGoodsType == Market::consumerGoods,
         ConsumerGoodsRequest,
