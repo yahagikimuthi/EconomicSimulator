@@ -14,24 +14,28 @@
 namespace abm::labor::supplier {
 class Employment {
   public:
-    Employment(const double productPower) : productPower_{productPower} {}
-    auto isEmployed() const -> bool { return rosterEntry_.has_value(); }
+    [[nodiscard]] Employment(const double productPower) : productPower_{productPower} {}
+
+    [[nodiscard]] auto isEmployed() const -> bool { return rosterEntry_.has_value(); }
+
     void startWorking(RosterEntry& rosterEntry) {
         resign();
         rosterEntry_ = rosterEntry;
     }
-    auto contractFirmId() const -> AgentID {
+
+    [[nodiscard]] auto contractFirmId() const -> AgentID {
         return isEmployed() ? rosterEntry_->firmId() : AgentID{-1};
     }
-    auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+
+    [[nodiscard]] auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
+
     void work(const Market phase) {
-        if (not isEmployed()) return;
         if (shouldWork(phase)) rosterEntry_->addInput(productPower_);
     }
 
-    auto productPower() const -> double { return productPower_; }
+    [[nodiscard]] auto productPower() const -> double { return productPower_; }
 
     void updateStatus() {
         if (not isEmployed()) return;
@@ -39,7 +43,11 @@ class Employment {
     }
 
   private:
-    auto shouldWork(const Market phase) const -> bool { return rosterEntry_->firmType() == phase; }
+    [[nodiscard]] auto shouldWork(const Market phase) const -> bool {
+        if (not isEmployed()) return false;
+        return rosterEntry_->firmType() == phase;
+    }
+
     void resign() {
         if (not isEmployed()) return;
         rosterEntry_->resign();
@@ -49,11 +57,11 @@ class Employment {
     const double                productPower_;
 };
 
-class [[nodiscard]] JobSearchThreshold {
+class JobSearch {
   public:
-    JobSearchThreshold(const RandomGenerator rng, const double threshold)
+    [[nodiscard]] JobSearch(const RandomGenerator rng, const double threshold)
         : rng_{rng}, threshold_{threshold} {}
-    auto shouldSearch() const -> bool { return threshold_ < rng_.rand(); }
+    auto operator()() const -> bool { return threshold_ < rng_.rand(); }
 
   private:
     mutable RandomGenerator rng_;
@@ -65,19 +73,20 @@ namespace abm {
 class LaborSupplier {
   public:
     LaborSupplier(
-        const labor::supplier::JobHunter&&        jobHunter,
-        const labor::supplier::Employment&&       employment,
-        const labor::supplier::JobSearchThreshold jobSearchThreshold
+        const labor::supplier::JobHunter&&  jobHunter,
+        const labor::supplier::Employment&& employment,
+        const labor::supplier::JobSearch    jobSearchThreshold
     )
-        : jobHunter_{jobHunter}, employment_{employment}, jobSearchThreshold_{jobSearchThreshold} {}
+        : jobHunter_{jobHunter}, employment_{employment}, jobSearch_{jobSearchThreshold} {}
 
     void entry(const AgentID id, const LaborMarket::RequestBoxT& requestBox) {
         employment_.updateStatus();
-        if (not jobSearchThreshold_.shouldSearch()) return;
+        if (not employment_.isEmployed()) return;
+        if (not jobSearch_()) return;
         if (requestBox.empty()) return;
 
         using Request = LaborRequest;
-        auto isAligned{[&](const Request& req) -> bool {
+        auto isAligned{[&] [[nodiscard]] (const Request& req) -> bool {
             if (req.firmID == employment_.contractFirmId()) return false;
             if (req.wage < employment_.wage()) return false;
             return true;
@@ -91,7 +100,7 @@ class LaborSupplier {
     void accept() { jobHunter_.accept(); }
 
     void recordRosterEntry() {
-        const std::optional<LaborEntry&> acceptedEntry{jobHunter_.acceptedEntry()};
+        const std::optional<LaborEntry&> acceptedEntry{jobHunter_.huntedResult()};
         if (not acceptedEntry) return;
         employment_.startWorking(*acceptedEntry->rosterEntry);
     }
@@ -103,13 +112,13 @@ class LaborSupplier {
 
     void product(const Market phase) { employment_.work(phase); }
 
-    auto wage() const -> Money POST(wage : wage >= Money{0.0}) {
+    [[nodiscard]] auto wage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(employment_.wage());
     }
 
   private:
-    labor::supplier::JobHunter          jobHunter_;
-    labor::supplier::Employment         employment_;
-    labor::supplier::JobSearchThreshold jobSearchThreshold_;
+    labor::supplier::JobHunter  jobHunter_;
+    labor::supplier::Employment employment_;
+    labor::supplier::JobSearch  jobSearch_;
 };
 }  // namespace abm

@@ -36,12 +36,12 @@ inline auto sortApplicants(const HeadCount offer, LaborRequest::EntryBoxT entryB
     return applicants | std::views::transform(toRawRef);
 }
 
-class [[nodiscard]] OfferApplicants {
+class OfferApplicants {
     template <typename T>
     using RefWrap = std::reference_wrapper<T>;
 
   public:
-    OfferApplicants() = default;
+    [[nodiscard]] OfferApplicants() = default;
 
     void add(LaborEntry& entry) { applicants_.emplace_back(std::ref(entry)); }
     void clear() { applicants_.clear(); }
@@ -61,39 +61,29 @@ struct OfferResult {
     const HeadCount applicants;
 };
 
-class [[nodiscard]] Ledger {
+class Ledger {
   public:
-    Ledger() = default;
+    [[nodiscard]] Ledger() = default;
 
-    void makeNewPage(const HeadCount offerPlan) {
-        remainOffer_ = offerPlan;
-        wasPageMade_ = true;
-    }
+    void makeNewPage(const HeadCount offerPlan) { remainOffer_ = offerPlan; }
 
-    auto remainOffer() const -> HeadCount { return wasPageMade_ ? remainOffer_ : HeadCount{0.0}; }
+    [[nodiscard]] auto remainOffer() const -> HeadCount { return remainOffer_; }
 
     void readOfferResult(const OfferResult& result) {
-        if (not wasPageMade_) return;
         remainOffer_ -= result.offer;
         applicants_ += result.applicants;
     }
 
-    void addEmploy(const HeadCount add) {
-        if (not wasPageMade_) return;
-        employ_ = add;
-    }
+    void addEmploy(const HeadCount add) { employ_ = add; }
 
-    auto publishResult() const -> std::optional<RecruitResult> {
-        if (not wasPageMade_) return std::nullopt;
-        return RecruitResult{.applicants = applicants_, .employ = employ_};
+    [[nodiscard]] auto publishResult() const -> RecruitResult {
+        return {.applicants = applicants_, .employ = employ_};
     }
 
     void reset() {
-        if (not wasPageMade_) return;
         remainOffer_ = HeadCount{0.0};
         applicants_  = HeadCount{0.0};
         employ_      = HeadCount{0.0};
-        wasPageMade_ = false;
     }
 
   private:
@@ -101,19 +91,20 @@ class [[nodiscard]] Ledger {
     HeadCount remainOffer_{0.0};
     HeadCount applicants_{0.0};
     HeadCount employ_{0.0};
-    bool      wasPageMade_{false};
 };
 
-class [[nodiscard]] Recruiter {
+class Recruiter {
   public:
-    Recruiter() = default;
+    [[nodiscard]] Recruiter() = default;
 
     void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) {
+        if (not shouldPost(plan)) return;
         ledger_.makeNewPage(plan.offer);
         myRequest_ = laborMarket.request(id, plan.wage);
     }
 
     void offer() {
+        if (not isPosting()) return;
         if (myRequest_->entryBox().empty()) return;
 
         std::ranges::view auto applicants{
@@ -134,6 +125,7 @@ class [[nodiscard]] Recruiter {
 
     template <AddRosterFn F>
     void registerMember(F&& addRoster) {
+        if (not isPosting()) return;
         HeadCount              employCnt{0.0};
         std::ranges::view auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
         for (LaborEntry& acceptApplicant : acceptApplicants) {
@@ -144,9 +136,13 @@ class [[nodiscard]] Recruiter {
         ledger_.addEmploy(employCnt);
     }
 
-    auto publishResult() const -> std::optional<RecruitResult> { return ledger_.publishResult(); }
+    [[nodiscard]] auto publishResult() const -> RecruitResult {
+        if (not isPosting()) return {.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
+        return ledger_.publishResult();
+    }
 
     void endStep() {
+        if (not isPosting()) return;
         myRequest_.reset();
         ledger_.reset();
         offerApplicants_.clear();
@@ -154,6 +150,10 @@ class [[nodiscard]] Recruiter {
 
   private:
     [[nodiscard]] auto isPosting() const -> bool { return myRequest_.has_value(); }
+
+    [[nodiscard]] auto shouldPost(const RecruitPlan& plan) const -> bool {
+        return plan.offer > HeadCount{0.0};
+    }
 
     std::optional<LaborRequest&> myRequest_{std::nullopt};
     Ledger                       ledger_;

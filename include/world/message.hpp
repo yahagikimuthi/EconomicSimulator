@@ -111,15 +111,28 @@ struct LaborEntry {
 
 struct [[nodiscard]] LaborRequest {
     using EntryBoxT = std::ranges::subrange<
-        tbb::concurrent_vector<LaborEntry>::iterator,
-        tbb::concurrent_vector<LaborEntry>::iterator,
-        std::ranges::subrange_kind::sized>;
+        std::ranges::iterator_t<tbb::detail::d1::concurrent_vector<
+            abm::LaborEntry,
+            tbb::detail::d1::cache_aligned_allocator<abm::LaborEntry>>&>,
+        std::ranges::sentinel_t<tbb::detail::d1::concurrent_vector<
+            abm::LaborEntry,
+            tbb::detail::d1::cache_aligned_allocator<abm::LaborEntry>>&>,
+        (std::ranges::sized_range<tbb::detail::d1::concurrent_vector<abm::LaborEntry>&> ||
+         std::sized_sentinel_for<
+             std::ranges::sentinel_t<tbb::detail::d1::concurrent_vector<
+                 abm::LaborEntry,
+                 tbb::detail::d1::cache_aligned_allocator<abm::LaborEntry>>&>,
+             std::ranges::iterator_t<tbb::detail::d1::concurrent_vector<
+                 abm::LaborEntry,
+                 tbb::detail::d1::cache_aligned_allocator<abm::LaborEntry>>&>>)
+            ? std::ranges::subrange_kind::sized
+            : std::ranges::subrange_kind::unsized>;
 
     LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
     auto entry(const AgentID id, const double productPower) -> LaborEntry& {
         return *entryBox_.emplace_back(id, productPower, *this);
     }
-    auto entryBox() -> EntryBoxT { return entryBox_; }
+    auto entryBox() -> EntryBoxT { return std::ranges::subrange{entryBox_}; }
 
     const AgentID firmID;
     const Wage    wage;
@@ -131,12 +144,25 @@ struct [[nodiscard]] LaborRequest {
 class [[nodiscard]] LaborMarket {
   public:
     using RequestBoxT = std::ranges::subrange<
-        tbb::concurrent_vector<LaborRequest>::iterator,
-        tbb::concurrent_vector<LaborRequest>::iterator,
-        std::ranges::subrange_kind::sized>;
+        std::ranges::iterator_t<tbb::detail::d1::concurrent_vector<
+            abm::LaborRequest,
+            tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>,
+        std::ranges::sentinel_t<tbb::detail::d1::concurrent_vector<
+            abm::LaborRequest,
+            tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>,
+        (std::ranges::sized_range<tbb::detail::d1::concurrent_vector<abm::LaborRequest>&> ||
+         std::sized_sentinel_for<
+             std::ranges::sentinel_t<tbb::detail::d1::concurrent_vector<
+                 abm::LaborRequest,
+                 tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>,
+             std::ranges::iterator_t<tbb::detail::d1::concurrent_vector<
+                 abm::LaborRequest,
+                 tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>>)
+            ? std::ranges::subrange_kind::sized
+            : std::ranges::subrange_kind::unsized>;
 
     LaborMarket() = default;
-    auto requestBox() -> RequestBoxT { return requestBox_; }
+    auto requestBox() -> RequestBoxT { return std::ranges::subrange{requestBox_}; }
     auto request(const AgentID id, const Wage wage) -> LaborRequest& {
         return *requestBox_.emplace_back(id, wage);
     }

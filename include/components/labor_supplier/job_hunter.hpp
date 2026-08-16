@@ -8,6 +8,7 @@
 #include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
+#include <span>
 
 #include "components/labor_supplier/concepts.hpp"
 #include "config.hpp"
@@ -17,13 +18,12 @@
 
 namespace abm::labor::supplier {
 inline void pickSample(
-    LaborMarket::RequestBoxT&                          requestBox,
+    LaborMarket::RequestBoxT                           requestBox,
     std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
     RandomGenerator&                                   rng,
     const int                                          sampleCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
-    sampleRequests.clear();
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
         for (LaborRequest& request : requestBox) sampleRequests.emplace_back(std::ref(request));
         return;
@@ -32,7 +32,7 @@ inline void pickSample(
 }
 
 inline void sortSample(
-    std::vector<std::reference_wrapper<LaborRequest>>& sortRequests, const int entryCnt
+    std::span<std::reference_wrapper<LaborRequest>> sortRequests, const int entryCnt
 ) {
     const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
@@ -45,20 +45,21 @@ inline void sortSample(
     );
 }
 
-[[nodiscard]] inline auto pickJobs(
-    LaborMarket::RequestBoxT requestBox,
-    RandomGenerator&         rng,
-    const int                sampleCnt,
-    const int                entryCnt
+[[nodiscard]] inline auto pickAndSortJobs(
+    const LaborMarket::RequestBoxT& requestBox,
+    RandomGenerator&                rng,
+    const int                       sampleCnt,
+    const int                       entryCnt
 ) -> std::ranges::view auto {
-    using Request = LaborRequest;
-    static thread_local std::vector<std::reference_wrapper<Request>> sampleRequest;
+    using Request    = LaborRequest;
+    using RequestRef = std::reference_wrapper<Request>;
+
+    static thread_local std::vector<RequestRef> sampleRequest;
+    sampleRequest.clear();
     pickSample(requestBox, sampleRequest, rng, sampleCnt);
     sortSample(sampleRequest, entryCnt);
     return sampleRequest |
-           std::views::transform([](std::reference_wrapper<Request> reqRef) -> Request& {
-               return reqRef.get();
-           });
+           std::views::transform([](RequestRef reqRef) -> Request& { return reqRef.get(); });
 }
 
 class [[nodiscard]] MyEntries {
@@ -69,7 +70,8 @@ class [[nodiscard]] MyEntries {
     MyEntries() = default;
     void add(LaborEntry& entry) { entries_.emplace_back(std::ref(entry)); }
     void clear() { entries_.clear(); }
-    auto takeOfferedEntry() -> std::ranges::view auto {
+
+    [[nodiscard]] auto takeOfferedEntry() -> std::ranges::view auto {
         return entries_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
                    return ref.get();
                }) |
@@ -80,41 +82,47 @@ class [[nodiscard]] MyEntries {
     std::vector<RefWrap<LaborEntry>> entries_;
 };
 
-class [[nodiscard]] JobHunter {
+class JobHunter {
   public:
-    JobHunter(const RandomGenerator rng) : rng_{rng} {}
+    [[nodiscard]] JobHunter(const RandomGenerator rng) : rng_{rng} {}
 
+    template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(
-        IsAlignedFn auto&&              isAligned,
-        MakeEntrySheetFn auto&&         makeEntrySheet,
+        F1&&                            isAligned,
+        F2&&                            makeEntrySheet,
         const LaborMarket::RequestBoxT& requestBox,
         const int                       sampleCnt = config::labor_supplier::jobSampleCnt,
         const int                       entryCnt  = config::labor_supplier::jobEntryCnt
     ) PRE(entryCnt > 0) {
         using Request = LaborRequest;
         std::ranges::view auto alignedRequests{
-            pickJobs(requestBox, rng_, sampleCnt, entryCnt) |
-            std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
+            pickAndSortJobs(requestBox, rng_, sampleCnt, entryCnt) |
+            std::views::filter([&](const Request& req) -> bool {
+                return std::forward<F1>(isAligned)(req);
+            }) |
             std::views::take(entryCnt)
         };
         if (alignedRequests.empty()) return;
         isPosting_ = true;
-        for (auto&& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
+        for (auto&& request : alignedRequests)
+            myEntries_.add(std::forward<F2>(makeEntrySheet)(request));
     }
 
     void accept() {
         if (not isPosting_) return;
-        std::optional<Entry&> acceptEntry{takeAcceptEntry()};
+        const std::optional<Entry&> acceptEntry{takeAcceptEntry()};
         if (not acceptEntry) return;
         acceptEntry->isAccept = true;
         acceptedEntry_        = acceptEntry;
     }
+
     void endStep() { myEntries_.clear(), acceptedEntry_.reset(), isPosting_ = false; }
-    auto acceptedEntry() -> std::optional<LaborEntry&> { return acceptedEntry_; }
+
+    [[nodiscard]] auto huntedResult() -> std::optional<LaborEntry&> { return acceptedEntry_; }
 
   private:
     using Entry = LaborEntry;
-    auto takeAcceptEntry() -> std::optional<Entry&> {
+    [[nodiscard]] auto takeAcceptEntry() -> std::optional<Entry&> {
         std::ranges::view auto offered{myEntries_.takeOfferedEntry() | std::views::take(1)};
         if (offered.empty()) return std::nullopt;
         return offered.front();

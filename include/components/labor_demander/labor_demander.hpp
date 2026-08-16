@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/hr_manager.hpp"
 #include "components/labor_demander/planner.hpp"
@@ -52,11 +50,7 @@ class LaborDemander {
     }
 
     void endStep(CensusDropBox& dropBox) {
-        using namespace labor::demander;
-        std::optional<RecruitResult> result{recruiter_.publishResult()};
-        if (result) {
-            memory_.memorize(*result);
-        }
+        memory_.memorize(recruiter_.publishResult());
         recruiter_.endStep();
         memory_.endStep(dropBox);
     }
