@@ -27,6 +27,8 @@ class [[nodiscard]] Wage {
         return *this;
     }
 
+    [[nodiscard]] auto operator-() const -> Wage { return Wage{-value_}; }
+
     [[nodiscard]] explicit operator Money() const { return Money{value_}; }
 
   private:
@@ -82,6 +84,8 @@ class [[nodiscard]] HeadCount {
         --value_;
         return *this;
     }
+
+    [[nodiscard]] auto operator-() const -> HeadCount { return HeadCount{-value_}; }
 
   private:
     double value_;

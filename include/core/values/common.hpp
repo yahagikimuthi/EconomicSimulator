@@ -27,6 +27,8 @@ class Money {
         return *this;
     }
 
+    [[nodiscard]] auto operator-() const -> Money { return Money{-value_}; }
+
   private:
     double value_;
 };
