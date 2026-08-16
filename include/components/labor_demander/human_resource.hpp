@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <numeric>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -36,7 +38,16 @@ class EmptyRosterPool {
 class HumanResource {
   public:
     [[nodiscard]] HumanResource(CompanyBoard&& companyBoard)
-        : companyBoard_{std::move(companyBoard)} {}
+        : companyBoard_{std::move(companyBoard)}, sumWage_{[&]() -> Wage {
+              const auto& roster = companyBoard_.roster;
+
+              auto wages{
+                  roster | std::views::filter(&RosterEntry::isOccupied) |
+                  std::views::transform(&RosterEntry::wage) |
+                  std::views::transform([](Wage wage) -> double { return wage.value(); })
+              };
+              return Wage{std::reduce(wages.begin(), wages.end())};
+          }()} {}
 
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
@@ -83,7 +94,7 @@ class HumanResource {
   private:
     CompanyBoard    companyBoard_;
     EmptyRosterPool emptyRosterPool_;
-    Wage            sumWage_{0.0};
+    Wage            sumWage_;
 };
 }  // namespace abm::labor::demander::human_resource
 
