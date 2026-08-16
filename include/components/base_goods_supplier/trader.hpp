@@ -19,7 +19,7 @@
 namespace abm::base_goods::supplier {
 class LedgerManager {
   public:
-    LedgerManager() = default;
+    [[nodiscard]] LedgerManager() = default;
 
     void makeNewPage(const GoodsQuantity supply) { supply_ = supply; }
 
@@ -36,13 +36,15 @@ class LedgerManager {
         totalDemand_  = GoodsQuantity{0.0};
     }
 
-    auto isExcessDemand(const GoodsQuantity demand) const -> bool { return demand >= inventory_; }
+    [[nodiscard]] auto isExcessDemand(const GoodsQuantity demand) const -> bool {
+        return demand >= inventory_;
+    }
 
-    auto salesAmount(const GoodsQuantity demand) -> GoodsQuantity {
+    [[nodiscard]] auto salesAmount(const GoodsQuantity demand) -> GoodsQuantity {
         return isExcessDemand(demand) ? inventory_ : demand;
     }
 
-    auto tradingResult() const -> TradeResult {
+    [[nodiscard]] auto tradingResult() const -> TradeResult {
         return {
             .supply      = supply_,
             .soldAmount  = supply_ - inventory_,
@@ -86,7 +88,9 @@ class Trader {
         ledgerManager_.add(myEntry_->price, salesAmount);
     }
 
-    auto tradingResult() const -> TradeResult { return ledgerManager_.tradingResult(); }
+    [[nodiscard]] auto tradingResult() const -> TradeResult {
+        return ledgerManager_.tradingResult();
+    }
 
     void endStep() { myEntry_.reset(), isPosting_ = false, ledgerManager_.reset(); }
 

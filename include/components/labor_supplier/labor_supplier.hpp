@@ -72,7 +72,7 @@ class JobSearch {
 namespace abm {
 class LaborSupplier {
   public:
-    LaborSupplier(
+    [[nodiscard]] LaborSupplier(
         const labor::supplier::JobHunter&&  jobHunter,
         const labor::supplier::Employment&& employment,
         const labor::supplier::JobSearch    jobSearchThreshold

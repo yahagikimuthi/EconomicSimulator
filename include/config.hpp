@@ -11,10 +11,6 @@ constexpr std::string_view simulationResultOutputPath{"../outputs/result.h5"};
 constexpr std::string_view metricDataOutputPath{"../outputs/metrics.h5"};
 }  // namespace abm::config::setting
 
-namespace abm::config::labor_demander {
-constexpr double epsilonWage{1e-16};
-}
-
 namespace abm::config::labor_supplier {
 constexpr int jobSampleCnt{2};
 constexpr int jobEntryCnt{2};

@@ -11,9 +11,9 @@
 #include "world/message.hpp"
 
 namespace abm {
-class [[nodiscard]] ProductionGoodsSupplier final : public BaseGoodsSupplier {
+class ProductionGoodsSupplier final : public BaseGoodsSupplier {
   public:
-    ProductionGoodsSupplier(
+    [[nodiscard]] ProductionGoodsSupplier(
         const base_goods::supplier::Planner&      planner,
         const production_goods::supplier::Trader& trader,
         base_goods::supplier::Producer&&          producer

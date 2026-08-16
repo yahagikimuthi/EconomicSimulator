@@ -16,9 +16,9 @@ struct TradeResult {
     Money         sales;
 };
 
-class [[nodiscard]] PlanMemory {
+class PlanMemory {
   public:
-    PlanMemory();
+    [[nodiscard]] PlanMemory();
     void memorize(TradePlan& newPlan) { currentPlan_ = newPlan; }
     auto rememberLastPlan() const -> const TradePlan& { return log_; }
     void endStep(CensusDropBox& dropBox) {
@@ -33,9 +33,9 @@ class [[nodiscard]] PlanMemory {
     TradePlan currentPlan_;
 };
 
-class [[nodiscard]] TradingMemory {
+class TradingMemory {
   public:
-    TradingMemory();
+    [[nodiscard]] TradingMemory();
     void memory(const TradeResult& newResult) { currentResult_ = newResult; }
     auto rememberLastResult() const -> const TradeResult& { return log_; }
 
@@ -44,9 +44,9 @@ class [[nodiscard]] TradingMemory {
     TradeResult currentResult_;
 };
 
-class [[nodiscard]] Memory {
+class Memory {
   public:
-    Memory();
+    [[nodiscard]] Memory();
 
   private:
     PlanMemory    planMemory_;

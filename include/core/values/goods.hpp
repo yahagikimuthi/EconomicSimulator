@@ -6,13 +6,12 @@
 #include "core/values/common.hpp"
 
 namespace abm {
-
-class [[nodiscard]] Price {
+class Price {
   public:
-    explicit Price(const double value) : value_{value} {}
-    auto value() const -> double { return value_; }
-    auto operator<=>(const Price&) const = default;
-    auto operator+=(const Price other) -> Price& {
+    [[nodiscard]] explicit Price(const double value) : value_{value} {}
+    [[nodiscard]] auto value() const -> double { return value_; }
+    [[nodiscard]] auto operator<=>(const Price&) const = default;
+    auto               operator+=(const Price other) -> Price& {
         value_ += other.value();
         return *this;
     }
@@ -28,7 +27,7 @@ class [[nodiscard]] Price {
         value_ /= other;
         return *this;
     }
-    explicit operator Money() const { return Money{value_}; }
+    [[nodiscard]] explicit operator Money() const { return Money{value_}; }
 
   private:
     double value_;
@@ -53,12 +52,12 @@ class [[nodiscard]] Price {
     return lhs;
 }
 
-class [[nodiscard]] GoodsQuantity {
+class GoodsQuantity {
   public:
-    explicit GoodsQuantity(const double value) : value_{value} {}
-    auto value() const -> double { return value_; }
-    auto operator<=>(const GoodsQuantity&) const = default;
-    auto operator+=(const GoodsQuantity other) -> GoodsQuantity& {
+    [[nodiscard]] explicit GoodsQuantity(const double value) : value_{value} {}
+    [[nodiscard]] auto value() const -> double { return value_; }
+    [[nodiscard]] auto operator<=>(const GoodsQuantity&) const = default;
+    auto               operator+=(const GoodsQuantity other) -> GoodsQuantity& {
         value_ += other.value();
         return *this;
     }

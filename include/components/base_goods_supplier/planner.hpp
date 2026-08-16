@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
@@ -12,20 +13,12 @@
 #include "world/message.hpp"
 
 namespace abm::base_goods::supplier {
-[[nodiscard]] inline auto markupGuard(const double markup) -> double {
-    return std::max(markup, config::goods_supplier::epsilonMarkup);
-}
-
-[[nodiscard]] inline auto priceGuard(const Price price) -> Price {
-    return Price{std::max(price.value(), config::goods_supplier::epsilonPrice)};
-}
-
-class [[nodiscard]] MarkupPlanner {
+class MarkupPlanner {
   public:
-    MarkupPlanner(const RandomGenerator rng, const double log, const double adjustVol)
+    [[nodiscard]] MarkupPlanner(const RandomGenerator rng, const double log, const double adjustVol)
         : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
 
-    auto judgeMarkup(const bool isSold) -> double {
+    [[nodiscard]] auto judgeMarkup(const bool isSold) -> double {
         const double nextMarkup{calcMarkup(isSold)};
         plan_ = nextMarkup;
         return nextMarkup;
@@ -38,10 +31,14 @@ class [[nodiscard]] MarkupPlanner {
     }
 
   private:
-    auto calcMarkup(const bool isSold) const -> double POST(markup : markup > 0.0) {
+    [[nodiscard]] auto calcMarkup(const bool isSold) const -> double POST(markup : markup > 0.0) {
         const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_))};
         const double nextMarkup{log_ + (isSold ? alpha : -alpha)};
         return markupGuard(nextMarkup);
+    }
+
+    auto markupGuard(const double markup) const -> double {
+        return std::max(markup, std::numeric_limits<double>::epsilon());
     }
 
     mutable RandomGenerator rng_;
@@ -50,12 +47,13 @@ class [[nodiscard]] MarkupPlanner {
     const double            adjustVol_;
 };
 
-class [[nodiscard]] PricePlanner {
+class PricePlanner {
   public:
-    PricePlanner() = default;
+    [[nodiscard]] PricePlanner() = default;
 
-    auto judgePrice(const GoodsQuantity supply, const double markup, const Money totalCost)
-        -> Price {
+    [[nodiscard]] auto judgePrice(
+        const GoodsQuantity supply, const double markup, const Money totalCost
+    ) -> Price {
         const Price nextPrice{calcPrice(supply, markup, totalCost)};
         plan_ = nextPrice;
         return nextPrice;
@@ -67,8 +65,9 @@ class [[nodiscard]] PricePlanner {
     }
 
   private:
-    auto calcPrice(const GoodsQuantity supply, const double markup, const Money totalCost) const
-        -> Price {
+    [[nodiscard]] auto calcPrice(
+        const GoodsQuantity supply, const double markup, const Money totalCost
+    ) const -> Price {
         const Money avgCost{
             (supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0
         };
@@ -76,15 +75,20 @@ class [[nodiscard]] PricePlanner {
         return priceGuard(price);
     }
 
+    [[nodiscard]] auto priceGuard(const Price price) const -> Price {
+        return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
+    }
+
     Price plan_{0.0};
 };
 
 class PostingInfoPlanner {
   public:
-    PostingInfoPlanner(MarkupPlanner markupPlanner) : markupPlanner_{markupPlanner} {}
+    [[nodiscard]] PostingInfoPlanner(MarkupPlanner markupPlanner) : markupPlanner_{markupPlanner} {}
 
-    auto judgePlan(const GoodsQuantity supply, const Money totalCost, const bool isSold)
-        -> TradePlan {
+    [[nodiscard]] auto judgePlan(
+        const GoodsQuantity supply, const Money totalCost, const bool isSold
+    ) -> TradePlan {
         const double markup{markupPlanner_.judgeMarkup(isSold)};
         const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
         return {.price = price, .supply = supply};
@@ -100,7 +104,7 @@ class PostingInfoPlanner {
     PricePlanner  pricePlanner_;
 };
 
-class [[nodiscard]] DemandForecastManager {
+class DemandForecastManager {
   public:
     DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
 
@@ -109,7 +113,7 @@ class [[nodiscard]] DemandForecastManager {
         demandForecast_ = next;
     }
 
-    auto targetSupply(const double targetInvRatio) const -> GoodsQuantity {
+    [[nodiscard]] auto targetSupply(const double targetInvRatio) const -> GoodsQuantity {
         return demandForecast_ / (1.0 - targetInvRatio);
     }
 
@@ -118,9 +122,9 @@ class [[nodiscard]] DemandForecastManager {
     const double  adjustVol_;
 };
 
-class [[nodiscard]] Planner {
+class Planner {
   public:
-    Planner(
+    [[nodiscard]] Planner(
         const GoodsQuantity         lastSupply,
         const bool                  isSold,
         const double                targetInvRatio,
@@ -132,17 +136,19 @@ class [[nodiscard]] Planner {
           postingPlanner_{postingPlanner},
           demandForecastManager_{demandForecastManager} {}
 
-    auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> TradePlan
+    [[nodiscard]] auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> TradePlan
         PRE(supply >= GoodsQuantity{0.0}) PRE(totalCost >= Money{0.0}) {
         supplyPlan_ = supply;
         return postingPlanner_.judgePlan(supply, totalCost, log_.isSold);
     }
 
-    auto lastSupply() const -> GoodsQuantity POST(supply : supply >= GoodsQuantity{0.0}) {
+    [[nodiscard]] auto lastSupply() const -> GoodsQuantity POST(supply
+                                                                : supply >= GoodsQuantity{0.0}) {
         return log_.supply;
     }
 
-    auto targetSupply() const -> GoodsQuantity POST(target : target >= GoodsQuantity{0.0}) {
+    [[nodiscard]] auto targetSupply() const -> GoodsQuantity POST(target
+                                                                  : target >= GoodsQuantity{0.0}) {
         return demandForecastManager_.targetSupply(targetInvRatio_);
     }
 
@@ -157,7 +163,7 @@ class [[nodiscard]] Planner {
     }  // namespace goods_supplier
 
   private:
-    auto isSold(const GoodsQuantity unsoldAmount
+    [[nodiscard]] auto isSold(const GoodsQuantity unsoldAmount
     ) const -> bool PRE(unsoldAmount >= GoodsQuantity{0.0}) {
         return (supplyPlan_ != GoodsQuantity{0.0}) ? unsoldAmount / supplyPlan_ < targetInvRatio_
                                                    : true;

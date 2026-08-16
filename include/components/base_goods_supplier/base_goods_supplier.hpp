@@ -6,19 +6,19 @@
 #include "world/message.hpp"
 
 namespace abm {
-class [[nodiscard]] BaseGoodsSupplier {
+class BaseGoodsSupplier {
   public:
-    auto calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount
+    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount
         PRE(employeeCnt >= HeadCount{0.0}) {
         return producer_.calcDesiredEmploy(
             planner_.targetSupply(), planner_.lastSupply(), employeeCnt
         );
     }
 
-    auto workspace() -> Workspace& { return producer_.workspace(); }
+    [[nodiscard]] auto workspace() -> Workspace& { return producer_.workspace(); }
 
   protected:
-    BaseGoodsSupplier(
+    [[nodiscard]] BaseGoodsSupplier(
         const base_goods::supplier::Planner&   planner,
         const base_goods::supplier::Producer&& producer
     )

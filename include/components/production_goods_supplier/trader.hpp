@@ -13,7 +13,7 @@
 namespace abm::production_goods::supplier {
 class Trader final : public base_goods::supplier::Trader<Market::productionGoods> {
   public:
-    Trader(const RandomGenerator rng)
+    [[nodiscard]] Trader(const RandomGenerator rng)
         : base_goods::supplier::Trader<Market::productionGoods>::Trader(rng) {}
 
     void post(

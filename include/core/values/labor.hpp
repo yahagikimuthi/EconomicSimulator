@@ -7,10 +7,10 @@
 namespace abm {
 class [[nodiscard]] Wage {
   public:
-    explicit Wage(const double value) : value_{value} {}
-    auto value() const -> double { return value_; }
-    auto operator<=>(const Wage&) const = default;
-    auto operator+=(const Wage other) -> Wage& {
+    [[nodiscard]] explicit Wage(const double value) : value_{value} {}
+    [[nodiscard]] auto value() const -> double { return value_; }
+    [[nodiscard]] auto operator<=>(const Wage&) const = default;
+    auto               operator+=(const Wage other) -> Wage& {
         value_ += other.value();
         return *this;
     }
@@ -26,9 +26,8 @@ class [[nodiscard]] Wage {
         value_ /= other;
         return *this;
     }
-    auto operator-() const -> Wage { return Wage{-value_}; }
 
-    explicit operator Money() const { return Money{value_}; }
+    [[nodiscard]] explicit operator Money() const { return Money{value_}; }
 
   private:
     double value_;
@@ -53,12 +52,13 @@ class [[nodiscard]] Wage {
 
 class [[nodiscard]] HeadCount {
   public:
-    explicit HeadCount(const double value) : value_{value} {}
-    explicit HeadCount(const int value) : value_{static_cast<double>(value)} {}
-    explicit HeadCount(const std::size_t value) : value_{static_cast<double>(value)} {}
-    auto value() const -> double { return value_; }
-    auto operator<=>(const HeadCount&) const = default;
-    auto operator+=(const HeadCount other) -> HeadCount& {
+    [[nodiscard]] explicit HeadCount(const double value) : value_{value} {}
+    [[nodiscard]] explicit HeadCount(const int value) : value_{static_cast<double>(value)} {}
+    [[nodiscard]] explicit HeadCount(const std::size_t value)
+        : value_{static_cast<double>(value)} {}
+    [[nodiscard]] auto value() const -> double { return value_; }
+    [[nodiscard]] auto operator<=>(const HeadCount&) const = default;
+    auto               operator+=(const HeadCount other) -> HeadCount& {
         value_ += other.value();
         return *this;
     }
@@ -82,11 +82,11 @@ class [[nodiscard]] HeadCount {
         --value_;
         return *this;
     }
-    auto operator-() const -> HeadCount { return HeadCount{-value_}; }
 
   private:
     double value_;
 };
+
 [[nodiscard]] inline auto operator+(HeadCount lhs, const HeadCount rhs) -> HeadCount {
     lhs += rhs;
     return lhs;

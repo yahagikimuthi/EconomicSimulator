@@ -178,7 +178,7 @@ namespace labor::supplier {
     return Employment{productPower};
 }
 
-[[nodiscard]] auto makeJobSearchThreshold(RandomGenerator& masterRng) -> JobSearchThreshold {
+[[nodiscard]] auto makeJobSearchThreshold(RandomGenerator& masterRng) -> JobSearch {
     const RandomGenerator rng{{masterRng.makeUint64(), masterRng.makeUint64()}};
     const double          jobSearchThreshold{masterRng.rand(0.01, 0.05)};
     return {rng, jobSearchThreshold};

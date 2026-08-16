@@ -9,16 +9,20 @@
 #include "world/message.hpp"
 
 namespace abm::base_goods::supplier {
-class [[nodiscard]] Producer {
+class Producer {
   public:
-    Producer(Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory)
+    [[nodiscard]] Producer(
+        Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory
+    )
         : workspace_{std::move(workspace)},
           firmProductPower_{firmProductPower},
           inventory_{inventory} {}
 
-    auto product() const -> GoodsQuantity { return workspace_.totalInput() + inventory_; }
+    [[nodiscard]] auto product() const -> GoodsQuantity {
+        return workspace_.totalInput() + inventory_;
+    }
 
-    auto calcDesiredEmploy(
+    [[nodiscard]] auto calcDesiredEmploy(
         const GoodsQuantity targetSupply,
         const GoodsQuantity lastSupply,
         const HeadCount     employeeCnt,
@@ -43,7 +47,7 @@ class [[nodiscard]] Producer {
         workspace_.resetInput();
     }
 
-    auto workspace() -> Workspace& { return workspace_; }
+    [[nodiscard]] auto workspace() -> Workspace& { return workspace_; }
 
   private:
     Workspace     workspace_;
