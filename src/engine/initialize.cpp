@@ -67,9 +67,7 @@ namespace base_goods::supplier {
 }
 
 [[nodiscard]] auto makePlanner(RandomGenerator& masterRng) -> Planner {
-    const auto rng            = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
     const auto lastSupply     = GoodsQuantity{masterRng.rand(4.0, 15.0)};
-    const auto demandForecast = GoodsQuantity{masterRng.rand(5.0, 20.0)};
     const auto isSold         = bool{masterRng.rand() < 0.5};
     const auto targetInvRatio = masterRng.rand(0.1, 0.2);
     return {
@@ -180,7 +178,6 @@ namespace labor::supplier {
 }
 
 [[nodiscard]] auto make(RandomGenerator& masterRng) -> LaborSupplier {
-    const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
     return LaborSupplier{
         makeJobHunter(masterRng), makeEmployment(masterRng), makeJobSearchThreshold(masterRng)
     };
