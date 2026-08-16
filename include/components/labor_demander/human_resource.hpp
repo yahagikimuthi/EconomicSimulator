@@ -25,7 +25,7 @@ class EmptyRosterPool {
 
     auto popBackEntry() -> RosterEntry& {
         ASSERT(not empty());
-        RosterEntry& back = pool_.back().get();
+        auto& back = pool_.back().get();
         pool_.pop_back();
         return back;
     }
@@ -41,11 +41,9 @@ class HumanResource {
         : companyBoard_{std::move(companyBoard)}, sumWage_{[&]() -> Wage {
               const auto& roster = companyBoard_.roster;
 
-              auto wages{
-                  roster | std::views::filter(&RosterEntry::isOccupied) |
-                  std::views::transform(&RosterEntry::wage) |
-                  std::views::transform([](Wage wage) -> double { return wage.value(); })
-              };
+              auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
+                           std::views::transform(&RosterEntry::wage) |
+                           std::views::transform([](Wage wage) -> double { return wage.value(); });
               return Wage{std::reduce(wages.begin(), wages.end())};
           }()} {}
 
@@ -53,7 +51,7 @@ class HumanResource {
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
         sumWage_ += wage;
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
-        RosterEntry* newRoster = &emptyRosterPool_.popBackEntry();
+        auto* newRoster = &emptyRosterPool_.popBackEntry();
         ASSERT(newRoster != nullptr);
         std::destroy_at(newRoster);
         std::construct_at(newRoster, id, wage, companyBoard_, workspace);
@@ -85,7 +83,7 @@ class HumanResource {
 
     [[nodiscard]] auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
-        const auto rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
+        const auto rosterSize = std::size_t{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
 

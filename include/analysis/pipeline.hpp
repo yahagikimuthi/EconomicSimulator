@@ -20,19 +20,19 @@ class Pipeline {
     }
 
     void execute() {
-        std::vector<std::string> stepKeys = inputManager_.getStepKeys();
-        std::vector<double>      stepNumVec;
+        auto stepKeys   = inputManager_.getStepKeys();
+        auto stepNumVec = std::vector<double>{};
         stepNumVec.reserve(stepKeys.size());
         for (auto& task : tasks_) {
             task->reserve(stepKeys.size());
         }
 
-        DataContext ctx;
+        auto ctx = DataContext{};
         for (const std::string& stepKey : stepKeys) {
             stepNumVec.emplace_back(std::stoi(stepKey.substr(5)));
 
             for (std::string_view requireData : requireDatas_) {
-                std::vector<double> data;
+                auto data = std::vector<double>{};
                 inputManager_.read(stepKey, requireData, data);
                 ctx.set(requireData, std::move(data));
             }

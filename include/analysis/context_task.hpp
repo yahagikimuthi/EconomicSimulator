@@ -19,8 +19,7 @@ class [[nodiscard]] DataContext {
     }
 
     auto get(std::string_view name) const -> const std::vector<double>& {
-        const std::vector<double>* out{tryGet(name)};
-        if (out != nullptr) return *out;
+        if (const auto* out = tryGet(name); out != nullptr) return *out;
         std::cerr << "this function return empty vector(size=0) now\n";
         return noneData_;
     }
@@ -34,7 +33,7 @@ class [[nodiscard]] DataContext {
             std::cerr << "required data not found in context: " << name << '\n';
             return nullptr;
         }
-        return &(it->second);
+        return &it->second;
     }
 
     std::unordered_map<std::string_view, std::vector<double>> cache_;

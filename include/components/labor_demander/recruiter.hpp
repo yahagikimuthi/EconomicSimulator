@@ -121,10 +121,8 @@ class Recruiter : public SortApplicants {
         if (not isPosting()) return;
         if (myRequest_->entryBox().empty()) return;
 
-        auto applicants{
-            sortApplicants(ledger_.remainOffer(), myRequest_->entryBox()) |
-            std::views::take(ledger_.remainOffer().value())
-        };
+        auto applicants = sortApplicants(ledger_.remainOffer(), myRequest_->entryBox()) |
+                          std::views::take(ledger_.remainOffer().value());
 
         auto offerCnt = HeadCount{0.0};
         for (auto& entry : applicants) {
@@ -141,8 +139,8 @@ class Recruiter : public SortApplicants {
     template <AddRosterFn F>
     void registerMember(F&& addRoster) {
         if (not isPosting()) return;
-        auto employCnt = HeadCount{0.0};
-        auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
+        auto employCnt        = HeadCount{0.0};
+        auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
         for (auto& acceptApplicant : acceptApplicants) {
             acceptApplicant.rosterEntry =
                 std::forward<F>(addRoster)(acceptApplicant.hholdID, myRequest_->wage);

@@ -22,10 +22,10 @@ concept AssetPlusFn = requires(F f, const Money money) {
 
 class RandomGenerator {
   public:
-    [[nodiscard]] RandomGenerator(const pcg32 rng) : rng_{rng} {}
+    [[nodiscard]] explicit RandomGenerator(const pcg32 rng) : rng_{rng} {}
 
     [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) -> double {
-        std::uniform_real_distribution<double> dist(min, limit);
+        auto dist = std::uniform_real_distribution<double>{min, limit};
         return dist(rng_);
     }
 
@@ -35,13 +35,13 @@ class RandomGenerator {
         const double min  = -std::numeric_limits<double>::infinity(),
         const double max  = std::numeric_limits<double>::infinity()
     ) -> double {
-        std::normal_distribution<double> dist{mean, div};
-        const double                     out{dist(rng_)};
+        auto       dist = std::normal_distribution<double>{mean, div};
+        const auto out  = double{dist(rng_)};
         return std::clamp(out, min, max);
     }
 
     [[nodiscard]] auto rand(const int min, const int limit) -> int {
-        std::uniform_int_distribution<int> dist{min, limit};
+        auto dist = std::uniform_int_distribution<int>{min, limit};
         return dist(rng_);
     }
 
@@ -51,7 +51,7 @@ class RandomGenerator {
         }
     [[nodiscard]] auto discreteDistribution(Container&& container, Proj&& proj = {})
         -> decltype(auto) {
-        double total{0.0};
+        auto total = 0.0;
         for (const auto& elem : std::forward<Container>(container)) {
             const double weight = std::invoke(std::forward<Proj>(proj), elem);
             ASSERT(weight >= 0.0 && "weight is required >= 0");
@@ -59,8 +59,8 @@ class RandomGenerator {
         }
         ASSERT(total >= 0.0 && "total is required >= 0");
 
-        const double target{rand(0.0, total)};
-        double       currentCnt{0.0};
+        const auto target     = rand(0.0, total);
+        auto       currentCnt = 0.0;
         for (auto& elem : std::forward<Container>(container)) {
             currentCnt += std::invoke(std::forward<Proj>(proj), elem);
             if (currentCnt >= target) {

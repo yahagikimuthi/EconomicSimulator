@@ -85,22 +85,22 @@ class LaborSupplier {
         if (not jobSearch_()) return;
         if (requestBox.empty()) return;
 
-        using Request = LaborRequest;
-        auto isAligned{[&] [[nodiscard]] (const Request& req) -> bool {
+        using Request  = LaborRequest;
+        auto isAligned = [&] [[nodiscard]] (const Request& req) -> bool {
             if (req.firmID == employment_.contractFirmId()) return false;
             if (req.wage < employment_.wage()) return false;
             return true;
-        }};
-        auto makeEntrySheet{[&](Request& req) -> LaborEntry& {
+        };
+        auto makeEntrySheet = [&](Request& req) -> LaborEntry& {
             return req.entry(id, employment_.productPower());
-        }};
+        };
         jobHunter_.entry(isAligned, makeEntrySheet, requestBox);
     }
 
     void accept() { jobHunter_.accept(); }
 
     void recordRosterEntry() {
-        const std::optional<LaborEntry&> acceptedEntry{jobHunter_.huntedResult()};
+        const auto acceptedEntry = jobHunter_.huntedResult();
         if (not acceptedEntry) return;
         employment_.startWorking(*acceptedEntry->rosterEntry);
     }

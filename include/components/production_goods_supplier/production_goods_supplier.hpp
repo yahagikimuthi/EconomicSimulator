@@ -25,7 +25,7 @@ class ProductionGoodsSupplier final : public BaseGoodsSupplier {
         const Money                                   totalCost,
         tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
-        const GoodsQuantity supply{producer_.product()};
+        const auto supply = producer_.product();
         trader_.post(id, planner_.judgePlan(supply, totalCost), entryBox);
     }
 
@@ -33,7 +33,7 @@ class ProductionGoodsSupplier final : public BaseGoodsSupplier {
 
     void endStep(AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
         using namespace base_goods::supplier;
-        const TradeResult result{trader_.tradingResult()};
+        const auto result = trader_.tradingResult();
         assetPlus(result.sales);
         planner_.endStep(result.totalDemand, result.supply - result.soldAmount, dropBox);
         producer_.endStep(result.supply - result.soldAmount, dropBox);

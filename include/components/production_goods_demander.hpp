@@ -25,12 +25,11 @@ class [[nodiscard]] ProductionGoodsDemander final
     void request(
         const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
-        using Entry = ProductionGoodsEntry;
         if (isPass(asset, entryBox)) return;
-        const Money budget{budgetCalculator_.calcBudget(asset)};
+        const auto budget = budgetCalculator_.calcBudget(asset);
         if (budget <= Money{0.0}) return;
-        isPosting_                              = true;
-        const std::optional<Entry&> pickedEntry = pickEntry(id, entryBox);
+        isPosting_             = true;
+        const auto pickedEntry = pickEntry(id, entryBox);
         if (not pickedEntry) return;
         myRequest_ = pickedEntry->request(GoodsQuantity{budget / pickedEntry->price});
     }
@@ -64,13 +63,13 @@ class [[nodiscard]] ProductionGoodsDemander final
         tbb::concurrent_vector<ProductionGoodsEntry> entryBox,
         const int sampleCnt = config::goods_demander::goodsSampleCnt
     ) const -> std::optional<ProductionGoodsEntry&> {
-        using Entry = ProductionGoodsEntry;
-        auto toDouble{[](const Entry& entry) -> double { return entry.supply.value(); }};
-        std::optional<Entry&> betterEntry{std::nullopt};
+        using Entry      = ProductionGoodsEntry;
+        auto toDouble    = [](const Entry& entry) -> double { return entry.supply.value(); };
+        auto betterEntry = std::optional<Entry&>{std::nullopt};
 
         for (const auto _ : std::views::iota(0, sampleCnt)) {
             auto&      sampleEntry = rng_.discreteDistribution(entryBox, toDouble);
-            const bool isAdopt{shouldAdopt(id, betterEntry, sampleEntry)};
+            const auto isAdopt     = shouldAdopt(id, betterEntry, sampleEntry);
             if (not isAdopt) continue;
             betterEntry = std::ref(sampleEntry);
         }

@@ -2,7 +2,7 @@
 #include "core/engine.hpp"
 
 auto main() -> int {
-    abm::Engine engine{1000};
+    auto engine = abm::Engine{1000};
     engine.run();
 
     abm::analysis::analysisData();

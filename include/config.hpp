@@ -3,43 +3,47 @@
 #include <cstdint>
 #include <string_view>
 
+namespace abm {
+using namespace std::string_view_literals;
+}
+
 namespace abm::config::setting {
-constexpr bool             useRuntimeRandomSeed{false};
-constexpr std::uint64_t    fixedSeedState{0x853c49e6748fea9bULL};
-constexpr std::uint64_t    fixedSeedStream{0xda3e39cb94b95bdbULL};
-constexpr std::string_view simulationResultOutputPath{"../outputs/result.h5"};
-constexpr std::string_view metricDataOutputPath{"../outputs/metrics.h5"};
+constexpr auto useRuntimeRandomSeed       = false;
+constexpr auto fixedSeedState             = std::uint64_t{0x853c49e6748fea9bULL};
+constexpr auto fixedSeedStream            = std::uint64_t{0xda3e39cb94b95bdbULL};
+constexpr auto simulationResultOutputPath = "../outputs/result.h5"sv;
+constexpr auto metricDataOutputPath       = "../outputs/metrics.h5"sv;
 }  // namespace abm::config::setting
 
 namespace abm::config::labor_supplier {
-constexpr int jobSampleCnt{2};
-constexpr int jobEntryCnt{2};
+constexpr auto jobSampleCnt = 2;
+constexpr auto jobEntryCnt  = 2;
 }  // namespace abm::config::labor_supplier
 
 namespace abm::config::goods_supplier {
-constexpr double epsilonMarkup{1e-12};
-constexpr double epsilonPrice{1e-12};
+constexpr auto epsilonMarkup = 1e-12;
+constexpr auto epsilonPrice  = 1e-12;
 }  // namespace abm::config::goods_supplier
 
 namespace abm::config::goods_demander {
-constexpr int maxPurchaseFrequency{7};
-constexpr int goodsSampleCnt{2};
+constexpr auto maxPurchaseFrequency = 7;
+constexpr auto goodsSampleCnt       = 2;
 }  // namespace abm::config::goods_demander
 
 namespace abm::config::agent_count {
-constexpr int BtoCFirm{2};
-constexpr int BtoBFirm{2};
-constexpr int hhold{1000};
+constexpr auto BtoCFirm = 2;
+constexpr auto BtoBFirm = 2;
+constexpr auto hhold    = 1000;
 }  // namespace abm::config::agent_count
 
 namespace abm::config::save_name {
-constexpr std::string_view firmAssets{"firmAssets"};
-constexpr std::string_view postedEmployments{"postedEmployments"};
-constexpr std::string_view employments{"employments"};
-constexpr std::string_view prices{"prices"};
-constexpr std::string_view supplies{"supplies"};
-constexpr std::string_view markups{"markups"};
-constexpr std::string_view inventories{"inventories"};
-constexpr std::string_view householdAssets{"householdAssets"};
-constexpr std::string_view wages{"wages"};
+constexpr auto firmAssets        = "firmAssets"sv;
+constexpr auto postedEmployments = "postedEmployments"sv;
+constexpr auto employments       = "employments"sv;
+constexpr auto prices            = "prices"sv;
+constexpr auto supplies          = "supplies"sv;
+constexpr auto markups           = "markups"sv;
+constexpr auto inventories       = "inventories"sv;
+constexpr auto householdAssets   = "householdAssets"sv;
+constexpr auto wages             = "wages"sv;
 }  // namespace abm::config::save_name

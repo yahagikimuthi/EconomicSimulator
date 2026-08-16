@@ -18,11 +18,11 @@ class [[nodiscard]] InputDataManager {
   public:
     InputDataManager()
         : inFile_{[]() -> HighFive::File {
-              const std::string filepath{
-                  static_cast<std::string>(config::setting::simulationResultOutputPath)
-              };
-              const std::filesystem::path path{filepath};
-              if (path.has_parent_path()) std::filesystem::create_directories(path.parent_path());
+              const auto filepath =
+                  static_cast<std::string>(config::setting::simulationResultOutputPath);
+
+              if (const auto path = std::filesystem::path{filepath}; path.has_parent_path())
+                  std::filesystem::create_directories(path.parent_path());
               return HighFive::File{filepath, HighFive::File::ReadOnly};
           }()} {
         if (not inFile_.isValid()) {
@@ -37,7 +37,7 @@ class [[nodiscard]] InputDataManager {
     }
 
     auto getStepKeys() const -> std::vector<std::string> {
-        auto stepKeys{inFile_.listObjectNames()};
+        auto stepKeys = inFile_.listObjectNames();
         std::ranges::sort(stepKeys, std::ranges::less{}, [](const std::string& step) -> int {
             return std::stoi(step.substr(5));
         });
@@ -46,7 +46,7 @@ class [[nodiscard]] InputDataManager {
 
     void read(const std::string& path, std::string_view dataName, std::vector<double>& container)
         const {
-        const auto group{getGroup(path)};
+        const auto group = getGroup(path);
         if (not group) {
             container.clear();
             return;
@@ -75,11 +75,8 @@ class [[nodiscard]] OutputDataManager {
   public:
     OutputDataManager()
         : outFile_{[]() -> HighFive::File {
-              const std::string filepath{
-                  static_cast<std::string>(config::setting::metricDataOutputPath)
-              };
-              const std::filesystem::path path{filepath};
-              if (path.has_parent_path()) {
+              const auto filepath = static_cast<std::string>(config::setting::metricDataOutputPath);
+              if (const auto path = std::filesystem::path{filepath}; path.has_parent_path()) {
                   std::filesystem::create_directories(path.parent_path());
               }
               return HighFive::File{

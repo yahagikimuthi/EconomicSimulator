@@ -78,10 +78,10 @@ class Trader {
   public:
     void trade() {
         if (not isPosting_) return;
-        auto&               requestBox = myEntry_->requestBox;
-        const GoodsQuantity totalDemand{calcTotalDemand(requestBox)};
+        auto&      requestBox  = myEntry_->requestBox;
+        const auto totalDemand = calcTotalDemand(requestBox);
         if (totalDemand == GoodsQuantity{0.0}) return;
-        const GoodsQuantity salesAmount{ledgerManager_.salesAmount(totalDemand)};
+        const auto salesAmount = ledgerManager_.salesAmount(totalDemand);
         ledgerManager_.isExcessDemand(totalDemand)
             ? performRationedTrade(myEntry_->supply, requestBox)
             : performFullTrade(requestBox);
@@ -105,7 +105,7 @@ class Trader {
   private:
     static auto calcTotalDemand(const tbb::concurrent_vector<Request>& requestBox
     ) -> GoodsQuantity {
-        const GoodsQuantity demand{std::ranges::fold_left(
+        const auto demand = GoodsQuantity{std::ranges::fold_left(
             requestBox | std::ranges::views::transform([](const Request& req) -> double {
                 return req.amount.value();
             }),
@@ -120,20 +120,20 @@ class Trader {
         tbb::concurrent_vector<Request>& requestBox, std::vector<RefWrap<Request>>& requests
     ) const {
         requests.clear();
-        for (Request& request : requestBox) requests.emplace_back(std::ref(request));
+        for (auto& request : requestBox) requests.emplace_back(std::ref(request));
         rng_.shuffle(requests);
     }
 
     void performRationedTrade(
         const GoodsQuantity supply, tbb::concurrent_vector<Request>& requestBox
     ) const {
-        static thread_local std::vector<RefWrap<Request>> requests;
+        static thread_local auto requests = std::vector<RefWrap<Request>>{};
         shuffleIdx(requestBox, requests);
 
-        GoodsQuantity remainAmount{supply};
+        auto remainAmount = GoodsQuantity{supply};
         for (auto requestRef : requests) {
-            auto&               request = requestRef.get();
-            const GoodsQuantity requestAmount{request.amount};
+            auto&      request       = requestRef.get();
+            const auto requestAmount = GoodsQuantity{request.amount};
             if (remainAmount <= requestAmount) {
                 request.tradeAmount = remainAmount;
                 return;

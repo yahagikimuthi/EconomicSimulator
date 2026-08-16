@@ -22,7 +22,7 @@ class Trader final : public base_goods::supplier::Trader<Market::consumerGoods> 
         if (postingInfo.supply == GoodsQuantity{0.0}) return;
         isPosting_ = true;
         ledgerManager_.makeNewPage(postingInfo.supply);
-        auto it{entryBox.emplace_back(postingInfo.price, postingInfo.supply)};
+        auto it  = entryBox.emplace_back(postingInfo.price, postingInfo.supply);
         myEntry_ = *it;
     }
 };

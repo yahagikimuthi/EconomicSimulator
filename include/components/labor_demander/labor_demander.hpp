@@ -17,8 +17,8 @@ class LaborDemander {
 
     void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket)
         PRE(desiredEmploy > HeadCount{0.0}) {
-        isRecruiting_ = true;
-        const auto plan{requestPlanner_.plan(desiredEmploy)};
+        isRecruiting_   = true;
+        const auto plan = requestPlanner_.plan(desiredEmploy);
         recruiter_.post(id, plan, laborMarket);
     }
 
@@ -50,7 +50,7 @@ class LaborDemander {
 
     void endStep(CensusDropBox&) {
         if (not isRecruiting_) return;
-        const auto result{recruiter_.publishResult()};
+        const auto result = recruiter_.publishResult();
         requestPlanner_.endStep(result);
         recruiter_.endStep();
         isRecruiting_ = false;

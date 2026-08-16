@@ -58,6 +58,9 @@ struct PCG32Seed {
 };
 
 class Engine {
+    template <typename T>
+    using TBBVec = tbb::concurrent_vector<T>;
+
   public:
     [[nodiscard]] explicit Engine(const int totalStep);
 
@@ -77,9 +80,9 @@ class Engine {
     std::vector<BtoBFirm> BtoBFirms_;
     std::vector<HHold>    hholds_;
 
-    LaborMarket                                  laborMarket_;
-    tbb::concurrent_vector<ProductionGoodsEntry> productionGoodsEntryBox_;
-    tbb::concurrent_vector<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
+    LaborMarket                  laborMarket_;
+    TBBVec<ProductionGoodsEntry> productionGoodsEntryBox_;
+    TBBVec<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
 
     CensusDropBox dropBox_;
 
@@ -95,9 +98,9 @@ class Engine {
                 .state = config::setting::fixedSeedState, .stream = config::setting::fixedSeedStream
             };
 
-        std::random_device  rd;
-        const std::uint64_t state{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
-        const std::uint64_t stream{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
+        auto       rd     = std::random_device{};
+        const auto state  = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
+        const auto stream = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
         return {.state = state, .stream = stream};
     }
 };

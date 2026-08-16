@@ -23,7 +23,7 @@ inline void pickSample(
     RandomGenerator&                                   rng,
     const int                                          sampleCnt
 ) {
-    const std::size_t k{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
+    const auto k = std::size_t{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
         for (LaborRequest& request : requestBox) sampleRequests.emplace_back(std::ref(request));
         return;
@@ -34,7 +34,7 @@ inline void pickSample(
 inline void sortSample(
     std::span<std::reference_wrapper<LaborRequest>> sortRequests, const int entryCnt
 ) {
-    const std::size_t k{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
+    const auto k = std::size_t{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
         sortRequests,
         sortRequests.begin() + static_cast<int>(k),
@@ -54,7 +54,7 @@ inline void sortSample(
     using Request    = LaborRequest;
     using RequestRef = std::reference_wrapper<Request>;
 
-    static thread_local std::vector<RequestRef> sampleRequest;
+    static thread_local auto sampleRequest = std::vector<RequestRef>{};
     sampleRequest.clear();
     pickSample(requestBox, sampleRequest, rng, sampleCnt);
     sortSample(sampleRequest, entryCnt);
@@ -83,6 +83,8 @@ class [[nodiscard]] MyEntries {
 };
 
 class JobHunter {
+    using Entry = LaborEntry;
+
   public:
     [[nodiscard]] JobHunter(const RandomGenerator rng) : rng_{rng} {}
 
@@ -110,7 +112,7 @@ class JobHunter {
 
     void accept() {
         if (not isPosting_) return;
-        const std::optional<Entry&> acceptEntry{takeAcceptEntry()};
+        const auto acceptEntry = takeAcceptEntry();
         if (not acceptEntry) return;
         acceptEntry->isAccept = true;
         acceptedEntry_        = acceptEntry;
@@ -118,19 +120,18 @@ class JobHunter {
 
     void endStep() { myEntries_.clear(), acceptedEntry_.reset(), isPosting_ = false; }
 
-    [[nodiscard]] auto huntedResult() -> std::optional<LaborEntry&> { return acceptedEntry_; }
+    [[nodiscard]] auto huntedResult() -> std::optional<Entry&> { return acceptedEntry_; }
 
   private:
-    using Entry = LaborEntry;
     [[nodiscard]] auto takeAcceptEntry() -> std::optional<Entry&> {
-        std::ranges::view auto offered{myEntries_.takeOfferedEntry() | std::views::take(1)};
+        auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);
         if (offered.empty()) return std::nullopt;
         return offered.front();
     }
 
-    mutable RandomGenerator    rng_;
-    MyEntries                  myEntries_;
-    std::optional<LaborEntry&> acceptedEntry_{std::nullopt};
-    bool                       isPosting_{false};
+    mutable RandomGenerator rng_;
+    MyEntries               myEntries_;
+    std::optional<Entry&>   acceptedEntry_{std::nullopt};
+    bool                    isPosting_{false};
 };
 }  // namespace abm::labor::supplier

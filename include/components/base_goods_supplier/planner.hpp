@@ -19,8 +19,8 @@ class MarkupPlanner {
         : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
 
     [[nodiscard]] auto judgeMarkup(const bool isSold) -> double {
-        const double nextMarkup{calcMarkup(isSold)};
-        plan_ = nextMarkup;
+        const auto nextMarkup = calcMarkup(isSold);
+        plan_                 = nextMarkup;
         return nextMarkup;
     }
 
@@ -32,8 +32,8 @@ class MarkupPlanner {
 
   private:
     [[nodiscard]] auto calcMarkup(const bool isSold) const -> double POST(markup : markup > 0.0) {
-        const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_))};
-        const double nextMarkup{log_ + (isSold ? alpha : -alpha)};
+        const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
+        const auto nextMarkup = log_ + (isSold ? alpha : -alpha);
         return markupGuard(nextMarkup);
     }
 
@@ -54,8 +54,8 @@ class PricePlanner {
     [[nodiscard]] auto judgePrice(
         const GoodsQuantity supply, const double markup, const Money totalCost
     ) -> Price {
-        const Price nextPrice{calcPrice(supply, markup, totalCost)};
-        plan_ = nextPrice;
+        const auto nextPrice = calcPrice(supply, markup, totalCost);
+        plan_                = nextPrice;
         return nextPrice;
     }
 
@@ -68,10 +68,9 @@ class PricePlanner {
     [[nodiscard]] auto calcPrice(
         const GoodsQuantity supply, const double markup, const Money totalCost
     ) const -> Price {
-        const Money avgCost{
-            (supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0
-        };
-        const Price price{avgCost.value() * (1.0 + markup)};
+        const auto avgCost =
+            Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
+        const auto price = Price{avgCost.value() * (1.0 + markup)};
         return priceGuard(price);
     }
 
@@ -89,8 +88,8 @@ class PostingInfoPlanner {
     [[nodiscard]] auto judgePlan(
         const GoodsQuantity supply, const Money totalCost, const bool isSold
     ) -> TradePlan {
-        const double markup{markupPlanner_.judgeMarkup(isSold)};
-        const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
+        const auto markup = markupPlanner_.judgeMarkup(isSold);
+        const auto price  = pricePlanner_.judgePrice(supply, markup, totalCost);
         return {.price = price, .markup = markup, .supply = supply};
     }
 
@@ -109,7 +108,8 @@ class DemandForecastManager {
     DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
 
     void update(const GoodsQuantity totalDemand) {
-        const GoodsQuantity next{demandForecast_ + (adjustVol_ * (totalDemand - demandForecast_))};
+        const auto next =
+            GoodsQuantity{demandForecast_ + (adjustVol_ * (totalDemand - demandForecast_))};
         demandForecast_ = next;
     }
 

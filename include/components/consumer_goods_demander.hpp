@@ -25,10 +25,10 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
           myPhase_{myPhase} {}
 
     void request(
-        const Money asset, const Step step, tbb::concurrent_vector<ConsumerGoodsEntry> entryBox
+        const Money asset, const Step step, tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) {
         if (isPass(asset, step, entryBox)) return;
-        const Money budget{budgetCalculator_.calcBudget(asset)};
+        const auto budget = budgetCalculator_.calcBudget(asset);
         if (budget <= Money{0.0}) return;
         isPosting_        = true;
         auto& pickedEntry = pickEntry(entryBox);
@@ -50,13 +50,13 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
 
   private:
     auto isPass(
-        const Money                                      asset,
-        const Step                                       step,
-        const tbb::concurrent_vector<ConsumerGoodsEntry> entryBox
+        const Money                                       asset,
+        const Step                                        step,
+        const tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
     ) const -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;
-        const Step dayOfWeek{step % config::goods_demander::maxPurchaseFrequency};
+        const auto dayOfWeek = Step{step % config::goods_demander::maxPurchaseFrequency};
         return dayOfWeek != myPhase_;
     }
 
@@ -66,8 +66,9 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
     ) const -> ConsumerGoodsEntry& {
         using Entry = ConsumerGoodsEntry;
 
-        auto toDouble{[](const Entry& entry) -> double { return entry.supply.value(); }};
-        std::reference_wrapper<Entry> betterEntry = rng_.discreteDistribution(entryBox, toDouble);
+        auto toDouble = [](const Entry& entry) -> double { return entry.supply.value(); };
+        auto betterEntry =
+            std::reference_wrapper<Entry>{std::ref(rng_.discreteDistribution(entryBox, toDouble))};
 
         if (sampleCnt <= 1) return betterEntry.get();
 

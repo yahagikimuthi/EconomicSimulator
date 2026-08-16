@@ -16,7 +16,7 @@ void adjustWorkforce(
     LaborDemander&               laborDemander,
     LaborMarket&                 laborMarket
 ) {
-    const HeadCount desiredEmploy{goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt())};
+    const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
     if (desiredEmploy > HeadCount{0.0}) {
         laborDemander.post(index.id(), desiredEmploy, laborMarket);
     } else if (desiredEmploy < HeadCount{0.0}) {

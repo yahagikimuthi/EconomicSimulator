@@ -25,7 +25,7 @@ class Trader final : public base_goods::supplier::Trader<Market::productionGoods
         if (supply == GoodsQuantity{0.0}) return;
         isPosting_ = true;
         ledgerManager_.makeNewPage(supply);
-        auto it{entryBox.emplace_back(id, pricePlan, supply)};
+        auto it  = entryBox.emplace_back(id, pricePlan, supply);
         myEntry_ = *it;
     }
 };

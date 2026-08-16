@@ -52,7 +52,7 @@ class WagePlanner {
         : memory_{memory}, rng_{rng}, adjustVol_{adjustVol} {}
 
     [[nodiscard]] auto plan(const HeadCount targetEmploy) -> Wage {
-        const auto next{calcNextWage()};
+        const auto next = calcNextWage();
         memory_.memorizeWagePlan(next);
         memory_.memorizeEmployPlan(targetEmploy);
         return next;
@@ -62,9 +62,10 @@ class WagePlanner {
 
   private:
     [[nodiscard]] auto calcNextWage() const -> Wage {
-        const auto alpha{rng_.randNormal(0.0, adjustVol_, -1.0, 1.0)};
-        const auto raise{memory_.wasApplicantsLack()};
-        const auto nextWage{memory_.rememberLastWage() * (raise ? 1.0 + alpha : 1.0 - alpha)};
+        const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
+        const auto raise = memory_.wasApplicantsLack();
+        const auto nextWage =
+            Wage{memory_.rememberLastWage() * (raise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(nextWage);
     }
 
@@ -84,6 +85,7 @@ class OfferPlannerMemory {
     void memorizeEmployPlan(const HeadCount employPlan) { currentTargetEmploy_ = employPlan; }
     void endStep() {
         if (not currentTargetEmploy_) return;
+        currentTargetEmploy_.reset();
     }
 
     [[nodiscard]] auto rememberEmployPlan() const -> HeadCount {
@@ -103,7 +105,7 @@ class OfferPlanner {
         : rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy) -> HeadCount {
-        const auto next{calcNextOffer(desiredEmploy)};
+        const auto next = calcNextOffer(desiredEmploy);
         memory_.memorizeEmployPlan(desiredEmploy);
         return next;
     }
@@ -120,9 +122,9 @@ class OfferPlanner {
 
     [[nodiscard]] auto calcOfferRate(const HeadCount employPlan, const HeadCount actualEmploy) const
         -> double {
-        const auto alpha{std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0))};
-        const auto shouldRaise{actualEmploy < employPlan};
-        const auto next{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
+        const auto shouldRaise = actualEmploy < employPlan;
+        const auto next        = offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
         return std::max(0.0, next);
     }
 

@@ -161,8 +161,8 @@ void Engine::check() const {}
 
 void Logger::save(const CensusDropBox& dropBox, const Step step) {
     namespace name = config::save_name;
-    std::string     groupPath{"/step_" + std::to_string(step.value())};
-    HighFive::Group group{file_.createGroup(groupPath)};
+    auto groupPath = std::string{"/step_" + std::to_string(step.value())};
+    auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
     auto create{[&group](std::string_view dataName, const std::vector<double>& data) -> void {
         group.createDataSet(static_cast<std::string>(dataName), data);
