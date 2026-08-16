@@ -14,27 +14,37 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace abm::labor::demander {
-inline auto sortApplicants(const HeadCount offer, LaborRequest::EntryBoxT entryBox)
-    -> std::ranges::view auto {
-    using EntryRef = std::reference_wrapper<LaborEntry>;
-    static thread_local std::vector<EntryRef> applicants;
-    applicants.clear();
-    const std::size_t k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
-    for (LaborEntry& entry : entryBox) applicants.emplace_back(std::ref(entry));
-    const bool isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
+namespace abm::labor::demander::recruiter {
+class SortApplicants {
+    template <typename T>
+    using RefWrap = std::reference_wrapper<T>;
 
-    const auto toRawRef{[](EntryRef entryRef) -> LaborEntry& { return entryRef.get(); }};
-    if (not isOver) return applicants | std::views::transform(toRawRef);
+  protected:
+    [[nodiscard]] SortApplicants() = default;
+    [[nodiscard]] static auto sortApplicants(
+        const HeadCount offer, LaborRequest::EntryBoxT entryBox
+    ) -> std::ranges::view auto {
+        using Entry = LaborEntry;
 
-    std::ranges::nth_element(
-        applicants,
-        applicants.begin() + static_cast<int>(k),
-        std::ranges::greater{},
-        [](const EntryRef entryRef) -> double { return entryRef.get().productPower; }
-    );
-    return applicants | std::views::transform(toRawRef);
-}
+        static thread_local auto applicants = std::vector<RefWrap<Entry>>{};
+        applicants.clear();
+
+        const auto k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
+        for (auto& entry : entryBox) applicants.emplace_back(std::ref(entry));
+        const auto isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
+
+        const auto toRawRef{[](RefWrap<Entry> entryRef) -> Entry& { return entryRef.get(); }};
+        if (not isOver) return applicants | std::views::transform(toRawRef);
+
+        std::ranges::nth_element(
+            applicants,
+            applicants.begin() + static_cast<int>(k),
+            std::ranges::greater{},
+            [](const RefWrap<Entry> entryRef) -> double { return entryRef.get().productPower; }
+        );
+        return applicants | std::views::transform(toRawRef);
+    }
+};
 
 class OfferApplicants {
     template <typename T>
@@ -61,6 +71,10 @@ struct OfferResult {
     const HeadCount applicants;
 };
 
+struct EmployResult {
+    const HeadCount employ;
+};
+
 class Ledger {
   public:
     [[nodiscard]] Ledger() = default;
@@ -74,7 +88,7 @@ class Ledger {
         applicants_ += result.applicants;
     }
 
-    void addEmploy(const HeadCount add) { employ_ = add; }
+    void readEmployResult(const EmployResult add) { employ_ += add.employ; }
 
     [[nodiscard]] auto publishResult() const -> RecruitResult {
         return {.applicants = applicants_, .employ = employ_};
@@ -93,7 +107,7 @@ class Ledger {
     HeadCount employ_{0.0};
 };
 
-class Recruiter {
+class Recruiter : public SortApplicants {
   public:
     [[nodiscard]] Recruiter() = default;
 
@@ -107,17 +121,18 @@ class Recruiter {
         if (not isPosting()) return;
         if (myRequest_->entryBox().empty()) return;
 
-        std::ranges::view auto applicants{
+        auto applicants{
             sortApplicants(ledger_.remainOffer(), myRequest_->entryBox()) |
             std::views::take(ledger_.remainOffer().value())
         };
 
-        HeadCount offerCnt{0.0};
+        auto offerCnt = HeadCount{0.0};
         for (auto& entry : applicants) {
             entry.isOffer = true;
             offerApplicants_.add(entry);
             ++offerCnt;
         }
+
         ledger_.readOfferResult(
             {.offer = offerCnt, .applicants = HeadCount{myRequest_->entryBox().size()}}
         );
@@ -126,14 +141,14 @@ class Recruiter {
     template <AddRosterFn F>
     void registerMember(F&& addRoster) {
         if (not isPosting()) return;
-        HeadCount              employCnt{0.0};
-        std::ranges::view auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
-        for (LaborEntry& acceptApplicant : acceptApplicants) {
+        auto employCnt = HeadCount{0.0};
+        auto acceptApplicants{offerApplicants_.offerAcceptedApplicants()};
+        for (auto& acceptApplicant : acceptApplicants) {
             acceptApplicant.rosterEntry =
                 std::forward<F>(addRoster)(acceptApplicant.hholdID, myRequest_->wage);
             ++employCnt;
         }
-        ledger_.addEmploy(employCnt);
+        ledger_.readEmployResult({.employ = employCnt});
     }
 
     [[nodiscard]] auto publishResult() const -> RecruitResult {
@@ -159,4 +174,8 @@ class Recruiter {
     Ledger                       ledger_;
     OfferApplicants              offerApplicants_;
 };
-}  // namespace abm::labor::demander
+}  // namespace abm::labor::demander::recruiter
+
+namespace abm::labor::demander {
+using Recruiter = recruiter::Recruiter;
+}

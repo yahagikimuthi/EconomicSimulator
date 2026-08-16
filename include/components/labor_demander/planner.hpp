@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <optional>
 #include <pcg_random.hpp>
 
 #include "components/labor_demander/common.hpp"
@@ -17,14 +18,14 @@ class WagePlannerMemory {
     )
         : log_{.wage = lastWage, .targetEmploy = lastTargetEmploy, .applicants = lastApplicants} {}
     [[nodiscard]] auto rememberLastWage() const -> Wage { return log_.wage; }
-    [[nodiscard]] auto rememberLastTargetEmploy() const -> HeadCount { return log_.targetEmploy; }
-    [[nodiscard]] auto rememberLastApplicants() const -> HeadCount { return log_.applicants; }
+    [[nodiscard]] auto wasApplicantsLack() const -> bool {
+        return log_.applicants < log_.targetEmploy;
+    }
 
-    void memorize(Wage wagePlan) { plan_.wage = wagePlan; }
-    void memorize(HeadCount targetEmploy) { plan_.targetEmploy = targetEmploy; }
+    void memorizeWagePlan(Wage wagePlan) { plan_.wage = wagePlan; }
+    void memorizeEmployPlan(HeadCount targetEmploy) { plan_.targetEmploy = targetEmploy; }
     void endStep(const RecruitResult& result) {
-        ASSERT(plan_.wage.has_value() == plan_.targetEmploy.has_value());
-        if (not plan_.wage) return;
+        ASSERT(plan_.wage and plan_.targetEmploy);
         log_.applicants   = result.applicants;
         log_.wage         = *plan_.wage;
         log_.targetEmploy = *plan_.targetEmploy;
@@ -52,8 +53,8 @@ class WagePlanner {
 
     [[nodiscard]] auto plan(const HeadCount targetEmploy) -> Wage {
         const auto next{calcNextWage()};
-        memory_.memorize(next);
-        memory_.memorize(targetEmploy);
+        memory_.memorizeWagePlan(next);
+        memory_.memorizeEmployPlan(targetEmploy);
         return next;
     }
 
@@ -62,13 +63,9 @@ class WagePlanner {
   private:
     [[nodiscard]] auto calcNextWage() const -> Wage {
         const auto alpha{rng_.randNormal(0.0, adjustVol_, -1.0, 1.0)};
-        const auto raise{shouldRaise()};
+        const auto raise{memory_.wasApplicantsLack()};
         const auto nextWage{memory_.rememberLastWage() * (raise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(nextWage);
-    }
-
-    [[nodiscard]] auto shouldRaise() const -> bool {
-        return memory_.rememberLastApplicants() < memory_.rememberLastTargetEmploy();
     }
 
     [[nodiscard]] static auto wageGuard(const Wage wage) -> Wage {
@@ -82,51 +79,32 @@ class WagePlanner {
 
 class OfferPlannerMemory {
   public:
-    [[nodiscard]] OfferPlannerMemory(const HeadCount targetEmploy, const HeadCount lastOffer)
-        : log_{.targetEmploy = targetEmploy, .offer = lastOffer} {}
+    [[nodiscard]] OfferPlannerMemory() = default;
 
-    void memorizeOfferPlan(const HeadCount offerPlan) { plan_.offer = offerPlan; }
-    void memorizeEmployPlan(const HeadCount employPlan) { plan_.targetEmploy = employPlan; }
+    void memorizeEmployPlan(const HeadCount employPlan) { currentTargetEmploy_ = employPlan; }
     void endStep() {
-        ASSERT(plan_.offer.has_value() == plan_.targetEmploy.has_value());
-        if (not plan_.offer.has_value()) return;
-        log_.targetEmploy = *plan_.targetEmploy;
-        log_.offer        = *plan_.offer;
+        if (not currentTargetEmploy_) return;
     }
 
-    [[nodiscard]] auto rememberLastOffer() const -> HeadCount { return log_.offer; }
-    [[nodiscard]] auto rememberLastTargetEmploy() const -> HeadCount { return log_.targetEmploy; }
     [[nodiscard]] auto rememberEmployPlan() const -> HeadCount {
-        ASSERT(plan_.targetEmploy);
-        return *plan_.targetEmploy;
+        ASSERT(currentTargetEmploy_.has_value());
+        return *currentTargetEmploy_;
     }
 
   private:
-    struct {
-        HeadCount targetEmploy;
-        HeadCount offer;
-    } log_;
-
-    struct {
-        std::optional<HeadCount> targetEmploy{std::nullopt};
-        std::optional<HeadCount> offer{std::nullopt};
-    } plan_;
+    std::optional<HeadCount> currentTargetEmploy_{std::nullopt};
 };
 
 class OfferPlanner {
   public:
     [[nodiscard]] OfferPlanner(
-        const RandomGenerator     rng,
-        const OfferPlannerMemory& memory,
-        const double              offerRate,
-        const double              adjustVol
+        const RandomGenerator rng, const double offerRate, const double adjustVol
     )
-        : memory_{memory}, rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
+        : rng_{rng}, offerRate_{offerRate}, adjustVol_{adjustVol} {}
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy) -> HeadCount {
         const auto next{calcNextOffer(desiredEmploy)};
         memory_.memorizeEmployPlan(desiredEmploy);
-        memory_.memorizeOfferPlan(next);
         return next;
     }
 
@@ -142,9 +120,9 @@ class OfferPlanner {
 
     [[nodiscard]] auto calcOfferRate(const HeadCount employPlan, const HeadCount actualEmploy) const
         -> double {
-        const double alpha{std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0))};
-        const bool   shouldRaise{actualEmploy < employPlan};
-        const double next{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        const auto alpha{std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0))};
+        const auto shouldRaise{actualEmploy < employPlan};
+        const auto next{offerRate_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
         return std::max(0.0, next);
     }
 
@@ -154,9 +132,9 @@ class OfferPlanner {
     const double            adjustVol_;
 };
 
-class RequestPlanner {
+class RecruitPlanner {
   public:
-    [[nodiscard]] RequestPlanner(const WagePlanner& wagePlanner, const OfferPlanner& offerPlanner)
+    [[nodiscard]] RecruitPlanner(const WagePlanner& wagePlanner, const OfferPlanner& offerPlanner)
         : wagePlanner_{wagePlanner}, offerPlanner_{offerPlanner} {}
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy) -> RecruitPlan {
@@ -175,3 +153,7 @@ class RequestPlanner {
     OfferPlanner offerPlanner_;
 };
 }  // namespace abm::labor::demander::planner
+
+namespace abm::labor::demander {
+using RecruitPlanner = planner::RecruitPlanner;
+}
