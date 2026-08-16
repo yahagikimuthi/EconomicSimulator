@@ -5,8 +5,9 @@
 
 namespace abm::base_goods::supplier {
 struct TradePlan {
-    Price         price{0.0};
-    GoodsQuantity supply{0.0};
+    Price         price;
+    double        markup;
+    GoodsQuantity supply;
 };
 
 struct TradeResult {
@@ -19,13 +20,13 @@ struct TradeResult {
 class PlanMemory {
   public:
     [[nodiscard]] PlanMemory();
-    void memorize(TradePlan& newPlan) { currentPlan_ = newPlan; }
+    void memorize(const TradePlan& newPlan) { currentPlan_ = newPlan; }
     auto rememberLastPlan() const -> const TradePlan& { return log_; }
     void endStep(CensusDropBox& dropBox) {
         log_ = currentPlan_;
         dropBox.prices.emplace_back(currentPlan_.price.value());
         dropBox.supplies.emplace_back(currentPlan_.supply.value());
-        currentPlan_ = {.price = Price{0.0}, .supply = GoodsQuantity{0.0}};
+        currentPlan_ = {.price = Price{0.0}, .markup = 0.0, .supply = GoodsQuantity{0.0}};
     }
 
   private:
@@ -36,7 +37,7 @@ class PlanMemory {
 class TradingMemory {
   public:
     [[nodiscard]] TradingMemory();
-    void memory(const TradeResult& newResult) { currentResult_ = newResult; }
+    void memorize(const TradeResult& newResult) { currentResult_ = newResult; }
     auto rememberLastResult() const -> const TradeResult& { return log_; }
 
   private:
@@ -47,6 +48,9 @@ class TradingMemory {
 class Memory {
   public:
     [[nodiscard]] Memory();
+
+    void memorize(const TradePlan& plan) { planMemory_.memorize(plan); }
+    void memorize(const TradeResult& result) { tradingMemory_.memorize(result); }
 
   private:
     PlanMemory    planMemory_;

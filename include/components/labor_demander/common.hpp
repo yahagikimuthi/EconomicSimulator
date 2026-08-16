@@ -14,7 +14,6 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
 
 struct RecruitPlan {
     Wage      wage;
-    HeadCount employ;
     HeadCount offer;
 };
 
@@ -25,26 +24,24 @@ struct RecruitResult {
 
 class RecruitPlanMemory {
   public:
-    [[nodiscard]] RecruitPlanMemory(
-        const Wage lastWage, const HeadCount lastEmployPlan, const HeadCount lastOfferPlan
-    )
-        : lastPlan_{.wage = lastWage, .employ = lastEmployPlan, .offer = lastOfferPlan} {}
+    [[nodiscard]] RecruitPlanMemory(const Wage lastWage, const HeadCount lastOfferPlan)
+        : lastPlan_{.wage = lastWage, .offer = lastOfferPlan} {}
     void memorize(const RecruitPlan& newPlan) {
         currentPlan_  = newPlan;
         wasMemorized_ = true;
     }
     [[nodiscard]] auto rememberLog() const -> const RecruitPlan& { return lastPlan_; }
-    void               endStep(CensusDropBox& dropBox) {
+
+    void endStep() {
         if (not wasMemorized_) return;
-        dropBox.postedEmployments.emplace_back(currentPlan_.employ.value());
-        lastPlan_ = currentPlan_;
-        currentPlan_ = {.wage = Wage{0.0}, .employ = HeadCount{0.0}, .offer = HeadCount{0.0}};
+        lastPlan_     = currentPlan_;
+        currentPlan_  = {.wage = Wage{0.0}, .offer = HeadCount{0.0}};
         wasMemorized_ = false;
     }
 
   private:
     RecruitPlan lastPlan_;
-    RecruitPlan currentPlan_{.wage = Wage{0.0}, .employ = HeadCount{0.0}, .offer = HeadCount{0.0}};
+    RecruitPlan currentPlan_{.wage = Wage{0.0}, .offer = HeadCount{0.0}};
     bool        wasMemorized_{false};
 };
 
@@ -85,8 +82,8 @@ class Memory {
     [[nodiscard]] auto rememberLastRecruitResult() const -> const RecruitResult& {
         return resultMemory_.rememberLog();
     }
-    void endStep(CensusDropBox& dropBox) {
-        planMemory_.endStep(dropBox);
+    void endStep() {
+        planMemory_.endStep();
         resultMemory_.endStep();
     }
 

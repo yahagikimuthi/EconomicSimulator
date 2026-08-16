@@ -91,7 +91,7 @@ class PostingInfoPlanner {
     ) -> TradePlan {
         const double markup{markupPlanner_.judgeMarkup(isSold)};
         const Price  price{pricePlanner_.judgePrice(supply, markup, totalCost)};
-        return {.price = price, .supply = supply};
+        return {.price = price, .markup = markup, .supply = supply};
     }
 
     void endStep(CensusDropBox& dropBox) {
@@ -120,6 +120,22 @@ class DemandForecastManager {
   private:
     GoodsQuantity demandForecast_{0.0};
     const double  adjustVol_;
+};
+
+class MarkupPlannerT {
+  public:
+    [[nodiscard]] MarkupPlannerT();
+
+  private:
+};
+
+class PricePlannerT {};
+
+class PlannerT {
+  public:
+    PlannerT();
+
+  private:
 };
 
 class Planner {

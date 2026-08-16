@@ -8,21 +8,19 @@
 #include "core/values/labor.hpp"
 #include "world/message.hpp"
 
-namespace abm {
+namespace abm::labor::demander {
 class LaborDemander {
   public:
     [[nodiscard]] LaborDemander(
-        const labor::demander::RequestPlanner& offerPlanner,
-        const labor::demander::HumanResource&& humanResource,
-        const labor::demander::Memory&         memory
+        const planner::RequestPlanner& offerPlanner,
+        const HumanResource&&          humanResource,
+        const Memory&                  memory
     )
         : requestPlanner_{offerPlanner}, humanResource_{humanResource}, memory_{memory} {}
 
     void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket)
         PRE(desiredEmploy > HeadCount{0.0}) {
-        const labor::demander::RecruitPlan plan{requestPlanner_.judgePlan(
-            memory_.rememberLastRecruitPlan(), memory_.rememberLastRecruitResult(), desiredEmploy
-        )};
+        const auto plan{requestPlanner_.plan(desiredEmploy)};
         memory_.memorize(plan);
         recruiter_.post(id, plan, laborMarket);
     }
@@ -49,16 +47,21 @@ class LaborDemander {
         return static_cast<Money>(humanResource_.sumWage());
     }
 
-    void endStep(CensusDropBox& dropBox) {
+    void endStep(CensusDropBox&) {
         memory_.memorize(recruiter_.publishResult());
         recruiter_.endStep();
-        memory_.endStep(dropBox);
+        memory_.endStep();
     }
 
   private:
-    labor::demander::RequestPlanner requestPlanner_;
-    labor::demander::Recruiter      recruiter_;
-    labor::demander::HumanResource  humanResource_;
-    labor::demander::Memory         memory_;
+    labor::demander::planner::RequestPlanner requestPlanner_;
+    labor::demander::Recruiter               recruiter_;
+    labor::demander::HumanResource           humanResource_;
+    labor::demander::Memory                  memory_;
 };
-}  // namespace abm
+
+}  // namespace abm::labor::demander
+
+namespace abm {
+using LaborDemander = labor::demander::LaborDemander;
+}
