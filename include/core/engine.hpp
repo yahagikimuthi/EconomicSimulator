@@ -44,7 +44,7 @@ struct HHold {  // NOLINT
 
 class [[nodiscard]] Logger {
   public:
-    explicit Logger();
+    [[nodiscard]] explicit Logger();
     auto isValid() const -> bool { return file_.isValid(); }
     void save(const CensusDropBox& dropBox, const Step step);
 
@@ -57,9 +57,9 @@ struct PCG32Seed {
     const std::uint64_t stream;
 };
 
-class [[nodiscard]] Engine {
+class Engine {
   public:
-    explicit Engine(const int totalStep);
+    [[nodiscard]] explicit Engine(const int totalStep);
 
     void run();
 
@@ -89,7 +89,7 @@ class [[nodiscard]] Engine {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    static auto generateSeed() -> PCG32Seed {
+    [[nodiscard]] static auto generateSeed() -> PCG32Seed {
         if (not config::setting::useRuntimeRandomSeed)
             return {
                 .state = config::setting::fixedSeedState, .stream = config::setting::fixedSeedStream

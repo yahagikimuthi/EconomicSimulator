@@ -14,17 +14,16 @@
 #include "world/message.hpp"
 
 namespace abm::labor::demander {
-
-class [[nodiscard]] EmptyRosterPool {
+class EmptyRosterPool {
     template <typename T>
     using RefWrap = std::reference_wrapper<T>;
 
   public:
-    EmptyRosterPool() = default;
+    [[nodiscard]] EmptyRosterPool() = default;
 
-    auto size() const -> std::size_t { return pool_.size(); }
-    auto empty() const -> bool { return size() == 0UZ; }
-    auto popBackEntry() -> RosterEntry& {
+    [[nodiscard]] auto size() const -> std::size_t { return pool_.size(); }
+    [[nodiscard]] auto empty() const -> bool { return size() == 0UZ; }
+    auto               popBackEntry() -> RosterEntry& {
         ASSERT(not empty());
         RosterEntry& back = pool_.back().get();
         pool_.pop_back();
@@ -36,9 +35,10 @@ class [[nodiscard]] EmptyRosterPool {
     std::vector<RefWrap<RosterEntry>> pool_;
 };
 
-class [[nodiscard]] HumanResource {
+class HumanResource {
   public:
-    HumanResource(CompanyBoard&& companyBoard) : companyBoard_{std::move(companyBoard)} {}
+    [[nodiscard]] HumanResource(CompanyBoard&& companyBoard)
+        : companyBoard_{std::move(companyBoard)} {}
 
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
@@ -71,13 +71,13 @@ class [[nodiscard]] HumanResource {
         }
     }
 
-    auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+    [[nodiscard]] auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const std::size_t rosterSize{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
 
-    auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+    [[nodiscard]] auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) {
         using Entry = RosterEntry;
         std::ranges::view auto wages{
             companyBoard_.roster | std::views::filter(&Entry::isOccupied) |

@@ -7,34 +7,34 @@
 #include "world/message.hpp"
 
 namespace abm {
-class [[nodiscard]] AgentIndex {
+class AgentIndex {
   public:
-    AgentIndex(const AgentID id) : id_{id} {}
-    auto id() const -> AgentID POST(id : id >= AgentID{0}) { return id_; }
+    [[nodiscard]] AgentIndex(const AgentID id) : id_{id} {}
+    [[nodiscard]] auto id() const -> AgentID POST(id : id >= AgentID{0}) { return id_; }
 
   private:
     const AgentID id_;
 };
 
-class [[nodiscard]] BaseFinance {
+class BaseFinance {
   public:
-    void assetPlus(const Money plus) { asset_ += plus; }
-    auto asset() const -> Money { return asset_; }
+    void               assetPlus(const Money plus) { asset_ += plus; }
+    [[nodiscard]] auto asset() const -> Money { return asset_; }
 
   protected:
-    BaseFinance(const Money asset) : asset_{asset} {}
+    [[nodiscard]] BaseFinance(const Money asset) : asset_{asset} {}
     Money asset_;
 };
 
-class [[nodiscard]] FirmFinance : public BaseFinance {
+class FirmFinance : public BaseFinance {
   public:
-    FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
+    [[nodiscard]] FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
 
-class [[nodiscard]] HHoldFinance : public BaseFinance {
+class HHoldFinance : public BaseFinance {
   public:
-    HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
+    [[nodiscard]] HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
 };
 }  // namespace abm

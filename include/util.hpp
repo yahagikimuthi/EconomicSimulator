@@ -20,16 +20,16 @@ concept AssetPlusFn = requires(F f, const Money money) {
     { f(money) } -> std::same_as<void>;
 };
 
-class [[nodiscard]] RandomGenerator {
+class RandomGenerator {
   public:
-    RandomGenerator(const pcg32 rng) : rng_{rng} {}
+    [[nodiscard]] RandomGenerator(const pcg32 rng) : rng_{rng} {}
 
-    auto rand(const double min = 0.0, const double limit = 1.0) -> double {
+    [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) -> double {
         std::uniform_real_distribution<double> dist(min, limit);
         return dist(rng_);
     }
 
-    auto randNormal(
+    [[nodiscard]] auto randNormal(
         const double mean = 0.0,
         const double div  = 1.0,
         const double min  = -std::numeric_limits<double>::infinity(),
@@ -40,7 +40,7 @@ class [[nodiscard]] RandomGenerator {
         return std::clamp(out, min, max);
     }
 
-    auto rand(const int min, const int limit) -> int {
+    [[nodiscard]] auto rand(const int min, const int limit) -> int {
         std::uniform_int_distribution<int> dist{min, limit};
         return dist(rng_);
     }
@@ -49,7 +49,8 @@ class [[nodiscard]] RandomGenerator {
         requires requires(Container container, Proj proj) {
             { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
         }
-    auto discreteDistribution(Container&& container, Proj&& proj = {}) -> decltype(auto) {
+    [[nodiscard]] auto discreteDistribution(Container&& container, Proj&& proj = {})
+        -> decltype(auto) {
         double total{0.0};
         for (const auto& elem : std::forward<Container>(container)) {
             const double weight = std::invoke(std::forward<Proj>(proj), elem);
@@ -84,7 +85,7 @@ class [[nodiscard]] RandomGenerator {
         std::ranges::sample(std::forward<Range>(r), out, n, rng_);
     }
 
-    auto makeUint64() -> std::uint64_t {
+    [[nodiscard]] auto makeUint64() -> std::uint64_t {
         return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
     }
 

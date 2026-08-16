@@ -11,9 +11,9 @@
 #include "world/message.hpp"
 
 namespace abm {
-class [[nodiscard]] LaborDemander {
+class LaborDemander {
   public:
-    LaborDemander(
+    [[nodiscard]] LaborDemander(
         const labor::demander::RequestPlanner& offerPlanner,
         const labor::demander::HumanResource&& humanResource,
         const labor::demander::Memory&         memory
@@ -43,11 +43,11 @@ class [[nodiscard]] LaborDemander {
 
     void acceptResignation() { humanResource_.acceptResignation(); }
 
-    auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+    [[nodiscard]] auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         return humanResource_.employeeCnt();
     }
 
-    auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
+    [[nodiscard]] auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(humanResource_.sumWage());
     }
 
