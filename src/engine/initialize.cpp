@@ -14,8 +14,7 @@
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
-#include "components/labor_demander/common.hpp"
-#include "components/labor_demander/hr_manager.hpp"
+#include "components/labor_demander/human_resource.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
@@ -120,11 +119,18 @@ namespace production_goods::supplier {
 }
 }  // namespace production_goods::supplier
 
-namespace labor::demander {
+namespace labor::demander::planner {
+[[nodiscard]] auto makeWagePlannerMemory(RandomGenerator& masterRng) -> WagePlannerMemory {
+    const auto lastWage         = Wage{masterRng.rand(10.0, 50.0)};
+    const auto lastTargetEmploy = HeadCount{masterRng.rand(10, 20)};
+    const auto lastApplicants   = HeadCount{masterRng.rand(10, 20)};
+    return {lastWage, lastTargetEmploy, lastApplicants};
+}
+
 [[nodiscard]] auto makeWagePlanner(RandomGenerator& masterRng) -> WagePlanner {
     const RandomGenerator rng{{masterRng.makeUint64(), masterRng.makeUint64()}};
     const double          adjustVol{masterRng.rand(0.01, 0.1)};
-    return {rng, adjustVol};
+    return {rng, makeWagePlannerMemory(masterRng), adjustVol};
 }
 
 [[nodiscard]] auto makeOfferPlanner(RandomGenerator& masterRng) -> OfferPlanner {
@@ -134,36 +140,25 @@ namespace labor::demander {
     return {rng, offerRate, adjustVol};
 }
 
-[[nodiscard]] auto makePlanner(RandomGenerator& masterRng) -> RequestPlanner {
-    return RequestPlanner{makeWagePlanner(masterRng), makeOfferPlanner(masterRng)};
+[[nodiscard]] auto makePlanner(RandomGenerator& masterRng) -> RecruitPlanner {
+    return {makeWagePlanner(masterRng), makeOfferPlanner(masterRng)};
 }
+}  // namespace labor::demander::planner
 
+namespace labor::demander::human_resource {
 [[nodiscard]] auto makeHumanResourceManager(const AgentID id, const Market firmType)
     -> HumanResource {
     CompanyBoard companyBoard{id, firmType};
     return HumanResource{std::move(companyBoard)};
 }
+}  // namespace labor::demander::human_resource
 
-[[nodiscard]] auto makePlanMemory(RandomGenerator& masterRng) -> RecruitPlanMemory {
-    const Wage      wage{masterRng.rand(10.0, 50.0)};
-    const HeadCount employ{masterRng.rand(10, 20)};
-    const HeadCount offer{masterRng.rand(10, 20)};
-    return {wage, employ, offer};
-}
-
-[[nodiscard]] auto makeResultMemory(RandomGenerator& masterRng) -> RecruitResultMemory {
-    const HeadCount lastApplicants{masterRng.rand(10, 20)};
-    const HeadCount lastEmploy{masterRng.rand(5, 15)};
-    return {lastApplicants, lastEmploy};
-}
-
-[[nodiscard]] auto makeMemory(RandomGenerator& masterRng) -> Memory {
-    return {makePlanMemory(masterRng), makeResultMemory(masterRng)};
-}
-
+namespace labor::demander {
 [[nodiscard]] auto make(RandomGenerator& masterRng, const AgentID id, const Market firmType)
     -> LaborDemander {
-    return {makePlanner(masterRng), makeHumanResourceManager(id, firmType), makeMemory(masterRng)};
+    return {
+        planner::makePlanner(masterRng), human_resource::makeHumanResourceManager(id, firmType)
+    };
 }
 }  // namespace labor::demander
 

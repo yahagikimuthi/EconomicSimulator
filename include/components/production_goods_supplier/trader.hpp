@@ -21,7 +21,7 @@ class Trader final : public base_goods::supplier::Trader<Market::productionGoods
         const base_goods::supplier::TradePlan         postingInfo,
         tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
     ) {
-        const auto [pricePlan, supply] = postingInfo;
+        const auto [pricePlan, _, supply] = postingInfo;
         if (supply == GoodsQuantity{0.0}) return;
         isPosting_ = true;
         ledgerManager_.makeNewPage(supply);
