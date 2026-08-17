@@ -152,11 +152,13 @@ namespace labor::demander::human_resource {
 }  // namespace labor::demander::human_resource
 
 namespace labor::demander {
+[[nodiscard]] auto makeRecruitSystem(RandomGenerator& masterRng) -> RecruitSystem {
+    return {planner::makePlanner(masterRng)};
+}
+
 [[nodiscard]] auto make(RandomGenerator& masterRng, const AgentID id, const Market firmType)
     -> LaborDemander {
-    return {
-        planner::makePlanner(masterRng), human_resource::makeHumanResourceManager(id, firmType)
-    };
+    return {makeRecruitSystem(masterRng), human_resource::makeHumanResourceManager(id, firmType)};
 }
 }  // namespace labor::demander
 
