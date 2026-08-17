@@ -13,12 +13,19 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
 };
 
 struct RecruitPlan {
-    const Wage      wage;
-    const HeadCount offer;
+    Wage      wage;
+    HeadCount offer;
 };
 
 struct RecruitResult {
     const HeadCount applicants;
     const HeadCount employ;
+};
+
+template <typename T>
+concept IMediator = requires(T t, HeadCount employPlan) {
+    { t.publishEmployPlan(employPlan) } -> std::same_as<void>;
+} and requires(T t, RecruitResult& result) {
+    { t.publishRecruitResult(result) } -> std::same_as<void>;
 };
 }  // namespace abm::labor::demander

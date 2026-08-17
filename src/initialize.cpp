@@ -14,16 +14,13 @@
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
-#include "components/labor_demander/human_resource.hpp"
 #include "components/labor_demander/labor_demander.hpp"
-#include "components/labor_demander/planner.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "config.hpp"
 #include "core/values/goods.hpp"
-#include "core/values/labor.hpp"
 #include "util.hpp"
 #include "world/message.hpp"
 
@@ -117,51 +114,6 @@ namespace production_goods::supplier {
 }
 }  // namespace production_goods::supplier
 
-namespace labor::demander::planner {
-[[nodiscard]] auto makeWagePlannerMemory(RandomGenerator& masterRng) -> WagePlannerMemory {
-    const auto lastWage         = Wage{masterRng.rand(10.0, 50.0)};
-    const auto lastTargetEmploy = HeadCount{masterRng.rand(10, 20)};
-    const auto lastApplicants   = HeadCount{masterRng.rand(10, 20)};
-    return {lastWage, lastTargetEmploy, lastApplicants};
-}
-
-[[nodiscard]] auto makeWagePlanner(RandomGenerator& masterRng) -> WagePlanner {
-    const auto rng       = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
-    const auto adjustVol = masterRng.rand(0.01, 0.1);
-    return {rng, makeWagePlannerMemory(masterRng), adjustVol};
-}
-
-[[nodiscard]] auto makeOfferPlanner(RandomGenerator& masterRng) -> OfferPlanner {
-    const auto rng       = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
-    const auto offerRate = masterRng.rand();
-    const auto adjustVol = masterRng.rand(0.3, 0.5);
-    return {rng, offerRate, adjustVol};
-}
-
-[[nodiscard]] auto makePlanner(RandomGenerator& masterRng) -> RecruitPlanner {
-    return {makeWagePlanner(masterRng), makeOfferPlanner(masterRng)};
-}
-}  // namespace labor::demander::planner
-
-namespace labor::demander::human_resource {
-[[nodiscard]] auto makeHumanResourceManager(const AgentID id, const Market firmType)
-    -> HumanResource {
-    auto companyBoard = CompanyBoard{id, firmType};
-    return HumanResource{std::move(companyBoard)};
-}
-}  // namespace labor::demander::human_resource
-
-namespace labor::demander {
-[[nodiscard]] auto makeRecruitSystem(RandomGenerator& masterRng) -> RecruitSystem {
-    return {planner::makePlanner(masterRng)};
-}
-
-[[nodiscard]] auto make(RandomGenerator& masterRng, const AgentID id, const Market firmType)
-    -> LaborDemander {
-    return {makeRecruitSystem(masterRng), human_resource::makeHumanResourceManager(id, firmType)};
-}
-}  // namespace labor::demander
-
 namespace labor::supplier {
 [[nodiscard]] auto makeJobHunter(RandomGenerator& masterRng) -> JobHunter {
     const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
@@ -186,6 +138,14 @@ namespace labor::supplier {
 }
 }  // namespace labor::supplier
 
+namespace {
+[[nodiscard]] auto makeLaborDemander(
+    RandomGenerator& masterRng, const AgentID id, const Market firmType
+) -> ::abm::labor::demander::LaborDemander {
+    return {masterRng, CompanyBoard{id, firmType}};
+}
+}  // namespace
+
 Engine::Engine(const int totalStep)
     : totalStep_{totalStep}, seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}} {
     if (not logger_.isValid()) {
@@ -201,7 +161,7 @@ Engine::Engine(const int totalStep)
         BtoCFirms_.emplace_back(BtoCFirm{
             .index           = {AgentID{agentId}},
             .finance         = makeFirmFinanceComponent(rng_),
-            .labor           = labor::demander::make(rng_, AgentID{agentId}, Market::consumerGoods),
+            .labor           = makeLaborDemander(rng_, AgentID{agentId}, Market::consumerGoods),
             .consumerGoods   = consumer_goods::supplier::makeSupplier(rng_),
             .productionGoods = makeProductionGoodsDemander(rng_)
         });
@@ -212,7 +172,7 @@ Engine::Engine(const int totalStep)
         BtoBFirms_.emplace_back(BtoBFirm{
             .index   = {AgentID{agentId}},
             .finance = makeFirmFinanceComponent(rng_),
-            .labor   = labor::demander::make(rng_, AgentID{agentId}, Market::productionGoods),
+            .labor   = makeLaborDemander(rng_, AgentID{agentId}, Market::productionGoods),
             .productionGoodsSupplier = production_goods::supplier::make(rng_),
             .productionGoodsDemander = makeProductionGoodsDemander(rng_)
         });

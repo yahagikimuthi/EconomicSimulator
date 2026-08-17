@@ -1,8 +1,10 @@
 #pragma once
 
 #include <utility>
+
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/human_resource.hpp"
+#include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
 #include "core/values/common.hpp"
@@ -12,12 +14,17 @@
 namespace abm::labor::demander {
 class RecruitSystem {
   public:
-    [[nodiscard]] RecruitSystem(const RecruitPlanner& planner) : planner_{planner} {}
+    [[nodiscard]] RecruitSystem(RandomGenerator& masterRng) : planner_{masterRng} {}
 
-    void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket) {
+    void post(
+        const AgentID   id,
+        const HeadCount desiredEmploy,
+        LaborMarket&    laborMarket,
+        IMediator auto& mediator
+    ) {
         ASSERT(desiredEmploy > HeadCount{0.0});
         isRecruiting_   = true;
-        const auto plan = planner_.plan(desiredEmploy);
+        const auto plan = planner_.plan(desiredEmploy, mediator);
         recruiter_.post(id, plan, laborMarket);
     }
 
@@ -48,12 +55,12 @@ class RecruitSystem {
 
 class LaborDemander {
   public:
-    [[nodiscard]] LaborDemander(RecruitSystem&& recruitSystem, HumanResource&& humanResource)
-        : recruitSystem_{std::move(recruitSystem)}, humanResource_{std::move(humanResource)} {}
+    [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board)
+        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
 
     void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket)
         PRE(desiredEmploy > HeadCount{0.0}) {
-        recruitSystem_.post(id, desiredEmploy, laborMarket);
+        recruitSystem_.post(id, desiredEmploy, laborMarket, mediator_);
     }
 
     void offer() { recruitSystem_.offer(); }
@@ -83,6 +90,7 @@ class LaborDemander {
   private:
     RecruitSystem recruitSystem_;
     HumanResource humanResource_;
+    Mediator      mediator_;
 };
 }  // namespace abm::labor::demander
 
