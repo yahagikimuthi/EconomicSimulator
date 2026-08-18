@@ -11,14 +11,12 @@
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "util.hpp"
 #include "world/goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::human_resource {
-class EmptyRosterPool {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
+class EmptyRosterPool final {
   public:
     [[nodiscard]] EmptyRosterPool() = default;
     [[nodiscard]] auto size() const -> std::size_t { return pool_.size(); }
@@ -36,7 +34,7 @@ class EmptyRosterPool {
     std::vector<RefWrap<RosterEntry>> pool_;
 };
 
-class HumanResource {
+class HumanResource final {
   public:
     [[nodiscard]] HumanResource(CompanyBoard&& companyBoard)
         : companyBoard_{std::move(companyBoard)}, sumWage_{[&]() -> Wage {

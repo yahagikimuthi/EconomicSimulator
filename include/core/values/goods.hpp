@@ -6,7 +6,7 @@
 #include "core/values/common.hpp"
 
 namespace abm {
-class Price {
+class Price final {
   public:
     [[nodiscard]] explicit Price(const double value) noexcept : value_{value} {}
     [[nodiscard]] auto value() const noexcept -> double { return value_; }
@@ -52,7 +52,7 @@ class Price {
     return lhs;
 }
 
-class GoodsQuantity {
+class GoodsQuantity final {
   public:
     [[nodiscard]] explicit GoodsQuantity(const double value) noexcept : value_{value} {}
     [[nodiscard]] auto value() const noexcept -> double { return value_; }

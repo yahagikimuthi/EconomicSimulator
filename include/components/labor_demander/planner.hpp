@@ -7,7 +7,7 @@
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
-class RecruitPlanner {
+class RecruitPlanner final {
   public:
     [[nodiscard]] RecruitPlanner(RandomGenerator& masterRng)
         : wagePlanner_{masterRng}, employPlanSystem_{masterRng} {}

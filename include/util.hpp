@@ -23,7 +23,7 @@ concept AssetPlusFn = requires(F f, const Money money) {
     { f(money) } -> std::same_as<void>;
 };
 
-class RandomGenerator {
+class RandomGenerator final {
   public:
     [[nodiscard]] explicit RandomGenerator(const pcg32 rng) : rng_{rng} {}
 

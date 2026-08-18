@@ -13,7 +13,7 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::demander {
-class RecruitSystem {
+class RecruitSystem final {
   public:
     [[nodiscard]] RecruitSystem(RandomGenerator& masterRng) : planner_{masterRng} {}
 
@@ -63,7 +63,7 @@ class RecruitSystem {
     Recruiter      recruiter_;
 };
 
-class LaborDemander {
+class LaborDemander final {
   public:
     [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board)
         : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}

@@ -11,10 +11,11 @@
 #include "core/forward.hpp"
 #include "util.hpp"
 #include "world/common.hpp"
+#include "world/integration.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
-class Employment {
+class Employment final {
   public:
     [[nodiscard]] Employment(const double productPower) : productPower_{productPower} {}
 
@@ -72,7 +73,7 @@ class JobSearch {
 }  // namespace abm::labor::supplier
 
 namespace abm {
-class LaborSupplier {
+class LaborSupplier final {
   public:
     [[nodiscard]] LaborSupplier(
         const labor::supplier::JobHunter&&  jobHunter,

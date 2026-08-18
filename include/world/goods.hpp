@@ -9,7 +9,7 @@
 
 namespace abm {
 
-class [[nodiscard]] Workspace {
+class [[nodiscard]] Workspace final {
   public:
     Workspace(const double power) : firmProductPower_{power} {}
     ~Workspace() = default;
@@ -55,7 +55,7 @@ inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     return *this;
 }
 
-struct ConsumerGoodsRequest {
+struct ConsumerGoodsRequest final {
     const GoodsQuantity amount;
     GoodsQuantity       tradeAmount{0.0};
 
@@ -64,7 +64,7 @@ struct ConsumerGoodsRequest {
         : amount{Amount}, entry{Entry} {}
 };
 
-struct [[nodiscard]] ConsumerGoodsEntry {
+struct [[nodiscard]] ConsumerGoodsEntry final {
     ConsumerGoodsEntry(const Price Price, const GoodsQuantity Supply)
         : price{Price}, supply{Supply} {}
     auto request(const GoodsQuantity amount) -> ConsumerGoodsRequest& {
@@ -76,7 +76,7 @@ struct [[nodiscard]] ConsumerGoodsEntry {
     tbb::concurrent_vector<ConsumerGoodsRequest> requestBox;
 };
 
-struct ProductionGoodsRequest {
+struct ProductionGoodsRequest final {
     const GoodsQuantity amount;
     GoodsQuantity       tradeAmount{0.0};
 
@@ -85,7 +85,7 @@ struct ProductionGoodsRequest {
         : amount{Amount}, entry{Entry} {}
 };
 
-struct [[nodiscard]] ProductionGoodsEntry {
+struct [[nodiscard]] ProductionGoodsEntry final {
     ProductionGoodsEntry(const AgentID Id, const Price Price, const GoodsQuantity Supply)
         : id{Id}, price{Price}, supply{Supply} {}
     auto request(const GoodsQuantity amount) -> ProductionGoodsRequest& {

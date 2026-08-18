@@ -12,12 +12,12 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;
 };
 
-struct RecruitPlan {
+struct RecruitPlan final {
     Wage      wage;
     HeadCount offer;
 };
 
-struct RecruitResult {
+struct RecruitResult final {
     const HeadCount applicants;
     const HeadCount employ;
 };

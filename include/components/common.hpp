@@ -7,7 +7,7 @@
 #include "world/common.hpp"
 
 namespace abm {
-class AgentIndex {
+class AgentIndex final {
   public:
     [[nodiscard]] AgentIndex(const AgentID id) : id_{id} {}
     [[nodiscard]] auto id() const -> AgentID POST(id : id >= AgentID{0}) { return id_; }
@@ -26,13 +26,13 @@ class BaseFinance {
     Money asset_;
 };
 
-class FirmFinance : public BaseFinance {
+class FirmFinance final : public BaseFinance {
   public:
     [[nodiscard]] FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
 
-class HHoldFinance : public BaseFinance {
+class HHoldFinance final : public BaseFinance {
   public:
     [[nodiscard]] HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }

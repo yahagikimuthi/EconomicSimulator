@@ -14,7 +14,7 @@
 #include "config.hpp"
 
 namespace abm::analysis {
-class InputDataManager {
+class InputDataManager final {
   public:
     [[nodiscard]] InputDataManager()
         : inFile_{[]() -> HighFive::File {
@@ -71,7 +71,7 @@ class InputDataManager {
     HighFive::File inFile_;
 };
 
-class [[nodiscard]] OutputDataManager {
+class OutputDataManager final {
   public:
     [[nodiscard]] OutputDataManager()
         : outFile_{[]() -> HighFive::File {

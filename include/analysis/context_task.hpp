@@ -11,7 +11,7 @@
 #include "analysis/data_manager.hpp"
 
 namespace abm::analysis {
-class DataContext {
+class DataContext final {
   public:
     [[nodiscard]] DataContext() noexcept = default;
     void set(std::string_view name, std::vector<double>&& data) noexcept {

@@ -10,7 +10,7 @@
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
-class Producer {
+class Producer final {
   public:
     [[nodiscard]] Producer(
         Workspace&& workspace, const double firmProductPower, const GoodsQuantity inventory

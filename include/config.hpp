@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string_view>
 
-namespace abm {
+namespace abm::config {
 using namespace std::string_view_literals;
 }
 

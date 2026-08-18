@@ -10,7 +10,7 @@
 
 namespace abm::analysis {
 
-class Pipeline {
+class Pipeline final {
   public:
     [[nodiscard]] Pipeline() noexcept = default;
     void requireData(std::string_view name) noexcept { requireDatas_.emplace_back(name); }

@@ -13,7 +13,7 @@
 #include "world/common.hpp"
 
 namespace abm::base_goods::supplier {
-class MarkupPlanner {
+class MarkupPlanner final {
   public:
     [[nodiscard]] MarkupPlanner(const RandomGenerator rng, const double log, const double adjustVol)
         : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
@@ -47,7 +47,7 @@ class MarkupPlanner {
     const double            adjustVol_;
 };
 
-class PricePlanner {
+class PricePlanner final {
   public:
     [[nodiscard]] PricePlanner() = default;
 
@@ -81,7 +81,7 @@ class PricePlanner {
     Price plan_{0.0};
 };
 
-class PostingInfoPlanner {
+class PostingInfoPlanner final {
   public:
     [[nodiscard]] PostingInfoPlanner(MarkupPlanner markupPlanner) : markupPlanner_{markupPlanner} {}
 
@@ -103,7 +103,7 @@ class PostingInfoPlanner {
     PricePlanner  pricePlanner_;
 };
 
-class DemandForecastManager {
+class DemandForecastManager final {
   public:
     DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
 
@@ -138,7 +138,7 @@ class PlannerT {
   private:
 };
 
-class Planner {
+class Planner final {
   public:
     [[nodiscard]] Planner(
         const GoodsQuantity         lastSupply,

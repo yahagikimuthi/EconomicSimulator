@@ -5,7 +5,7 @@
 #include "core/values/common.hpp"
 
 namespace abm {
-class [[nodiscard]] Wage {
+class [[nodiscard]] Wage final {
   public:
     [[nodiscard]] explicit Wage(const double value) noexcept : value_{value} {}
     [[nodiscard]] auto value() const noexcept -> double { return value_; }
@@ -54,7 +54,7 @@ class [[nodiscard]] Wage {
     return lhs;
 }
 
-class [[nodiscard]] HeadCount {
+class [[nodiscard]] HeadCount final {
   public:
     [[nodiscard]] explicit HeadCount(const double value) noexcept : value_{value} {}
     [[nodiscard]] explicit HeadCount(const int value) noexcept

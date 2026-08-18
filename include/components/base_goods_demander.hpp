@@ -11,7 +11,7 @@
 #include "world/goods.hpp"
 
 namespace abm::base_goods::demander {
-class BudgetCalculator {
+class BudgetCalculator final {
   public:
     BudgetCalculator(const double mpc) : mpc_{mpc} {}
 

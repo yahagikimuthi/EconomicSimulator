@@ -8,9 +8,9 @@
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
-class WagePlannerMemory {
+class WagePlannerMemory final {
     template <typename T>
-    class Memory {
+    class Memory final {
       public:
         [[nodiscard]] Memory(const T Last) noexcept : last{Last} {}
         void commit() noexcept {
@@ -50,7 +50,7 @@ class WagePlannerMemory {
     Memory<HeadCount> applicants_;
 };
 
-class WagePlanner {
+class WagePlanner final {
   public:
     [[nodiscard]] WagePlanner(RandomGenerator& rng) noexcept
         : lastWage_{rng.rand(10.0, 20.0)},

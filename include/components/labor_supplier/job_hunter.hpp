@@ -60,7 +60,7 @@ inline void sortSample(std::span<RefWrap<LaborRequest>> sortRequests, const int 
            std::views::transform([](RequestRef reqRef) -> Request& { return reqRef.get(); });
 }
 
-class [[nodiscard]] MyEntries {
+class [[nodiscard]] MyEntries final {
   public:
     MyEntries() = default;
     void add(LaborEntry& entry) { entries_.emplace_back(std::ref(entry)); }
@@ -77,7 +77,7 @@ class [[nodiscard]] MyEntries {
     std::vector<RefWrap<LaborEntry>> entries_;
 };
 
-class JobHunter {
+class JobHunter final {
     using Entry = LaborEntry;
 
   public:

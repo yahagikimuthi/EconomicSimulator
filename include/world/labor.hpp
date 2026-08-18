@@ -15,7 +15,7 @@ namespace abm {
 
 class RosterEntry;
 class Workspace;
-struct CompanyBoard {
+struct CompanyBoard final {
     const AgentID                                               firmId;
     const Market                                                firmType;
     std::deque<RosterEntry>                                     roster;
@@ -27,13 +27,13 @@ struct CompanyBoard {
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) -> RosterEntry&;
 };
 
-class RosterEntry {
+class RosterEntry final {
   public:
     [[nodiscard]] RosterEntry(
         const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace
     )
         : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
-    void addInput(const double productPower);
+    void addInput(const double productPower) noexcept;
     void resign() { companyBoard.resign(*this); }
     auto firmId() const -> AgentID { return companyBoard.firmId; }
     auto firmType() const -> Market { return companyBoard.firmType; }
@@ -53,7 +53,7 @@ inline auto CompanyBoard::addRoster(const AgentID id, const Wage wage, Workspace
 }
 
 struct LaborRequest;
-struct LaborEntry {
+struct LaborEntry final {
     const AgentID hholdID;
     const double  productPower;
 
@@ -69,7 +69,7 @@ struct LaborEntry {
         : hholdID{Id}, productPower{ProductPower}, request{Request} {}
 };
 
-struct LaborRequest {
+struct LaborRequest final {
     [[nodiscard]] LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
     auto entry(const AgentID id, const double productPower) -> LaborEntry& {
         auto it = entryBox_.emplace_back(id, productPower, *this);
@@ -87,7 +87,7 @@ struct LaborRequest {
     std::vector<RefWrap<LaborEntry>>   references_;
 };
 
-class LaborMarket {
+class LaborMarket final {
   public:
     [[nodiscard]] LaborMarket() noexcept = default;
     auto requestBox() -> std::span<RefWrap<LaborRequest>> { return references_; }

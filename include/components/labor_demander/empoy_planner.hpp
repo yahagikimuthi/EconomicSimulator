@@ -7,16 +7,16 @@
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
-class EmployPlanner {
+class EmployPlanner final {
   public:
     [[nodiscard]] auto plan(const HeadCount desiredEmploy) const noexcept -> HeadCount {
         return desiredEmploy;
     }
 };
 
-class OfferPlannerMemory {
+class OfferPlannerMemory final {
     template <typename T>
-    class Memory {
+    class Memory final {
       public:
         [[nodiscard]] Memory(const T Last) noexcept : last{Last} {}
 
@@ -49,7 +49,7 @@ class OfferPlannerMemory {
     Memory<HeadCount> employPlan_;
 };
 
-class OfferPlanner {
+class OfferPlanner final {
   public:
     [[nodiscard]] OfferPlanner(RandomGenerator& rng) noexcept
         : memory_{rng},
@@ -92,7 +92,7 @@ class OfferPlanner {
     const double            adjustVol_;
 };
 
-class EmployPlanningSystem {
+class EmployPlanningSystem final {
   public:
     [[nodiscard]] EmployPlanningSystem(RandomGenerator& masterRng) : offerPlanner_{masterRng} {}
 

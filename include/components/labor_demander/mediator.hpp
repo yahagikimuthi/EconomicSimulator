@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <functional>
 #include <variant>
 
 #include "components/labor_demander/common.hpp"
@@ -13,10 +12,7 @@ namespace abm::labor::demander::mediator {
 using EmployPlanListener    = std::variant<planner::WagePlannerMemory>;
 using RecruitResultListener = std::variant<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
-class Mediator {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
+class Mediator final {
   public:
     Mediator() = default;
     void publishEmployPlan(const HeadCount employPlan) {

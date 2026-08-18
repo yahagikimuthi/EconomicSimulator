@@ -21,7 +21,7 @@
 
 namespace abm {
 
-struct BtoCFirm {  // NOLINT
+struct BtoCFirm final {  // NOLINT
     AgentIndex              index;
     FirmFinance             finance;
     LaborDemander           labor;
@@ -29,7 +29,7 @@ struct BtoCFirm {  // NOLINT
     ProductionGoodsDemander productionGoods;
 };
 
-struct BtoBFirm {  // NOLINT
+struct BtoBFirm final {  // NOLINT
     AgentIndex              index;
     FirmFinance             finance;
     LaborDemander           labor;
@@ -37,14 +37,14 @@ struct BtoBFirm {  // NOLINT
     ProductionGoodsDemander productionGoodsDemander;
 };
 
-struct HHold {  // NOLINT
+struct HHold final {  // NOLINT
     AgentIndex            index;
     HHoldFinance          finance;
     LaborSupplier         labor;
     ConsumerGoodsDemander consumerGoods;
 };
 
-class Logger {
+class Logger final {
   public:
     [[nodiscard]] explicit Logger();
     auto isValid() const noexcept -> bool { return file_.isValid(); }
@@ -54,12 +54,12 @@ class Logger {
     HighFive::File file_;
 };
 
-struct PCG32Seed {
+struct PCG32Seed final {
     const std::uint64_t state;
     const std::uint64_t stream;
 };
 
-class Engine {
+class Engine final {
     template <typename T>
     using TBBVec = tbb::concurrent_vector<T>;
 

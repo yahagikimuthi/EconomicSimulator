@@ -5,7 +5,7 @@
 #include "core/base.hpp"
 
 namespace abm {
-class Money {
+class Money final {
   public:
     [[nodiscard]] explicit Money(const double value) noexcept : value_{value} {}
     [[nodiscard]] auto value() const noexcept -> double { return value_; }
@@ -50,7 +50,7 @@ class Money {
     return lhs;
 }
 
-class AgentID {
+class AgentID final {
   public:
     [[nodiscard]] explicit AgentID(const int value) noexcept : value_{value} {
         ASSERT(value >= -1);
@@ -61,7 +61,7 @@ class AgentID {
     int value_;
 };
 
-class Step {
+class Step final {
   public:
     [[nodiscard]] explicit Step(const int value) noexcept : value_{value} {}
     [[nodiscard]] auto value() const noexcept -> int { return value_; }

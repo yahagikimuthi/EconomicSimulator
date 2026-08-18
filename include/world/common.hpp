@@ -8,7 +8,7 @@
 namespace abm {
 enum class Market : char { labor, consumerGoods, productionGoods };
 
-struct CensusDropBox {
+struct CensusDropBox final {
     std::vector<double> firmAssets;
     std::vector<double> postedEmployments;
     std::vector<double> employments;

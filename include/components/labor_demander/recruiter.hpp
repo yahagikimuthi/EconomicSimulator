@@ -16,7 +16,7 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::recruiter {
-class OfferApplicants {
+class OfferApplicants final {
   public:
     [[nodiscard]] OfferApplicants() = default;
 
@@ -33,16 +33,16 @@ class OfferApplicants {
     std::vector<RefWrap<LaborEntry>> applicants_;
 };
 
-struct OfferResult {
+struct OfferResult final {
     const HeadCount offer;
     const HeadCount applicants;
 };
 
-struct EmployResult {
+struct EmployResult final {
     const HeadCount employ;
 };
 
-class Ledger {
+class Ledger final {
   public:
     [[nodiscard]] Ledger() = default;
 
@@ -74,7 +74,7 @@ class Ledger {
     HeadCount employ_{0.0};
 };
 
-class Recruiter {
+class Recruiter final {
   public:
     [[nodiscard]] Recruiter() = default;
 

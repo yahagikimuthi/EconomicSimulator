@@ -18,7 +18,7 @@
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
-class LedgerManager {
+class LedgerManager final {
   public:
     [[nodiscard]] LedgerManager() = default;
 
