@@ -15,7 +15,7 @@
 namespace abm::labor::demander {
 class RecruitSystem final {
   public:
-    [[nodiscard]] RecruitSystem(RandomGenerator& masterRng) : planner_{masterRng} {}
+    [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) : planner_{masterRng} {}
 
     void post(
         const AgentID   id,
@@ -95,7 +95,7 @@ class LaborDemander final {
         return static_cast<Money>(humanResource_.sumWage());
     }
 
-    void endStep(CensusDropBox&) {
+    void endStep() {
         recruitSystem_.endStep(mediator_);
         recruitSystem_.commit();
         recruitSystem_.reset();

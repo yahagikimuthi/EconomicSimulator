@@ -132,7 +132,7 @@ class Recruiter final {
   private:
     [[nodiscard]] auto isPosting() const -> bool { return myRequest_.has_value(); }
 
-    [[nodiscard]] auto shouldPost(const RecruitPlan& plan) const -> bool {
+    [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) -> bool {
         return plan.offer > HeadCount{0.0};
     }
 

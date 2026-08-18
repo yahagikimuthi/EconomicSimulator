@@ -11,13 +11,12 @@
 #include "core/forward.hpp"
 #include "util.hpp"
 #include "world/common.hpp"
-#include "world/integration.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
 class Employment final {
   public:
-    [[nodiscard]] Employment(const double productPower) : productPower_{productPower} {}
+    [[nodiscard]] explicit Employment(const double productPower) : productPower_{productPower} {}
 
     [[nodiscard]] auto isEmployed() const -> bool { return rosterEntry_.has_value(); }
 

@@ -2,6 +2,7 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <highfive/bits/H5Slice_traits.hpp>
 #include <string>
 #include <string_view>
 
@@ -29,7 +30,7 @@ void Engine::run() noexcept {
 }
 
 void Engine::runLabor() noexcept {
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         labor::adjustWorkforce(firm.index, firm.consumerGoods, firm.labor, laborMarket_);
     }
 
@@ -37,7 +38,7 @@ void Engine::runLabor() noexcept {
         labor::jobEntry(hhold.index, hhold.labor, laborMarket_);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         labor::offer(firm.labor);
     }
 
@@ -45,7 +46,7 @@ void Engine::runLabor() noexcept {
         labor::acceptOffer(hhold.labor);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         labor::registerMember(firm.consumerGoods, firm.labor);
     }
 
@@ -53,12 +54,12 @@ void Engine::runLabor() noexcept {
         labor::recordRosterEntry(hhold.labor);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         labor::acceptResignation(firm.labor);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
-        labor::endStep(firm.finance, firm.labor, dropBox_);
+    for (BtoCFirm& firm : bToCFirms_) {
+        labor::endStep(firm.finance, firm.labor);
     }
     for (HHold& hhold : hholds_) {
         labor::endStep(hhold.finance, hhold.labor, dropBox_);
@@ -70,13 +71,13 @@ void Engine::runProductionGoods() noexcept {
         production_goods::product(hhold.labor, Market::productionGoods);
     }
 
-    for (BtoBFirm& firm : BtoBFirms_) {
+    for (BtoBFirm& firm : bToBFirms_) {
         production_goods::postGoods(
             firm.index, firm.productionGoodsSupplier, firm.labor, productionGoodsEntryBox_
         );
     }
 
-    for (BtoBFirm& firm : BtoBFirms_) {
+    for (BtoBFirm& firm : bToBFirms_) {
         production_goods::purchase(
             firm.index,
             firm.finance,
@@ -86,25 +87,25 @@ void Engine::runProductionGoods() noexcept {
         );
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         production_goods::purchase(
             firm.index, firm.finance, firm.productionGoods, firm.labor, productionGoodsEntryBox_
         );
     }
 
-    for (BtoBFirm& firm : BtoBFirms_) {
+    for (BtoBFirm& firm : bToBFirms_) {
         production_goods::trade(firm.productionGoodsSupplier);
     }
 
-    for (BtoBFirm& firm : BtoBFirms_) {
+    for (BtoBFirm& firm : bToBFirms_) {
         production_goods::afterTrade(firm.productionGoodsDemander);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         production_goods::afterTrade(firm.productionGoods);
     }
 
-    for (BtoBFirm& firm : BtoBFirms_) {
+    for (BtoBFirm& firm : bToBFirms_) {
         production_goods::endStep(firm.finance, firm.productionGoodsDemander);
     }
 }
@@ -114,7 +115,7 @@ void Engine::runConsumerGoods() noexcept {
         consumer_goods::product(hhold.labor, Market::consumerGoods);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         consumer_goods::postGoods(firm.consumerGoods, firm.labor, consumerGoodsEntryBox_);
     }
 
@@ -124,7 +125,7 @@ void Engine::runConsumerGoods() noexcept {
         );
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         consumer_goods::trade(firm.consumerGoods);
     }
 
@@ -132,7 +133,7 @@ void Engine::runConsumerGoods() noexcept {
         consumer_goods::afterTrade(hhold.consumerGoods);
     }
 
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         consumer_goods::endStep(firm.finance, firm.consumerGoods, dropBox_);
     }
 
@@ -142,7 +143,7 @@ void Engine::runConsumerGoods() noexcept {
 }
 
 void Engine::logging() noexcept {
-    for (BtoCFirm& firm : BtoCFirms_) {
+    for (BtoCFirm& firm : bToCFirms_) {
         firm_finance::logging(dropBox_, firm.finance);
     }
     for (HHold& hhold : hholds_) {

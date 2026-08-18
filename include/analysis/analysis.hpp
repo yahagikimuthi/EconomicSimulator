@@ -1,6 +1,6 @@
 #pragma once
 
-#include <numeric>
+#include <algorithm>
 
 #include "analysis/context_task.hpp"
 #include "config.hpp"
@@ -11,7 +11,7 @@ namespace abm::analysis {
     const std::vector<double>& container, const double nanToNum = 0.0
 ) noexcept -> double {
     if (container.empty()) return nanToNum;
-    const auto sum = std::reduce(container.begin(), container.end(), 0.0);
+    const auto sum = std::ranges::fold_left(container, 0.0, std::plus{});
     const auto n   = static_cast<double>(container.size());
     return sum / n;
 }

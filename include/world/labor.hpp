@@ -6,15 +6,13 @@
 #include <span>
 #include <vector>
 
+#include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
 #include "world/common.hpp"
 
 namespace abm {
-
-class RosterEntry;
-class Workspace;
 struct CompanyBoard final {
     const AgentID                                               firmId;
     const Market                                                firmType;
@@ -32,19 +30,20 @@ class RosterEntry final {
     [[nodiscard]] RosterEntry(
         const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace
     )
-        : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
+        : hholdId{Id}, wage{Wage}, companyBoard_{CompanyBoard}, workspace_{Workspace} {}
     void addInput(const double productPower) noexcept;
-    void resign() { companyBoard.resign(*this); }
-    auto firmId() const -> AgentID { return companyBoard.firmId; }
-    auto firmType() const -> Market { return companyBoard.firmType; }
+    void resign() { companyBoard_.resign(*this); }
+
+    [[nodiscard]] auto firmId() const -> AgentID { return companyBoard_.firmId; }
+    [[nodiscard]] auto firmType() const -> Market { return companyBoard_.firmType; }
 
     const AgentID hholdId;
     const Wage    wage;
     bool          isOccupied{true};
 
   private:
-    CompanyBoard& companyBoard;
-    Workspace&    workspace;
+    CompanyBoard& companyBoard_;
+    Workspace&    workspace_;
 };
 
 inline auto CompanyBoard::addRoster(const AgentID id, const Wage wage, Workspace& workspace)
@@ -52,7 +51,6 @@ inline auto CompanyBoard::addRoster(const AgentID id, const Wage wage, Workspace
     return roster.emplace_back(id, wage, *this, workspace);
 }
 
-struct LaborRequest;
 struct LaborEntry final {
     const AgentID hholdID;
     const double  productPower;

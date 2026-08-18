@@ -37,7 +37,7 @@ class MarkupPlanner final {
         return markupGuard(nextMarkup);
     }
 
-    auto markupGuard(const double markup) const -> double {
+    static auto markupGuard(const double markup) noexcept -> double {
         return std::max(markup, std::numeric_limits<double>::epsilon());
     }
 
@@ -65,16 +65,16 @@ class PricePlanner final {
     }
 
   private:
-    [[nodiscard]] auto calcPrice(
+    [[nodiscard]] static auto calcPrice(
         const GoodsQuantity supply, const double markup, const Money totalCost
-    ) const -> Price {
+    ) -> Price {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
         const auto price = Price{avgCost.value() * (1.0 + markup)};
         return priceGuard(price);
     }
 
-    [[nodiscard]] auto priceGuard(const Price price) const -> Price {
+    [[nodiscard]] static auto priceGuard(const Price price) -> Price {
         return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
     }
 
@@ -83,7 +83,8 @@ class PricePlanner final {
 
 class PostingInfoPlanner final {
   public:
-    [[nodiscard]] PostingInfoPlanner(MarkupPlanner markupPlanner) : markupPlanner_{markupPlanner} {}
+    [[nodiscard]] explicit PostingInfoPlanner(MarkupPlanner markupPlanner)
+        : markupPlanner_{markupPlanner} {}
 
     [[nodiscard]] auto judgePlan(
         const GoodsQuantity supply, const Money totalCost, const bool isSold
@@ -105,7 +106,7 @@ class PostingInfoPlanner final {
 
 class DemandForecastManager final {
   public:
-    DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
+    explicit DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
 
     void update(const GoodsQuantity totalDemand) {
         const auto next =

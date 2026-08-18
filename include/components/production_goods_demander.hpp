@@ -52,8 +52,9 @@ class [[nodiscard]] ProductionGoodsDemander final
     auto purchaseAmount() const -> GoodsQuantity { return ledger_.amount; }
 
   private:
-    auto isPass(const Money asset, const tbb::concurrent_vector<ProductionGoodsEntry>& entryBox)
-        const -> bool {
+    static auto isPass(
+        const Money asset, const tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
+    ) -> bool {
         if (asset <= Money{0.0}) return true;
         if (entryBox.empty()) return true;
         return false;
@@ -77,11 +78,11 @@ class [[nodiscard]] ProductionGoodsDemander final
         return betterEntry;
     }
 
-    auto shouldAdopt(
+    static auto shouldAdopt(
         const AgentID                                    id,
         const std::optional<const ProductionGoodsEntry&> existingEntry,
         const ProductionGoodsEntry&                      sampleEntry
-    ) const -> bool {
+    ) -> bool {
         if (sampleEntry.id == id) return false;
         if (not existingEntry) return true;
         return sampleEntry.price <= existingEntry->price;

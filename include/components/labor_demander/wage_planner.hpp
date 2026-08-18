@@ -12,7 +12,7 @@ class WagePlannerMemory final {
     template <typename T>
     class Memory final {
       public:
-        [[nodiscard]] Memory(const T Last) noexcept : last{Last} {}
+        [[nodiscard]] explicit Memory(const T Last) noexcept : last{Last} {}
         void commit() noexcept {
             if (current) last = *current;
         }
@@ -21,7 +21,7 @@ class WagePlannerMemory final {
     };
 
   public:
-    [[nodiscard]] WagePlannerMemory(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.rand(10, 20)}},
           applicants_{HeadCount{masterRng.rand(10, 20)}} {}
 
@@ -52,7 +52,7 @@ class WagePlannerMemory final {
 
 class WagePlanner final {
   public:
-    [[nodiscard]] WagePlanner(RandomGenerator& rng) noexcept
+    [[nodiscard]] explicit WagePlanner(RandomGenerator& rng) noexcept
         : lastWage_{rng.rand(10.0, 20.0)},
           memory_{rng},
           rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},

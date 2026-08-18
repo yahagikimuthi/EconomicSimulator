@@ -49,7 +49,7 @@ namespace abm {
 ) -> ProductionGoodsDemander {
     const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
     const auto mpc = masterRng.rand(0.7, 0.9);
-    return {rng, mpc};
+    return ProductionGoodsDemander{rng, mpc};
 }
 
 namespace base_goods::supplier {
@@ -62,19 +62,19 @@ namespace base_goods::supplier {
 
 [[nodiscard]] auto makeDemandForecastManager(RandomGenerator& masterRng) -> DemandForecastManager {
     const auto adjustVol = masterRng.rand(0.1, 0.4);
-    return {adjustVol};
+    return DemandForecastManager{adjustVol};
 }
 
 [[nodiscard]] auto makePlanner(RandomGenerator& masterRng) -> Planner {
     const auto lastSupply     = GoodsQuantity{masterRng.rand(4.0, 15.0)};
     const auto isSold         = bool{masterRng.rand() < 0.5};
     const auto targetInvRatio = masterRng.rand(0.1, 0.2);
-    return {
+    return Planner{
         lastSupply,
         isSold,
         targetInvRatio,
-        makeMarkupPlanner(masterRng),
-        makeDemandForecastManager(masterRng)
+        MarkupPlanner{makeMarkupPlanner(masterRng)},
+        DemandForecastManager{makeDemandForecastManager(masterRng)}
     };
 }
 
@@ -89,7 +89,7 @@ namespace base_goods::supplier {
 namespace consumer_goods::supplier {
 [[nodiscard]] auto makeTrader(RandomGenerator& masterRng) -> Trader {
     const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
-    return {rng};
+    return Trader{rng};
 }
 
 [[nodiscard]] auto makeSupplier(RandomGenerator& masterRng) -> ConsumerGoodsSupplier {
@@ -104,7 +104,7 @@ namespace consumer_goods::supplier {
 namespace production_goods::supplier {
 [[nodiscard]] auto makeTrader(RandomGenerator& masterRng) -> Trader {
     const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
-    return {rng};
+    return Trader{rng};
 }
 
 [[nodiscard]] auto make(RandomGenerator& masterRng) -> ProductionGoodsSupplier {
@@ -157,11 +157,11 @@ Engine::Engine(const int totalStep) noexcept
 
     namespace cnt = config::agent_count;
 
-    BtoCFirms_.reserve(cnt::BtoCFirm);
+    bToCFirms_.reserve(cnt::bToCFirm);
     int agentId{};
-    for (; agentId < config::agent_count::BtoCFirm; ++agentId) {
-        BtoCFirms_.emplace_back(BtoCFirm{
-            .index           = {AgentID{agentId}},
+    for (; agentId < config::agent_count::bToCFirm; ++agentId) {
+        bToCFirms_.emplace_back(BtoCFirm{
+            .index           = AgentIndex{AgentID{agentId}},
             .finance         = makeFirmFinanceComponent(rng_),
             .labor           = makeLaborDemander(rng_, AgentID{agentId}, Market::consumerGoods),
             .consumerGoods   = consumer_goods::supplier::makeSupplier(rng_),
@@ -169,10 +169,10 @@ Engine::Engine(const int totalStep) noexcept
         });
     }
 
-    BtoBFirms_.reserve(cnt::BtoBFirm);
-    for (; agentId < cnt::BtoCFirm + cnt::BtoBFirm; ++agentId) {
-        BtoBFirms_.emplace_back(BtoBFirm{
-            .index   = {AgentID{agentId}},
+    bToBFirms_.reserve(cnt::bToBFirm);
+    for (; agentId < cnt::bToCFirm + cnt::bToBFirm; ++agentId) {
+        bToBFirms_.emplace_back(BtoBFirm{
+            .index   = AgentIndex{AgentID{agentId}},
             .finance = makeFirmFinanceComponent(rng_),
             .labor   = makeLaborDemander(rng_, AgentID{agentId}, Market::productionGoods),
             .productionGoodsSupplier = production_goods::supplier::make(rng_),
@@ -181,9 +181,9 @@ Engine::Engine(const int totalStep) noexcept
     }
 
     hholds_.reserve(cnt::hhold);
-    for (; agentId < cnt::BtoCFirm + cnt::BtoBFirm + cnt::hhold; ++agentId) {
+    for (; agentId < cnt::bToCFirm + cnt::bToBFirm + cnt::hhold; ++agentId) {
         hholds_.emplace_back(HHold{
-            .index         = {AgentID{agentId}},
+            .index         = AgentIndex{AgentID{agentId}},
             .finance       = makeHHoldFinanceComponent(rng_),
             .labor         = labor::supplier::make(rng_),
             .consumerGoods = makeConsumerGoodsDemander(rng_, agentId)

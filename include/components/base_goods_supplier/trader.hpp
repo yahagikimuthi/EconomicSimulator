@@ -96,7 +96,7 @@ class Trader {
     void endStep() { myEntry_.reset(), isPosting_ = false, ledgerManager_.reset(); }
 
   protected:
-    Trader(const RandomGenerator rng) : rng_{rng} {}
+    explicit Trader(const RandomGenerator rng) : rng_{rng} {}
 
     mutable RandomGenerator rng_;
     std::optional<Entry&>   myEntry_{std::nullopt};

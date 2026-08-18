@@ -9,7 +9,7 @@
 namespace abm::labor::demander::planner {
 class EmployPlanner final {
   public:
-    [[nodiscard]] auto plan(const HeadCount desiredEmploy) const noexcept -> HeadCount {
+    [[nodiscard]] static auto plan(const HeadCount desiredEmploy) noexcept -> HeadCount {
         return desiredEmploy;
     }
 };
@@ -18,7 +18,7 @@ class OfferPlannerMemory final {
     template <typename T>
     class Memory final {
       public:
-        [[nodiscard]] Memory(const T Last) noexcept : last{Last} {}
+        [[nodiscard]] explicit Memory(const T Last) noexcept : last{Last} {}
 
         void commit() noexcept {
             if (current) last = *current;
@@ -29,7 +29,7 @@ class OfferPlannerMemory final {
     };
 
   public:
-    [[nodiscard]] OfferPlannerMemory(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit OfferPlannerMemory(RandomGenerator& masterRng) noexcept
         : applicants_{HeadCount{masterRng.rand(10, 20)}},
           employPlan_{HeadCount{masterRng.rand(10, 20)}} {}
     [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
@@ -51,7 +51,7 @@ class OfferPlannerMemory final {
 
 class OfferPlanner final {
   public:
-    [[nodiscard]] OfferPlanner(RandomGenerator& rng) noexcept
+    [[nodiscard]] explicit OfferPlanner(RandomGenerator& rng) noexcept
         : memory_{rng},
           offerRate_{rng.rand(0.1, 0.2)},
           rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
@@ -94,10 +94,11 @@ class OfferPlanner final {
 
 class EmployPlanningSystem final {
   public:
-    [[nodiscard]] EmployPlanningSystem(RandomGenerator& masterRng) : offerPlanner_{masterRng} {}
+    [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng)
+        : offerPlanner_{masterRng} {}
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) -> HeadCount {
-        const auto employPlan = employPlanner_.plan(desiredEmploy);
+        const auto employPlan = EmployPlanner::plan(desiredEmploy);
         mediator.publishEmployPlan(employPlan);
         const auto offerPlan = offerPlanner_.plan(employPlan);
         return offerPlan;
@@ -106,7 +107,6 @@ class EmployPlanningSystem final {
     void commit() { offerPlanner_.commit(); }
 
   private:
-    EmployPlanner employPlanner_;
-    OfferPlanner  offerPlanner_;
+    OfferPlanner offerPlanner_;
 };
 }  // namespace abm::labor::demander::planner

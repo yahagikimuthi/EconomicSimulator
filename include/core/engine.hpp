@@ -48,7 +48,7 @@ class Logger final {
   public:
     [[nodiscard]] explicit Logger();
     auto isValid() const noexcept -> bool { return file_.isValid(); }
-    void save(const CensusDropBox& dropBox, const Step step);
+    void save(const CensusDropBox& dropBox, Step step);
 
   private:
     HighFive::File file_;
@@ -78,8 +78,8 @@ class Engine final {
     void check() const noexcept;
 
     Logger                logger_;
-    std::vector<BtoCFirm> BtoCFirms_;
-    std::vector<BtoBFirm> BtoBFirms_;
+    std::vector<BtoCFirm> bToCFirms_;
+    std::vector<BtoBFirm> bToBFirms_;
     std::vector<HHold>    hholds_;
 
     LaborMarket                  laborMarket_;

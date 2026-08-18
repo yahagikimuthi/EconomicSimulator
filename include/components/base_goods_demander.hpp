@@ -13,9 +13,9 @@
 namespace abm::base_goods::demander {
 class BudgetCalculator final {
   public:
-    BudgetCalculator(const double mpc) : mpc_{mpc} {}
+    explicit BudgetCalculator(const double mpc) : mpc_{mpc} {}
 
-    auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
+    [[nodiscard]] auto calcBudget(const Money asset) const -> Money { return asset * mpc_; }
 
   private:
     const double mpc_;

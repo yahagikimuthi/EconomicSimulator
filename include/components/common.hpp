@@ -9,7 +9,7 @@
 namespace abm {
 class AgentIndex final {
   public:
-    [[nodiscard]] AgentIndex(const AgentID id) : id_{id} {}
+    [[nodiscard]] explicit AgentIndex(const AgentID id) : id_{id} {}
     [[nodiscard]] auto id() const -> AgentID POST(id : id >= AgentID{0}) { return id_; }
 
   private:
@@ -18,23 +18,24 @@ class AgentIndex final {
 
 class BaseFinance {
   public:
-    void               assetPlus(const Money plus) { asset_ += plus; }
+    void assetPlus(const Money plus) { asset_ += plus; }
+
     [[nodiscard]] auto asset() const -> Money { return asset_; }
 
   protected:
-    [[nodiscard]] BaseFinance(const Money asset) : asset_{asset} {}
+    [[nodiscard]] explicit BaseFinance(const Money asset) : asset_{asset} {}
     Money asset_;
 };
 
 class FirmFinance final : public BaseFinance {
   public:
-    [[nodiscard]] FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
+    [[nodiscard]] explicit FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
 };
 
 class HHoldFinance final : public BaseFinance {
   public:
-    [[nodiscard]] HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
+    [[nodiscard]] explicit HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
     void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
 };
 }  // namespace abm

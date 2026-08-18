@@ -39,7 +39,7 @@ class InputDataManager final {
     [[nodiscard]] auto getStepKeys() const -> std::vector<std::string> {
         auto stepKeys = inFile_.listObjectNames();
         std::ranges::sort(stepKeys, std::ranges::less{}, [](const std::string& step) -> int {
-            return std::stoi(step.substr(5));
+            return std::stoi(step.substr(5));  // NOLINT
         });
         return stepKeys;
     }

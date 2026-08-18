@@ -9,7 +9,7 @@
 namespace abm::labor::demander::planner {
 class RecruitPlanner final {
   public:
-    [[nodiscard]] RecruitPlanner(RandomGenerator& masterRng)
+    [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng)
         : wagePlanner_{masterRng}, employPlanSystem_{masterRng} {}
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator)

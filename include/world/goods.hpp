@@ -11,7 +11,7 @@ namespace abm {
 
 class [[nodiscard]] Workspace final {
   public:
-    Workspace(const double power) : firmProductPower_{power} {}
+    explicit Workspace(const double power) : firmProductPower_{power} {}
     ~Workspace() = default;
     Workspace(const Workspace& other);
     auto operator=(const Workspace& other) -> Workspace&;

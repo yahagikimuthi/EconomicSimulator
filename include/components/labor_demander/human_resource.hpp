@@ -1,9 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <numeric>
 #include <ranges>
 #include <utility>
 #include <vector>
@@ -36,14 +36,14 @@ class EmptyRosterPool final {
 
 class HumanResource final {
   public:
-    [[nodiscard]] HumanResource(CompanyBoard&& companyBoard)
+    [[nodiscard]] explicit HumanResource(CompanyBoard&& companyBoard)
         : companyBoard_{std::move(companyBoard)}, sumWage_{[&]() -> Wage {
               const auto& roster = companyBoard_.roster;
 
               auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
                            std::views::transform(&RosterEntry::wage) |
                            std::views::transform([](Wage wage) -> double { return wage.value(); });
-              return Wage{std::reduce(wages.begin(), wages.end())};
+              return Wage{std::ranges::fold_left(wages, 0.0, std::plus{})};
           }()} {}
 
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)

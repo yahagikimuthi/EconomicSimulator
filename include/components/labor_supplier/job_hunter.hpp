@@ -81,7 +81,7 @@ class JobHunter final {
     using Entry = LaborEntry;
 
   public:
-    [[nodiscard]] JobHunter(const RandomGenerator rng) : rng_{rng} {}
+    [[nodiscard]] explicit JobHunter(const RandomGenerator rng) : rng_{rng} {}
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(

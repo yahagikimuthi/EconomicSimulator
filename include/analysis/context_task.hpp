@@ -47,7 +47,8 @@ concept LogicType = requires(Logic logic, const DataContext& ctx) {
 
 class IMetricTask {
   public:
-    [[nodiscard]] IMetricTask(std::string&& outName) noexcept : outName_{std::move(outName)} {}
+    [[nodiscard]] explicit IMetricTask(std::string&& outName) noexcept
+        : outName_{std::move(outName)} {}
 
     virtual ~IMetricTask() noexcept                             = default;
     IMetricTask(const IMetricTask&) noexcept                    = default;
@@ -74,12 +75,12 @@ class IMetricTask {
 template <LogicType Logic>
 class MetricTask final : public IMetricTask {
   public:
-    MetricTask(std::string&& outName, const Logic logic) noexcept
-        : IMetricTask(std::move(outName)), logic_{logic} {}
+    MetricTask(std::string&& outName, Logic&& logic) noexcept
+        : IMetricTask(std::move(outName)), logic_{std::move(logic)} {}
 
     void process(const DataContext& ctx) noexcept override { pushBackData(logic_(ctx)); }
 
   private:
-    const Logic logic_;
+    Logic logic_;
 };
 }  // namespace abm::analysis

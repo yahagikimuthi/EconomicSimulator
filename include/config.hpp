@@ -31,8 +31,8 @@ constexpr auto goodsSampleCnt       = 2;
 }  // namespace abm::config::goods_demander
 
 namespace abm::config::agent_count {
-constexpr auto BtoCFirm = 2;
-constexpr auto BtoBFirm = 2;
+constexpr auto bToCFirm = 2;
+constexpr auto bToBFirm = 2;
 constexpr auto hhold    = 1000;
 }  // namespace abm::config::agent_count
 

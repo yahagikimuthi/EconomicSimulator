@@ -30,7 +30,7 @@ class Pipeline final {
 
         auto ctx = DataContext{};
         for (const std::string& stepKey : stepKeys) {
-            stepNumVec.emplace_back(std::stoi(stepKey.substr(5)));
+            stepNumVec.emplace_back(std::stoi(stepKey.substr(5)));  // NOLINT
 
             for (std::string_view requireData : requireDatas_) {
                 auto data = std::vector<double>{};
