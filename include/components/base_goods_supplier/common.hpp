@@ -6,12 +6,10 @@
 namespace abm::base_goods::supplier {
 struct TradePlan {
     Price         price;
-    double        markup;
     GoodsQuantity supply;
 };
 
 struct TradeResult {
-    GoodsQuantity supply;
     GoodsQuantity soldAmount;
     GoodsQuantity totalDemand;
     Money         sales;
@@ -26,7 +24,7 @@ class PlanMemory {
         log_ = currentPlan_;
         dropBox.prices.emplace_back(currentPlan_.price.value());
         dropBox.supplies.emplace_back(currentPlan_.supply.value());
-        currentPlan_ = {.price = Price{0.0}, .markup = 0.0, .supply = GoodsQuantity{0.0}};
+        currentPlan_ = {.price = Price{0.0}, .supply = GoodsQuantity{0.0}};
     }
 
   private:

@@ -15,10 +15,10 @@
 
 namespace abm {
 struct CompanyBoard final {
-    const AgentID                                               firmId;
-    const Market                                                firmType;
-    std::deque<RosterEntry>                                     roster;
-    tbb::concurrent_vector<std::reference_wrapper<RosterEntry>> resignationBox;
+    const AgentID                                firmId;
+    const Market                                 firmType;
+    std::deque<RosterEntry>                      roster;
+    tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
 
     [[nodiscard]] CompanyBoard(const AgentID i, const Market type) noexcept
         : firmId{i}, firmType{type} {}

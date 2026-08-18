@@ -12,11 +12,11 @@ class WagePlannerMemory final {
     template <typename T>
     class Memory final {
       public:
-        [[nodiscard]] explicit Memory(const T Last) noexcept : last{Last} {}
+        [[nodiscard]] explicit Memory(const T l) noexcept : last{l} {}
         void commit() noexcept {
             if (current) last = *current;
         }
-        std::optional<T> last{std::nullopt};
+        std::optional<T> last;
         std::optional<T> current{std::nullopt};
     };
 

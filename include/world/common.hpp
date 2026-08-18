@@ -11,6 +11,7 @@ enum class Market : char { labor, consumerGoods, productionGoods };
 struct CensusDropBox final {
     std::vector<double> firmAssets;
     std::vector<double> postedEmployments;
+    std::vector<double> postedWages;
     std::vector<double> employments;
     std::vector<double> prices;
     std::vector<double> supplies;
@@ -21,10 +22,13 @@ struct CensusDropBox final {
     std::vector<double> wages;
 
     [[nodiscard]] CensusDropBox() noexcept {
-        constexpr std::size_t firmCnt{static_cast<std::size_t>(config::agent_count::bToCFirm)};
+        constexpr std::size_t firmCnt{
+            static_cast<std::size_t>(config::agent_count::bToCFirm + config::agent_count::bToBFirm)
+        };
         constexpr std::size_t hholdCnt{static_cast<std::size_t>(config::agent_count::hhold)};
         firmAssets.reserve(firmCnt);
         postedEmployments.reserve(firmCnt);
+        postedWages.reserve(firmCnt);
         employments.reserve(firmCnt);
         prices.reserve(firmCnt);
         supplies.reserve(firmCnt);
@@ -38,6 +42,7 @@ struct CensusDropBox final {
     void clear() noexcept {
         firmAssets.clear();
         postedEmployments.clear();
+        postedWages.clear();
         employments.clear();
         prices.clear();
         supplies.clear();

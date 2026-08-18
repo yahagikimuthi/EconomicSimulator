@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <optional>
 #include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
@@ -10,58 +11,94 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
-#include "world/common.hpp"
 
 namespace abm::base_goods::supplier {
-class MarkupPlanner final {
-  public:
-    [[nodiscard]] MarkupPlanner(const RandomGenerator rng, const double log, const double adjustVol)
-        : rng_{rng}, log_{log}, adjustVol_{adjustVol} {}
+class MarkupPlannerMemory {
+    template <typename T>
+    class Memory {
+      public:
+        [[nodiscard]] explicit Memory(T l) noexcept : last_{l} {}
+        void commit() noexcept {
+            if (current_) last_ = current_;
+        }
+        void clearLog() { last_.reset(); }
 
-    [[nodiscard]] auto judgeMarkup(const bool isSold) -> double {
-        const auto nextMarkup = calcMarkup(isSold);
-        plan_                 = nextMarkup;
-        return nextMarkup;
+        std::optional<T> last_;
+        std::optional<T> current_{std::nullopt};
+    };
+
+  public:
+    [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
+        return supply_.last_;
+    }
+    [[nodiscard]] auto rememberLastSalesAmount() const noexcept -> std::optional<GoodsQuantity> {
+        return salesAmount_.last_;
     }
 
-    void endStep(CensusDropBox& dropBox) {
-        dropBox.markups.emplace_back(plan_);
-        log_  = plan_;
-        plan_ = 0.0;
+    void listenTradeResult(const TradeResult& result) noexcept;
+    void listenTradePlan(const TradePlan& plan) noexcept;
+    void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }
+    void commit() noexcept { supply_.commit(), salesAmount_.commit(); }
+
+  private:
+    Memory<GoodsQuantity> supply_;
+    Memory<GoodsQuantity> salesAmount_;
+};
+
+class MarkupPlanner final {
+  public:
+    [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng);
+
+    [[nodiscard]] auto plan() noexcept -> double {
+        const auto next = calcNextMarkup();
+        memory_.clearLog();
+        if (not next) return log_;
+        log_ = *next;
+        return *next;
     }
 
   private:
-    [[nodiscard]] auto calcMarkup(const bool isSold) const -> double POST(markup : markup > 0.0) {
+    // isSold = (前期供給 - 前期売上) / 前回供給 < 定数
+    [[nodiscard]] auto calcNextMarkup() const -> std::optional<double> {
+        const auto lastSupply      = memory_.rememberLastSupply();
+        const auto lastSalesAmount = memory_.rememberLastSalesAmount();
+        if (not lastSupply or not lastSalesAmount) return std::nullopt;
+        ASSERT(*lastSupply >= GoodsQuantity{0.0});
+        const auto inventory = *lastSupply - *lastSalesAmount;
+        ASSERT(inventory >= GoodsQuantity{0.0});
+        const auto isSupplied = *lastSupply == GoodsQuantity{0.0};
+        const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio_ : true;
+        return calcNextMarkup(isSold);
+    }
+
+    [[nodiscard]] auto calcNextMarkup(const bool isSold) const -> double {
         const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto nextMarkup = log_ + (isSold ? alpha : -alpha);
         return markupGuard(nextMarkup);
     }
 
-    static auto markupGuard(const double markup) noexcept -> double {
+    [[nodiscard]] static auto markupGuard(const double markup) noexcept -> double {
         return std::max(markup, std::numeric_limits<double>::epsilon());
     }
 
+    MarkupPlannerMemory     memory_;
     mutable RandomGenerator rng_;
     double                  log_;
-    double                  plan_{};
+    std::optional<double>   plan_;
     const double            adjustVol_;
+    const double            targetInvRatio_;
 };
 
 class PricePlanner final {
   public:
-    [[nodiscard]] PricePlanner() = default;
+    [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept;
 
-    [[nodiscard]] auto judgePrice(
-        const GoodsQuantity supply, const double markup, const Money totalCost
-    ) -> Price {
-        const auto nextPrice = calcPrice(supply, markup, totalCost);
-        plan_                = nextPrice;
-        return nextPrice;
-    }
-
-    void endStep(CensusDropBox& dropBox) {
-        dropBox.prices.emplace_back(plan_.value());
-        plan_ = Price{0.0};
+    [[nodiscard]] auto plan(const GoodsQuantity supply, const double markup, const Money totalCost)
+        const noexcept -> Price {
+        const auto price = calcPrice(supply, markup, totalCost);
+        const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
+        return price * (1.0 + alpha);
     }
 
   private:
@@ -78,25 +115,19 @@ class PricePlanner final {
         return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
     }
 
-    Price plan_{0.0};
+    mutable RandomGenerator rng_;
+    const double            adjustVol_;
 };
 
-class PostingInfoPlanner final {
+class TradePlanner final {
   public:
-    [[nodiscard]] explicit PostingInfoPlanner(MarkupPlanner markupPlanner)
-        : markupPlanner_{markupPlanner} {}
+    [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept;
 
-    [[nodiscard]] auto judgePlan(
-        const GoodsQuantity supply, const Money totalCost, const bool isSold
-    ) -> TradePlan {
-        const auto markup = markupPlanner_.judgeMarkup(isSold);
-        const auto price  = pricePlanner_.judgePrice(supply, markup, totalCost);
-        return {.price = price, .markup = markup, .supply = supply};
-    }
-
-    void endStep(CensusDropBox& dropBox) {
-        markupPlanner_.endStep(dropBox);
-        pricePlanner_.endStep(dropBox);
+    [[nodiscard]] auto plan(const GoodsQuantity supply, const Money totalCost) noexcept
+        -> TradePlan {
+        const auto markup = markupPlanner_.plan();
+        const auto price  = pricePlanner_.plan(supply, markup, totalCost);
+        return {.price = price, .supply = supply};
     }
 
   private:
@@ -104,95 +135,25 @@ class PostingInfoPlanner final {
     PricePlanner  pricePlanner_;
 };
 
-class DemandForecastManager final {
+class EmployPlanner final {
   public:
-    explicit DemandForecastManager(const double adjustVol) : adjustVol_{adjustVol} {}
-
-    void update(const GoodsQuantity totalDemand) {
-        const auto next =
-            GoodsQuantity{demandForecast_ + (adjustVol_ * (totalDemand - demandForecast_))};
-        demandForecast_ = next;
-    }
-
-    [[nodiscard]] auto targetSupply(const double targetInvRatio) const -> GoodsQuantity {
-        return demandForecast_ / (1.0 - targetInvRatio);
-    }
+    [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept;
 
   private:
-    GoodsQuantity demandForecast_{0.0};
-    const double  adjustVol_;
+    GoodsQuantity demandForecast_;
 };
 
-class MarkupPlannerT {
+class Planner {
   public:
-    [[nodiscard]] MarkupPlannerT();
+    [[nodiscard]] explicit Planner(RandomGenerator& masterRng) noexcept;
+
+    [[nodiscard]] auto planTrading(const GoodsQuantity supply, const Money totalCost) noexcept
+        -> TradePlan {
+        return tradePlanner_.plan(supply, totalCost);
+    }
 
   private:
-};
-
-class PricePlannerT {};
-
-class PlannerT {
-  public:
-    PlannerT();
-
-  private:
-};
-
-class Planner final {
-  public:
-    [[nodiscard]] Planner(
-        const GoodsQuantity         lastSupply,
-        const bool                  isSold,
-        const double                targetInvRatio,
-        const PostingInfoPlanner    postingPlanner,
-        const DemandForecastManager demandForecastManager
-    )
-        : log_{.supply = lastSupply, .isSold = isSold},
-          targetInvRatio_{targetInvRatio},
-          postingPlanner_{postingPlanner},
-          demandForecastManager_{demandForecastManager} {}
-
-    [[nodiscard]] auto judgePlan(const GoodsQuantity supply, const Money totalCost) -> TradePlan
-        PRE(supply >= GoodsQuantity{0.0}) PRE(totalCost >= Money{0.0}) {
-        supplyPlan_ = supply;
-        return postingPlanner_.judgePlan(supply, totalCost, log_.isSold);
-    }
-
-    [[nodiscard]] auto lastSupply() const -> GoodsQuantity POST(supply
-                                                                : supply >= GoodsQuantity{0.0}) {
-        return log_.supply;
-    }
-
-    [[nodiscard]] auto targetSupply() const -> GoodsQuantity POST(target
-                                                                  : target >= GoodsQuantity{0.0}) {
-        return demandForecastManager_.targetSupply(targetInvRatio_);
-    }
-
-    void endStep(
-        const GoodsQuantity totalDemand, const GoodsQuantity unsoldAmount, CensusDropBox& dropBox
-    ) PRE(totalDemand >= GoodsQuantity{0.0}) PRE(unsoldAmount >= GoodsQuantity{0.0}) {
-        dropBox.supplies.emplace_back(supplyPlan_.value());
-        postingPlanner_.endStep(dropBox);
-        demandForecastManager_.update(totalDemand);
-        log_        = {.supply = supplyPlan_, .isSold = isSold(unsoldAmount)};
-        supplyPlan_ = GoodsQuantity{0.0};
-    }  // namespace goods_supplier
-
-  private:
-    [[nodiscard]] auto isSold(const GoodsQuantity unsoldAmount
-    ) const -> bool PRE(unsoldAmount >= GoodsQuantity{0.0}) {
-        return (supplyPlan_ != GoodsQuantity{0.0}) ? unsoldAmount / supplyPlan_ < targetInvRatio_
-                                                   : true;
-    }
-
-    GoodsQuantity supplyPlan_{0.0};
-    struct {
-        GoodsQuantity supply;
-        bool          isSold;
-    } log_;
-    const double          targetInvRatio_;
-    PostingInfoPlanner    postingPlanner_;
-    DemandForecastManager demandForecastManager_;
+    TradePlanner  tradePlanner_;
+    EmployPlanner employPlanner_;
 };
 }  // namespace abm::base_goods::supplier

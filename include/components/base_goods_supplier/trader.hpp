@@ -73,9 +73,6 @@ class Trader {
         ConsumerGoodsRequest,
         ProductionGoodsRequest>;
 
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
   public:
     void trade() {
         if (not isPosting_) return;

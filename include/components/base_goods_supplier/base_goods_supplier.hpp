@@ -5,7 +5,7 @@
 #include "core/values/labor.hpp"
 #include "world/goods.hpp"
 
-namespace abm {
+namespace abm::base_goods::supplier {
 class BaseGoodsSupplier {
   public:
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employeeCnt) const noexcept -> HeadCount
@@ -18,12 +18,13 @@ class BaseGoodsSupplier {
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }
 
   protected:
-    [[nodiscard]] BaseGoodsSupplier(
-        const base_goods::supplier::Planner&   planner,
-        const base_goods::supplier::Producer&& producer
-    ) noexcept
+    [[nodiscard]] BaseGoodsSupplier(const Planner& planner, const Producer&& producer) noexcept
         : planner_{planner}, producer_{producer} {}
-    base_goods::supplier::Planner  planner_;
-    base_goods::supplier::Producer producer_;
+    Planner  planner_;
+    Producer producer_;
 };
-}  // namespace abm
+}  // namespace abm::base_goods::supplier
+
+namespace abm {
+using BaseGoodsSupplier = base_goods::supplier::BaseGoodsSupplier;
+}

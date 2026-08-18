@@ -67,9 +67,8 @@ class [[nodiscard]] ConsumerGoodsDemander final : public BaseGoodsDemander<Marke
     ) const -> ConsumerGoodsEntry& {
         using Entry = ConsumerGoodsEntry;
 
-        auto toDouble = [](const Entry& entry) -> double { return entry.supply.value(); };
-        auto betterEntry =
-            std::reference_wrapper<Entry>{std::ref(rng_.discreteDistribution(entryBox, toDouble))};
+        auto toDouble    = [](const Entry& entry) -> double { return entry.supply.value(); };
+        auto betterEntry = RefWrap<Entry>{std::ref(rng_.discreteDistribution(entryBox, toDouble))};
 
         if (sampleCnt <= 1) return betterEntry.get();
 
