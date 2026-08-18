@@ -12,44 +12,11 @@
 #include "components/labor_demander/common.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/message.hpp"
+#include "util.hpp"
+#include "world/labor.hpp"
 
 namespace abm::labor::demander::recruiter {
-class SortApplicants {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
-  protected:
-    [[nodiscard]] SortApplicants() = default;
-    [[nodiscard]] static auto sortApplicants(
-        const HeadCount offer, LaborRequest::EntryBoxT entryBox
-    ) -> std::ranges::view auto {
-        using Entry = LaborEntry;
-
-        static thread_local auto applicants = std::vector<RefWrap<Entry>>{};
-        applicants.clear();
-
-        const auto k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
-        for (auto& entry : entryBox) applicants.emplace_back(std::ref(entry));
-        const auto isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
-
-        const auto toRawRef{[](RefWrap<Entry> entryRef) -> Entry& { return entryRef.get(); }};
-        if (not isOver) return applicants | std::views::transform(toRawRef);
-
-        std::ranges::nth_element(
-            applicants,
-            applicants.begin() + static_cast<int>(k),
-            std::ranges::greater{},
-            [](const RefWrap<Entry> entryRef) -> double { return entryRef.get().productPower; }
-        );
-        return applicants | std::views::transform(toRawRef);
-    }
-};
-
 class OfferApplicants {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
   public:
     [[nodiscard]] OfferApplicants() = default;
 
@@ -107,7 +74,7 @@ class Ledger {
     HeadCount employ_{0.0};
 };
 
-class Recruiter : public SortApplicants {
+class Recruiter {
   public:
     [[nodiscard]] Recruiter() = default;
 
@@ -125,7 +92,8 @@ class Recruiter : public SortApplicants {
                           std::views::take(ledger_.remainOffer().value());
 
         auto offerCnt = HeadCount{0.0};
-        for (auto& entry : applicants) {
+        for (RefWrap<LaborEntry> entryRef : applicants) {
+            auto& entry   = entryRef.get();
             entry.isOffer = true;
             offerApplicants_.add(entry);
             ++offerCnt;
@@ -166,6 +134,25 @@ class Recruiter : public SortApplicants {
 
     [[nodiscard]] auto shouldPost(const RecruitPlan& plan) const -> bool {
         return plan.offer > HeadCount{0.0};
+    }
+
+    [[nodiscard]] static auto sortApplicants(
+        const HeadCount offer, const std::span<RefWrap<LaborEntry>> entryBox
+    ) -> std::span<RefWrap<LaborEntry>> {
+        using Entry = LaborEntry;
+
+        const auto k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
+        const auto isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
+
+        if (not isOver) return entryBox;
+
+        std::ranges::nth_element(
+            entryBox,
+            entryBox.begin() + static_cast<int>(k),
+            std::ranges::greater{},
+            [](const RefWrap<Entry> entryRef) -> double { return entryRef.get().productPower; }
+        );
+        return entryBox;
     }
 
     std::optional<LaborRequest&> myRequest_{std::nullopt};

@@ -11,7 +11,8 @@
 #include "core/base.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/message.hpp"
+#include "world/goods.hpp"
+#include "world/labor.hpp"
 
 namespace abm::labor::demander::human_resource {
 class EmptyRosterPool {

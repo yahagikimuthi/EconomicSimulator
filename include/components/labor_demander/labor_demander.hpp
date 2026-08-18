@@ -9,7 +9,8 @@
 #include "components/labor_demander/recruiter.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/message.hpp"
+#include "world/goods.hpp"
+#include "world/labor.hpp"
 
 namespace abm::labor::demander {
 class RecruitSystem {
@@ -43,7 +44,6 @@ class RecruitSystem {
         if (not isRecruiting_) return;
         const auto result = recruiter_.publishResult();
         mediator.publishRecruitResult(result);
-        planner_.endStep();
     }
 
     void commit() {

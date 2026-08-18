@@ -15,6 +15,9 @@
 #include "core/values/common.hpp"
 
 namespace abm {
+template <typename T>
+using RefWrap = std::reference_wrapper<T>;
+
 template <typename F>
 concept AssetPlusFn = requires(F f, const Money money) {
     { f(money) } -> std::same_as<void>;
