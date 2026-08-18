@@ -20,17 +20,16 @@ class OfferApplicants final {
   public:
     [[nodiscard]] OfferApplicants() = default;
 
-    void add(LaborEntry& entry) { applicants_.emplace_back(std::ref(entry)); }
+    void add(Entry& entry) { applicants_.emplace_back(std::ref(entry)); }
     void clear() { applicants_.clear(); }
     auto offerAcceptedApplicants() -> std::ranges::view auto {
-        return applicants_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
-                   return ref.get();
-               }) |
-               std::views::filter(&LaborEntry::isAccept);
+        return applicants_ |
+               std::views::transform([](RefWrap<Entry> ref) -> Entry& { return ref.get(); }) |
+               std::views::filter(&Entry::isAccept);
     }
 
   private:
-    std::vector<RefWrap<LaborEntry>> applicants_;
+    std::vector<RefWrap<Entry>> applicants_;
 };
 
 struct OfferResult final {
@@ -137,10 +136,8 @@ class Recruiter final {
     }
 
     [[nodiscard]] static auto sortApplicants(
-        const HeadCount offer, const std::span<RefWrap<LaborEntry>> entryBox
-    ) -> std::span<RefWrap<LaborEntry>> {
-        using Entry = LaborEntry;
-
+        const HeadCount offer, const std::span<RefWrap<Entry>> entryBox
+    ) -> std::span<RefWrap<Entry>> {
         const auto k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
         const auto isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
 

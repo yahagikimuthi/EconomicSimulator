@@ -8,7 +8,6 @@
 #include "core/values/goods.hpp"
 
 namespace abm {
-
 class [[nodiscard]] Workspace final {
   public:
     explicit Workspace(const double power) : firmProductPower_{power} {}
@@ -22,7 +21,9 @@ class [[nodiscard]] Workspace final {
         const double input{firmProductPower_ * workerProductPower};
         totalInput_.fetch_add(input);
     }
-    auto totalInput() const noexcept -> GoodsQuantity { return GoodsQuantity{totalInput_.load()}; }
+    [[nodiscard]] auto totalInput() const noexcept -> GoodsQuantity {
+        return GoodsQuantity{totalInput_.load()};
+    }
     void resetInput() noexcept { totalInput_.store(0.0); }
 
   private:
@@ -60,13 +61,12 @@ struct ConsumerGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ConsumerGoodsEntry& entry;
-    ConsumerGoodsRequest(const GoodsQuantity Amount, const ConsumerGoodsEntry& Entry)
-        : amount{Amount}, entry{Entry} {}
+    ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e)
+        : amount{a}, entry{e} {}
 };
 
 struct [[nodiscard]] ConsumerGoodsEntry final {
-    ConsumerGoodsEntry(const Price Price, const GoodsQuantity Supply)
-        : price{Price}, supply{Supply} {}
+    ConsumerGoodsEntry(const Price p, const GoodsQuantity s) : price{p}, supply{s} {}
     auto request(const GoodsQuantity amount) -> ConsumerGoodsRequest& {
         return *requestBox.emplace_back(amount, *this);
     }
@@ -81,13 +81,13 @@ struct ProductionGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ProductionGoodsEntry& entry;
-    ProductionGoodsRequest(const GoodsQuantity Amount, const ProductionGoodsEntry& Entry)
-        : amount{Amount}, entry{Entry} {}
+    ProductionGoodsRequest(const GoodsQuantity a, const ProductionGoodsEntry& e)
+        : amount{a}, entry{e} {}
 };
 
 struct [[nodiscard]] ProductionGoodsEntry final {
-    ProductionGoodsEntry(const AgentID Id, const Price Price, const GoodsQuantity Supply)
-        : id{Id}, price{Price}, supply{Supply} {}
+    ProductionGoodsEntry(const AgentID i, const Price p, const GoodsQuantity s)
+        : id{i}, price{p}, supply{s} {}
     auto request(const GoodsQuantity amount) -> ProductionGoodsRequest& {
         return *requestBox.emplace_back(amount, *this);
     }
