@@ -4,46 +4,48 @@
 
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "util.hpp"
 #include "world/common.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
 class Employment final {
   public:
-    [[nodiscard]] explicit Employment(const double productPower) : productPower_{productPower} {}
+    [[nodiscard]] explicit Employment(RandomGenerator& masterRng) noexcept
+        : productPower_{masterRng.randNormal(1.0, 1.0 / 3.0, 0.0, 2.0)} {}
 
-    [[nodiscard]] auto isEmployed() const -> bool { return rosterEntry_.has_value(); }
+    [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_.has_value(); }
 
-    void startWorking(RosterEntry& rosterEntry) {
+    void startWorking(RosterEntry& rosterEntry) noexcept {
         resign();
         rosterEntry_ = rosterEntry;
     }
 
-    [[nodiscard]] auto contractFirmId() const -> AgentID {
+    [[nodiscard]] auto contractFirmId() const noexcept -> AgentID {
         return isEmployed() ? rosterEntry_->firmId() : AgentID{-1};
     }
-    [[nodiscard]] auto wage() const -> Wage POST(wage : wage >= Wage{0.0}) {
+    [[nodiscard]] auto wage() const noexcept -> Wage POST(wage : wage >= Wage{0.0}) {
         return isEmployed() ? rosterEntry_->wage : Wage{0.0};
     }
 
-    void work(const Market phase) {
+    void work(const Market phase) noexcept {
         if (shouldWork(phase)) rosterEntry_->addInput(productPower_);
     }
 
-    [[nodiscard]] auto productPower() const -> double { return productPower_; }
+    [[nodiscard]] auto productPower() const noexcept -> double { return productPower_; }
 
-    void updateStatus() {
+    void updateStatus() noexcept {
         if (not isEmployed()) return;
         if (not rosterEntry_->isOccupied) rosterEntry_.reset();
     }
 
   private:
-    [[nodiscard]] auto shouldWork(const Market phase) const -> bool {
+    [[nodiscard]] auto shouldWork(const Market phase) const noexcept -> bool {
         if (not isEmployed()) return false;
         return rosterEntry_->firmType() == phase;
     }
 
-    void resign() {
+    void resign() noexcept {
         if (not isEmployed()) return;
         rosterEntry_->resign();
     }

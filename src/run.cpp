@@ -142,7 +142,7 @@ void Engine::runConsumerGoods() noexcept {
     }
 }
 
-void Engine::logging() noexcept {
+void Engine::logging() {
     for (BtoCFirm& firm : bToCFirms_) {
         firm_finance::logging(dropBox_, firm.finance);
     }

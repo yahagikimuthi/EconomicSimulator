@@ -65,14 +65,14 @@ struct LaborEntry final {
 };
 
 struct LaborRequest final {
-    [[nodiscard]] LaborRequest(const AgentID i, const Wage w) : firmID{i}, wage{w} {}
-    auto entry(const AgentID id, const double productPower) -> LaborEntry& {
+    [[nodiscard]] LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {}
+    auto entry(const AgentID id, const double productPower) noexcept -> LaborEntry& {
         auto it = entryBox_.emplace_back(id, productPower, *this);
         references_.emplace_back(std::ref(*it));
         return *it;
     }
 
-    auto entryBox() -> std::span<RefWrap<LaborEntry>> { return references_; }
+    auto entryBox() noexcept -> std::span<RefWrap<LaborEntry>> { return references_; }
 
     const AgentID firmID;
     const Wage    wage;
@@ -88,29 +88,29 @@ class LaborMarket final {
   public:
     [[nodiscard]] explicit LaborMarket(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+
     [[nodiscard]] auto request(const AgentID id, const Wage wage) -> Request& {
-        auto it = requestBox_.emplace_back(id, wage);
-        references_.emplace_back(std::ref(*it));
-        return *it;
+        return *requestBox_.emplace_back(id, wage);
     }
-    void pickRequest(std::vector<RefWrap<Request>>& out, const int n) {
+
+    void pickRequest(std::vector<RefWrap<Request>>& out, const int n) noexcept {
         ASSERT(out.empty());
-        ASSERT(requestBox_.size() == references_.size());
         if (n > static_cast<int>(requestBox_.size())) {
             packAllRequest(out);
             return;
         }
+        packPartRequest(out, n);
     }
 
-    void clear() { requestBox_.clear(), references_.clear(); }
+    void clear() noexcept { requestBox_.clear(); }
 
   private:
-    void packAllRequest(std::vector<RefWrap<Request>>& out) {
-        for (RefWrap<Request> request : references_) {
-            out.emplace_back(request);
+    void packAllRequest(std::vector<RefWrap<Request>>& out) noexcept {
+        for (Request& request : requestBox_) {
+            out.emplace_back(std::ref(request));
         }
     }
-    void packPartRequest(std::vector<RefWrap<Request>>& out, const int n) {
+    void packPartRequest(std::vector<RefWrap<Request>>& out, const int n) noexcept {
         rng_.sample(
             requestBox_ | std::views::transform([](Request& req) -> RefWrap<Request> {
                 return std::ref(req);
@@ -121,7 +121,6 @@ class LaborMarket final {
     }
 
     tbb::concurrent_vector<LaborRequest> requestBox_;
-    std::vector<RefWrap<LaborRequest>>   references_;
     RandomGenerator                      rng_;
 };
 }  // namespace abm

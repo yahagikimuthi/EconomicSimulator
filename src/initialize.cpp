@@ -15,7 +15,6 @@
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
-#include "components/labor_supplier/job_hunter.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
@@ -116,40 +115,27 @@ namespace production_goods::supplier {
 }
 }  // namespace production_goods::supplier
 
-namespace labor::supplier {
-[[nodiscard]] auto makeJobHunter(RandomGenerator& masterRng) -> JobHunter {
-    const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
-    return JobHunter{rng};
-}
-
-[[nodiscard]] auto makeEmployment(RandomGenerator& masterRng) -> Employment {
-    const auto productPower = masterRng.randNormal(1.0, 1.0 / 3.0, 0.0, 2.0);
-    return Employment{productPower};
-}
-
-[[nodiscard]] auto makeJobSearchThreshold(RandomGenerator& masterRng) -> JobSearch {
-    const auto rng = RandomGenerator{{masterRng.makeUint64(), masterRng.makeUint64()}};
-    const auto jobSearchThreshold = masterRng.rand(0.01, 0.05);
-    return {rng, jobSearchThreshold};
-}
-
-[[nodiscard]] auto make(RandomGenerator& masterRng) -> LaborSupplier {
-    return LaborSupplier{
-        makeJobHunter(masterRng), makeEmployment(masterRng), makeJobSearchThreshold(masterRng)
-    };
-}
-}  // namespace labor::supplier
-
 namespace {
 [[nodiscard]] auto makeLaborDemander(
     RandomGenerator& masterRng, const AgentID id, const Market firmType
-) -> ::abm::labor::demander::LaborDemander {
+) -> LaborDemander {
     return {masterRng, CompanyBoard{id, firmType}};
+}
+
+[[nodiscard]] auto makeLaborSupplier(RandomGenerator& masterRng) -> LaborSupplier {
+    return LaborSupplier{masterRng};
+}
+
+[[nodiscard]] auto makeLaborMarket(RandomGenerator& masterRng) -> LaborMarket {
+    return LaborMarket{masterRng};
 }
 }  // namespace
 
 Engine::Engine(const int totalStep) noexcept
-    : totalStep_{totalStep}, seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}} {
+    : totalStep_{totalStep},
+      seed_{generateSeed()},
+      rng_{pcg32{seed_.state, seed_.stream}},
+      laborMarket_{rng_} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";
         std::abort();
@@ -185,7 +171,7 @@ Engine::Engine(const int totalStep) noexcept
         hholds_.emplace_back(HHold{
             .index         = AgentIndex{AgentID{agentId}},
             .finance       = makeHHoldFinanceComponent(rng_),
-            .labor         = labor::supplier::make(rng_),
+            .labor         = makeLaborSupplier(rng_),
             .consumerGoods = makeConsumerGoodsDemander(rng_, agentId)
         });
     }

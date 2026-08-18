@@ -18,18 +18,17 @@ namespace abm::labor::supplier {
 class MyEntries final {
   public:
     [[nodiscard]] MyEntries() noexcept = default;
-    void add(LaborEntry& entry) noexcept { entries_.emplace_back(std::ref(entry)); }
+    void add(Entry& entry) noexcept { entries_.emplace_back(std::ref(entry)); }
     void clear() noexcept { entries_.clear(); }
 
     [[nodiscard]] auto takeOfferedEntry() noexcept -> std::ranges::view auto {
-        return entries_ | std::views::transform([](RefWrap<LaborEntry> ref) -> LaborEntry& {
-                   return ref.get();
-               }) |
-               std::views::filter(&LaborEntry::isOffer);
+        return entries_ |
+               std::views::transform([](RefWrap<Entry> ref) -> Entry& { return ref.get(); }) |
+               std::views::filter(&Entry::isOffer);
     }
 
   private:
-    std::vector<RefWrap<LaborEntry>> entries_;
+    std::vector<RefWrap<Entry>> entries_;
 };
 
 class JobHunter final {

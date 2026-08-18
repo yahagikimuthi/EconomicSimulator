@@ -73,26 +73,9 @@ class Engine final {
     void runProductionGoods() noexcept;
     void runConsumerGoods() noexcept;
     void update() noexcept;
-    void logging() noexcept;
+    void logging();
     void reset() noexcept;
     void check() const noexcept;
-
-    Logger                logger_;
-    std::vector<BtoCFirm> bToCFirms_;
-    std::vector<BtoBFirm> bToBFirms_;
-    std::vector<HHold>    hholds_;
-
-    LaborMarket                  laborMarket_;
-    TBBVec<ProductionGoodsEntry> productionGoodsEntryBox_;
-    TBBVec<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
-
-    CensusDropBox dropBox_;
-
-    const Step totalStep_;
-    Step       currentStep_{0};
-
-    const PCG32Seed seed_;
-    RandomGenerator rng_;
 
     [[nodiscard]] static auto generateSeed() noexcept -> PCG32Seed {
         if (not config::setting::useRuntimeRandomSeed)
@@ -105,5 +88,22 @@ class Engine final {
         const auto stream = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
         return {.state = state, .stream = stream};
     }
+
+    Logger                logger_;
+    std::vector<BtoCFirm> bToCFirms_;
+    std::vector<BtoBFirm> bToBFirms_;
+    std::vector<HHold>    hholds_;
+
+    CensusDropBox dropBox_;
+
+    const Step totalStep_;
+    Step       currentStep_{0};
+
+    const PCG32Seed seed_;
+    RandomGenerator rng_;
+
+    LaborMarket                  laborMarket_;
+    TBBVec<ProductionGoodsEntry> productionGoodsEntryBox_;
+    TBBVec<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
 };
 }  // namespace abm

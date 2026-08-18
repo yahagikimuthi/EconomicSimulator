@@ -14,11 +14,13 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
-class JobSearch {
+class LikelihoodChangingJob {
   public:
-    [[nodiscard]] JobSearch(const RandomGenerator rng, const double threshold)
-        : rng_{rng}, threshold_{threshold} {}
-    auto operator()() const -> bool { return threshold_ < rng_.rand(); }
+    [[nodiscard]] explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          threshold_{masterRng.rand(0.05, 0.1)} {}
+
+    auto shouldChangingJobs() const noexcept -> bool { return threshold_ < rng_.rand(); }
 
   private:
     mutable RandomGenerator rng_;
@@ -29,51 +31,58 @@ class JobSearch {
 namespace abm::labor::supplier {
 class LaborSupplier final {
   public:
-    [[nodiscard]] LaborSupplier(
-        const JobHunter&&  jobHunter,
-        const Employment&& employment,
-        const JobSearch    jobSearchThreshold
-    )
-        : jobHunter_{jobHunter}, employment_{employment}, jobSearch_{jobSearchThreshold} {}
+    [[nodiscard]] explicit LaborSupplier(RandomGenerator& masterRng) noexcept
+        : employment_{masterRng}, likelihoodChangingJob_{masterRng} {}
 
-    void entry(const AgentID id, LaborMarket& market) {
+    void entry(const AgentID id, LaborMarket& market) noexcept {
         employment_.updateStatus();
-        if (not employment_.isEmployed()) return;
-        if (not jobSearch_()) return;
-        auto isAligned = [&] [[nodiscard]] (const Request& req) -> bool {
-            if (req.firmID == employment_.contractFirmId()) return false;
-            if (req.wage < employment_.wage()) return false;
-            return true;
-        };
-        auto makeEntrySheet = [&](Request& req) -> LaborEntry& {
-            return req.entry(id, employment_.productPower());
-        };
-        jobHunter_.entry(isAligned, makeEntrySheet, market);
+        if (not shouldSearch()) return;
+        jobHunter_.entry(
+            [&](const Request& req) -> bool { return isAligned(req); },
+            [&](Request& req) -> Entry& { return makeEntrySheet(id, req); },
+            market
+        );
     }
 
-    void accept() { jobHunter_.accept(); }
+    void accept() noexcept { jobHunter_.accept(); }
 
-    void recordRosterEntry() {
+    void recordRosterEntry() noexcept {
         const auto acceptedEntry = jobHunter_.huntedResult();
         if (not acceptedEntry) return;
         employment_.startWorking(*acceptedEntry->rosterEntry);
     }
 
-    void endStep(CensusDropBox& dropBox) {
+    void endStep(CensusDropBox& dropBox) noexcept {
         dropBox.wages.emplace_back(wage().value());
         jobHunter_.endStep();
     }
 
-    void product(const Market phase) { employment_.work(phase); }
+    void product(const Market phase) noexcept { employment_.work(phase); }
 
-    [[nodiscard]] auto wage() const -> Money POST(wage : wage >= Money{0.0}) {
+    [[nodiscard]] auto wage() const noexcept -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(employment_.wage());
     }
 
   private:
-    JobHunter  jobHunter_;
-    Employment employment_;
-    JobSearch  jobSearch_;
+    [[nodiscard]] auto shouldSearch() const noexcept -> bool {
+        if (not employment_.isEmployed()) return true;
+        if (likelihoodChangingJob_.shouldChangingJobs()) return true;
+        return false;
+    }
+
+    [[nodiscard]] auto isAligned(const Request& request) const noexcept -> bool {
+        if (request.firmID == employment_.contractFirmId()) return false;
+        if (request.wage < employment_.wage()) return false;
+        return true;
+    }
+
+    [[nodiscard]] auto makeEntrySheet(const AgentID id, Request& request) const noexcept -> Entry& {
+        return request.entry(id, employment_.productPower());
+    }
+
+    JobHunter             jobHunter_;
+    Employment            employment_;
+    LikelihoodChangingJob likelihoodChangingJob_;
 };
 }  // namespace abm::labor::supplier
 
