@@ -7,8 +7,9 @@
 #include "pipeline.hpp"
 
 namespace abm::analysis {
-[[nodiscard]] auto calcMean(const std::vector<double>& container, const double nanToNum = 0.0)
-    -> double {
+[[nodiscard]] auto calcMean(
+    const std::vector<double>& container, const double nanToNum = 0.0
+) noexcept -> double {
     if (container.empty()) return nanToNum;
     const auto sum = std::reduce(container.begin(), container.end(), 0.0);
     const auto n   = static_cast<double>(container.size());

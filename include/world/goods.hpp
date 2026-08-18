@@ -3,7 +3,6 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 
-#include "config.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"

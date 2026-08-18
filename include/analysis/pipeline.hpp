@@ -12,10 +12,11 @@ namespace abm::analysis {
 
 class Pipeline {
   public:
-    void requireData(std::string_view name) { requireDatas_.emplace_back(name); }
+    [[nodiscard]] Pipeline() noexcept = default;
+    void requireData(std::string_view name) noexcept { requireDatas_.emplace_back(name); }
 
     template <LogicType Logic>
-    void registerMetric(std::string outName, Logic logic) {
+    void registerMetric(std::string outName, Logic logic) noexcept {
         tasks_.emplace_back(std::make_unique<MetricTask<Logic>>(std::move(outName), logic));
     }
 

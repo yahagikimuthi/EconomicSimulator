@@ -11,23 +11,23 @@
 #include "analysis/data_manager.hpp"
 
 namespace abm::analysis {
-
-class [[nodiscard]] DataContext {
+class DataContext {
   public:
-    void set(std::string_view name, std::vector<double>&& data) {
+    [[nodiscard]] DataContext() noexcept = default;
+    void set(std::string_view name, std::vector<double>&& data) noexcept {
         cache_.try_emplace(name, std::move(data));
     }
 
-    auto get(std::string_view name) const -> const std::vector<double>& {
+    [[nodiscard]] auto get(std::string_view name) const noexcept -> const std::vector<double>& {
         if (const auto* out = tryGet(name); out != nullptr) return *out;
         std::cerr << "this function return empty vector(size=0) now\n";
         return noneData_;
     }
 
-    void clear() { cache_.clear(); }
+    void clear() noexcept { cache_.clear(); }
 
   private:
-    auto tryGet(std::string_view name) const -> const std::vector<double>* {
+    [[nodiscard]] auto tryGet(std::string_view name) const noexcept -> const std::vector<double>* {
         auto it = cache_.find(name);
         if (it == cache_.end()) {
             std::cerr << "required data not found in context: " << name << '\n';
@@ -47,24 +47,24 @@ concept LogicType = requires(Logic logic, const DataContext& ctx) {
 
 class IMetricTask {
   public:
-    IMetricTask(std::string&& outName) : outName_{std::move(outName)} {}
+    [[nodiscard]] IMetricTask(std::string&& outName) noexcept : outName_{std::move(outName)} {}
 
-    virtual ~IMetricTask()                             = default;
-    IMetricTask(const IMetricTask&)                    = default;
-    auto operator=(const IMetricTask&) -> IMetricTask& = delete;
-    IMetricTask(IMetricTask&&)                         = default;
-    auto operator=(IMetricTask&&) -> IMetricTask&      = delete;
+    virtual ~IMetricTask() noexcept                             = default;
+    IMetricTask(const IMetricTask&) noexcept                    = default;
+    auto operator=(const IMetricTask&) noexcept -> IMetricTask& = delete;
+    IMetricTask(IMetricTask&&) noexcept                         = default;
+    auto operator=(IMetricTask&&) noexcept -> IMetricTask&      = delete;
 
-    void reserve(const std::size_t n) { results_.reserve(n); }
+    void reserve(const std::size_t n) noexcept { results_.reserve(n); }
 
-    virtual void process(const DataContext& ctx) = 0;
+    virtual void process(const DataContext& ctx) noexcept = 0;
 
     void writeResult(OutputDataManager& output) {
         output.write(std::move(outName_), std::move(results_));
     }
 
   protected:
-    void pushBackData(const double data) { results_.emplace_back(data); }
+    void pushBackData(const double data) noexcept { results_.emplace_back(data); }
 
   private:
     std::vector<double> results_;
@@ -74,10 +74,10 @@ class IMetricTask {
 template <LogicType Logic>
 class MetricTask final : public IMetricTask {
   public:
-    MetricTask(std::string&& outName, const Logic logic)
+    MetricTask(std::string&& outName, const Logic logic) noexcept
         : IMetricTask(std::move(outName)), logic_{logic} {}
 
-    void process(const DataContext& ctx) override { pushBackData(logic_(ctx)); }
+    void process(const DataContext& ctx) noexcept override { pushBackData(logic_(ctx)); }
 
   private:
     const Logic logic_;

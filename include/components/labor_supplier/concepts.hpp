@@ -2,7 +2,7 @@
 
 #include <concepts>
 
-#include "world/message.hpp"
+#include "world/labor.hpp"
 
 namespace abm::labor::supplier {
 template <typename F>

@@ -3,29 +3,35 @@
 #include <tbb/concurrent_vector.h>
 #include <deque>
 #include <functional>
+#include <span>
+#include <vector>
 
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "util.hpp"
 #include "world/common.hpp"
 
 namespace abm {
 
 class RosterEntry;
 class Workspace;
-struct [[nodiscard]] CompanyBoard {
+struct CompanyBoard {
     const AgentID                                               firmId;
     const Market                                                firmType;
     std::deque<RosterEntry>                                     roster;
     tbb::concurrent_vector<std::reference_wrapper<RosterEntry>> resignationBox;
 
-    CompanyBoard(const AgentID Id, const Market FirmType) : firmId{Id}, firmType{FirmType} {}
+    [[nodiscard]] CompanyBoard(const AgentID Id, const Market FirmType) noexcept
+        : firmId{Id}, firmType{FirmType} {}
     void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
     auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) -> RosterEntry&;
 };
 
-class [[nodiscard]] RosterEntry {
+class RosterEntry {
   public:
-    RosterEntry(const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace)
+    [[nodiscard]] RosterEntry(
+        const AgentID Id, const Wage Wage, CompanyBoard& CompanyBoard, Workspace& Workspace
+    )
         : hholdId{Id}, wage{Wage}, companyBoard{CompanyBoard}, workspace{Workspace} {}
     void addInput(const double productPower);
     void resign() { companyBoard.resign(*this); }
@@ -57,15 +63,14 @@ struct LaborEntry {
     std::optional<RosterEntry&> rosterEntry{std::nullopt};
     const LaborRequest&         request;
 
-    LaborEntry(const AgentID Id, const double ProductPower, const LaborRequest& Request)
+    [[nodiscard]] LaborEntry(
+        const AgentID Id, const double ProductPower, const LaborRequest& Request
+    )
         : hholdID{Id}, productPower{ProductPower}, request{Request} {}
 };
 
-struct [[nodiscard]] LaborRequest {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
-    LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
+struct LaborRequest {
+    [[nodiscard]] LaborRequest(const AgentID Id, const Wage Wage) : firmID{Id}, wage{Wage} {}
     auto entry(const AgentID id, const double productPower) -> LaborEntry& {
         auto it = entryBox_.emplace_back(id, productPower, *this);
         references_.emplace_back(std::ref(*it));
@@ -82,34 +87,19 @@ struct [[nodiscard]] LaborRequest {
     std::vector<RefWrap<LaborEntry>>   references_;
 };
 
-class [[nodiscard]] LaborMarket {
+class LaborMarket {
   public:
-    using RequestBoxT = std::ranges::subrange<
-        std::ranges::iterator_t<tbb::detail::d1::concurrent_vector<
-            abm::LaborRequest,
-            tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>,
-        std::ranges::sentinel_t<tbb::detail::d1::concurrent_vector<
-            abm::LaborRequest,
-            tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>,
-        (std::ranges::sized_range<tbb::detail::d1::concurrent_vector<abm::LaborRequest>&> ||
-         std::sized_sentinel_for<
-             std::ranges::sentinel_t<tbb::detail::d1::concurrent_vector<
-                 abm::LaborRequest,
-                 tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>,
-             std::ranges::iterator_t<tbb::detail::d1::concurrent_vector<
-                 abm::LaborRequest,
-                 tbb::detail::d1::cache_aligned_allocator<abm::LaborRequest>>&>>)
-            ? std::ranges::subrange_kind::sized
-            : std::ranges::subrange_kind::unsized>;
-
-    LaborMarket() = default;
-    auto requestBox() -> RequestBoxT { return std::ranges::subrange{requestBox_}; }
+    [[nodiscard]] LaborMarket() noexcept = default;
+    auto requestBox() -> std::span<RefWrap<LaborRequest>> { return references_; }
     auto request(const AgentID id, const Wage wage) -> LaborRequest& {
-        return *requestBox_.emplace_back(id, wage);
+        auto it = requestBox_.emplace_back(id, wage);
+        references_.emplace_back(std::ref(*it));
+        return *it;
     }
     void clear() { requestBox_.clear(); }
 
   private:
     tbb::concurrent_vector<LaborRequest> requestBox_;
+    std::vector<RefWrap<LaborRequest>>   references_;
 };
 }  // namespace abm

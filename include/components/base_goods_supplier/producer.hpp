@@ -6,7 +6,8 @@
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
 class Producer {

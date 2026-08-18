@@ -11,7 +11,8 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/goods.hpp"
 
 namespace abm {
 class [[nodiscard]] ProductionGoodsDemander final

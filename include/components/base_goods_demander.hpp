@@ -7,7 +7,8 @@
 
 #include "core/values/common.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/goods.hpp"
 
 namespace abm::base_goods::demander {
 class BudgetCalculator {

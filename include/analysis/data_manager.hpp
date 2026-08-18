@@ -14,9 +14,9 @@
 #include "config.hpp"
 
 namespace abm::analysis {
-class [[nodiscard]] InputDataManager {
+class InputDataManager {
   public:
-    InputDataManager()
+    [[nodiscard]] InputDataManager()
         : inFile_{[]() -> HighFive::File {
               const auto filepath =
                   static_cast<std::string>(config::setting::simulationResultOutputPath);
@@ -36,7 +36,7 @@ class [[nodiscard]] InputDataManager {
         }
     }
 
-    auto getStepKeys() const -> std::vector<std::string> {
+    [[nodiscard]] auto getStepKeys() const -> std::vector<std::string> {
         auto stepKeys = inFile_.listObjectNames();
         std::ranges::sort(stepKeys, std::ranges::less{}, [](const std::string& step) -> int {
             return std::stoi(step.substr(5));
@@ -60,7 +60,7 @@ class [[nodiscard]] InputDataManager {
     }
 
   private:
-    auto getGroup(const std::string& path) const -> std::optional<HighFive::Group> {
+    [[nodiscard]] auto getGroup(const std::string& path) const -> std::optional<HighFive::Group> {
         if (inFile_.exist(path)) {
             return inFile_.getGroup(path);
         }
@@ -73,7 +73,7 @@ class [[nodiscard]] InputDataManager {
 
 class [[nodiscard]] OutputDataManager {
   public:
-    OutputDataManager()
+    [[nodiscard]] OutputDataManager()
         : outFile_{[]() -> HighFive::File {
               const auto filepath = static_cast<std::string>(config::setting::metricDataOutputPath);
               if (const auto path = std::filesystem::path{filepath}; path.has_parent_path()) {

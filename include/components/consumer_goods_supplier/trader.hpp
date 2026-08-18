@@ -7,7 +7,7 @@
 #include "components/base_goods_supplier/trader.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 class Trader final : public base_goods::supplier::Trader<Market::consumerGoods> {

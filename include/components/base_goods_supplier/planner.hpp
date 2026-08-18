@@ -10,7 +10,7 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
 
 namespace abm::base_goods::supplier {
 class MarkupPlanner {

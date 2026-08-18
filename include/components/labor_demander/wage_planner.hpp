@@ -12,7 +12,7 @@ class WagePlannerMemory {
     template <typename T>
     class Memory {
       public:
-        [[nodiscard]] Memory(const T last) noexcept : last{last} {}
+        [[nodiscard]] Memory(const T Last) noexcept : last{Last} {}
         void commit() noexcept {
             if (current) last = *current;
         }

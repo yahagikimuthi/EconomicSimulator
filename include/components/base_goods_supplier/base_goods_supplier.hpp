@@ -3,25 +3,25 @@
 #include "components/base_goods_supplier/planner.hpp"
 #include "components/base_goods_supplier/producer.hpp"
 #include "core/values/labor.hpp"
-#include "world/message.hpp"
+#include "world/goods.hpp"
 
 namespace abm {
 class BaseGoodsSupplier {
   public:
-    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employeeCnt) const -> HeadCount
+    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employeeCnt) const noexcept -> HeadCount
         PRE(employeeCnt >= HeadCount{0.0}) {
         return producer_.calcDesiredEmploy(
             planner_.targetSupply(), planner_.lastSupply(), employeeCnt
         );
     }
 
-    [[nodiscard]] auto workspace() -> Workspace& { return producer_.workspace(); }
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }
 
   protected:
     [[nodiscard]] BaseGoodsSupplier(
         const base_goods::supplier::Planner&   planner,
         const base_goods::supplier::Producer&& producer
-    )
+    ) noexcept
         : planner_{planner}, producer_{producer} {}
     base_goods::supplier::Planner  planner_;
     base_goods::supplier::Producer producer_;

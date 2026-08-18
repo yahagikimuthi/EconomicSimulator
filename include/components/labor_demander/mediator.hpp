@@ -18,27 +18,29 @@ class Mediator {
     using RefWrap = std::reference_wrapper<T>;
 
   public:
-    Mediator();
+    Mediator() = default;
     void publishEmployPlan(const HeadCount employPlan) {
-        for (RefWrap<EmployPlanListener> listenerRef : employPlanListeners_) {
+        for (std::optional<EmployPlanListener&> listenerOpt : employPlanListeners_) {
+            if (not listenerOpt) return;
             std::visit(
                 [employPlan](auto&& listener) -> void { listener.listenEmployPlan(employPlan); },
-                listenerRef.get()
+                *listenerOpt
             );
         }
     }
     void publishRecruitResult(const RecruitResult& result) {
-        for (RefWrap<RecruitResultListener> listenerRef : recruitResultListeners_) {
+        for (std::optional<RecruitResultListener&> listenerOpt : recruitResultListeners_) {
+            if (not listenerOpt) return;
+
             std::visit(
-                [&](auto&& listener) -> void { listener.listenRecruitResult(result); },
-                listenerRef.get()
+                [&](auto&& listener) -> void { listener.listenRecruitResult(result); }, *listenerOpt
             );
         }
     }
 
   private:
-    std::array<RefWrap<EmployPlanListener>, 1>    employPlanListeners_;
-    std::array<RefWrap<RecruitResultListener>, 2> recruitResultListeners_;
+    std::array<std::optional<EmployPlanListener&>, 1>    employPlanListeners_;
+    std::array<std::optional<RecruitResultListener&>, 2> recruitResultListeners_;
 };
 }  // namespace abm::labor::demander::mediator
 

@@ -10,11 +10,12 @@
 #include "orchestrator/labor.hpp"
 #include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 void foo() {}
-void Engine::run() {
+void Engine::run() noexcept {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
         if (currentStep_.value() == 600) {
             foo();
@@ -27,7 +28,7 @@ void Engine::run() {
     }
 }
 
-void Engine::runLabor() {
+void Engine::runLabor() noexcept {
     for (BtoCFirm& firm : BtoCFirms_) {
         labor::adjustWorkforce(firm.index, firm.consumerGoods, firm.labor, laborMarket_);
     }
@@ -64,7 +65,7 @@ void Engine::runLabor() {
     }
 }
 
-void Engine::runProductionGoods() {
+void Engine::runProductionGoods() noexcept {
     for (HHold& hhold : hholds_) {
         production_goods::product(hhold.labor, Market::productionGoods);
     }
@@ -108,7 +109,7 @@ void Engine::runProductionGoods() {
     }
 }
 
-void Engine::runConsumerGoods() {
+void Engine::runConsumerGoods() noexcept {
     for (HHold& hhold : hholds_) {
         consumer_goods::product(hhold.labor, Market::consumerGoods);
     }
@@ -140,7 +141,7 @@ void Engine::runConsumerGoods() {
     }
 }
 
-void Engine::logging() {
+void Engine::logging() noexcept {
     for (BtoCFirm& firm : BtoCFirms_) {
         firm_finance::logging(dropBox_, firm.finance);
     }
@@ -150,14 +151,14 @@ void Engine::logging() {
     logger_.save(dropBox_, currentStep_);
 }
 
-void Engine::reset() {
+void Engine::reset() noexcept {
     dropBox_.clear();
     laborMarket_.clear();
     productionGoodsEntryBox_.clear();
     consumerGoodsEntryBox_.clear();
 }
 
-void Engine::check() const {}
+void Engine::check() const noexcept {}
 
 void Logger::save(const CensusDropBox& dropBox, const Step step) {
     namespace name = config::save_name;

@@ -4,7 +4,7 @@
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
 
 namespace abm {
 class AgentIndex {

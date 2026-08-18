@@ -29,8 +29,9 @@ class OfferPlannerMemory {
     };
 
   public:
-    [[nodiscard]] OfferPlannerMemory(RandomGenerator& masterRng) noexcept;
-
+    [[nodiscard]] OfferPlannerMemory(RandomGenerator& masterRng) noexcept
+        : applicants_{HeadCount{masterRng.rand(10, 20)}},
+          employPlan_{HeadCount{masterRng.rand(10, 20)}} {}
     [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.last;
     }

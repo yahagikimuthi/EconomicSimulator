@@ -22,7 +22,9 @@
 #include "config.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/goods.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 [[nodiscard]] auto makeFirmFinanceComponent(RandomGenerator& masterRng) -> FirmFinance {
@@ -146,7 +148,7 @@ namespace {
 }
 }  // namespace
 
-Engine::Engine(const int totalStep)
+Engine::Engine(const int totalStep) noexcept
     : totalStep_{totalStep}, seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";

@@ -15,7 +15,9 @@
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "config.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/goods.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 
@@ -42,10 +44,10 @@ struct HHold {  // NOLINT
     ConsumerGoodsDemander consumerGoods;
 };
 
-class [[nodiscard]] Logger {
+class Logger {
   public:
     [[nodiscard]] explicit Logger();
-    auto isValid() const -> bool { return file_.isValid(); }
+    auto isValid() const noexcept -> bool { return file_.isValid(); }
     void save(const CensusDropBox& dropBox, const Step step);
 
   private:
@@ -62,18 +64,18 @@ class Engine {
     using TBBVec = tbb::concurrent_vector<T>;
 
   public:
-    [[nodiscard]] explicit Engine(const int totalStep);
+    [[nodiscard]] explicit Engine(const int totalStep) noexcept;
 
-    void run();
+    void run() noexcept;
 
   private:
-    void runLabor();
-    void runProductionGoods();
-    void runConsumerGoods();
-    void update();
-    void logging();
-    void reset();
-    void check() const;
+    void runLabor() noexcept;
+    void runProductionGoods() noexcept;
+    void runConsumerGoods() noexcept;
+    void update() noexcept;
+    void logging() noexcept;
+    void reset() noexcept;
+    void check() const noexcept;
 
     Logger                logger_;
     std::vector<BtoCFirm> BtoCFirms_;
@@ -92,7 +94,7 @@ class Engine {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    [[nodiscard]] static auto generateSeed() -> PCG32Seed {
+    [[nodiscard]] static auto generateSeed() noexcept -> PCG32Seed {
         if (not config::setting::useRuntimeRandomSeed)
             return {
                 .state = config::setting::fixedSeedState, .stream = config::setting::fixedSeedStream

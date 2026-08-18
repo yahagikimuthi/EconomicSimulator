@@ -14,14 +14,14 @@
 #include "config.hpp"
 #include "core/base.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/labor.hpp"
 
 namespace abm::labor::supplier {
 inline void pickSample(
-    LaborMarket::RequestBoxT                           requestBox,
-    std::vector<std::reference_wrapper<LaborRequest>>& sampleRequests,
-    RandomGenerator&                                   rng,
-    const int                                          sampleCnt
+    std::span<RefWrap<LaborRequest>>    requestBox,
+    std::vector<RefWrap<LaborRequest>>& sampleRequests,
+    RandomGenerator&                    rng,
+    const int                           sampleCnt
 ) {
     const auto k = std::size_t{std::min(static_cast<std::size_t>(sampleCnt), requestBox.size())};
     if (requestBox.size() <= static_cast<std::size_t>(sampleCnt)) {
@@ -31,25 +31,23 @@ inline void pickSample(
     rng.sample(requestBox, std::back_inserter(sampleRequests), static_cast<int>(k));
 }
 
-inline void sortSample(
-    std::span<std::reference_wrapper<LaborRequest>> sortRequests, const int entryCnt
-) {
+inline void sortSample(std::span<RefWrap<LaborRequest>> sortRequests, const int entryCnt) {
     const auto k = std::size_t{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
     std::ranges::partial_sort(
         sortRequests,
         sortRequests.begin() + static_cast<int>(k),
         std::ranges::greater{},
-        [](const std::reference_wrapper<LaborRequest>& requestRef) -> double {
+        [](const RefWrap<LaborRequest>& requestRef) -> double {
             return requestRef.get().wage.value();
         }
     );
 }
 
 [[nodiscard]] inline auto pickAndSortJobs(
-    const LaborMarket::RequestBoxT& requestBox,
-    RandomGenerator&                rng,
-    const int                       sampleCnt,
-    const int                       entryCnt
+    const std::span<RefWrap<LaborRequest>> requestBox,
+    RandomGenerator&                       rng,
+    const int                              sampleCnt,
+    const int                              entryCnt
 ) -> std::ranges::view auto {
     using Request    = LaborRequest;
     using RequestRef = std::reference_wrapper<Request>;
@@ -63,9 +61,6 @@ inline void sortSample(
 }
 
 class [[nodiscard]] MyEntries {
-    template <typename T>
-    using RefWrap = std::reference_wrapper<T>;
-
   public:
     MyEntries() = default;
     void add(LaborEntry& entry) { entries_.emplace_back(std::ref(entry)); }
@@ -90,11 +85,11 @@ class JobHunter {
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(
-        F1&&                            isAligned,
-        F2&&                            makeEntrySheet,
-        const LaborMarket::RequestBoxT& requestBox,
-        const int                       sampleCnt = config::labor_supplier::jobSampleCnt,
-        const int                       entryCnt  = config::labor_supplier::jobEntryCnt
+        F1&&                                   isAligned,
+        F2&&                                   makeEntrySheet,
+        const std::span<RefWrap<LaborRequest>> requestBox,
+        const int                              sampleCnt = config::labor_supplier::jobSampleCnt,
+        const int                              entryCnt  = config::labor_supplier::jobEntryCnt
     ) PRE(entryCnt > 0) {
         using Request = LaborRequest;
         std::ranges::view auto alignedRequests{

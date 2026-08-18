@@ -3,13 +3,15 @@
 #include <tbb/concurrent_vector.h>
 #include <optional>
 #include <pcg_random.hpp>
+#include <span>
 #include <vector>
 
 #include "components/labor_supplier/job_hunter.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
 #include "util.hpp"
-#include "world/message.hpp"
+#include "world/common.hpp"
+#include "world/labor.hpp"
 
 namespace abm::labor::supplier {
 class Employment {
@@ -79,7 +81,7 @@ class LaborSupplier {
     )
         : jobHunter_{jobHunter}, employment_{employment}, jobSearch_{jobSearchThreshold} {}
 
-    void entry(const AgentID id, const LaborMarket::RequestBoxT& requestBox) {
+    void entry(const AgentID id, const std::span<RefWrap<LaborRequest>> requestBox) {
         employment_.updateStatus();
         if (not employment_.isEmployed()) return;
         if (not jobSearch_()) return;
