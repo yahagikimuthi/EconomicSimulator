@@ -10,9 +10,8 @@
 #include "core/values/labor.hpp"
 
 namespace abm::labor::demander::mediator {
-using EmployPlanListener = std::variant<planner::WagePlannerMemory>;
-using RecruitResultListener =
-    std::variant<planner::WagePlannerMemory, planner::EmployPlannerMemory>;
+using EmployPlanListener    = std::variant<planner::WagePlannerMemory>;
+using RecruitResultListener = std::variant<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
 class Mediator {
     template <typename T>

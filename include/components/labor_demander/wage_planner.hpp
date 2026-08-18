@@ -8,111 +8,88 @@
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
-
-struct WageJudgeContext {
-    const Wage      lastWage;
-    const HeadCount lastEmployPlan;
-    const HeadCount lastApplicants;
-};
-
-class WagePlanner {
-  public:
-    [[nodiscard]] WagePlanner(RandomGenerator& rng)
-        : rng_{pcg32{rng.makeUint64(), rng.makeUint64()}}, adjustVol_{rng.rand(0.1, 0.2)} {}
-
-    [[nodiscard]] auto plan(const WageJudgeContext& ctx) const -> Wage {
-        const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
-        const auto next  = Wage{
-            ctx.lastWage *
-            (shouldRaise(ctx.lastEmployPlan, ctx.lastApplicants) ? 1.0 + alpha : 1.0 - alpha)
-        };
-        return wageGuard(next);
-    }
-
-  private:
-    [[nodiscard]] auto shouldRaise(const HeadCount lastEmployPlan, const HeadCount lastApplicants)
-        const -> bool {
-        return lastApplicants < lastEmployPlan;
-    }
-
-    [[nodiscard]] static auto wageGuard(const Wage wage) -> Wage {
-        return Wage{std::max(wage.value(), std::numeric_limits<double>::epsilon())};
-    }
-
-    mutable RandomGenerator rng_;
-    const double            adjustVol_;
-};
-
 class WagePlannerMemory {
     template <typename T>
     class Memory {
       public:
-        Memory(const T& last) : last_{last} {}
-        void memorize(const T& plan) { plan_ = plan; }
-        void endStep() {
-            if (plan_) last_ = *plan_;
+        [[nodiscard]] Memory(const T last) noexcept : last{last} {}
+        void commit() noexcept {
+            if (current) last = *current;
         }
-        [[nodiscard]] auto rememberLog() const -> const T& { return last_; }
-        [[nodiscard]] auto rememberPlan() const -> const T& {
-            ASSERT(plan_);
-            return *plan_;
-        }
-
-      private:
-        T                last_;
-        std::optional<T> plan_{std::nullopt};
+        std::optional<T> last{std::nullopt};
+        std::optional<T> current{std::nullopt};
     };
 
   public:
-    [[nodiscard]] WagePlannerMemory(RandomGenerator& masterRng)
-        : employPlanMemory_{HeadCount{masterRng.rand(10, 20)}},
-          applicantsMemory_{HeadCount{masterRng.rand(10, 20)}},
-          wagePlanMemory_{Wage{masterRng.rand(10.0, 20.0)}} {}
+    [[nodiscard]] WagePlannerMemory(RandomGenerator& masterRng) noexcept
+        : employPlan_{HeadCount{masterRng.rand(10, 20)}},
+          applicants_{HeadCount{masterRng.rand(10, 20)}} {}
 
-    void listenEmployPlan(const HeadCount employPlan) { employPlanMemory_.memorize(employPlan); }
+    void listenEmployPlan(const HeadCount employPlan) noexcept { employPlan_.current = employPlan; }
 
-    void listenRecruitResult(const RecruitResult& result) {
-        applicantsMemory_.memorize(result.applicants);
+    void listenRecruitResult(const RecruitResult& result) noexcept {
+        applicants_.current = result.applicants;
     }
 
-    void memorizeWagePlan(const Wage wagePlan) { wagePlanMemory_.memorize(wagePlan); }
-
-    void endStep() {
-        employPlanMemory_.endStep();
-        applicantsMemory_.endStep();
+    [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
+        return applicants_.last;
+    }
+    [[nodiscard]] auto rememberLastEmployPlan() const noexcept -> std::optional<HeadCount> {
+        return employPlan_.last;
     }
 
-    [[nodiscard]] auto makeJudgeContext() const -> WageJudgeContext {
-        return {
-            .lastWage       = wagePlanMemory_.rememberLog(),
-            .lastEmployPlan = applicantsMemory_.rememberLog(),
-            .lastApplicants = applicantsMemory_.rememberLog()
-        };
+    void clearLog() noexcept { employPlan_.last.reset(), applicants_.last.reset(); }
+
+    void commit() noexcept {
+        employPlan_.commit();
+        applicants_.commit();
     }
 
   private:
-    struct EmployPlanMemory : public Memory<HeadCount> {
-    } employPlanMemory_;
-    struct LastApplicants : public Memory<HeadCount> {
-    } applicantsMemory_;
-    struct WagePlanMemory : public Memory<Wage> {
-    } wagePlanMemory_;
+    Memory<HeadCount> employPlan_;
+    Memory<HeadCount> applicants_;
 };
 
-class WagePlanningSystem {
+class WagePlanner {
   public:
-    WagePlanningSystem(RandomGenerator& masterRng) : planner_{masterRng}, memory_{masterRng} {}
+    [[nodiscard]] WagePlanner(RandomGenerator& rng) noexcept
+        : lastWage_{rng.rand(10.0, 20.0)},
+          memory_{rng},
+          rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
+          adjustVol_{rng.rand(0.1, 0.2)} {}
 
-    [[nodiscard]] auto plan() -> Wage {
-        const auto plan = planner_.plan(memory_.makeJudgeContext());
-        memory_.memorizeWagePlan(plan);
-        return plan;
+    [[nodiscard]] auto plan() noexcept -> Wage {
+        const auto next = calcWage();
+        memory_.clearLog();
+        if (not next) return lastWage_;
+        wagePlan_ = *next;
+        return *next;
     }
 
-    void endStep() { memory_.endStep(); }
+    void commit() noexcept {
+        memory_.commit();
+        if (wagePlan_) lastWage_ = *wagePlan_;
+    }
 
   private:
-    WagePlanner       planner_;
-    WagePlannerMemory memory_;
+    [[nodiscard]] auto calcWage() const noexcept -> std::optional<Wage> {
+        const auto lastApplicants = memory_.rememberLastApplicants();
+        const auto lastEmployPlan = memory_.rememberLastEmployPlan();
+        if (not lastApplicants or not lastEmployPlan) return std::nullopt;
+        const auto alpha       = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
+        const auto shouldRaise = *lastApplicants < *lastEmployPlan;
+        const auto plan        = Wage{lastWage_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        return wageGuard(plan);
+    }
+
+    [[nodiscard]] static auto wageGuard(const Wage wage) noexcept -> Wage {
+        return Wage{std::max(wage.value(), std::numeric_limits<double>::epsilon())};
+    }
+
+    Wage                    lastWage_;
+    std::optional<Wage>     wagePlan_;
+    WagePlannerMemory       memory_;
+    mutable RandomGenerator rng_;
+    const double            adjustVol_;
 };
 }  // namespace abm::labor::demander::planner

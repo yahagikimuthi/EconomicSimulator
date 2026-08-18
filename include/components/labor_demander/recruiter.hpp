@@ -154,7 +154,7 @@ class Recruiter : public SortApplicants {
         return ledger_.publishResult();
     }
 
-    void endStep() {
+    void reset() {
         if (not isPosting()) return;
         myRequest_.reset();
         ledger_.reset();

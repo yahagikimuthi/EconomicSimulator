@@ -39,11 +39,21 @@ class RecruitSystem {
         recruiter_.registerMember(std::forward<F>(addRoster));
     }
 
-    void endStep() {
+    void endStep(IMediator auto& mediator) {
         if (not isRecruiting_) return;
         const auto result = recruiter_.publishResult();
-        planner_.endStep(result);
-        recruiter_.endStep();
+        mediator.publishRecruitResult(result);
+        planner_.endStep();
+    }
+
+    void commit() {
+        if (not isRecruiting_) return;
+        planner_.commit();
+    }
+
+    void reset() {
+        if (not isRecruiting_) return;
+        recruiter_.reset();
         isRecruiting_ = false;
     }
 
@@ -85,7 +95,11 @@ class LaborDemander {
         return static_cast<Money>(humanResource_.sumWage());
     }
 
-    void endStep(CensusDropBox&) { recruitSystem_.endStep(); }
+    void endStep(CensusDropBox&) {
+        recruitSystem_.endStep(mediator_);
+        recruitSystem_.commit();
+        recruitSystem_.reset();
+    }
 
   private:
     RecruitSystem recruitSystem_;

@@ -10,23 +10,23 @@ namespace abm::labor::demander::planner {
 class RecruitPlanner {
   public:
     [[nodiscard]] RecruitPlanner(RandomGenerator& masterRng)
-        : wagePlanSystem_{masterRng}, employPlanSystem_{masterRng} {}
+        : wagePlanner_{masterRng}, employPlanSystem_{masterRng} {}
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator)
         -> RecruitPlan {
         const auto plan = RecruitPlan{
-            .wage = wagePlanSystem_.plan(), .offer = employPlanSystem_.plan(desiredEmploy, mediator)
+            .wage = wagePlanner_.plan(), .offer = employPlanSystem_.plan(desiredEmploy, mediator)
         };
         return plan;
     }
 
-    void endStep(const RecruitResult&) {
-        wagePlanSystem_.endStep();
-        employPlanSystem_.endStep();
+    void commit() {
+        wagePlanner_.commit();
+        employPlanSystem_.commit();
     }
 
   private:
-    WagePlanningSystem   wagePlanSystem_;
+    WagePlanner          wagePlanner_;
     EmployPlanningSystem employPlanSystem_;
 };
 }  // namespace abm::labor::demander::planner
