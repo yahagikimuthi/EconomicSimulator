@@ -24,7 +24,7 @@ class MarkupPlannerMemory {
                 current_.reset();
             }
         }
-        void clearLog() { last_.reset(); }
+        void clearLog() noexcept { last_.reset(); }
 
         std::optional<T> last_;
         std::optional<T> current_{std::nullopt};
@@ -71,7 +71,7 @@ class MarkupPlanner final {
 
   private:
     // isSold = (前期供給 - 前期売上) / 前回供給 < 定数
-    [[nodiscard]] auto calcNextMarkup() const -> std::optional<double> {
+    [[nodiscard]] auto calcNextMarkup() const noexcept -> std::optional<double> {
         const auto lastSupply      = memory_.rememberLastSupply();
         const auto lastSalesAmount = memory_.rememberLastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
@@ -83,7 +83,7 @@ class MarkupPlanner final {
         return calcNextMarkup(isSold);
     }
 
-    [[nodiscard]] auto calcNextMarkup(const bool isSold) const -> double {
+    [[nodiscard]] auto calcNextMarkup(const bool isSold) const noexcept -> double {
         const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto nextMarkup = log_ + (isSold ? alpha : -alpha);
         return markupGuard(nextMarkup);
@@ -115,14 +115,14 @@ class PricePlanner final {
   private:
     [[nodiscard]] static auto calcPrice(
         const GoodsQuantity supply, const double markup, const Money totalCost
-    ) -> Price {
+    ) noexcept -> Price {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
         const auto price = Price{avgCost.value() * (1.0 + markup)};
         return priceGuard(price);
     }
 
-    [[nodiscard]] static auto priceGuard(const Price price) -> Price {
+    [[nodiscard]] static auto priceGuard(const Price price) noexcept -> Price {
         return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
     }
 
@@ -152,6 +152,35 @@ class EmployPlanner final {
 
   private:
     GoodsQuantity demandForecast_;
+};
+
+class DemandForecastManagerMemory {
+  public:
+    [[nodiscard]] DemandForecastManagerMemory();
+
+    [[nodiscard]] auto rememberLastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
+        return lastTotalDemand_;
+    }
+
+  private:
+    std::optional<GoodsQuantity> lastTotalDemand_;
+    std::optional<GoodsQuantity> currentTotalDemand_{std::nullopt};
+};
+
+class DemandForecastManager {
+  public:
+    [[nodiscard]] DemandForecastManager() noexcept;
+
+  private:
+    auto calcNext() noexcept -> std::optional<GoodsQuantity> {
+        const auto lastTotalDemand = memory_.rememberLastTotalDemand();
+        if (not lastTotalDemand) return std::nullopt;
+    }
+
+    DemandForecastManagerMemory  memory_;
+    std::optional<GoodsQuantity> current_{std::nullopt};
+    GoodsQuantity                last_;
+    const double                 adjustment_;
 };
 
 class Planner {
