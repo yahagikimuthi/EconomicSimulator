@@ -14,8 +14,13 @@ class WagePlannerMemory final {
       public:
         [[nodiscard]] explicit Memory(const T l) noexcept : last{l} {}
         void commit() noexcept {
-            if (current) last = *current;
+            if (current) {
+                last = *current;
+                current.reset();
+            }
         }
+        void clearLog() { last.reset(); }
+
         std::optional<T> last;
         std::optional<T> current{std::nullopt};
     };
@@ -38,7 +43,7 @@ class WagePlannerMemory final {
         return employPlan_.last;
     }
 
-    void clearLog() noexcept { employPlan_.last.reset(), applicants_.last.reset(); }
+    void clearLog() noexcept { employPlan_.clearLog(), applicants_.clearLog(); }
 
     void commit() noexcept {
         employPlan_.commit();
@@ -68,7 +73,10 @@ class WagePlanner final {
 
     void commit() noexcept {
         memory_.commit();
-        if (wagePlan_) lastWage_ = *wagePlan_;
+        if (wagePlan_) {
+            lastWage_ = *wagePlan_;
+            wagePlan_.reset();
+        }
     }
 
   private:

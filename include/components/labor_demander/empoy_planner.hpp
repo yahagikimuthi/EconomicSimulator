@@ -21,8 +21,12 @@ class OfferPlannerMemory final {
         [[nodiscard]] explicit Memory(const T l) noexcept : last{l} {}
 
         void commit() noexcept {
-            if (current) last = *current;
+            if (current) {
+                last = *current;
+                current.reset();
+            }
         }
+        void clearLog() { last.reset(); }
 
         std::optional<T> last;
         std::optional<T> current{std::nullopt};
@@ -38,7 +42,7 @@ class OfferPlannerMemory final {
     [[nodiscard]] auto rememberLastEmployPlan() const noexcept -> std::optional<HeadCount> {
         return employPlan_.last;
     }
-    void clearLog() noexcept { applicants_.last.reset(), employPlan_.last.reset(); }
+    void clearLog() noexcept { applicants_.clearLog(), employPlan_.clearLog(); }
     void commit() noexcept { applicants_.commit(), employPlan_.commit(); }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         applicants_.current = result.applicants;
@@ -63,7 +67,10 @@ class OfferPlanner final {
 
     void commit() noexcept {
         memory_.commit();
-        if (currentOfferRate_) offerRate_ = *currentOfferRate_;
+        if (currentOfferRate_) {
+            offerRate_ = *currentOfferRate_;
+            currentOfferRate_.reset();
+        }
     }
 
   private:
@@ -92,6 +99,9 @@ class OfferPlanner final {
     const double            adjustVol_;
 };
 
+// EmployPlannerが静的関数となっているためインスタンス化しないが、意味論的に
+// 要求雇用数->雇用計画策定->オファー数決定という手順を踏むほうが望ましい。
+// このクラスはその統括を行う
 class EmployPlanningSystem final {
   public:
     [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng)

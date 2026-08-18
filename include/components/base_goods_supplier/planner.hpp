@@ -19,7 +19,10 @@ class MarkupPlannerMemory {
       public:
         [[nodiscard]] explicit Memory(T l) noexcept : last_{l} {}
         void commit() noexcept {
-            if (current_) last_ = current_;
+            if (current_) {
+                last_ = current_;
+                current_.reset();
+            }
         }
         void clearLog() { last_.reset(); }
 
@@ -56,6 +59,14 @@ class MarkupPlanner final {
         if (not next) return log_;
         log_ = *next;
         return *next;
+    }
+
+    void commit() noexcept {
+        memory_.commit();
+        if (plan_) {
+            log_ = *plan_;
+            plan_.reset();
+        }
     }
 
   private:
