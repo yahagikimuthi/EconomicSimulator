@@ -26,7 +26,7 @@ class Trader final {
     [[nodiscard]] explicit Trader(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    void post(const TradePlan& plan, Market& market) {
+    void post(const TradePlan& plan, Market& market) noexcept {
         ASSERT(plan.supply >= GoodsQuantity{0.0});
         if (plan.supply == GoodsQuantity{0.0}) return;
         myEntry_ = market.entry(plan.price, plan.supply);
@@ -59,7 +59,7 @@ class Trader final {
         return requestBox;
     }
 
-    void performRationedTrade(std::span<RefWrap<Request>> requestBox) {
+    void performRationedTrade(std::span<RefWrap<Request>> requestBox) noexcept {
         rng_.shuffle(requestBox);
         auto remainAmount = ledger_.inventory();
         for (RefWrap<Request> reqRef : requestBox) {

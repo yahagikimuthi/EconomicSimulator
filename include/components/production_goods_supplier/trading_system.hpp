@@ -25,12 +25,12 @@ class TradingSystem final {
 
     void trade() noexcept { trader_.trade(); }
 
-    void endStep(IMediator auto& mediator) {
+    void endStep(IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
         mediator.publishTradeResult(result);
     }
 
-    void reset() {
+    void reset() noexcept {
         planner_.reset();
         trader_.reset();
     }

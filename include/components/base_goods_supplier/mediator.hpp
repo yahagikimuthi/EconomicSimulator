@@ -15,7 +15,7 @@ using TradePlanListener = std::variant<EmployPlannerMemory, MarkupPlannerMemory>
 using TradeResultListener =
     std::variant<DemandForecastManagerMemory, MarkupPlannerMemory, Producer>;
 
-class Mediator {
+class Mediator final {
     template <typename T>
     using OptVec = std::vector<std::optional<T>>;
 

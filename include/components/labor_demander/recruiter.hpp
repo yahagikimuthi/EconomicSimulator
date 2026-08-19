@@ -18,11 +18,11 @@
 namespace abm::labor::demander::recruiter {
 class OfferApplicants final {
   public:
-    [[nodiscard]] OfferApplicants() = default;
+    [[nodiscard]] OfferApplicants() noexcept = default;
 
-    void add(Entry& entry) { applicants_.emplace_back(std::ref(entry)); }
-    void clear() { applicants_.clear(); }
-    auto offerAcceptedApplicants() -> std::ranges::view auto {
+    void add(Entry& entry) noexcept { applicants_.emplace_back(std::ref(entry)); }
+    void clear() noexcept { applicants_.clear(); }
+    auto offerAcceptedApplicants() noexcept -> std::ranges::view auto {
         return applicants_ |
                std::views::transform([](RefWrap<Entry> ref) -> Entry& { return ref.get(); }) |
                std::views::filter(&Entry::isAccept);
@@ -45,22 +45,22 @@ class Ledger final {
   public:
     [[nodiscard]] Ledger() = default;
 
-    void makeNewPage(const HeadCount offerPlan) { remainOffer_ = offerPlan; }
+    void makeNewPage(const HeadCount offerPlan) noexcept { remainOffer_ = offerPlan; }
 
-    [[nodiscard]] auto remainOffer() const -> HeadCount { return remainOffer_; }
+    [[nodiscard]] auto remainOffer() const noexcept -> HeadCount { return remainOffer_; }
 
-    void readOfferResult(const OfferResult& result) {
+    void readOfferResult(const OfferResult& result) noexcept {
         remainOffer_ -= result.offer;
         applicants_ += result.applicants;
     }
 
-    void readEmployResult(const EmployResult add) { employ_ += add.employ; }
+    void readEmployResult(const EmployResult add) noexcept { employ_ += add.employ; }
 
     [[nodiscard]] auto publishResult() const -> RecruitResult {
         return {.applicants = applicants_, .employ = employ_};
     }
 
-    void reset() {
+    void reset() noexcept {
         remainOffer_ = HeadCount{0.0};
         applicants_  = HeadCount{0.0};
         employ_      = HeadCount{0.0};
@@ -75,15 +75,15 @@ class Ledger final {
 
 class Recruiter final {
   public:
-    [[nodiscard]] Recruiter() = default;
+    [[nodiscard]] Recruiter() noexcept = default;
 
-    void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) {
+    void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) noexcept {
         if (not shouldPost(plan)) return;
         ledger_.makeNewPage(plan.offer);
         myRequest_ = laborMarket.request(id, plan.wage);
     }
 
-    void offer() {
+    void offer() noexcept {
         if (not isPosting()) return;
         if (myRequest_->entryBox().empty()) return;
 
@@ -104,7 +104,7 @@ class Recruiter final {
     }
 
     template <AddRosterFn F>
-    void registerMember(F&& addRoster) {
+    void registerMember(F&& addRoster) noexcept {
         if (not isPosting()) return;
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
@@ -116,12 +116,12 @@ class Recruiter final {
         ledger_.readEmployResult({.employ = employCnt});
     }
 
-    [[nodiscard]] auto publishResult() const -> RecruitResult {
+    [[nodiscard]] auto publishResult() const noexcept -> RecruitResult {
         if (not isPosting()) return {.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
         return ledger_.publishResult();
     }
 
-    void reset() {
+    void reset() noexcept {
         if (not isPosting()) return;
         myRequest_.reset();
         ledger_.reset();
@@ -129,15 +129,15 @@ class Recruiter final {
     }
 
   private:
-    [[nodiscard]] auto isPosting() const -> bool { return myRequest_.has_value(); }
+    [[nodiscard]] auto isPosting() const noexcept -> bool { return myRequest_.has_value(); }
 
-    [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) -> bool {
+    [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) noexcept -> bool {
         return plan.offer > HeadCount{0.0};
     }
 
     [[nodiscard]] static auto sortApplicants(
         const HeadCount offer, const std::span<RefWrap<Entry>> entryBox
-    ) -> std::span<RefWrap<Entry>> {
+    ) noexcept -> std::span<RefWrap<Entry>> {
         const auto k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
         const auto isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
 

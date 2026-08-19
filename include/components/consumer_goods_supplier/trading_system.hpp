@@ -8,7 +8,7 @@
 #include "world/goods.hpp"
 
 namespace abm::consumer_goods::supplier {
-class TradingSystem {
+class TradingSystem final {
     using TradePlanner = base_goods::supplier::TradePlanner;
     using Market       = ConsumerGoodsMarket;
 
@@ -23,12 +23,12 @@ class TradingSystem {
 
     void trade() noexcept { trader_.trade(); }
 
-    void endStep(IMediator auto& mediator) {
+    void endStep(IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
         mediator.publishTradeResult(result);
     }
 
-    void reset() {
+    void reset() noexcept {
         planner_.reset();
         trader_.reset();
     }

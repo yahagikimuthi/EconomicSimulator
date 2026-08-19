@@ -22,16 +22,21 @@ struct CompanyBoard final {
 
     [[nodiscard]] CompanyBoard(const AgentID i, const Market type) noexcept
         : firmId{i}, firmType{type} {}
-    void resign(RosterEntry& resignEntry) { resignationBox.emplace_back(std::ref(resignEntry)); }
-    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) -> RosterEntry&;
+    void resign(RosterEntry& resignEntry) noexcept {
+        resignationBox.emplace_back(std::ref(resignEntry));
+    }
+    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
+        -> RosterEntry&;
 };
 
 class RosterEntry final {
   public:
-    [[nodiscard]] RosterEntry(const AgentID i, const Wage w, CompanyBoard& board, Workspace& space)
+    [[nodiscard]] RosterEntry(
+        const AgentID i, const Wage w, CompanyBoard& board, Workspace& space
+    ) noexcept
         : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {}
     void addInput(const double productPower) noexcept;
-    void resign() { companyBoard_.resign(*this); }
+    void resign() noexcept { companyBoard_.resign(*this); }
 
     [[nodiscard]] auto firmId() const -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto firmType() const -> Market { return companyBoard_.firmType; }
@@ -45,8 +50,9 @@ class RosterEntry final {
     Workspace&    workspace_;
 };
 
-inline auto CompanyBoard::addRoster(const AgentID id, const Wage wage, Workspace& workspace)
-    -> RosterEntry& {
+inline auto CompanyBoard::addRoster(
+    const AgentID id, const Wage wage, Workspace& workspace
+) noexcept -> RosterEntry& {
     return roster.emplace_back(id, wage, *this, workspace);
 }
 
@@ -60,7 +66,7 @@ struct LaborEntry final {
     std::optional<RosterEntry&> rosterEntry{std::nullopt};
     const LaborRequest&         request;
 
-    [[nodiscard]] LaborEntry(const AgentID i, const double power, const LaborRequest& req)
+    [[nodiscard]] LaborEntry(const AgentID i, const double power, const LaborRequest& req) noexcept
         : hholdID{i}, productPower{power}, request{req} {}
 };
 
@@ -89,13 +95,13 @@ class LaborMarket final {
     [[nodiscard]] explicit LaborMarket(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    [[nodiscard]] auto request(const AgentID id, const Wage wage) -> Request& {
+    [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
         return *requestBox_.emplace_back(id, wage);
     }
 
     void pickRequest(std::vector<RefWrap<Request>>& out, const int n) noexcept {
         ASSERT(out.empty());
-        if (n > static_cast<int>(requestBox_.size())) {
+        if (n >= static_cast<int>(requestBox_.size())) {
             packAllRequest(out);
             return;
         }

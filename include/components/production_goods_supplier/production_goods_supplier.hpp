@@ -9,7 +9,7 @@
 #include "world/goods.hpp"
 
 namespace abm::production_goods::supplier {
-class ProductionGoodsSupplier {
+class ProductionGoodsSupplier final {
     using ProducingSystem = base_goods::supplier::ProducingSystem;
     using Market          = ProductionGoodsMarket;
     using Mediator        = base_goods::supplier::Mediator;
@@ -20,14 +20,14 @@ class ProductionGoodsSupplier {
     ) noexcept
         : producingSystem_{masterRng, workspace}, tradingSystem_{masterRng} {}
 
-    void post(const AgentID id, const Money totalCost, Market& market) {
+    void post(const AgentID id, const Money totalCost, Market& market) noexcept {
         const auto supply = producingSystem_.produce();
         tradingSystem_.post(id, supply, totalCost, market);
     }
 
-    void trade() { tradingSystem_.trade(); }
+    void trade() noexcept { tradingSystem_.trade(); }
 
-    void endStep() { tradingSystem_.endStep(mediator_); }
+    void endStep() noexcept { tradingSystem_.endStep(mediator_); }
 
   private:
     ProducingSystem producingSystem_;

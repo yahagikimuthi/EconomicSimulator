@@ -25,7 +25,7 @@ class ConsumerGoodsDemander final {
         Market&     market,
         const int   frequency = config::goods_demander::maxPurchaseFrequency,
         const int   sampleCnt = config::goods_demander::goodsSampleCnt
-    ) {
+    ) noexcept {
         if (shouldPass(step, frequency)) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
@@ -34,9 +34,9 @@ class ConsumerGoodsDemander final {
         myRequest_ = pickedEntry->request(budget / pickedEntry->price);
     }
 
-    void afterTrade() {}
+    void afterTrade() noexcept {}
 
-    void endStep() { myRequest_.reset(); }
+    void endStep() noexcept { myRequest_.reset(); }
 
   private:
     [[nodiscard]] auto shouldPass(const Step step, const int frequency) const noexcept -> bool {
@@ -49,8 +49,8 @@ class ConsumerGoodsDemander final {
     const double                  mpc_;
     const Step                    myPhase_;
 };
+}  // namespace abm::consumer_goods::demander
 
 namespace abm {
 using ConsumerGoodsDemander = consumer_goods::demander::ConsumerGoodsDemander;
 }
-}  // namespace abm::consumer_goods::demander

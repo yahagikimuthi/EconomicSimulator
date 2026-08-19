@@ -9,13 +9,13 @@
 #include "core/values/goods.hpp"
 
 namespace abm::base_goods::supplier {
-struct ATradeResult {
+struct ATradeResult final {
     const Price         price;
     const GoodsQuantity demand;
     const GoodsQuantity salesAmount;
 };
 
-class Ledger {
+class Ledger final {
   public:
     [[nodiscard]] Ledger() noexcept = default;
 

@@ -52,7 +52,7 @@ class TradePlanner final {
         return {.price = price, .supply = supply};
     }
 
-    void reset() { markupPlanner_.commit(); }
+    void reset() noexcept { markupPlanner_.commit(); }
 
   private:
     MarkupPlanner markupPlanner_;

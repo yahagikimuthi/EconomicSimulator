@@ -12,7 +12,7 @@ namespace abm::base_goods::supplier {
 
 // 前回の取引計画中、供給量が必要
 // 前回の取引結果中、売上高が必要
-class MarkupPlannerMemory {
+class MarkupPlannerMemory final {
   public:
     [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept;
     [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
@@ -23,9 +23,9 @@ class MarkupPlannerMemory {
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
-        salesAmount_.current = result.soldAmount;
+        salesAmount_.next = result.soldAmount;
     }
-    void listenTradePlan(const TradePlan& plan) noexcept { supply_.current = plan.supply; }
+    void listenTradePlan(const TradePlan& plan) noexcept { supply_.next = plan.supply; }
     void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }
     void commit() noexcept { supply_.commit(), salesAmount_.commit(); }
 
@@ -36,7 +36,7 @@ class MarkupPlannerMemory {
 
 class MarkupPlanner final {
   public:
-    [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng);
+    [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng) noexcept;
 
     [[nodiscard]] auto plan() noexcept -> double {
         const auto next = calcNextMarkup();

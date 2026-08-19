@@ -15,37 +15,20 @@ class EmployPlanner final {
 };
 
 class OfferPlannerMemory final {
-    template <typename T>
-    class Memory final {
-      public:
-        [[nodiscard]] explicit Memory(const T l) noexcept : last{l} {}
-
-        void commit() noexcept {
-            if (current) {
-                last = *current;
-                current.reset();
-            }
-        }
-        void clearLog() { last.reset(); }
-
-        std::optional<T> last;
-        std::optional<T> current{std::nullopt};
-    };
-
   public:
     [[nodiscard]] explicit OfferPlannerMemory(RandomGenerator& masterRng) noexcept
         : applicants_{HeadCount{masterRng.rand(10, 20)}},
           employPlan_{HeadCount{masterRng.rand(10, 20)}} {}
     [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
-        return applicants_.last;
+        return applicants_.log;
     }
     [[nodiscard]] auto rememberLastEmployPlan() const noexcept -> std::optional<HeadCount> {
-        return employPlan_.last;
+        return employPlan_.log;
     }
     void clearLog() noexcept { applicants_.clearLog(), employPlan_.clearLog(); }
     void commit() noexcept { applicants_.commit(), employPlan_.commit(); }
     void listenRecruitResult(const RecruitResult& result) noexcept {
-        applicants_.current = result.applicants;
+        applicants_.next = result.applicants;
     }
 
   private:
@@ -57,7 +40,7 @@ class OfferPlanner final {
   public:
     [[nodiscard]] explicit OfferPlanner(RandomGenerator& rng) noexcept
         : memory_{rng},
-          offerRate_{rng.rand(0.1, 0.2)},
+          cache_{rng.rand(0.1, 0.2)},
           rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
           adjustVol_{rng.rand(0.1, 0.2)} {}
 
@@ -67,34 +50,30 @@ class OfferPlanner final {
 
     void commit() noexcept {
         memory_.commit();
-        if (currentOfferRate_) {
-            offerRate_ = *currentOfferRate_;
-            currentOfferRate_.reset();
-        }
+        cache_.commit();
     }
 
   private:
     [[nodiscard]] auto planOfferRate() noexcept -> double {
         const auto nextRate = calcOfferRate();
         memory_.clearLog();
-        if (not nextRate) return offerRate_;
-        currentOfferRate_ = nextRate;
+        if (not nextRate) return cache_.cache();
+        cache_.next(*nextRate);
         return *nextRate;
     }
 
-    [[nodiscard]] auto calcOfferRate() const -> std::optional<double> {
+    [[nodiscard]] auto calcOfferRate() const noexcept -> std::optional<double> {
         const auto lastApplicants = memory_.rememberLastApplicants();
         const auto lastEmployPlan = memory_.rememberLastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = rng_.randNormal(0.0, adjustVol_);
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
-        const auto next        = offerRate_ + (shouldRaise ? alpha : -alpha);
+        const auto next        = cache_.cache() + (shouldRaise ? alpha : -alpha);
         return std::max(0.0, next);
     }
 
     OfferPlannerMemory      memory_;
-    double                  offerRate_;
-    std::optional<double>   currentOfferRate_;
+    Cache<double>           cache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };
@@ -104,17 +83,18 @@ class OfferPlanner final {
 // このクラスはその統括を行う
 class EmployPlanningSystem final {
   public:
-    [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng)
+    [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng) noexcept
         : offerPlanner_{masterRng} {}
 
-    [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) -> HeadCount {
+    [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
+        -> HeadCount {
         const auto employPlan = EmployPlanner::plan(desiredEmploy);
         mediator.publishEmployPlan(employPlan);
         const auto offerPlan = offerPlanner_.plan(employPlan);
         return offerPlan;
     }
 
-    void commit() { offerPlanner_.commit(); }
+    void commit() noexcept { offerPlanner_.commit(); }
 
   private:
     OfferPlanner offerPlanner_;

@@ -31,7 +31,7 @@ class ProductionGoodsDemander final {
         myRequest_ = pickedEntry->request(budget / pickedEntry->price);
     }
 
-    void afterTrade();
+    void afterTrade() noexcept;
 
   private:
     std::optional<const Request&> myRequest_{std::nullopt};

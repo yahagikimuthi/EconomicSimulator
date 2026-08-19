@@ -9,42 +9,21 @@
 
 namespace abm::labor::demander::planner {
 class WagePlannerMemory final {
-    template <typename T>
-    class Memory final {
-      public:
-        [[nodiscard]] explicit Memory(const T l) noexcept : last{l} {}
-        void commit() noexcept {
-            if (current) {
-                last = *current;
-                current.reset();
-            }
-        }
-        void clearLog() { last.reset(); }
-
-        std::optional<T> last;
-        std::optional<T> current{std::nullopt};
-    };
-
   public:
     [[nodiscard]] explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.rand(10, 20)}},
           applicants_{HeadCount{masterRng.rand(10, 20)}} {}
-
-    void listenEmployPlan(const HeadCount employPlan) noexcept { employPlan_.current = employPlan; }
-
+    void listenEmployPlan(const HeadCount employPlan) noexcept { employPlan_.next = employPlan; }
     void listenRecruitResult(const RecruitResult& result) noexcept {
-        applicants_.current = result.applicants;
+        applicants_.next = result.applicants;
     }
-
     [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
-        return applicants_.last;
+        return applicants_.log;
     }
     [[nodiscard]] auto rememberLastEmployPlan() const noexcept -> std::optional<HeadCount> {
-        return employPlan_.last;
+        return employPlan_.log;
     }
-
     void clearLog() noexcept { employPlan_.clearLog(), applicants_.clearLog(); }
-
     void commit() noexcept {
         employPlan_.commit();
         applicants_.commit();
@@ -58,7 +37,7 @@ class WagePlannerMemory final {
 class WagePlanner final {
   public:
     [[nodiscard]] explicit WagePlanner(RandomGenerator& rng) noexcept
-        : lastWage_{rng.rand(10.0, 20.0)},
+        : cache_{Wage{rng.rand(10.0, 20.0)}},
           memory_{rng},
           rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
           adjustVol_{rng.rand(0.1, 0.2)} {}
@@ -66,17 +45,14 @@ class WagePlanner final {
     [[nodiscard]] auto plan() noexcept -> Wage {
         const auto next = calcWage();
         memory_.clearLog();
-        if (not next) return lastWage_;
-        wagePlan_ = *next;
+        if (not next) return cache_.cache();
+        cache_.next(*next);
         return *next;
     }
 
     void commit() noexcept {
         memory_.commit();
-        if (wagePlan_) {
-            lastWage_ = *wagePlan_;
-            wagePlan_.reset();
-        }
+        cache_.commit();
     }
 
   private:
@@ -86,7 +62,7 @@ class WagePlanner final {
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
-        const auto plan        = Wage{lastWage_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        const auto plan        = Wage{cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(plan);
     }
 
@@ -94,8 +70,7 @@ class WagePlanner final {
         return Wage{std::max(wage.value(), std::numeric_limits<double>::epsilon())};
     }
 
-    Wage                    lastWage_;
-    std::optional<Wage>     wagePlan_;
+    Cache<Wage>             cache_;
     WagePlannerMemory       memory_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;

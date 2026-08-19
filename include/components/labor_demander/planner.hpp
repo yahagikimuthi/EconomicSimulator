@@ -9,10 +9,10 @@
 namespace abm::labor::demander::planner {
 class RecruitPlanner final {
   public:
-    [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng)
+    [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng) noexcept
         : wagePlanner_{masterRng}, employPlanSystem_{masterRng} {}
 
-    [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator)
+    [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> RecruitPlan {
         const auto plan = RecruitPlan{
             .wage = wagePlanner_.plan(), .offer = employPlanSystem_.plan(desiredEmploy, mediator)
@@ -20,7 +20,7 @@ class RecruitPlanner final {
         return plan;
     }
 
-    void commit() {
+    void commit() noexcept {
         wagePlanner_.commit();
         employPlanSystem_.commit();
     }

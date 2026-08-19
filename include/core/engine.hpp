@@ -66,7 +66,7 @@ class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int totalStep) noexcept;
 
-    void run() noexcept;
+    void run();
 
   private:
     void runLabor() noexcept;

@@ -14,8 +14,8 @@ using RecruitResultListener = std::variant<planner::WagePlannerMemory, planner::
 
 class Mediator final {
   public:
-    Mediator() = default;
-    void publishEmployPlan(const HeadCount employPlan) {
+    Mediator() noexcept = default;
+    void publishEmployPlan(const HeadCount employPlan) noexcept {
         for (std::optional<EmployPlanListener&> listenerOpt : employPlanListeners_) {
             if (not listenerOpt) continue;
             std::visit(
@@ -24,10 +24,9 @@ class Mediator final {
             );
         }
     }
-    void publishRecruitResult(const RecruitResult& result) {
+    void publishRecruitResult(const RecruitResult& result) noexcept {
         for (std::optional<RecruitResultListener&> listenerOpt : recruitResultListeners_) {
             if (not listenerOpt) continue;
-
             std::visit(
                 [&](auto&& listener) -> void { listener.listenRecruitResult(result); }, *listenerOpt
             );

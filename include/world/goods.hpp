@@ -15,10 +15,10 @@
 namespace abm {
 class [[nodiscard]] Workspace final {
   public:
-    explicit Workspace(const double power) : firmProductPower_{power} {}
-    ~Workspace() = default;
-    Workspace(const Workspace& other);
-    auto operator=(const Workspace& other) -> Workspace&;
+    explicit Workspace(const double power) noexcept : firmProductPower_{power} {}
+    ~Workspace() noexcept = default;
+    Workspace(const Workspace& other) noexcept;
+    auto operator=(const Workspace& other) noexcept -> Workspace&;
     Workspace(Workspace&& other) noexcept;
     auto operator=(Workspace&& other) noexcept -> Workspace&;
 
@@ -36,9 +36,9 @@ class [[nodiscard]] Workspace final {
     std::atomic<double> totalInput_;
 };
 
-inline Workspace::Workspace(const Workspace& other)
+inline Workspace::Workspace(const Workspace& other) noexcept
     : firmProductPower_{other.firmProductPower_}, totalInput_{other.totalInput_.load()} {}
-inline auto Workspace::operator=(const Workspace& other) -> Workspace& {
+inline auto Workspace::operator=(const Workspace& other) noexcept -> Workspace& {
     if (this == &other) return *this;
     firmProductPower_ = other.firmProductPower_;
     const double input{other.totalInput_.load()};
@@ -66,7 +66,7 @@ struct ConsumerGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ConsumerGoodsEntry& entry;
-    ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e)
+    ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
         : amount{a}, entry{e} {}
 };
 
@@ -141,7 +141,9 @@ struct ProductionGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ProductionGoodsEntry& entry;
-    [[nodiscard]] ProductionGoodsRequest(const GoodsQuantity a, const ProductionGoodsEntry& e)
+    [[nodiscard]] ProductionGoodsRequest(
+        const GoodsQuantity a, const ProductionGoodsEntry& e
+    ) noexcept
         : amount{a}, entry{e} {}
 };
 
@@ -149,7 +151,9 @@ class ProductionGoodsEntry final {
     using Request = ProductionGoodsRequest;
 
   public:
-    [[nodiscard]] ProductionGoodsEntry(const AgentID i, const Price p, const GoodsQuantity s)
+    [[nodiscard]] ProductionGoodsEntry(
+        const AgentID i, const Price p, const GoodsQuantity s
+    ) noexcept
         : id{i}, price{p}, supply{s} {}
     [[nodiscard]] auto request(const GoodsQuantity amount) -> Request& {
         return *requestBox_.emplace_back(amount, *this);
@@ -174,7 +178,7 @@ class ProductionGoodsEntry final {
         }
     }
 
-    void performFullTrade() {
+    void performFullTrade() noexcept {
         for (Request& req : requestBox_) req.tradeAmount = req.amount;
     }
 
@@ -214,7 +218,7 @@ class ProductionGoodsMarket final {
         return betterEntry;
     }
 
-    void clear() { entryBox_.clear(), totalSupply_.store(0.0); }
+    void clear() noexcept { entryBox_.clear(), totalSupply_.store(0.0); }
 
   private:
     tbb::concurrent_vector<Entry> entryBox_;

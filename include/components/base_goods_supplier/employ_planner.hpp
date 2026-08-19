@@ -13,7 +13,7 @@ namespace abm::base_goods::supplier {
 // 前回の取引結果中、需要量が必要
 class DemandForecastManagerMemory final {
   public:
-    [[nodiscard]] DemandForecastManagerMemory();
+    [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept;
 
     [[nodiscard]] auto rememberLastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
         return totalDemand_.log;
@@ -21,7 +21,7 @@ class DemandForecastManagerMemory final {
     void clearLog() noexcept { totalDemand_.clearLog(); }
     void commit() noexcept { totalDemand_.commit(); }
     void listenTradeResult(const TradeResult& result) noexcept {
-        totalDemand_.current = result.totalDemand;
+        totalDemand_.next = result.totalDemand;
     }
 
   private:
@@ -66,8 +66,8 @@ class EmployPlannerMemory final {
         return supply_.log;
     }
     void clearLog() noexcept { supply_.clearLog(); }
-    void commit() { supply_.commit(); }
-    void listenTradePlan(const TradePlan& plan) noexcept { supply_.current = plan.supply; }
+    void commit() noexcept { supply_.commit(); }
+    void listenTradePlan(const TradePlan& plan) noexcept { supply_.next = plan.supply; }
 
   private:
     Memory<GoodsQuantity> supply_;

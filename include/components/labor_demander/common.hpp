@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <optional>
 
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
@@ -23,6 +24,38 @@ struct RecruitPlan final {
 struct RecruitResult final {
     const HeadCount applicants;
     const HeadCount employ;
+};
+
+template <typename T>
+class Memory final {
+  public:
+    [[nodiscard]] explicit Memory(const T l) noexcept : log{l} {}
+
+    void commit() noexcept {
+        if (not next) return;
+        log = next, next.reset();
+    }
+    void clearLog() noexcept { log.reset(); }
+
+    std::optional<T> log;
+    std::optional<T> next{std::nullopt};
+};
+
+template <typename T>
+class Cache final {
+  public:
+    [[nodiscard]] explicit Cache(const T t) noexcept;
+    [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
+
+    void next(const T next) noexcept { next_ = next; }
+    void commit() noexcept {
+        if (not next_) return;
+        cache_ = *next_, next_.reset();
+    }
+
+  private:
+    T                cache_;
+    std::optional<T> next_;
 };
 
 template <typename T>

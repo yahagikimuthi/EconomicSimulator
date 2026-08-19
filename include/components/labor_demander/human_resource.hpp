@@ -18,17 +18,17 @@
 namespace abm::labor::demander::human_resource {
 class EmptyRosterPool final {
   public:
-    [[nodiscard]] EmptyRosterPool() = default;
-    [[nodiscard]] auto size() const -> std::size_t { return pool_.size(); }
-    [[nodiscard]] auto empty() const -> bool { return size() == 0UZ; }
+    [[nodiscard]] EmptyRosterPool() noexcept = default;
+    [[nodiscard]] auto size() const noexcept -> std::size_t { return pool_.size(); }
+    [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0UZ; }
 
-    auto popBackEntry() -> RosterEntry& {
+    auto popBackEntry() noexcept -> RosterEntry& {
         ASSERT(not empty());
         auto& back = pool_.back().get();
         pool_.pop_back();
         return back;
     }
-    void add(RosterEntry& entry) { pool_.emplace_back(std::ref(entry)); }
+    void add(RosterEntry& entry) noexcept { pool_.emplace_back(std::ref(entry)); }
 
   private:
     std::vector<RefWrap<RosterEntry>> pool_;
@@ -36,7 +36,7 @@ class EmptyRosterPool final {
 
 class HumanResource final {
   public:
-    [[nodiscard]] explicit HumanResource(CompanyBoard&& companyBoard)
+    [[nodiscard]] explicit HumanResource(CompanyBoard&& companyBoard) noexcept
         : companyBoard_{std::move(companyBoard)}, sumWage_{[&]() -> Wage {
               const auto& roster = companyBoard_.roster;
 
@@ -46,7 +46,7 @@ class HumanResource final {
               return Wage{std::ranges::fold_left(wages, 0.0, std::plus{})};
           }()} {}
 
-    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace)
+    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
         sumWage_ += wage;
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
@@ -57,7 +57,7 @@ class HumanResource final {
         return *newRoster;
     }
 
-    void acceptResignation() {
+    void acceptResignation() noexcept {
         auto& resignationBox = companyBoard_.resignationBox;
         for (RosterEntry& resignEntry : resignationBox) {
             ASSERT(resignEntry.isOccupied);
@@ -68,7 +68,7 @@ class HumanResource final {
         resignationBox.clear();
     }
 
-    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt >= HeadCount{0.0}) {
+    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt >= HeadCount{0.0}) noexcept {
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : companyBoard_.roster) {
             if (currentLayOffs >= layOffsCnt) break;
@@ -80,13 +80,15 @@ class HumanResource final {
         }
     }
 
-    [[nodiscard]] auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const auto rosterSize = std::size_t{companyBoard_.roster.size() - emptyRosterPool_.size()};
         return HeadCount{static_cast<double>(rosterSize)};
     }
 
-    [[nodiscard]] auto sumWage() const -> Wage POST(wage : wage >= Wage{0.0}) { return sumWage_; }
+    [[nodiscard]] auto sumWage() const noexcept -> Wage POST(wage : wage >= Wage{0.0}) {
+        return sumWage_;
+    }
 
   private:
     CompanyBoard    companyBoard_;

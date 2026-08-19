@@ -67,7 +67,7 @@ class Producer final {
     GoodsQuantity inventory_;
 };
 
-class ProducingSystem {
+class ProducingSystem final {
   public:
     [[nodiscard]] explicit ProducingSystem(
         RandomGenerator& masterRng, const Workspace& workspace

@@ -12,25 +12,16 @@
 #include <utility>
 
 #include "core/base.hpp"
-#include "core/values/common.hpp"
 
 namespace abm {
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
-template <typename F>
-concept AssetPlusFn = requires(F f, const Money money) {
-    { f(money) } -> std::same_as<void>;
-};
-
-template <typename F>
-concept AssetMinusFn = AssetPlusFn<F>;
-
 class RandomGenerator final {
   public:
-    [[nodiscard]] explicit RandomGenerator(const pcg32 rng) : rng_{rng} {}
+    [[nodiscard]] explicit RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
 
-    [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) -> double {
+    [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) noexcept -> double {
         auto dist = std::uniform_real_distribution<double>{min, limit};
         return dist(rng_);
     }
@@ -40,13 +31,13 @@ class RandomGenerator final {
         const double div  = 1.0,
         const double min  = -std::numeric_limits<double>::infinity(),
         const double max  = std::numeric_limits<double>::infinity()
-    ) -> double {
+    ) noexcept -> double {
         auto       dist = std::normal_distribution<double>{mean, div};
         const auto out  = double{dist(rng_)};
         return std::clamp(out, min, max);
     }
 
-    [[nodiscard]] auto rand(const int min, const int limit) -> int {
+    [[nodiscard]] auto rand(const int min, const int limit) noexcept -> int {
         auto dist = std::uniform_int_distribution<int>{min, limit};
         return dist(rng_);
     }
@@ -57,7 +48,7 @@ class RandomGenerator final {
         }
     [[nodiscard]] auto discreteDistribution(
         Container&& container, const double total, Proj&& proj = {}
-    ) -> decltype(auto) {
+    ) noexcept -> decltype(auto) {
         ASSERT(total >= 0.0);
         const auto target     = rand(0.0, total);
         auto       currentCnt = 0.0;
@@ -73,7 +64,7 @@ class RandomGenerator final {
         requires requires(Container container, Proj proj) {
             { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
         }
-    [[nodiscard]] auto discreteDistribution(Container&& container, Proj&& proj = {})
+    [[nodiscard]] auto discreteDistribution(Container&& container, Proj&& proj = {}) noexcept
         -> decltype(auto) {
         auto total = 0.0;
         for (const auto& elem : std::forward<Container>(container)) {
@@ -87,7 +78,7 @@ class RandomGenerator final {
 
     template <std::ranges::random_access_range Container>
         requires requires(Container& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
-    void shuffle(Container&& c) {
+    void shuffle(Container&& c) noexcept {
         std::ranges::shuffle(std::forward<Container>(c), rng_);
     }
 
@@ -95,11 +86,11 @@ class RandomGenerator final {
         requires requires(Range& range, Out outIt, int n, pcg32 rng) {
             std::ranges::sample(range, outIt, n, rng);
         }
-    void sample(Range&& r, Out out, const int n) {
+    void sample(Range&& r, Out out, const int n) noexcept {
         std::ranges::sample(std::forward<Range>(r), out, n, rng_);
     }
 
-    [[nodiscard]] auto makeUint64() -> std::uint64_t {
+    [[nodiscard]] auto makeUint64() noexcept -> std::uint64_t {
         return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
     }
 

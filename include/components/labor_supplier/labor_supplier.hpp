@@ -14,7 +14,7 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
-class LikelihoodChangingJob {
+class LikelihoodChangingJob final {
   public:
     [[nodiscard]] explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},

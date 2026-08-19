@@ -15,43 +15,44 @@
 namespace abm::labor::demander {
 class RecruitSystem final {
   public:
-    [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) : planner_{masterRng} {}
+    [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) noexcept
+        : planner_{masterRng} {}
 
     void post(
         const AgentID   id,
         const HeadCount desiredEmploy,
         LaborMarket&    laborMarket,
         IMediator auto& mediator
-    ) {
+    ) noexcept {
         ASSERT(desiredEmploy > HeadCount{0.0});
         isRecruiting_   = true;
         const auto plan = planner_.plan(desiredEmploy, mediator);
         recruiter_.post(id, plan, laborMarket);
     }
 
-    void offer() {
+    void offer() noexcept {
         if (not isRecruiting_) return;
         recruiter_.offer();
     }
 
     template <AddRosterFn F>
-    void registerMember(F&& addRoster) {
+    void registerMember(F&& addRoster) noexcept {
         if (not isRecruiting_) return;
         recruiter_.registerMember(std::forward<F>(addRoster));
     }
 
-    void endStep(IMediator auto& mediator) {
+    void endStep(IMediator auto& mediator) noexcept {
         if (not isRecruiting_) return;
         const auto result = recruiter_.publishResult();
         mediator.publishRecruitResult(result);
     }
 
-    void commit() {
+    void commit() noexcept {
         if (not isRecruiting_) return;
         planner_.commit();
     }
 
-    void reset() {
+    void reset() noexcept {
         if (not isRecruiting_) return;
         recruiter_.reset();
         isRecruiting_ = false;
@@ -65,37 +66,37 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board)
+    [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
         : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
 
-    void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket)
+    void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket) noexcept
         PRE(desiredEmploy > HeadCount{0.0}) {
         recruitSystem_.post(id, desiredEmploy, laborMarket, mediator_);
     }
 
-    void offer() { recruitSystem_.offer(); }
+    void offer() noexcept { recruitSystem_.offer(); }
 
-    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt > HeadCount{0.0}) {
+    void layOffs(const HeadCount layOffsCnt) noexcept PRE(layOffsCnt > HeadCount{0.0}) {
         humanResource_.layOffs(layOffsCnt);
     }
 
-    void registerMember(Workspace& workspace) {
+    void registerMember(Workspace& workspace) noexcept {
         recruitSystem_.registerMember([&](const AgentID id, const Wage wage) -> RosterEntry& {
             return humanResource_.addRoster(id, wage, workspace);
         });
     };
 
-    void acceptResignation() { humanResource_.acceptResignation(); }
+    void acceptResignation() noexcept { humanResource_.acceptResignation(); }
 
-    [[nodiscard]] auto employeeCnt() const -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
         return humanResource_.employeeCnt();
     }
 
-    [[nodiscard]] auto sumWage() const -> Money POST(wage : wage >= Money{0.0}) {
+    [[nodiscard]] auto sumWage() const noexcept -> Money POST(wage : wage >= Money{0.0}) {
         return static_cast<Money>(humanResource_.sumWage());
     }
 
-    void endStep() {
+    void endStep() noexcept {
         recruitSystem_.endStep(mediator_);
         recruitSystem_.commit();
         recruitSystem_.reset();
