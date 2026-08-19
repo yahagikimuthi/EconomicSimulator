@@ -20,9 +20,9 @@ class RecruitPlanner final {
         return plan;
     }
 
-    void commit() noexcept {
-        wagePlanner_.commit();
-        employPlanSystem_.commit();
+    void reset() noexcept {
+        wagePlanner_.reset();
+        employPlanSystem_.reset();
     }
 
   private:

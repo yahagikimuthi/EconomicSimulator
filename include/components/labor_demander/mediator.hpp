@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <optional>
 #include <variant>
 
 #include "components/labor_demander/common.hpp"
@@ -13,6 +14,9 @@ using EmployPlanListener    = std::variant<planner::WagePlannerMemory>;
 using RecruitResultListener = std::variant<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
 class Mediator final {
+    template <typename T, int N>
+    using OptArr = std::array<std::optional<T>, N>;
+
   public:
     Mediator() noexcept = default;
     void publishEmployPlan(const HeadCount employPlan) noexcept {
@@ -34,8 +38,8 @@ class Mediator final {
     }
 
   private:
-    std::array<std::optional<EmployPlanListener&>, 1>    employPlanListeners_;
-    std::array<std::optional<RecruitResultListener&>, 2> recruitResultListeners_;
+    OptArr<EmployPlanListener&, 1>    employPlanListeners_;
+    OptArr<RecruitResultListener&, 2> recruitResultListeners_;
 };
 }  // namespace abm::labor::demander::mediator
 

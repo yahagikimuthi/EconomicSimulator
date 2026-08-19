@@ -31,7 +31,7 @@ class Memory final {
   public:
     [[nodiscard]] explicit Memory(const T l) noexcept : log{l} {}
 
-    void commit() noexcept {
+    void reset() noexcept {
         if (not next) return;
         log = next, next.reset();
     }
@@ -48,7 +48,7 @@ class Cache final {
     [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
 
     void next(const T next) noexcept { next_ = next; }
-    void commit() noexcept {
+    void reset() noexcept {
         if (not next_) return;
         cache_ = *next_, next_.reset();
     }

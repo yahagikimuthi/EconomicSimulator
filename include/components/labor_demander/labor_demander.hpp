@@ -47,13 +47,9 @@ class RecruitSystem final {
         mediator.publishRecruitResult(result);
     }
 
-    void commit() noexcept {
-        if (not isRecruiting_) return;
-        planner_.commit();
-    }
-
     void reset() noexcept {
         if (not isRecruiting_) return;
+        planner_.reset();
         recruiter_.reset();
         isRecruiting_ = false;
     }
@@ -66,8 +62,10 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
-        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
+    [[nodiscard]] LaborDemander(
+        RandomGenerator& masterRng, CompanyBoard&& board, const Mediator& mediator
+    ) noexcept
+        : recruitSystem_{masterRng}, humanResource_{std::move(board)}, mediator_{mediator} {}
 
     void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket) noexcept
         PRE(desiredEmploy > HeadCount{0.0}) {
@@ -98,7 +96,7 @@ class LaborDemander final {
 
     void endStep() noexcept {
         recruitSystem_.endStep(mediator_);
-        recruitSystem_.commit();
+        recruitSystem_.reset();
         recruitSystem_.reset();
     }
 

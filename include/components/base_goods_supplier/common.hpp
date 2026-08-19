@@ -21,9 +21,9 @@ struct TradeResult final {
 template <typename T>
 class Memory final {
   public:
-    [[nodiscard]] explicit Memory(T l) noexcept : log{l} {}
+    [[nodiscard]] explicit Memory(const T l) noexcept : log{l} {}
 
-    void commit() noexcept {
+    void reset() noexcept {
         if (not next) return;
         log = next, next.reset();
     }
@@ -39,7 +39,7 @@ class Cache final {
     [[nodiscard]] explicit Cache(const T cache) noexcept : cache_{cache} {}
     [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
 
-    void commit() noexcept {
+    void reset() noexcept {
         if (not next_) return;
         cache_ = *next_;
         next_.reset();

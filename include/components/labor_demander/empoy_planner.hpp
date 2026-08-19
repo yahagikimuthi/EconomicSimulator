@@ -26,7 +26,7 @@ class OfferPlannerMemory final {
         return employPlan_.log;
     }
     void clearLog() noexcept { applicants_.clearLog(), employPlan_.clearLog(); }
-    void commit() noexcept { applicants_.commit(), employPlan_.commit(); }
+    void reset() noexcept { applicants_.reset(), employPlan_.reset(); }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         applicants_.next = result.applicants;
     }
@@ -48,9 +48,9 @@ class OfferPlanner final {
         return HeadCount{employPlan * (1.0 + planOfferRate())};
     }
 
-    void commit() noexcept {
-        memory_.commit();
-        cache_.commit();
+    void reset() noexcept {
+        memory_.reset();
+        cache_.reset();
     }
 
   private:
@@ -94,7 +94,7 @@ class EmployPlanningSystem final {
         return offerPlan;
     }
 
-    void commit() noexcept { offerPlanner_.commit(); }
+    void reset() noexcept { offerPlanner_.reset(); }
 
   private:
     OfferPlanner offerPlanner_;

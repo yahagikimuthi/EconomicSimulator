@@ -24,9 +24,9 @@ class WagePlannerMemory final {
         return employPlan_.log;
     }
     void clearLog() noexcept { employPlan_.clearLog(), applicants_.clearLog(); }
-    void commit() noexcept {
-        employPlan_.commit();
-        applicants_.commit();
+    void reset() noexcept {
+        employPlan_.reset();
+        applicants_.reset();
     }
 
   private:
@@ -50,9 +50,9 @@ class WagePlanner final {
         return *next;
     }
 
-    void commit() noexcept {
-        memory_.commit();
-        cache_.commit();
+    void reset() noexcept {
+        memory_.reset();
+        cache_.reset();
     }
 
   private:

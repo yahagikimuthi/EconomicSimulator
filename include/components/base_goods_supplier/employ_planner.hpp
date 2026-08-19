@@ -19,7 +19,7 @@ class DemandForecastManagerMemory final {
         return totalDemand_.log;
     }
     void clearLog() noexcept { totalDemand_.clearLog(); }
-    void commit() noexcept { totalDemand_.commit(); }
+    void reset() noexcept { totalDemand_.reset(); }
     void listenTradeResult(const TradeResult& result) noexcept {
         totalDemand_.next = result.totalDemand;
     }
@@ -66,7 +66,7 @@ class EmployPlannerMemory final {
         return supply_.log;
     }
     void clearLog() noexcept { supply_.clearLog(); }
-    void commit() noexcept { supply_.commit(); }
+    void reset() noexcept { supply_.reset(); }
     void listenTradePlan(const TradePlan& plan) noexcept { supply_.next = plan.supply; }
 
   private:
@@ -88,9 +88,9 @@ class EmployPlanner final {
         return *out;
     }
 
-    void commit() noexcept {
-        cache_.commit();
-        memory_.commit();
+    void reset() noexcept {
+        cache_.reset();
+        memory_.reset();
     }
 
   private:

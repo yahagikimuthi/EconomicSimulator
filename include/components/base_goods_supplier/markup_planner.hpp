@@ -27,7 +27,7 @@ class MarkupPlannerMemory final {
     }
     void listenTradePlan(const TradePlan& plan) noexcept { supply_.next = plan.supply; }
     void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }
-    void commit() noexcept { supply_.commit(), salesAmount_.commit(); }
+    void reset() noexcept { supply_.reset(), salesAmount_.reset(); }
 
   private:
     Memory<GoodsQuantity> supply_;
@@ -46,9 +46,9 @@ class MarkupPlanner final {
         return *next;
     }
 
-    void commit() noexcept {
-        memory_.commit();
-        cache_.commit();
+    void reset() noexcept {
+        memory_.reset();
+        cache_.reset();
     }
 
   private:

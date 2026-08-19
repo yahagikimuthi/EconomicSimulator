@@ -1,8 +1,8 @@
 #pragma once
 
+#include <array>
 #include <optional>
 #include <variant>
-#include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
@@ -10,14 +10,13 @@
 #include "components/base_goods_supplier/produsing.hpp"
 
 namespace abm::base_goods::supplier::mediator {
-
 using TradePlanListener = std::variant<EmployPlannerMemory, MarkupPlannerMemory>;
 using TradeResultListener =
     std::variant<DemandForecastManagerMemory, MarkupPlannerMemory, Producer>;
 
 class Mediator final {
-    template <typename T>
-    using OptVec = std::vector<std::optional<T>>;
+    template <typename T, int N>
+    using OptArr = std::array<std::optional<T>, N>;
 
   public:
     [[nodiscard]] Mediator() noexcept = default;
@@ -43,8 +42,8 @@ class Mediator final {
     }
 
   private:
-    OptVec<TradePlanListener&>   tradePlanListeners_;
-    OptVec<TradeResultListener&> tradeResultListeners_;
+    OptArr<TradePlanListener&, 2>   tradePlanListeners_;
+    OptArr<TradeResultListener&, 3> tradeResultListeners_;
 };
 }  // namespace abm::base_goods::supplier::mediator
 

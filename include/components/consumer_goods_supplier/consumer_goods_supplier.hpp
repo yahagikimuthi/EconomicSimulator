@@ -16,9 +16,9 @@ class ConsumerGoodsSupplier final {
 
   public:
     [[nodiscard]] explicit ConsumerGoodsSupplier(
-        RandomGenerator& masterRng, const Workspace& workspace
+        RandomGenerator& masterRng, const Workspace& workspace, const Mediator& mediator
     ) noexcept
-        : producingSystem_{masterRng, workspace}, tradingSystem_{masterRng} {}
+        : producingSystem_{masterRng, workspace}, tradingSystem_{masterRng}, mediator_{mediator} {}
 
     void post(const Money totalCost, Market& market) noexcept {
         const auto supply = producingSystem_.produce();
