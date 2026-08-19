@@ -35,7 +35,7 @@ class WagePlannerMemory final {
 };
 
 class WagePlanner final {
-    friend class ::abm::labor::demander::Factory;
+    friend class ::abm::labor::demander::LaborDemanderFactory;
 
   public:
     [[nodiscard]] explicit WagePlanner(RandomGenerator& rng) noexcept

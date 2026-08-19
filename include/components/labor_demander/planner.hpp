@@ -8,7 +8,7 @@
 
 namespace abm::labor::demander::planner {
 class RecruitPlanner final {
-    friend class ::abm::labor::demander::Factory;
+    friend class ::abm::labor::demander::LaborDemanderFactory;
 
   public:
     [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng) noexcept

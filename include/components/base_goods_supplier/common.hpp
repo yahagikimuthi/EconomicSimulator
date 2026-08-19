@@ -5,6 +5,14 @@
 
 #include "core/values/goods.hpp"
 
+namespace abm::consumer_goods::supplier {
+class ConsumerGoodsSupplierFactory;
+}
+
+namespace abm::production_goods::supplier {
+class ProductionGoodsSupplierFactory;
+}
+
 namespace abm::base_goods::supplier {
 struct TradePlan final {
     const Price         price;

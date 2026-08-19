@@ -8,7 +8,7 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::demander {
-class Factory {
+class LaborDemanderFactory {
     static auto create(RandomGenerator& masterRng, const AgentID id, const Market firmType)
         -> LaborDemander {
         auto board    = CompanyBoard{id, firmType};
@@ -25,5 +25,5 @@ class Factory {
 }  // namespace abm::labor::demander
 
 namespace abm {
-using LaborDemanderFactory = labor::demander::Factory;
+using LaborDemanderFactory = labor::demander::LaborDemanderFactory;
 }

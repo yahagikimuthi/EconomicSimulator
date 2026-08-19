@@ -14,7 +14,7 @@
 
 namespace abm::labor::demander {
 class RecruitSystem final {
-    friend class Factory;
+    friend class LaborDemanderFactory;
 
   public:
     [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) noexcept
@@ -63,7 +63,7 @@ class RecruitSystem final {
 };
 
 class LaborDemander final {
-    friend class Factory;
+    friend class LaborDemanderFactory;
 
   public:
     [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept

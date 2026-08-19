@@ -14,7 +14,7 @@ using RecruitResultListener =
     std::variant<planner::WagePlannerMemory*, planner::OfferPlannerMemory*>;
 
 class Mediator final {
-    friend class ::abm::labor::demander::Factory;
+    friend class ::abm::labor::demander::LaborDemanderFactory;
 
   public:
     Mediator() noexcept = default;
