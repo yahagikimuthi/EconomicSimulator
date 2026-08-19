@@ -15,7 +15,9 @@
 namespace abm::base_goods::supplier {
 class Producer final {
   public:
-    [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit Producer(
+        RandomGenerator& masterRng, const Workspace& workspace
+    ) noexcept;
 
     [[nodiscard]] auto product() const noexcept -> GoodsQuantity {
         return workspace_.totalInput() + inventory_;
@@ -67,7 +69,10 @@ class Producer final {
 
 class ProducingSystem {
   public:
-    [[nodiscard]] explicit ProducingSystem(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit ProducingSystem(
+        RandomGenerator& masterRng, const Workspace& workspace
+    ) noexcept
+        : employPlanner_{masterRng}, producer_{masterRng, workspace} {}
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
         const auto inventory    = producer_.inventory();

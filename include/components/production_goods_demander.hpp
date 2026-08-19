@@ -1,97 +1,40 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <functional>
 #include <optional>
 #include <pcg_random.hpp>
-#include <ranges>
 
-#include "components/base_goods_demander.hpp"
 #include "config.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
-#include "world/common.hpp"
 #include "world/goods.hpp"
 
 namespace abm {
-class [[nodiscard]] ProductionGoodsDemander final
-    : public BaseGoodsDemander<Market::productionGoods> {
+class ProductionGoodsDemander final {
+    using Request = ProductionGoodsRequest;
+    using Market  = ProductionGoodsMarket;
+
   public:
-    ProductionGoodsDemander(
-        const RandomGenerator rng, const base_goods::demander::BudgetCalculator budgetCalculator
-    )
-        : BaseGoodsDemander<Market::productionGoods>::BaseGoodsDemander(rng, budgetCalculator) {}
+    [[nodiscard]] explicit ProductionGoodsDemander(RandomGenerator& masterRng) noexcept;
 
     void request(
-        const AgentID id, const Money asset, tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
-    ) {
-        if (isPass(asset, entryBox)) return;
-        const auto budget = budgetCalculator_.calcBudget(asset);
+        const AgentID id,
+        const Money   asset,
+        Market&       market,
+        const int     sampleCnt = config::goods_demander::goodsSampleCnt
+    ) noexcept {
+        const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
-        isPosting_             = true;
-        const auto pickedEntry = pickEntry(id, entryBox);
+        const auto pickedEntry = market.pickEntry(id, sampleCnt);
         if (not pickedEntry) return;
-        myRequest_ = pickedEntry->request(GoodsQuantity{budget / pickedEntry->price});
+        myRequest_ = pickedEntry->request(budget / pickedEntry->price);
     }
 
-    void afterTrade() {
-        if (not isPosting_) return;
-        if (not myRequest_) return;
-        ledger_.purchasing += myRequest_->entry.price * myRequest_->tradeAmount;
-        ledger_.amount += myRequest_->tradeAmount;
-    }
-
-    void endStep() {
-        myRequest_.reset();
-        isPosting_ = false;
-        ledger_.reset();
-    }
-
-    auto purchase() const -> Money POST(money : money >= Money{0.0}) { return ledger_.purchasing; }
-    auto purchaseAmount() const -> GoodsQuantity { return ledger_.amount; }
+    void afterTrade();
 
   private:
-    static auto isPass(
-        const Money asset, const tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
-    ) -> bool {
-        if (asset <= Money{0.0}) return true;
-        if (entryBox.empty()) return true;
-        return false;
-    }
-
-    auto pickEntry(
-        const AgentID                                id,
-        tbb::concurrent_vector<ProductionGoodsEntry> entryBox,
-        const int sampleCnt = config::goods_demander::goodsSampleCnt
-    ) const -> std::optional<ProductionGoodsEntry&> {
-        using Entry      = ProductionGoodsEntry;
-        auto toDouble    = [](const Entry& entry) -> double { return entry.supply.value(); };
-        auto betterEntry = std::optional<Entry&>{std::nullopt};
-
-        for (const auto _ : std::views::iota(0, sampleCnt)) {
-            auto&      sampleEntry = rng_.discreteDistribution(entryBox, toDouble);
-            const auto isAdopt     = shouldAdopt(id, betterEntry, sampleEntry);
-            if (not isAdopt) continue;
-            betterEntry = std::ref(sampleEntry);
-        }
-        return betterEntry;
-    }
-
-    static auto shouldAdopt(
-        const AgentID                                    id,
-        const std::optional<const ProductionGoodsEntry&> existingEntry,
-        const ProductionGoodsEntry&                      sampleEntry
-    ) -> bool {
-        if (sampleEntry.id == id) return false;
-        if (not existingEntry) return true;
-        return sampleEntry.price <= existingEntry->price;
-    }
-
-    struct {
-        Money         purchasing{0.0};
-        GoodsQuantity amount{0.0};
-        void          reset() { purchasing = Money{0.0}, amount = GoodsQuantity{0.0}; }
-    } ledger_;
+    std::optional<const Request&> myRequest_{std::nullopt};
+    const double                  mpc_;
 };
 }  // namespace abm

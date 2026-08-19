@@ -6,7 +6,7 @@ struct LaborRequest;
 struct ConsumerGoodsRequest;
 class ConsumerGoodsEntry;
 struct ProductionGoodsRequest;
-struct ProductionGoodsEntry;
+class ProductionGoodsEntry;
 class Workspace;
 class RosterEntry;
 struct CompanyBoard;

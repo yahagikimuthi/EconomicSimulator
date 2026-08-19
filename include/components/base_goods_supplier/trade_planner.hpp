@@ -42,7 +42,8 @@ class PricePlanner final {
 
 class TradePlanner final {
   public:
-    [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept
+        : markupPlanner_{masterRng}, pricePlanner_{masterRng} {}
 
     [[nodiscard]] auto plan(const GoodsQuantity supply, const Money totalCost) noexcept
         -> TradePlan {

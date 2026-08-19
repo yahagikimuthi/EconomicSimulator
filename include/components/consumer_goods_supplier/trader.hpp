@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
-#include "components/base_goods_supplier/trader.hpp"
+#include "components/base_goods_supplier/ledger.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
 #include "world/goods.hpp"
@@ -23,7 +23,8 @@ class Trader final {
     using TradeResult  = base_goods::supplier::TradeResult;
 
   public:
-    [[nodiscard]] explicit Trader(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit Trader(RandomGenerator& masterRng) noexcept
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void post(const TradePlan& plan, Market& market) {
         ASSERT(plan.supply >= GoodsQuantity{0.0});

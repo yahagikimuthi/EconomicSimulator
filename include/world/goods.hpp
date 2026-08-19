@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 #include <functional>
+#include <ranges>
 #include <vector>
 
 #include "core/base.hpp"
@@ -110,11 +111,29 @@ class ConsumerGoodsMarket final {
   public:
     [[nodiscard]] explicit ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept;
     [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
+        totalSupply_.fetch_add(supply.value());
         return *entryBox_.emplace_back(price, supply);
+    }
+    void clear() noexcept { entryBox_.clear(), totalSupply_.store(0.0); }
+
+    auto pickEntry(const int sampleCnt) noexcept -> std::optional<Entry&> {
+        if (entryBox_.empty()) return std::nullopt;
+        auto toDouble    = [](const Entry& entry) -> double { return entry.supply.value(); };
+        auto betterEntry = std::ref(rng_.discreteDistribution(entryBox_, totalSupply_, toDouble));
+        if (sampleCnt <= 1) return betterEntry.get();
+
+        for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
+            auto& sample = rng_.discreteDistribution(entryBox_, totalSupply_, toDouble);
+            if (sample.price >= betterEntry.get().price) continue;
+            betterEntry = std::ref(sample);
+        }
+        return betterEntry.get();
     }
 
   private:
     tbb::concurrent_vector<Entry> entryBox_;
+    RandomGenerator               rng_;
+    std::atomic<double>           totalSupply_;
 };
 
 struct ProductionGoodsRequest final {
@@ -122,20 +141,84 @@ struct ProductionGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ProductionGoodsEntry& entry;
-    ProductionGoodsRequest(const GoodsQuantity a, const ProductionGoodsEntry& e)
+    [[nodiscard]] ProductionGoodsRequest(const GoodsQuantity a, const ProductionGoodsEntry& e)
         : amount{a}, entry{e} {}
 };
 
-struct [[nodiscard]] ProductionGoodsEntry final {
-    ProductionGoodsEntry(const AgentID i, const Price p, const GoodsQuantity s)
+class ProductionGoodsEntry final {
+    using Request = ProductionGoodsRequest;
+
+  public:
+    [[nodiscard]] ProductionGoodsEntry(const AgentID i, const Price p, const GoodsQuantity s)
         : id{i}, price{p}, supply{s} {}
-    auto request(const GoodsQuantity amount) -> ProductionGoodsRequest& {
-        return *requestBox.emplace_back(amount, *this);
+    [[nodiscard]] auto request(const GoodsQuantity amount) -> Request& {
+        return *requestBox_.emplace_back(amount, *this);
     }
 
-    const AgentID                                  id;
-    const Price                                    price;
-    const GoodsQuantity                            supply;
-    tbb::concurrent_vector<ProductionGoodsRequest> requestBox;
+    [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
+        const auto demand = GoodsQuantity{std::ranges::fold_left(
+            requestBox_ | std::ranges::views::transform([](const Request& req) -> double {
+                return req.amount.value();
+            }),
+            0.0,
+            std::plus<>{}
+        )};
+        ASSERT(demand >= GoodsQuantity{0.0});
+        return demand;
+    }
+
+    void requestBox(std::vector<RefWrap<Request>>& out) noexcept {
+        ASSERT(out.empty());
+        for (Request& req : requestBox_) {
+            out.emplace_back(std::ref(req));
+        }
+    }
+
+    void performFullTrade() {
+        for (Request& req : requestBox_) req.tradeAmount = req.amount;
+    }
+
+    const AgentID       id;
+    const Price         price;
+    const GoodsQuantity supply;
+
+  private:
+    tbb::concurrent_vector<Request> requestBox_;
+};
+
+class ProductionGoodsMarket final {
+    using Entry = ProductionGoodsEntry;
+
+  public:
+    [[nodiscard]] explicit ProductionGoodsMarket(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] auto entry(
+        const AgentID id, const Price price, const GoodsQuantity supply
+    ) noexcept -> Entry& {
+        totalSupply_.fetch_add(supply.value());
+        return *entryBox_.emplace_back(id, price, supply);
+    }
+
+    auto pickEntry(const AgentID id, const int sampleCnt) noexcept -> std::optional<Entry&> {
+        if (entryBox_.empty()) return std::nullopt;
+        auto toDouble = [](const Entry& entry) -> double { return entry.supply.value(); };
+        std::optional<Entry&> betterEntry{std::nullopt};
+        for (const auto _ : std::views::iota(0, sampleCnt)) {
+            auto& sample = rng_.discreteDistribution(entryBox_, totalSupply_, toDouble);
+            if (sample.id == id) continue;
+            if (not betterEntry) {
+                betterEntry = sample;
+                continue;
+            }
+            if (sample.price < betterEntry->price) betterEntry = sample;
+        }
+        return betterEntry;
+    }
+
+    void clear() { entryBox_.clear(), totalSupply_.store(0.0); }
+
+  private:
+    tbb::concurrent_vector<Entry> entryBox_;
+    RandomGenerator               rng_;
+    std::atomic<double>           totalSupply_;
 };
 }  // namespace abm

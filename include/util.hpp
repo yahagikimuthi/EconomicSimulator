@@ -23,6 +23,9 @@ concept AssetPlusFn = requires(F f, const Money money) {
     { f(money) } -> std::same_as<void>;
 };
 
+template <typename F>
+concept AssetMinusFn = AssetPlusFn<F>;
+
 class RandomGenerator final {
   public:
     [[nodiscard]] explicit RandomGenerator(const pcg32 rng) : rng_{rng} {}
@@ -52,6 +55,24 @@ class RandomGenerator final {
         requires requires(Container container, Proj proj) {
             { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
         }
+    [[nodiscard]] auto discreteDistribution(
+        Container&& container, const double total, Proj&& proj = {}
+    ) -> decltype(auto) {
+        ASSERT(total >= 0.0);
+        const auto target     = rand(0.0, total);
+        auto       currentCnt = 0.0;
+        for (auto& elem : std::forward<Container>(container)) {
+            currentCnt += std::invoke(std::forward<Proj>(proj), elem);
+            if (currentCnt >= target) return elem;
+        }
+        ASSERT(false && "runtime error");
+        std::unreachable();
+    }
+
+    template <std::ranges::range Container, typename Proj = std::identity>
+        requires requires(Container container, Proj proj) {
+            { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
+        }
     [[nodiscard]] auto discreteDistribution(Container&& container, Proj&& proj = {})
         -> decltype(auto) {
         auto total = 0.0;
@@ -61,17 +82,7 @@ class RandomGenerator final {
             total += weight;
         }
         ASSERT(total >= 0.0 && "total is required >= 0");
-
-        const auto target     = rand(0.0, total);
-        auto       currentCnt = 0.0;
-        for (auto& elem : std::forward<Container>(container)) {
-            currentCnt += std::invoke(std::forward<Proj>(proj), elem);
-            if (currentCnt >= target) {
-                return elem;
-            }
-        }
-        ASSERT(false && "runtime error");
-        std::unreachable();
+        return discreteDistribution(std::forward<Container>(container), total, proj);
     }
 
     template <std::ranges::random_access_range Container>

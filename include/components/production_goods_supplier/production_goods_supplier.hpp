@@ -2,46 +2,40 @@
 
 #include <tbb/concurrent_vector.h>
 
-#include "components/base_goods_supplier/base_goods_supplier.hpp"
-#include "components/base_goods_supplier/common.hpp"
-#include "components/production_goods_supplier/trader.hpp"
-#include "core/values/common.hpp"
-#include "core/values/goods.hpp"
+#include "components/base_goods_supplier/mediator.hpp"
+#include "components/base_goods_supplier/produsing.hpp"
+#include "components/production_goods_supplier/trading_system.hpp"
 #include "util.hpp"
-#include "world/common.hpp"
 #include "world/goods.hpp"
 
-namespace abm {
-class ProductionGoodsSupplier final : public BaseGoodsSupplier {
+namespace abm::production_goods::supplier {
+class ProductionGoodsSupplier {
+    using ProducingSystem = base_goods::supplier::ProducingSystem;
+    using Market          = ProductionGoodsMarket;
+    using Mediator        = base_goods::supplier::Mediator;
+
   public:
-    [[nodiscard]] ProductionGoodsSupplier(
-        const base_goods::supplier::Planner&      planner,
-        const production_goods::supplier::Trader& trader,
-        base_goods::supplier::Producer&&          producer
-    )
-        : BaseGoodsSupplier(planner, std::move(producer)), trader_{trader} {}
+    [[nodiscard]] explicit ProductionGoodsSupplier(
+        RandomGenerator& masterRng, const Workspace& workspace
+    ) noexcept
+        : producingSystem_{masterRng, workspace}, tradingSystem_{masterRng} {}
 
-    void post(
-        const AgentID                                 id,
-        const Money                                   totalCost,
-        tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
-    ) {
-        const auto supply = producer_.product();
-        trader_.post(id, planner_.judgePlan(supply, totalCost), entryBox);
+    void post(const AgentID id, const Money totalCost, Market& market) {
+        const auto supply = producingSystem_.produce();
+        tradingSystem_.post(id, supply, totalCost, market);
     }
 
-    void trade() { trader_.trade(); }
+    void trade() { tradingSystem_.trade(); }
 
-    void endStep(AssetPlusFn auto&& assetPlus, CensusDropBox& dropBox) {
-        using namespace base_goods::supplier;
-        const auto result = trader_.tradingResult();
-        assetPlus(result.sales);
-        planner_.endStep(result.totalDemand, result.supply - result.soldAmount, dropBox);
-        producer_.endStep(result.supply - result.soldAmount, dropBox);
-        trader_.endStep();
-    }
+    void endStep() { tradingSystem_.endStep(mediator_); }
 
   private:
-    production_goods::supplier::Trader trader_;
+    ProducingSystem producingSystem_;
+    TradingSystem   tradingSystem_;
+    Mediator        mediator_;
 };
-}  // namespace abm
+}  // namespace abm::production_goods::supplier
+
+namespace abm {
+using ProductionGoodsSupplier = production_goods::supplier::ProductionGoodsSupplier;
+}
