@@ -114,4 +114,49 @@ class GoodsQuantity final {
     PRE(rhs != GoodsQuantity{0.0}) {
     return Price{lhs.value() / rhs.value()};
 }
+
+class Markup final {
+  public:
+    [[nodiscard]] explicit Markup(const double value) noexcept : value_{value} {}
+    [[nodiscard]] auto value() const noexcept -> double { return value_; }
+    [[nodiscard]] auto operator<=>(const Markup&) const noexcept -> auto = default;
+    auto               operator+=(const Markup other) noexcept -> Markup& {
+        value_ += other.value();
+        return *this;
+    }
+    auto operator-=(const Markup other) noexcept -> Markup& {
+        value_ -= other.value();
+        return *this;
+    }
+    auto operator*=(const double other) noexcept -> Markup& {
+        value_ += other;
+        return *this;
+    }
+    auto operator/=(const double other) noexcept -> Markup& PRE(other != 0.0) {
+        value_ /= other;
+        return *this;
+    }
+
+  private:
+    double value_;
+};
+[[nodiscard]] inline auto operator+(Markup lhs, const Markup rhs) noexcept -> Markup {
+    lhs += rhs;
+    return lhs;
+}
+[[nodiscard]] inline auto operator-(Markup lhs, const Markup rhs) noexcept -> Markup {
+    lhs -= rhs;
+    return lhs;
+}
+[[nodiscard]] inline auto operator*(Markup lhs, const double rhs) noexcept -> Markup {
+    lhs *= rhs;
+    return lhs;
+}
+[[nodiscard]] inline auto operator*(const double lhs, const Markup rhs) noexcept -> Markup {
+    return rhs * lhs;
+}
+[[nodiscard]] inline auto operator/(Markup lhs, const double rhs) noexcept -> Markup {
+    lhs /= rhs;
+    return lhs;
+}
 }  // namespace abm
