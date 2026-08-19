@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <optional>
 #include <variant>
 
 #include "components/labor_demander/common.hpp"
@@ -9,23 +10,39 @@
 #include "core/values/labor.hpp"
 
 namespace abm::labor::demander::mediator {
-using EmployPlanListener = std::variant<planner::WagePlannerMemory*>;
-using RecruitResultListener =
-    std::variant<planner::WagePlannerMemory*, planner::OfferPlannerMemory*>;
+using EmployPlanListener    = std::variant<std::optional<planner::WagePlannerMemory&>>;
+using RecruitResultListener = std::variant<
+    std::optional<planner::WagePlannerMemory&>,
+    std::optional<planner::OfferPlannerMemory&>>;
 
 class Mediator final {
-    friend class ::abm::labor::demander::LaborDemanderFactory;
-
   public:
     Mediator() noexcept = default;
+
+    template <typename T>
+    void subscribeEmployPlan(T& t) noexcept {
+        if constexpr (std::is_same_v<T, planner::WagePlannerMemory>) {
+            employPlanListeners_[0] = t;
+        }
+    }
+    template <typename T>
+    void subscribeRecruitResult(T& t) noexcept {
+        auto& arr = recruitResultListeners_;
+        if constexpr (std::is_same_v<T, planner::WagePlannerMemory>) {
+            arr[0] = t;
+        } else if constexpr (std::is_same_v<T, planner::OfferPlannerMemory>) {
+            arr[1] = t;
+        }
+    }
+
     void publishEmployPlan(const HeadCount employPlan) noexcept {
-        for (auto ptr : employPlanListeners_) {
+        for (auto opt : employPlanListeners_) {
             std::visit(
                 [employPlan](auto&& listener) -> void {
-                    if (listener == nullptr) return;
+                    if (not listener) return;
                     listener->listenEmployPlan(employPlan);
                 },
-                ptr
+                opt
             );
         }
     }
@@ -33,7 +50,7 @@ class Mediator final {
         for (auto ptr : recruitResultListeners_) {
             std::visit(
                 [&](auto&& listener) -> void {
-                    if (listener == nullptr) return;
+                    if (not listener) return;
                     listener->listenRecruitResult(result);
                 },
                 ptr

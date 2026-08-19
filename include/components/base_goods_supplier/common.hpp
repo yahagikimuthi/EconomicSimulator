@@ -2,16 +2,9 @@
 
 #include <concepts>
 #include <optional>
+#include <variant>
 
 #include "core/values/goods.hpp"
-
-namespace abm::consumer_goods::supplier {
-class ConsumerGoodsSupplierFactory;
-}
-
-namespace abm::production_goods::supplier {
-class ProductionGoodsSupplierFactory;
-}
 
 namespace abm::base_goods::supplier {
 struct TradePlan final {
@@ -59,9 +52,11 @@ class Cache final {
     std::optional<T> next_{std::nullopt};
 };
 
-template <typename T>
-concept IMediator = requires(T t, const TradePlan& plan, const TradeResult& result) {
+template <typename T, typename U = std::monostate>
+concept IMediator = requires(T t, U& u, const TradePlan& plan, const TradeResult& result) {
     { t.publishTradePlan(plan) } -> std::same_as<void>;
     { t.publishTradeResult(result) } -> std::same_as<void>;
+    { t.subscribeTradePlan(u) } -> std::same_as<void>;
+    { t.subscribeTradeResult(u) } -> std::same_as<void>;
 };
 }  // namespace abm::base_goods::supplier

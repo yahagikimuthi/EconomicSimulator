@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <optional>
+#include <variant>
 
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
@@ -10,8 +11,6 @@
 namespace abm::labor::demander {
 using Entry   = LaborEntry;
 using Request = LaborRequest;
-
-class LaborDemanderFactory;
 
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
@@ -60,10 +59,11 @@ class Cache final {
     std::optional<T> next_;
 };
 
-template <typename T>
-concept IMediator = requires(T t, HeadCount employPlan) {
+template <typename T, typename U = std::monostate>
+concept IMediator = requires(T t, U& u, HeadCount employPlan, RecruitResult& result) {
     { t.publishEmployPlan(employPlan) } -> std::same_as<void>;
-} and requires(T t, RecruitResult& result) {
     { t.publishRecruitResult(result) } -> std::same_as<void>;
+    { t.subscribeEmployPlan(u) } -> std::same_as<void>;
+    { t.subscribeRecruitResult(u) } -> std::same_as<void>;
 };
 }  // namespace abm::labor::demander

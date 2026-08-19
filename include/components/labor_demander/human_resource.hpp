@@ -68,7 +68,7 @@ class HumanResource final {
         resignationBox.clear();
     }
 
-    void layOffs(const HeadCount layOffsCnt) PRE(layOffsCnt >= HeadCount{0.0}) noexcept {
+    void layOffs(const HeadCount layOffsCnt) noexcept PRE(layOffsCnt >= HeadCount{0.0}) {
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : companyBoard_.roster) {
             if (currentLayOffs >= layOffsCnt) break;

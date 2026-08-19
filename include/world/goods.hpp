@@ -3,6 +3,7 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 #include <functional>
+#include <pcg_random.hpp>
 #include <ranges>
 #include <vector>
 
@@ -15,16 +16,15 @@
 namespace abm {
 class Workspace final {
   public:
-    [[nodiscard]] explicit Workspace(const double power) noexcept : firmProductPower_{power} {}
-    ~Workspace() noexcept = default;
+    [[nodiscard]] Workspace() noexcept = default;
+    ~Workspace() noexcept              = default;
     Workspace(const Workspace& other) noexcept;
     auto operator=(const Workspace& other) noexcept -> Workspace&;
     Workspace(Workspace&& other) noexcept;
     auto operator=(Workspace&& other) noexcept -> Workspace&;
 
     void addInput(const double workerProductPower) noexcept {
-        const double input{firmProductPower_ * workerProductPower};
-        totalInput_.fetch_add(input);
+        totalInput_.fetch_add(workerProductPower);
     }
     [[nodiscard]] auto totalInput() const noexcept -> GoodsQuantity {
         return GoodsQuantity{totalInput_.load()};
@@ -32,31 +32,25 @@ class Workspace final {
     void resetInput() noexcept { totalInput_.store(0.0); }
 
   private:
-    double              firmProductPower_;
     std::atomic<double> totalInput_;
 };
 
 inline Workspace::Workspace(const Workspace& other) noexcept
-    : firmProductPower_{other.firmProductPower_}, totalInput_{other.totalInput_.load()} {}
+    : totalInput_{other.totalInput_.load()} {}
 inline auto Workspace::operator=(const Workspace& other) noexcept -> Workspace& {
     if (this == &other) return *this;
-    firmProductPower_ = other.firmProductPower_;
     const double input{other.totalInput_.load()};
     totalInput_.store(input);
     return *this;
 }
-inline Workspace::Workspace(Workspace&& other) noexcept
-    : firmProductPower_{other.firmProductPower_}, totalInput_{other.totalInput_.load()} {
-    other.firmProductPower_ = 0.0;
+inline Workspace::Workspace(Workspace&& other) noexcept : totalInput_{other.totalInput_.load()} {
     other.totalInput_.store(0.0);
 }
 inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     if (this == &other) return *this;
-    firmProductPower_ = other.firmProductPower_;
     const double input{other.totalInput_.load()};
     totalInput_.store(input);
 
-    other.firmProductPower_ = 0.0;
     other.totalInput_.store(0.0);
     return *this;
 }
@@ -109,7 +103,8 @@ class ConsumerGoodsMarket final {
     using Entry = ConsumerGoodsEntry;
 
   public:
-    [[nodiscard]] explicit ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
     [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
         totalSupply_.fetch_add(supply.value());
         return *entryBox_.emplace_back(price, supply);
@@ -194,7 +189,8 @@ class ProductionGoodsMarket final {
     using Entry = ProductionGoodsEntry;
 
   public:
-    [[nodiscard]] explicit ProductionGoodsMarket(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit ProductionGoodsMarket(RandomGenerator& masterRng) noexcept
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {

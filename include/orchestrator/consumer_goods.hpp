@@ -17,35 +17,28 @@ void product(LaborSupplier& laborSupplier, const Market phase) noexcept {
 }
 
 void postGoods(
-    ConsumerGoodsSupplier&                      goodsSupplier,
-    const LaborDemander&                        laborDemander,
-    tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox
+    ConsumerGoodsSupplier& goodsSupplier,
+    const LaborDemander&   laborDemander,
+    ConsumerGoodsMarket&   market
 ) noexcept {
-    goodsSupplier.post(laborDemander.sumWage(), entryBox);
+    goodsSupplier.post(laborDemander.sumWage(), market);
 }
 
 void purchase(
-    const HHoldFinance&                         finance,
-    ConsumerGoodsDemander&                      goodsDemander,
-    const LaborSupplier&                        laborSupplier,
-    tbb::concurrent_vector<ConsumerGoodsEntry>& entryBox,
-    const Step                                  step
+    const HHoldFinance&    finance,
+    ConsumerGoodsDemander& goodsDemander,
+    const LaborSupplier&   laborSupplier,
+    ConsumerGoodsMarket&   market,
+    const Step             step
 ) noexcept {
-    goodsDemander.request(finance.asset() + laborSupplier.wage(), step, entryBox);
+    goodsDemander.request(finance.asset() + laborSupplier.wage(), step, market);
 }
 
 void trade(ConsumerGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trade(); }
 
 void afterTrade(ConsumerGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
-void endStep(
-    FirmFinance& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
-) noexcept {
-    goodsSupplier.endStep([&](const Money sales) -> void { finance.assetPlus(sales); }, dropBox);
-}
+void endStep(ConsumerGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.endStep(); }
 
-void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) noexcept {
-    finance.assetPlus(-goodsDemander.purchase());
-    goodsDemander.endStep();
-}
+void endStep(ConsumerGoodsDemander& goodsDemander) noexcept { goodsDemander.endStep(); }
 }  // namespace abm::consumer_goods

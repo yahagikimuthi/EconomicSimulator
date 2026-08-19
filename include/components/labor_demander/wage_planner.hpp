@@ -35,14 +35,17 @@ class WagePlannerMemory final {
 };
 
 class WagePlanner final {
-    friend class ::abm::labor::demander::LaborDemanderFactory;
-
   public:
     [[nodiscard]] explicit WagePlanner(RandomGenerator& rng) noexcept
         : cache_{Wage{rng.rand(10.0, 20.0)}},
           memory_{rng},
           rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
           adjustVol_{rng.rand(0.1, 0.2)} {}
+
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        mediator.subscribeEmployPlan(memory_);
+        mediator.subscribeRecruitResult(memory_);
+    }
 
     [[nodiscard]] auto plan() noexcept -> Wage {
         const auto next = calcWage();

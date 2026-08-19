@@ -8,11 +8,14 @@
 
 namespace abm::labor::demander::planner {
 class RecruitPlanner final {
-    friend class ::abm::labor::demander::LaborDemanderFactory;
-
   public:
     [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng) noexcept
         : wagePlanner_{masterRng}, employPlanSystem_{masterRng} {}
+
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        wagePlanner_.acceptMediator(mediator);
+        employPlanSystem_.acceptMediator(mediator);
+    }
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> RecruitPlan {

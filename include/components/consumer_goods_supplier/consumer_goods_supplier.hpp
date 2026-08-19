@@ -5,6 +5,7 @@
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/consumer_goods_supplier/trading_system.hpp"
+#include "core/values/labor.hpp"
 #include "util.hpp"
 #include "world/goods.hpp"
 
@@ -15,19 +16,22 @@ class ConsumerGoodsSupplier final {
     using Mediator        = base_goods::supplier::Mediator;
 
   public:
-    [[nodiscard]] explicit ConsumerGoodsSupplier(
-        RandomGenerator& masterRng, const Workspace& workspace, const Mediator& mediator
-    ) noexcept
-        : producingSystem_{masterRng, workspace}, tradingSystem_{masterRng}, mediator_{mediator} {}
-
+    [[nodiscard]] explicit ConsumerGoodsSupplier(RandomGenerator& masterRng) noexcept
+        : producingSystem_{masterRng}, tradingSystem_{masterRng} {
+        producingSystem_.acceptMediator(mediator_);
+        tradingSystem_.acceptMediator(mediator_);
+    }
+    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
+        return producingSystem_.calcDesiredEmploy(employee);
+    }
     void post(const Money totalCost, Market& market) noexcept {
         const auto supply = producingSystem_.produce();
         tradingSystem_.post(supply, totalCost, market);
     }
-
     void trade() noexcept { tradingSystem_.trade(); }
-
     void endStep() noexcept { tradingSystem_.endStep(mediator_); }
+
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
   private:
     ProducingSystem producingSystem_;

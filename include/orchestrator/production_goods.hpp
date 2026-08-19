@@ -14,37 +14,29 @@ void product(LaborSupplier& laborSupplier, const Market phase) noexcept {
 }
 
 void postGoods(
-    const AgentIndex&                             index,
-    ProductionGoodsSupplier&                      goodsSupplier,
-    const LaborDemander&                          laborDemander,
-    tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
+    const AgentIndex&        index,
+    ProductionGoodsSupplier& goodsSupplier,
+    const LaborDemander&     laborDemander,
+    ProductionGoodsMarket&   market
 ) noexcept {
-    goodsSupplier.post(index.id(), laborDemander.sumWage(), entryBox);
+    goodsSupplier.post(index.id(), laborDemander.sumWage(), market);
 }
 
 void purchase(
-    const AgentIndex                              index,
-    const FirmFinance&                            finance,
-    ProductionGoodsDemander&                      goodsDemander,
-    const LaborDemander&                          laborSupplier,
-    tbb::concurrent_vector<ProductionGoodsEntry>& entryBox
+    const AgentIndex         index,
+    const FirmFinance&       finance,
+    ProductionGoodsDemander& goodsDemander,
+    const LaborDemander&     laborSupplier,
+    ProductionGoodsMarket&   market
 ) noexcept {
-    goodsDemander.request(index.id(), finance.asset() - laborSupplier.sumWage(), entryBox);
+    goodsDemander.request(index.id(), finance.asset() - laborSupplier.sumWage(), market);
 }
 
 void trade(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trade(); }
 
 void afterTrade(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
-void endStep(
-    FirmFinance& finance, ProductionGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
-) noexcept {
-    goodsSupplier.endStep([&](Money sales) -> void { finance.assetPlus(sales); }, dropBox);
-}
+void endStep(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.endStep(); }
 
-void endStep(FirmFinance& finance, ProductionGoodsDemander& goodsDemander) noexcept {
-    finance.assetPlus(-goodsDemander.purchase());
-    goodsDemander.endStep();
-}
-
+void endStep(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander.endStep(); }
 }  // namespace abm::production_goods

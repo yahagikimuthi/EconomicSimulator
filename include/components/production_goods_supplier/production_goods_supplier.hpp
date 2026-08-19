@@ -15,10 +15,11 @@ class ProductionGoodsSupplier final {
     using Mediator        = base_goods::supplier::Mediator;
 
   public:
-    [[nodiscard]] explicit ProductionGoodsSupplier(
-        RandomGenerator& masterRng, const Workspace& workspace
-    ) noexcept
-        : producingSystem_{masterRng, workspace}, tradingSystem_{masterRng} {}
+    [[nodiscard]] explicit ProductionGoodsSupplier(RandomGenerator& masterRng) noexcept
+        : producingSystem_{masterRng}, tradingSystem_{masterRng} {
+        producingSystem_.acceptMediator(mediator_);
+        tradingSystem_.acceptMediator(mediator_);
+    }
 
     void post(const AgentID id, const Money totalCost, Market& market) noexcept {
         const auto supply = producingSystem_.produce();

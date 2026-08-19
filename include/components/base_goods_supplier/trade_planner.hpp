@@ -45,6 +45,8 @@ class TradePlanner final {
     [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept
         : markupPlanner_{masterRng}, pricePlanner_{masterRng} {}
 
+    void acceptMediator(IMediator auto& mediator) { markupPlanner_.acceptMediator(mediator); }
+
     [[nodiscard]] auto plan(const GoodsQuantity supply, const Money totalCost) noexcept
         -> TradePlan {
         const auto markup = markupPlanner_.plan();

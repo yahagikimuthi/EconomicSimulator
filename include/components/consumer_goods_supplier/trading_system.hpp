@@ -16,6 +16,8 @@ class TradingSystem final {
     [[nodiscard]] explicit TradingSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng}, trader_{masterRng} {}
 
+    void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
+
     void post(const GoodsQuantity supply, const Money totalCost, Market& market) noexcept {
         const auto plan = planner_.plan(supply, totalCost);
         trader_.post(plan, market);

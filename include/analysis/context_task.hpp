@@ -75,8 +75,8 @@ class IMetricTask {
 template <LogicType Logic>
 class MetricTask final : public IMetricTask {
   public:
-    MetricTask(std::string&& outName, Logic&& logic) noexcept
-        : IMetricTask(std::move(outName)), logic_{std::move(logic)} {}
+    MetricTask(std::string&& outName, const Logic& logic) noexcept
+        : IMetricTask(std::move(outName)), logic_{logic} {}
 
     void process(const DataContext& ctx) noexcept override { pushBackData(logic_(ctx)); }
 

@@ -37,14 +37,16 @@ class OfferPlannerMemory final {
 };
 
 class OfferPlanner final {
-    friend class ::abm::labor::demander::LaborDemanderFactory;
-
   public:
     [[nodiscard]] explicit OfferPlanner(RandomGenerator& rng) noexcept
         : memory_{rng},
           cache_{rng.rand(0.1, 0.2)},
           rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
           adjustVol_{rng.rand(0.1, 0.2)} {}
+
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        mediator.subscribeRecruitResult(memory_);
+    }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
         return HeadCount{employPlan * (1.0 + planOfferRate())};
@@ -84,11 +86,13 @@ class OfferPlanner final {
 // 要求雇用数->雇用計画策定->オファー数決定という手順を踏むほうが望ましい。
 // このクラスはその統括を行う
 class EmployPlanningSystem final {
-    friend class ::abm::labor::demander::LaborDemanderFactory;
-
   public:
     [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng) noexcept
         : offerPlanner_{masterRng} {}
+
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        offerPlanner_.acceptMediator(mediator);
+    }
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> HeadCount {

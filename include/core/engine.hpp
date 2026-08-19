@@ -102,8 +102,8 @@ class Engine final {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    LaborMarket                  laborMarket_;
-    TBBVec<ProductionGoodsEntry> productionGoodsEntryBox_;
-    TBBVec<ConsumerGoodsEntry>   consumerGoodsEntryBox_;
+    LaborMarket           laborMarket_;
+    ProductionGoodsMarket productionGoodsMarket_;
+    ConsumerGoodsMarket   consumerGoodsMarket_;
 };
 }  // namespace abm

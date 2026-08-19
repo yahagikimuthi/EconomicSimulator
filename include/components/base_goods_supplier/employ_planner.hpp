@@ -32,6 +32,9 @@ class DemandForecastManager final {
   public:
     [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept;
 
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        mediator.subscribeTradeResult(memory_);
+    }
     [[nodiscard]] auto plan() noexcept -> GoodsQuantity {
         const auto next = calcNext();
         memory_.clearLog();
@@ -76,6 +79,8 @@ class EmployPlannerMemory final {
 class EmployPlanner final {
   public:
     [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept;
+
+    void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(memory_); }
 
     [[nodiscard]] auto plan(
         const double firmProductPower, const HeadCount employee, const GoodsQuantity inventory

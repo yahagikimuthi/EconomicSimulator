@@ -38,6 +38,11 @@ class MarkupPlanner final {
   public:
     [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng) noexcept;
 
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        mediator.subscribeTradePlan(memory_);
+        mediator.subscribeTradeResult(memory_);
+    }
+
     [[nodiscard]] auto plan() noexcept -> double {
         const auto next = calcNextMarkup();
         memory_.clearLog();

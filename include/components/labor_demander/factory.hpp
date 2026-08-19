@@ -9,16 +9,12 @@
 
 namespace abm::labor::demander {
 class LaborDemanderFactory {
-    static auto create(RandomGenerator& masterRng, const AgentID id, const Market firmType)
-        -> LaborDemander {
+  public:
+    [[nodiscard]] static auto create(
+        RandomGenerator& masterRng, const AgentID id, const Market firmType
+    ) noexcept -> LaborDemander {
         auto board    = CompanyBoard{id, firmType};
         auto demander = LaborDemander{masterRng, std::move(board)};
-        demander.mediator_.employPlanListeners_[0] =
-            &demander.recruitSystem_.planner_.wagePlanner_.memory_;
-        auto& resultListeners = demander.mediator_.recruitResultListeners_;
-        resultListeners[0]    = &demander.recruitSystem_.planner_.wagePlanner_.memory_;
-        resultListeners[1] =
-            &demander.recruitSystem_.planner_.employPlanSystem_.offerPlanner_.memory_;
         return demander;
     }
 };

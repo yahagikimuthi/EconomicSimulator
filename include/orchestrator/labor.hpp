@@ -12,10 +12,10 @@
 
 namespace abm::labor {
 void adjustWorkforce(
-    const AgentIndex&            index,
-    const ConsumerGoodsSupplier& goodsSupplier,
-    LaborDemander&               laborDemander,
-    LaborMarket&                 laborMarket
+    const AgentIndex&      index,
+    ConsumerGoodsSupplier& goodsSupplier,
+    LaborDemander&         laborDemander,
+    LaborMarket&           laborMarket
 ) noexcept {
     const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
     if (desiredEmploy > HeadCount{0.0}) {
@@ -28,7 +28,7 @@ void adjustWorkforce(
 void jobEntry(
     const AgentIndex& index, LaborSupplier& laborSupplier, LaborMarket& laborMarket
 ) noexcept {
-    laborSupplier.entry(index.id(), laborMarket.requestBox());
+    laborSupplier.entry(index.id(), laborMarket);
 }
 
 void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer(); }

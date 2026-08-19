@@ -20,6 +20,8 @@ class RecruitSystem final {
     [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng} {}
 
+    void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
+
     void post(
         const AgentID   id,
         const HeadCount desiredEmploy,
@@ -67,7 +69,9 @@ class LaborDemander final {
 
   public:
     [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
-        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
+        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {
+        recruitSystem_.acceptMediator(mediator_);
+    }
 
     void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket) noexcept
         PRE(desiredEmploy > HeadCount{0.0}) {
