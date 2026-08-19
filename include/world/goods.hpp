@@ -13,9 +13,9 @@
 #include "util.hpp"
 
 namespace abm {
-class [[nodiscard]] Workspace final {
+class Workspace final {
   public:
-    explicit Workspace(const double power) noexcept : firmProductPower_{power} {}
+    [[nodiscard]] explicit Workspace(const double power) noexcept : firmProductPower_{power} {}
     ~Workspace() noexcept = default;
     Workspace(const Workspace& other) noexcept;
     auto operator=(const Workspace& other) noexcept -> Workspace&;
@@ -66,7 +66,7 @@ struct ConsumerGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ConsumerGoodsEntry& entry;
-    ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
+    [[nodiscard]] ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
         : amount{a}, entry{e} {}
 };
 
@@ -171,7 +171,7 @@ class ProductionGoodsEntry final {
         return demand;
     }
 
-    void requestBox(std::vector<RefWrap<Request>>& out) noexcept {
+    void packRequest(std::vector<RefWrap<Request>>& out) noexcept {
         ASSERT(out.empty());
         for (Request& req : requestBox_) {
             out.emplace_back(std::ref(req));

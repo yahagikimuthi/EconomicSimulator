@@ -85,9 +85,10 @@ class Recruiter final {
 
     void offer() noexcept {
         if (not isPosting()) return;
-        if (myRequest_->entryBox().empty()) return;
+        const auto entryBox = packEntry();
+        if (entryBox.empty()) return;
 
-        auto applicants = sortApplicants(ledger_.remainOffer(), myRequest_->entryBox()) |
+        auto applicants = sortApplicants(ledger_.remainOffer(), entryBox) |
                           std::views::take(ledger_.remainOffer().value());
 
         auto offerCnt = HeadCount{0.0};
@@ -98,9 +99,7 @@ class Recruiter final {
             ++offerCnt;
         }
 
-        ledger_.readOfferResult(
-            {.offer = offerCnt, .applicants = HeadCount{myRequest_->entryBox().size()}}
-        );
+        ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entryBox.size()}});
     }
 
     template <AddRosterFn F>
@@ -130,6 +129,14 @@ class Recruiter final {
 
   private:
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myRequest_.has_value(); }
+
+    [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {
+        ASSERT(myRequest_);
+        static thread_local auto box = std::vector<RefWrap<Entry>>{};
+        box.clear();
+        myRequest_->packEntry(box);
+        return box;
+    }
 
     [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) noexcept -> bool {
         return plan.offer > HeadCount{0.0};

@@ -4,7 +4,6 @@
 #include <deque>
 #include <functional>
 #include <iterator>
-#include <span>
 #include <vector>
 
 #include "core/forward.hpp"
@@ -70,22 +69,25 @@ struct LaborEntry final {
         : hholdID{i}, productPower{power}, request{req} {}
 };
 
-struct LaborRequest final {
+class LaborRequest final {
+    using Entry = LaborEntry;
+
+  public:
     [[nodiscard]] LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {}
-    auto entry(const AgentID id, const double productPower) noexcept -> LaborEntry& {
-        auto it = entryBox_.emplace_back(id, productPower, *this);
-        references_.emplace_back(std::ref(*it));
-        return *it;
+    auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
+        return *entryBox_.emplace_back(id, productPower, *this);
     }
 
-    auto entryBox() noexcept -> std::span<RefWrap<LaborEntry>> { return references_; }
+    void packEntry(std::vector<RefWrap<Entry>>& out) noexcept {
+        ASSERT(out.empty());
+        for (Entry& e : entryBox_) out.emplace_back(std::ref(e));
+    }
 
     const AgentID firmID;
     const Wage    wage;
 
   private:
-    tbb::concurrent_vector<LaborEntry> entryBox_;
-    std::vector<RefWrap<LaborEntry>>   references_;
+    tbb::concurrent_vector<Entry> entryBox_;
 };
 
 class LaborMarket final {

@@ -8,9 +8,6 @@
 #include <iostream>
 #include <utility>
 
-#include "components/base_goods_demander.hpp"
-#include "components/base_goods_supplier/planner.hpp"
-#include "components/base_goods_supplier/producer.hpp"
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"

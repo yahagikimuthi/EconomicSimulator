@@ -2,7 +2,7 @@
 
 namespace abm {
 struct LaborEntry;
-struct LaborRequest;
+class LaborRequest;
 struct ConsumerGoodsRequest;
 class ConsumerGoodsEntry;
 struct ProductionGoodsRequest;
