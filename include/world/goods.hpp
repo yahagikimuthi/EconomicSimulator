@@ -2,10 +2,14 @@
 
 #include <tbb/concurrent_vector.h>
 #include <atomic>
+#include <functional>
+#include <vector>
 
+#include "core/base.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "util.hpp"
 
 namespace abm {
 class [[nodiscard]] Workspace final {
@@ -65,15 +69,52 @@ struct ConsumerGoodsRequest final {
         : amount{a}, entry{e} {}
 };
 
-struct [[nodiscard]] ConsumerGoodsEntry final {
-    ConsumerGoodsEntry(const Price p, const GoodsQuantity s) : price{p}, supply{s} {}
-    auto request(const GoodsQuantity amount) -> ConsumerGoodsRequest& {
-        return *requestBox.emplace_back(amount, *this);
+class ConsumerGoodsEntry final {
+    using Request = ConsumerGoodsRequest;
+
+  public:
+    [[nodiscard]] ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept;
+    [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
+        return *requestBox_.emplace_back(amount, *this);
+    }
+    void requestBox(std::vector<RefWrap<Request>>& out) noexcept {
+        ASSERT(out.empty());
+        for (Request& req : requestBox_) out.emplace_back(std::ref(req));
+    }
+    [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
+        const auto demand = GoodsQuantity{std::ranges::fold_left(
+            requestBox_ | std::ranges::views::transform([](const Request& req) -> double {
+                return req.amount.value();
+            }),
+            0.0,
+            std::plus<>{}
+        )};
+        ASSERT(demand >= GoodsQuantity{0.0});
+        return demand;
     }
 
-    const Price                                  price;
-    const GoodsQuantity                          supply;
-    tbb::concurrent_vector<ConsumerGoodsRequest> requestBox;
+    const Price         price;
+    const GoodsQuantity supply;
+
+    void performFullTrade() noexcept {
+        for (Request& req : requestBox_) req.tradeAmount = req.amount;
+    }
+
+  private:
+    tbb::concurrent_vector<Request> requestBox_;
+};
+
+class ConsumerGoodsMarket final {
+    using Entry = ConsumerGoodsEntry;
+
+  public:
+    [[nodiscard]] explicit ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
+        return *entryBox_.emplace_back(price, supply);
+    }
+
+  private:
+    tbb::concurrent_vector<Entry> entryBox_;
 };
 
 struct ProductionGoodsRequest final {

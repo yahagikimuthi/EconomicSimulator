@@ -1,0 +1,60 @@
+#pragma once
+
+#include <algorithm>
+#include <limits>
+#include <pcg_random.hpp>
+
+#include "components/base_goods_supplier/common.hpp"
+#include "components/base_goods_supplier/markup_planner.hpp"
+#include "core/values/common.hpp"
+#include "core/values/goods.hpp"
+#include "util.hpp"
+
+namespace abm::base_goods::supplier {
+class PricePlanner final {
+  public:
+    [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept;
+
+    [[nodiscard]] auto plan(const GoodsQuantity supply, const double markup, const Money totalCost)
+        const noexcept -> Price {
+        const auto price = calcPrice(supply, markup, totalCost);
+        const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
+        return price * (1.0 + alpha);
+    }
+
+  private:
+    [[nodiscard]] static auto calcPrice(
+        const GoodsQuantity supply, const double markup, const Money totalCost
+    ) noexcept -> Price {
+        const auto avgCost =
+            Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
+        const auto price = Price{avgCost.value() * (1.0 + markup)};
+        return priceGuard(price);
+    }
+
+    [[nodiscard]] static auto priceGuard(const Price price) noexcept -> Price {
+        return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
+    }
+
+    mutable RandomGenerator rng_;
+    const double            adjustVol_;
+};
+
+class TradePlanner final {
+  public:
+    [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept;
+
+    [[nodiscard]] auto plan(const GoodsQuantity supply, const Money totalCost) noexcept
+        -> TradePlan {
+        const auto markup = markupPlanner_.plan();
+        const auto price  = pricePlanner_.plan(supply, markup, totalCost);
+        return {.price = price, .supply = supply};
+    }
+
+    void reset() { markupPlanner_.commit(); }
+
+  private:
+    MarkupPlanner markupPlanner_;
+    PricePlanner  pricePlanner_;
+};
+}  // namespace abm::base_goods::supplier

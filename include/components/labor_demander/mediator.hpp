@@ -17,7 +17,7 @@ class Mediator final {
     Mediator() = default;
     void publishEmployPlan(const HeadCount employPlan) {
         for (std::optional<EmployPlanListener&> listenerOpt : employPlanListeners_) {
-            if (not listenerOpt) return;
+            if (not listenerOpt) continue;
             std::visit(
                 [employPlan](auto&& listener) -> void { listener.listenEmployPlan(employPlan); },
                 *listenerOpt
@@ -26,7 +26,7 @@ class Mediator final {
     }
     void publishRecruitResult(const RecruitResult& result) {
         for (std::optional<RecruitResultListener&> listenerOpt : recruitResultListeners_) {
-            if (not listenerOpt) return;
+            if (not listenerOpt) continue;
 
             std::visit(
                 [&](auto&& listener) -> void { listener.listenRecruitResult(result); }, *listenerOpt

@@ -4,7 +4,7 @@ namespace abm {
 struct LaborEntry;
 struct LaborRequest;
 struct ConsumerGoodsRequest;
-struct ConsumerGoodsEntry;
+class ConsumerGoodsEntry;
 struct ProductionGoodsRequest;
 struct ProductionGoodsEntry;
 class Workspace;

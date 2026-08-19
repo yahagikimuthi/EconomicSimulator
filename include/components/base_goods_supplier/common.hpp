@@ -1,7 +1,10 @@
 #pragma once
 
+#include <concepts>
+#include <optional>
+
 #include "core/values/goods.hpp"
-#include "world/common.hpp"
+#include "util.hpp"
 
 namespace abm::base_goods::supplier {
 struct TradePlan {
@@ -11,47 +14,47 @@ struct TradePlan {
 
 struct TradeResult {
     GoodsQuantity soldAmount;
+    GoodsQuantity unsoldAmount;
     GoodsQuantity totalDemand;
     Money         sales;
 };
 
-class PlanMemory {
+template <typename T>
+class Memory final {
   public:
-    [[nodiscard]] PlanMemory();
-    void memorize(const TradePlan& newPlan) { currentPlan_ = newPlan; }
-    auto rememberLastPlan() const -> const TradePlan& { return log_; }
-    void endStep(CensusDropBox& dropBox) {
-        log_ = currentPlan_;
-        dropBox.prices.emplace_back(currentPlan_.price.value());
-        dropBox.supplies.emplace_back(currentPlan_.supply.value());
-        currentPlan_ = {.price = Price{0.0}, .supply = GoodsQuantity{0.0}};
+    [[nodiscard]] explicit Memory(RandomGenerator& masterRng) noexcept;
+
+    void commit() noexcept {
+        if (not current) return;
+        log = current, current.reset();
     }
+    void clearLog() noexcept { log.reset(); }
 
-  private:
-    TradePlan log_;
-    TradePlan currentPlan_;
+    std::optional<T> log;
+    std::optional<T> current{std::nullopt};
 };
 
-class TradingMemory {
+template <typename T>
+class Cache final {
   public:
-    [[nodiscard]] TradingMemory();
-    void memorize(const TradeResult& newResult) { currentResult_ = newResult; }
-    auto rememberLastResult() const -> const TradeResult& { return log_; }
+    [[nodiscard]] explicit Cache(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
+
+    void commit() noexcept {
+        if (not next_) return;
+        cache_ = *next_;
+        next_.reset();
+    }
+    void memorize(const T next) noexcept { next_ = next; }
 
   private:
-    TradeResult log_;
-    TradeResult currentResult_;
+    T                cache_;
+    std::optional<T> next_;
 };
 
-class Memory {
-  public:
-    [[nodiscard]] Memory();
-
-    void memorize(const TradePlan& plan) { planMemory_.memorize(plan); }
-    void memorize(const TradeResult& result) { tradingMemory_.memorize(result); }
-
-  private:
-    PlanMemory    planMemory_;
-    TradingMemory tradingMemory_;
+template <typename T>
+concept IMediator = requires(T t, const TradePlan& plan, const TradeResult& result) {
+    { t.publishTradePlan(plan) } -> std::same_as<void>;
+    { t.publishTradeResult(result) } -> std::same_as<void>;
 };
 }  // namespace abm::base_goods::supplier
