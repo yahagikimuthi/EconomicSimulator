@@ -35,6 +35,8 @@ class WagePlannerMemory final {
 };
 
 class WagePlanner final {
+    friend class ::abm::labor::demander::Factory;
+
   public:
     [[nodiscard]] explicit WagePlanner(RandomGenerator& rng) noexcept
         : cache_{Wage{rng.rand(10.0, 20.0)}},

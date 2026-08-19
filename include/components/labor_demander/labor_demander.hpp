@@ -14,6 +14,8 @@
 
 namespace abm::labor::demander {
 class RecruitSystem final {
+    friend class Factory;
+
   public:
     [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng} {}
@@ -61,11 +63,11 @@ class RecruitSystem final {
 };
 
 class LaborDemander final {
+    friend class Factory;
+
   public:
-    [[nodiscard]] LaborDemander(
-        RandomGenerator& masterRng, CompanyBoard&& board, const Mediator& mediator
-    ) noexcept
-        : recruitSystem_{masterRng}, humanResource_{std::move(board)}, mediator_{mediator} {}
+    [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
+        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
 
     void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket) noexcept
         PRE(desiredEmploy > HeadCount{0.0}) {

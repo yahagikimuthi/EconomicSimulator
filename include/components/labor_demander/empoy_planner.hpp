@@ -37,6 +37,8 @@ class OfferPlannerMemory final {
 };
 
 class OfferPlanner final {
+    friend class ::abm::labor::demander::Factory;
+
   public:
     [[nodiscard]] explicit OfferPlanner(RandomGenerator& rng) noexcept
         : memory_{rng},
@@ -82,6 +84,8 @@ class OfferPlanner final {
 // 要求雇用数->雇用計画策定->オファー数決定という手順を踏むほうが望ましい。
 // このクラスはその統括を行う
 class EmployPlanningSystem final {
+    friend class ::abm::labor::demander::Factory;
+
   public:
     [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng) noexcept
         : offerPlanner_{masterRng} {}

@@ -21,6 +21,13 @@ class Mediator final {
   public:
     [[nodiscard]] Mediator() noexcept = default;
 
+    void tradePlanListeners(OptArr<TradePlanListener&, 2>& listeners) noexcept {
+        tradePlanListeners_ = listeners;
+    }
+    void tradeResultListeners(OptArr<TradeResultListener&, 3>& listeners) noexcept {
+        tradeResultListeners_ = listeners;
+    }
+
     void publishTradePlan(const TradePlan& plan) noexcept {
         for (std::optional<TradePlanListener&> optListener : tradePlanListeners_) {
             if (not optListener) continue;

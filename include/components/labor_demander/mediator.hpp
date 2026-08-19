@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <optional>
 #include <variant>
 
 #include "components/labor_demander/common.hpp"
@@ -10,36 +9,41 @@
 #include "core/values/labor.hpp"
 
 namespace abm::labor::demander::mediator {
-using EmployPlanListener    = std::variant<planner::WagePlannerMemory>;
-using RecruitResultListener = std::variant<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
+using EmployPlanListener = std::variant<planner::WagePlannerMemory*>;
+using RecruitResultListener =
+    std::variant<planner::WagePlannerMemory*, planner::OfferPlannerMemory*>;
 
 class Mediator final {
-    template <typename T, int N>
-    using OptArr = std::array<std::optional<T>, N>;
+    friend class ::abm::labor::demander::Factory;
 
   public:
     Mediator() noexcept = default;
     void publishEmployPlan(const HeadCount employPlan) noexcept {
-        for (std::optional<EmployPlanListener&> listenerOpt : employPlanListeners_) {
-            if (not listenerOpt) continue;
+        for (auto ptr : employPlanListeners_) {
             std::visit(
-                [employPlan](auto&& listener) -> void { listener.listenEmployPlan(employPlan); },
-                *listenerOpt
+                [employPlan](auto&& listener) -> void {
+                    if (listener == nullptr) return;
+                    listener->listenEmployPlan(employPlan);
+                },
+                ptr
             );
         }
     }
     void publishRecruitResult(const RecruitResult& result) noexcept {
-        for (std::optional<RecruitResultListener&> listenerOpt : recruitResultListeners_) {
-            if (not listenerOpt) continue;
+        for (auto ptr : recruitResultListeners_) {
             std::visit(
-                [&](auto&& listener) -> void { listener.listenRecruitResult(result); }, *listenerOpt
+                [&](auto&& listener) -> void {
+                    if (listener == nullptr) return;
+                    listener->listenRecruitResult(result);
+                },
+                ptr
             );
         }
     }
 
   private:
-    OptArr<EmployPlanListener&, 1>    employPlanListeners_;
-    OptArr<RecruitResultListener&, 2> recruitResultListeners_;
+    std::array<EmployPlanListener, 1>    employPlanListeners_;
+    std::array<RecruitResultListener, 2> recruitResultListeners_;
 };
 }  // namespace abm::labor::demander::mediator
 

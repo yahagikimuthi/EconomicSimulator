@@ -11,6 +11,8 @@ namespace abm::labor::demander {
 using Entry   = LaborEntry;
 using Request = LaborRequest;
 
+class Factory;
+
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;
