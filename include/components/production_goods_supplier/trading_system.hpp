@@ -23,10 +23,14 @@ class TradingSystem final {
     }
 
     void post(
-        const AgentID id, const GoodsQuantity supply, const Money totalCost, Market& market
+        const AgentID       id,
+        const GoodsQuantity supply,
+        const Money         totalCost,
+        Market&             market,
+        IMediator auto&     mediator
     ) noexcept {
         ASSERT(supply >= GoodsQuantity{0.0});
-        const auto plan = planner_.planTrading(supply, totalCost);
+        const auto plan = planner_.planTrading(supply, totalCost, mediator);
         trader_.post(id, plan, market);
     }
 

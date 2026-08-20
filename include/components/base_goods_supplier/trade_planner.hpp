@@ -123,10 +123,12 @@ class TradePlanner final {
         demandForecast_.acceptMediator(mediator);
     }
 
-    [[nodiscard]] auto planTrading(const GoodsQuantity supply, const Money totalCost) noexcept
-        -> TradePlan {
+    [[nodiscard]] auto planTrading(
+        const GoodsQuantity supply, const Money totalCost, IMediator auto& mediator
+    ) noexcept -> TradePlan {
         const auto markup = markupPlanner_.plan(targetInvRatio_);
-        const auto price  = pricePlanner_.plan(supply, markup, totalCost);
+        mediator.publishMarkupPlan(markup);
+        const auto price = pricePlanner_.plan(supply, markup, totalCost);
         return {.price = price, .supply = supply};
     }
 

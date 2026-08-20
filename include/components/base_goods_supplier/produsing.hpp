@@ -6,6 +6,7 @@
 #include "core/values/labor.hpp"
 #include "setting.hpp"
 #include "util.hpp"
+#include "world/common.hpp"
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
@@ -50,6 +51,10 @@ class Producer final {
         productionGoods_ += productionGoods;
     }
 
+    void logging(CensusDropBox& dropBox) noexcept {
+        dropBox.inventories.emplace_back(inventory_.value());
+    }
+
   private:
     Workspace     workspace_;
     const double  baseProductPower;
@@ -82,6 +87,11 @@ class ProducingSystem final {
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity { return producer_.produce(); }
+
+    void reset(CensusDropBox& dropBox) noexcept {
+        producer_.logging(dropBox);
+        employPlanner_.reset();
+    }
 
   private:
     EmployPlanner employPlanner_;

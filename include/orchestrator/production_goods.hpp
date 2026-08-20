@@ -36,7 +36,9 @@ void trade(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trad
 
 void afterTrade(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
-void endStep(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.endStep(); }
+void endStep(ProductionGoodsSupplier& goodsSupplier, CensusDropBox& dropBox) noexcept {
+    goodsSupplier.endStep(dropBox);
+}
 
 void endStep(
     FirmFinance&             finance,

@@ -11,12 +11,14 @@
 #include "components/base_goods_supplier/trade_planner.hpp"
 
 namespace abm::base_goods::supplier::mediator {
+template <typename T>
+using Opt = std::optional<T>;
+
 using TradePlanListener =
-    std::variant<std::optional<EmployPlannerMemory&>, std::optional<MarkupPlannerMemory&>>;
-using TradeResultListener = std::variant<
-    std::optional<DemandForecastManagerMemory&>,
-    std::optional<MarkupPlannerMemory&>,
-    std::optional<Producer&>>;
+    std::variant<Opt<EmployPlannerMemory&>, Opt<MarkupPlannerMemory&>, Opt<CentralMemory&>>;
+using MarkupPlanListener = std::variant<Opt<CentralMemory&>>;
+using TradeResultListener =
+    std::variant<Opt<DemandForecastManagerMemory&>, Opt<MarkupPlannerMemory&>, Opt<Producer&>>;
 
 class Mediator final {
   public:
@@ -29,6 +31,18 @@ class Mediator final {
             arr[0] = t;
         } else if constexpr (std::is_same_v<T, MarkupPlannerMemory>) {
             arr[1] = t;
+        } else if constexpr (std::is_same_v<T, CentralMemory>) {
+            arr[2] = t;
+        } else {
+            static_assert(false);
+        }
+    }
+
+    template <typename T>
+    void subscribeMarkupPlan(T& t) noexcept {
+        auto& arr = markupPlanListeners_;
+        if constexpr (std::is_same_v<T, CentralMemory>) {
+            arr[0] = t;
         } else {
             static_assert(false);
         }
@@ -60,6 +74,18 @@ class Mediator final {
         }
     }
 
+    void publishMarkupPlan(const double markup) noexcept {
+        for (auto opt : markupPlanListeners_) {
+            std::visit(
+                [markup](auto&& listener) noexcept -> void {
+                    if (not listener) return;
+                    listener->listenMarkupPlan(markup);
+                },
+                opt
+            );
+        }
+    }
+
     void publishTradeResult(const TradeResult& result) noexcept {
         for (auto opt : tradeResultListeners_) {
             std::visit(
@@ -73,7 +99,8 @@ class Mediator final {
     }
 
   private:
-    std::array<TradePlanListener, 2>   tradePlanListeners_;
+    std::array<TradePlanListener, 3>   tradePlanListeners_;
+    std::array<MarkupPlanListener, 1>  markupPlanListeners_;
     std::array<TradeResultListener, 3> tradeResultListeners_;
 };
 }  // namespace abm::base_goods::supplier::mediator

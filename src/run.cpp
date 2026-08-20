@@ -143,7 +143,7 @@ void Engine::runConsumerGoods() noexcept {
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        consumer_goods::endStep(firm.consumerGoodsSupplier);
+        consumer_goods::endStep(firm.consumerGoodsSupplier, dropBox_);
     }
 
     for (HHold& hhold : hholds_) {
