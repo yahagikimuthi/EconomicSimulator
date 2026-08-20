@@ -69,16 +69,17 @@ class LaborDemander final {
         recruitSystem_.acceptMediator(mediator_);
     }
 
-    void post(const AgentID id, const HeadCount desiredEmploy, LaborMarket& laborMarket) noexcept
-        PRE(desiredEmploy > HeadCount{0.0}) {
-        recruitSystem_.post(id, desiredEmploy, laborMarket, mediator_);
+    void adjustWorkforce(
+        const AgentID id, const HeadCount adjustment, LaborMarket& laborMarket
+    ) noexcept {
+        if (adjustment > HeadCount{0.0}) {
+            recruitSystem_.post(id, adjustment, laborMarket, mediator_);
+        } else if (adjustment < HeadCount{0.0}) {
+            humanResource_.layOffs(-adjustment);
+        }
     }
 
     void offer() noexcept { recruitSystem_.offer(); }
-
-    void layOffs(const HeadCount layOffsCnt) noexcept PRE(layOffsCnt > HeadCount{0.0}) {
-        humanResource_.layOffs(layOffsCnt);
-    }
 
     void registerMember(Workspace& workspace) noexcept {
         recruitSystem_.registerMember([&](const AgentID id, const Wage wage) -> RosterEntry& {

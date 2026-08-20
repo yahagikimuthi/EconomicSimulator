@@ -5,6 +5,7 @@
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/production_goods_supplier/trading_system.hpp"
+#include "core/values/labor.hpp"
 #include "util.hpp"
 #include "world/goods.hpp"
 
@@ -25,6 +26,13 @@ class ProductionGoodsSupplier final {
         const auto supply = producingSystem_.produce();
         tradingSystem_.post(id, supply, totalCost, market);
     }
+
+    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
+        const auto targetSupply = tradingSystem_.requiresSupply();
+        return producingSystem_.calcDesiredEmploy(targetSupply, employee);
+    }
+
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     void trade() noexcept { tradingSystem_.trade(); }
 
