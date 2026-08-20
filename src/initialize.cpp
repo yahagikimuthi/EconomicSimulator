@@ -24,11 +24,11 @@ Engine::Engine(const int totalStep) noexcept
         std::abort();
     }
 
-    namespace cnt = config::agent_count;
+    namespace cnt = setting::agent_count;
 
     bToCFirms_.reserve(cnt::bToCFirm);
     int agentId{};
-    for (; agentId < config::agent_count::bToCFirm; ++agentId) {
+    for (; agentId < cnt::bToCFirm; ++agentId) {
     }
 
     bToBFirms_.reserve(cnt::bToBFirm);

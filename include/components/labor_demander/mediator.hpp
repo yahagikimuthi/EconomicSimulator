@@ -23,6 +23,8 @@ class Mediator final {
     void subscribeEmployPlan(T& t) noexcept {
         if constexpr (std::is_same_v<T, planner::WagePlannerMemory>) {
             employPlanListeners_[0] = t;
+        } else {
+            static_assert(false);
         }
     }
     template <typename T>
@@ -32,6 +34,8 @@ class Mediator final {
             arr[0] = t;
         } else if constexpr (std::is_same_v<T, planner::OfferPlannerMemory>) {
             arr[1] = t;
+        } else {
+            static_assert(false);
         }
     }
 

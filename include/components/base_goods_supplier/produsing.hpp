@@ -13,10 +13,10 @@ namespace abm::base_goods::supplier {
 class Producer final {
   public:
     [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept
-        : firmProductPower_{masterRng.random(config::productPower)},
-          inventory_{masterRng.random(config::inventory)} {}
+        : firmProductPower_{masterRng.random(setting::productPower)},
+          inventory_{masterRng.random(setting::inventory)} {}
 
-    void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(*this); }
+    void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradeResult(*this); }
     void endStep(const GoodsQuantity unsoldAmount, CensusDropBox& dropBox) noexcept {
         inventory_ = unsoldAmount;
         dropBox.inventories.emplace_back(inventory_.value());

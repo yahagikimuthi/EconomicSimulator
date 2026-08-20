@@ -28,6 +28,8 @@ class Mediator final {
             arr[0] = t;
         } else if constexpr (std::is_same_v<T, MarkupPlannerMemory>) {
             arr[1] = t;
+        } else {
+            static_assert(false);
         }
     }
 
@@ -40,6 +42,8 @@ class Mediator final {
             arr[1] = t;
         } else if constexpr (std::is_same_v<T, Producer>) {
             arr[2] = t;
+        } else {
+            static_assert(false);
         }
     }
 

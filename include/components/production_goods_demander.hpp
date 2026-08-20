@@ -17,13 +17,13 @@ class ProductionGoodsDemander final {
 
   public:
     [[nodiscard]] explicit ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
-        : mpc_{masterRng.random(config::mpc)} {}
+        : mpc_{masterRng.random(setting::mpc)} {}
 
     void request(
         const AgentID id,
         const Money   asset,
         Market&       market,
-        const int     sampleCnt = config::goodsSampleCnt
+        const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;

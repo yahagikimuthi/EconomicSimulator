@@ -22,10 +22,10 @@ struct CensusDropBox final {
     std::vector<double> wages;
 
     [[nodiscard]] CensusDropBox() noexcept {
-        constexpr std::size_t firmCnt{
-            static_cast<std::size_t>(config::agent_count::bToCFirm + config::agent_count::bToBFirm)
-        };
-        constexpr std::size_t hholdCnt{static_cast<std::size_t>(config::agent_count::hhold)};
+        constexpr std::size_t firmCnt{static_cast<std::size_t>(
+            setting::agent_count::bToCFirm + setting::agent_count::bToBFirm
+        )};
+        constexpr std::size_t hholdCnt{static_cast<std::size_t>(setting::agent_count::hhold)};
         firmAssets.reserve(firmCnt);
         postedEmployments.reserve(firmCnt);
         postedWages.reserve(firmCnt);

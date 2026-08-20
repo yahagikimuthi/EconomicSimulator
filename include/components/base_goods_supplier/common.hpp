@@ -4,6 +4,7 @@
 #include <optional>
 #include <variant>
 
+#include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 
 namespace abm::base_goods::supplier {

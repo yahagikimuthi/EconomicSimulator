@@ -2,9 +2,9 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <highfive/bits/H5Slice_traits.hpp>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "config.hpp"
 #include "orchestrator/consumer_goods.hpp"
@@ -12,15 +12,10 @@
 #include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
 #include "world/common.hpp"
-#include "world/labor.hpp"
 
 namespace abm {
-void foo() {}
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
-        if (currentStep_.value() == 600) {
-            foo();
-        }
         runLabor();
         runConsumerGoods();
         logging();

@@ -12,8 +12,8 @@ namespace abm::labor::demander::planner {
 class WagePlannerMemory final {
   public:
     [[nodiscard]] explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
-        : employPlan_{HeadCount{masterRng.random(config::lastEmployPlan)}},
-          applicants_{HeadCount{masterRng.random(config::lastApplicants)}} {}
+        : employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}},
+          applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenEmployPlan(const HeadCount employPlan) noexcept { employPlan_.next = employPlan; }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         applicants_.next = result.applicants;
@@ -39,9 +39,9 @@ class WagePlanner final {
   public:
     [[nodiscard]] explicit WagePlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          cache_{Wage{masterRng.random(config::lastWage)}},
+          cache_{Wage{masterRng.random(setting::lastWage)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
-          adjustVol_{masterRng.random(config::wageAdjustVol)} {}
+          adjustVol_{masterRng.random(setting::wageAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeEmployPlan(memory_);

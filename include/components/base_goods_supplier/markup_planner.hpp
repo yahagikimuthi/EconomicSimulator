@@ -16,8 +16,8 @@ namespace abm::base_goods::supplier {
 class MarkupPlannerMemory final {
   public:
     [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept
-        : supply_{GoodsQuantity{masterRng.random(config::lastSupply)}},
-          salesAmount_{GoodsQuantity{masterRng.random(config::lastSalesAmount)}} {}
+        : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}},
+          salesAmount_{GoodsQuantity{masterRng.random(setting::lastSalesAmount)}} {}
     [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log;
     }

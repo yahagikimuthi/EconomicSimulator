@@ -16,7 +16,7 @@ class PricePlanner final {
   public:
     [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
-          adjustVol_{masterRng.random(config::priceAdjustVol)} {}
+          adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
 
     [[nodiscard]] auto plan(const GoodsQuantity supply, const double markup, const Money totalCost)
         const noexcept -> Price {

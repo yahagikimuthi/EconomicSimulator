@@ -5,6 +5,7 @@
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/consumer_goods_supplier/trading_system.hpp"
+#include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
 #include "world/goods.hpp"

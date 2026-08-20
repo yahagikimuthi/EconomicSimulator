@@ -19,7 +19,7 @@ class LikelihoodChangingJob final {
   public:
     [[nodiscard]] explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
-          threshold_{masterRng.random(config::changingJobThreshold)} {}
+          threshold_{masterRng.random(setting::changingJobThreshold)} {}
 
     auto shouldChangingJobs() const noexcept -> bool { return threshold_ < rng_.rand(); }
 

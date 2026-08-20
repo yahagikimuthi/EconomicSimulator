@@ -18,15 +18,15 @@ class ConsumerGoodsDemander final {
 
   public:
     [[nodiscard]] explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
-        : mpc_{masterRng.random(config::mpc)},
-          myPhase_{instanceCnt_++ % config::maxPurchaseFrequency} {}
+        : mpc_{masterRng.random(setting::mpc)},
+          myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}
 
     void request(
         const Money asset,
         const Step  step,
         Market&     market,
-        const int   frequency = config::maxPurchaseFrequency,
-        const int   sampleCnt = config::goodsSampleCnt
+        const int   frequency = setting::maxPurchaseFrequency,
+        const int   sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         if (shouldPass(step, frequency)) return;
         const auto budget = asset * mpc_;

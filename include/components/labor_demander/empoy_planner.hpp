@@ -18,8 +18,8 @@ class EmployPlanner final {
 class OfferPlannerMemory final {
   public:
     [[nodiscard]] explicit OfferPlannerMemory(RandomGenerator& masterRng) noexcept
-        : applicants_{HeadCount{masterRng.random(config::lastApplicants)}},
-          employPlan_{HeadCount{masterRng.random(config::lastEmployPlan)}} {}
+        : applicants_{HeadCount{masterRng.random(setting::lastApplicants)}},
+          employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}} {}
     [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.log;
     }
@@ -41,9 +41,9 @@ class OfferPlanner final {
   public:
     [[nodiscard]] explicit OfferPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          rateCache_{masterRng.random(config::offerRate)},
+          rateCache_{masterRng.random(setting::offerRate)},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
-          adjustVol_{masterRng.random(config::offerRateAdjustVol)} {}
+          adjustVol_{masterRng.random(setting::offerRateAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeRecruitResult(memory_);

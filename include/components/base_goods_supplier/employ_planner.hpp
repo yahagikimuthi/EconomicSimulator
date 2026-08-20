@@ -1,9 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <optional>
 
 #include "components/base_goods_supplier/common.hpp"
+#include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
@@ -14,7 +16,7 @@ namespace abm::base_goods::supplier {
 class DemandForecastManagerMemory final {
   public:
     [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
-        : totalDemand_{GoodsQuantity{masterRng.random(config::lastDemand)}} {}
+        : totalDemand_{GoodsQuantity{masterRng.random(setting::lastDemand)}} {}
 
     [[nodiscard]] auto rememberLastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
         return totalDemand_.log;
@@ -33,8 +35,8 @@ class DemandForecastManager final {
   public:
     [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          cache_{GoodsQuantity{masterRng.random(config::demandForecast)}},
-          adjustment_{masterRng.random(config::demandForecastAdjustVol)} {}
+          cache_{GoodsQuantity{masterRng.random(setting::demandForecast)}},
+          adjustment_{masterRng.random(setting::demandForecastAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeTradeResult(memory_);
@@ -69,7 +71,7 @@ class DemandForecastManager final {
 class EmployPlannerMemory final {
   public:
     [[nodiscard]] explicit EmployPlannerMemory(RandomGenerator& masterRng) noexcept
-        : supply_{GoodsQuantity{masterRng.random(config::lastSupply)}} {}
+        : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}} {}
     [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log;
     }
@@ -86,7 +88,7 @@ class EmployPlanner final {
     [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept
         : demandForecastManager_{masterRng},
           memory_{masterRng},
-          cache_{HeadCount{masterRng.random(config::desiredEmploy)}} {}
+          cache_{HeadCount{masterRng.random(setting::desiredEmploy)}} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(memory_); }
 

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <algorithm>
-#include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "core/values/common.hpp"
