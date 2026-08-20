@@ -53,10 +53,12 @@ class ProducingSystem final {
         producer_.acceptMediator(mediator);
     }
 
-    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
+    [[nodiscard]] auto calcDesiredEmploy(
+        const GoodsQuantity requiresSupply, const HeadCount employee
+    ) noexcept -> HeadCount {
         const auto inventory    = producer_.inventory();
         const auto productPower = producer_.firmProductPower();
-        return employPlanner_.plan(productPower, employee, inventory);
+        return employPlanner_.plan(productPower, employee, requiresSupply - inventory);
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }

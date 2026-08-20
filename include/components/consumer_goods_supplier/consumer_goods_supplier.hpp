@@ -22,9 +22,12 @@ class ConsumerGoodsSupplier final {
         producingSystem_.acceptMediator(mediator_);
         tradingSystem_.acceptMediator(mediator_);
     }
+
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
-        return producingSystem_.calcDesiredEmploy(employee);
+        const auto requiresSupply = tradingSystem_.requiresSupply();
+        return producingSystem_.calcDesiredEmploy(requiresSupply, employee);
     }
+
     void post(const Money totalCost, Market& market) noexcept {
         const auto supply = producingSystem_.produce();
         tradingSystem_.post(supply, totalCost, market);

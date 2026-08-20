@@ -19,8 +19,12 @@ class TradingSystem final {
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
 
     void post(const GoodsQuantity supply, const Money totalCost, Market& market) noexcept {
-        const auto plan = planner_.plan(supply, totalCost);
+        const auto plan = planner_.planTrading(supply, totalCost);
         trader_.post(plan, market);
+    }
+
+    [[nodiscard]] auto requiresSupply() noexcept -> GoodsQuantity {
+        return planner_.requiresSupply();
     }
 
     void trade() noexcept { trader_.trade(); }

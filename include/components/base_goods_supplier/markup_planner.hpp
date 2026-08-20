@@ -46,8 +46,8 @@ class MarkupPlanner final {
         mediator.subscribeTradeResult(memory_);
     }
 
-    [[nodiscard]] auto plan() noexcept -> double {
-        const auto next = calcNextMarkup();
+    [[nodiscard]] auto plan(const double targetIvRatio) noexcept -> double {
+        const auto next = calcNextMarkup(targetIvRatio);
         memory_.clearLog();
         if (not next) return cache_.cache();
         cache_.memorize(*next);
@@ -61,7 +61,8 @@ class MarkupPlanner final {
 
   private:
     // isSold = (前期供給 - 前期売上) / 前回供給 < 定数
-    [[nodiscard]] auto calcNextMarkup() const noexcept -> std::optional<double> {
+    [[nodiscard]] auto calcNextMarkup(const double targetInvRatio
+    ) const noexcept -> std::optional<double> {
         const auto lastSupply      = memory_.rememberLastSupply();
         const auto lastSalesAmount = memory_.rememberLastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
@@ -69,7 +70,7 @@ class MarkupPlanner final {
         const auto inventory = *lastSupply - *lastSalesAmount;
         ASSERT(inventory >= GoodsQuantity{0.0});
         const auto isSupplied = *lastSupply == GoodsQuantity{0.0};
-        const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio_ : true;
+        const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio : true;
         return calcNextMarkup(isSold);
     }
 
@@ -87,6 +88,5 @@ class MarkupPlanner final {
     mutable RandomGenerator rng_;
     Cache<double>           cache_;
     const double            adjustVol_;
-    const double            targetInvRatio_;
 };
 }  // namespace abm::base_goods::supplier

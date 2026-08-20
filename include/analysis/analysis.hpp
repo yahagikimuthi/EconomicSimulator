@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include "analysis/context_task.hpp"
-#include "config.hpp"
 #include "pipeline.hpp"
+#include "setting.hpp"
 
 namespace abm::analysis {
 [[nodiscard]] auto calcMean(

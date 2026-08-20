@@ -21,7 +21,7 @@ class TradingSystem final {
     void post(
         const AgentID id, const GoodsQuantity supply, const Money totalCost, Market& market
     ) noexcept {
-        const auto plan = planner_.plan(supply, totalCost);
+        const auto plan = planner_.planTrading(supply, totalCost);
         trader_.post(id, plan, market);
     }
 

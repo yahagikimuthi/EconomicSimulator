@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <cmath>
 #include <optional>
 
@@ -11,62 +10,6 @@
 #include "util.hpp"
 
 namespace abm::base_goods::supplier {
-
-// 前回の取引結果中、需要量が必要
-class DemandForecastManagerMemory final {
-  public:
-    [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
-        : totalDemand_{GoodsQuantity{masterRng.random(setting::lastDemand)}} {}
-
-    [[nodiscard]] auto rememberLastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
-        return totalDemand_.log;
-    }
-    void clearLog() noexcept { totalDemand_.clearLog(); }
-    void reset() noexcept { totalDemand_.reset(); }
-    void listenTradeResult(const TradeResult& result) noexcept {
-        totalDemand_.next = result.totalDemand;
-    }
-
-  private:
-    Memory<GoodsQuantity> totalDemand_;
-};
-
-class DemandForecastManager final {
-  public:
-    [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
-        : memory_{masterRng},
-          cache_{GoodsQuantity{masterRng.random(setting::demandForecast)}},
-          adjustment_{masterRng.random(setting::demandForecastAdjustVol)} {}
-
-    void acceptMediator(IMediator auto& mediator) noexcept {
-        mediator.subscribeTradeResult(memory_);
-    }
-    [[nodiscard]] auto plan() noexcept -> GoodsQuantity {
-        const auto next = calcNext();
-        memory_.clearLog();
-        if (not next) return cache_.cache();
-        cache_.memorize(*next);
-        return *next;
-    }
-
-  private:
-    [[nodiscard]] auto calcNext() const noexcept -> std::optional<GoodsQuantity> {
-        const auto lastTotalDemand = memory_.rememberLastTotalDemand();
-        if (not lastTotalDemand) return std::nullopt;
-        const auto lastForecast = cache_.cache();
-        const auto out          = lastForecast + (adjustment_ * (*lastTotalDemand - lastForecast));
-        return guard(out);
-    }
-
-    [[nodiscard]] static auto guard(const GoodsQuantity expect) noexcept -> GoodsQuantity {
-        return GoodsQuantity{std::max(expect.value(), 0.0)};
-    }
-
-    DemandForecastManagerMemory memory_;
-    Cache<GoodsQuantity>        cache_;
-    const double                adjustment_;
-};
-
 // 前回の取引計画中、供給量が必要
 class EmployPlannerMemory final {
   public:
@@ -86,17 +29,16 @@ class EmployPlannerMemory final {
 class EmployPlanner final {
   public:
     [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept
-        : demandForecastManager_{masterRng},
-          memory_{masterRng},
-          cache_{HeadCount{masterRng.random(setting::desiredEmploy)}} {}
+        : memory_{masterRng}, cache_{HeadCount{masterRng.random(setting::desiredEmploy)}} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(memory_); }
 
     [[nodiscard]] auto plan(
-        const double firmProductPower, const HeadCount employee, const GoodsQuantity inventory
+        const double        firmProductPower,
+        const HeadCount     employee,
+        const GoodsQuantity targetProduction
     ) noexcept -> HeadCount {
-        const auto targetSupply = demandForecastManager_.plan();
-        const auto out          = calc(firmProductPower, employee, targetSupply - inventory);
+        const auto out = calc(firmProductPower, employee, targetProduction);
         memory_.clearLog();
         if (not out) return cache_.cache();
         cache_.memorize(*out);
@@ -129,8 +71,7 @@ class EmployPlanner final {
         return HeadCount{std::ceil(out)};
     }
 
-    DemandForecastManager demandForecastManager_;
-    EmployPlannerMemory   memory_;
-    Cache<HeadCount>      cache_;
+    EmployPlannerMemory memory_;
+    Cache<HeadCount>    cache_;
 };
 }  // namespace abm::base_goods::supplier

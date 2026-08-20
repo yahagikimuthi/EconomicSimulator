@@ -8,6 +8,7 @@
 #include "components/base_goods_supplier/employ_planner.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
+#include "components/base_goods_supplier/trade_planner.hpp"
 
 namespace abm::base_goods::supplier::mediator {
 using TradePlanListener =
