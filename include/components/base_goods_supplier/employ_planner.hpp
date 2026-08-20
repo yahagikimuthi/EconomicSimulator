@@ -67,7 +67,7 @@ class EmployPlanner final {
         const auto lastSupply = memory_.lastSupply();
         if (not lastSupply) return std::nullopt;
         ASSERT(*lastSupply >= GoodsQuantity{0.0});
-        const auto isEmploying = employee == HeadCount{0.0};
+        const auto isEmploying = employee != HeadCount{0.0};
         const auto avgPower =
             isEmploying ? lastSupply->value() / employee.value() : firmProductPower;
         const auto out = avgPower != 0.0 ? targetProduction.value() / avgPower : 1.0;

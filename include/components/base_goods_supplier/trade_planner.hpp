@@ -118,7 +118,7 @@ class TradePlanner final {
           demandForecast_{masterRng},
           targetInvRatio_{masterRng.random(setting::targetInvRatio)} {}
 
-    void acceptMediator(IMediator auto& mediator) {
+    void acceptMediator(IMediator auto& mediator) noexcept {
         markupPlanner_.acceptMediator(mediator);
         demandForecast_.acceptMediator(mediator);
     }

@@ -89,32 +89,4 @@ class OfferPlanner final {
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };
-
-// EmployPlannerが静的関数となっているためインスタンス化しないが、意味論的に
-// 要求雇用数->雇用計画策定->オファー数決定という手順を踏むほうが望ましい。
-// このクラスはその統括を行う
-class EmployPlanningSystem final {
-  public:
-    [[nodiscard]] explicit EmployPlanningSystem(RandomGenerator& masterRng) noexcept
-        : offerPlanner_{masterRng} {}
-
-    void acceptMediator(IMediator auto& mediator) noexcept {
-        offerPlanner_.acceptMediator(mediator);
-    }
-
-    [[nodiscard]] auto planOffer(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
-        -> HeadCount {
-        ASSERT(desiredEmploy >= HeadCount{0.0});
-
-        const auto employPlan = EmployPlanner::plan(desiredEmploy);
-        mediator.publishEmployPlan(employPlan);
-        const auto offerPlan = offerPlanner_.plan(employPlan);
-        return offerPlan;
-    }
-
-    void reset() noexcept { offerPlanner_.reset(); }
-
-  private:
-    OfferPlanner offerPlanner_;
-};
 }  // namespace abm::labor::demander::planner

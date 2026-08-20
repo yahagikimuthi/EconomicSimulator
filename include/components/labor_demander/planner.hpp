@@ -10,33 +10,35 @@ namespace abm::labor::demander::planner {
 class RecruitPlanner final {
   public:
     [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng) noexcept
-        : wagePlanner_{masterRng}, employPlanSystem_{masterRng} {}
+        : wagePlanner_{masterRng}, offerPlanner_{masterRng} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         wagePlanner_.acceptMediator(mediator);
-        employPlanSystem_.acceptMediator(mediator);
+        offerPlanner_.acceptMediator(mediator);
     }
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> RecruitPlan {
         ASSERT(desiredEmploy >= HeadCount{0.0});
 
-        const auto plan = RecruitPlan{
-            .wage  = wagePlanner_.plan(),
-            .offer = employPlanSystem_.planOffer(desiredEmploy, mediator)
-        };
+        const auto wage   = wagePlanner_.plan();
+        const auto employ = EmployPlanner::plan(desiredEmploy);
+        const auto offer  = offerPlanner_.plan(employ);
+        const auto plan   = RecruitPlan{.wage = wage, .offer = offer};
+
+        mediator.publishEmployPlan(employ);
         mediator.publishRecruitPlan(plan);
         return plan;
     }
 
     void reset() noexcept {
         wagePlanner_.reset();
-        employPlanSystem_.reset();
+        offerPlanner_.reset();
     }
 
   private:
-    WagePlanner          wagePlanner_;
-    EmployPlanningSystem employPlanSystem_;
+    WagePlanner  wagePlanner_;
+    OfferPlanner offerPlanner_;
 };
 }  // namespace abm::labor::demander::planner
 
