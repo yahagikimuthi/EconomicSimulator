@@ -6,7 +6,7 @@
 #include <highfive/H5PropertyList.hpp>
 #include <iostream>
 
-#include "config.hpp"
+#include "setting.hpp"
 #include "util.hpp"
 #include "world/goods.hpp"
 #include "world/labor.hpp"

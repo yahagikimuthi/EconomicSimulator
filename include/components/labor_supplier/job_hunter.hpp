@@ -10,7 +10,7 @@
 #include <span>
 
 #include "components/labor_supplier/common.hpp"
-#include "config.hpp"
+#include "setting.hpp"
 #include "util.hpp"
 #include "world/labor.hpp"
 

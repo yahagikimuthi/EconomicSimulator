@@ -12,8 +12,8 @@
 #include <utility>
 #include <variant>
 
-#include "config.hpp"
 #include "core/base.hpp"
+#include "setting.hpp"
 
 namespace abm {
 template <typename... Ts>

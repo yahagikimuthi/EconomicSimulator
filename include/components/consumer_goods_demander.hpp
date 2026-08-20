@@ -4,9 +4,9 @@
 #include <optional>
 #include <pcg_random.hpp>
 
-#include "config.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "setting.hpp"
 #include "util.hpp"
 #include "world/goods.hpp"
 

@@ -6,9 +6,9 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
-#include "config.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "setting.hpp"
 #include "util.hpp"
 
 namespace abm::base_goods::supplier {

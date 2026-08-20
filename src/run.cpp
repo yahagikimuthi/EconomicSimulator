@@ -6,11 +6,11 @@
 #include <string_view>
 #include <vector>
 
-#include "config.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
 #include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
+#include "setting.hpp"
 #include "world/common.hpp"
 
 namespace abm {

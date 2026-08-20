@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "config.hpp"
+#include "setting.hpp"
 
 namespace abm {
 enum class Market : char { labor, consumerGoods, productionGoods };

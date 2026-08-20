@@ -4,8 +4,8 @@
 #include <pcg_random.hpp>
 
 #include "components/labor_demander/common.hpp"
-#include "config.hpp"
 #include "core/values/labor.hpp"
+#include "setting.hpp"
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
