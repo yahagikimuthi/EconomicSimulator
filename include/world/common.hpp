@@ -13,6 +13,7 @@ struct CensusDropBox final {
     std::vector<double> postedEmployments;
     std::vector<double> postedWages;
     std::vector<double> employments;
+    std::vector<double> sumWages;
     std::vector<double> prices;
     std::vector<double> supplies;
     std::vector<double> markups;
@@ -30,6 +31,7 @@ struct CensusDropBox final {
         postedEmployments.reserve(firmCnt);
         postedWages.reserve(firmCnt);
         employments.reserve(firmCnt);
+        sumWages.reserve(firmCnt);
         prices.reserve(firmCnt);
         supplies.reserve(firmCnt);
         markups.reserve(firmCnt);

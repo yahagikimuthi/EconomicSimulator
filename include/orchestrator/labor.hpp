@@ -54,8 +54,8 @@ void recordRosterEntry(LaborSupplier& laborSuppler) noexcept { laborSuppler.reco
 
 void acceptResignation(LaborDemander& laborDemander) noexcept { laborDemander.acceptResignation(); }
 
-void endStep(FirmFinance& finance, LaborDemander& laborDemander) noexcept {
-    laborDemander.endStep();
+void endStep(FirmFinance& finance, LaborDemander& laborDemander, CensusDropBox& dropBox) noexcept {
+    laborDemander.endStep(dropBox);
     finance.assetPlus(-laborDemander.sumWage());
 }
 

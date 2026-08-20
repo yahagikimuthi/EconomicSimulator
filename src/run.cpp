@@ -55,7 +55,7 @@ void Engine::runLabor() noexcept {
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        labor::endStep(firm.finance, firm.laborDemander);
+        labor::endStep(firm.finance, firm.laborDemander, dropBox_);
     }
     for (HHold& hhold : hholds_) {
         labor::endStep(hhold.finance, hhold.laborSupplier, dropBox_);

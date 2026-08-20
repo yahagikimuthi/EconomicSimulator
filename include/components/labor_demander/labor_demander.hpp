@@ -9,6 +9,7 @@
 #include "components/labor_demander/recruiter.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "world/common.hpp"
 #include "world/goods.hpp"
 #include "world/labor.hpp"
 
@@ -101,12 +102,16 @@ class LaborDemander final {
         return static_cast<Money>(humanResource_.sumWage());
     }
 
-    void endStep() noexcept {
+    void endStep(CensusDropBox& dropBox) noexcept {
         recruitSystem_.endStep(mediator_);
-        recruitSystem_.reset();
+        memory_.logging(dropBox);
+        dropBox.employments.emplace_back(employeeCnt().value());
+        dropBox.employments.emplace_back(sumWage().value());
     }
 
   private:
+    void reset() noexcept { recruitSystem_.reset(); }
+
     RecruitSystem recruitSystem_;
     HumanResource humanResource_;
     Mediator      mediator_;
