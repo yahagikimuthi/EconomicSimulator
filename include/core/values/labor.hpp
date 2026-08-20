@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <compare>
 
 #include "core/values/common.hpp"
@@ -62,6 +63,12 @@ class [[nodiscard]] HeadCount final {
     [[nodiscard]] explicit HeadCount(const std::size_t value) noexcept
         : value_{static_cast<double>(value)} {}
     [[nodiscard]] auto value() const noexcept -> double { return value_; }
+
+    auto ceil() noexcept -> HeadCount& {
+        value_ = std::ceil(value_);
+        return *this;
+    }
+
     [[nodiscard]] auto operator<=>(const HeadCount&) const noexcept -> auto = default;
     auto               operator+=(const HeadCount other) noexcept -> HeadCount& {
         value_ += other.value();

@@ -68,7 +68,7 @@ class EmployPlanner final {
         const auto avgPower =
             isEmploying ? lastSupply->value() / employee.value() : firmProductPower;
         const auto out = avgPower != 0.0 ? targetProduction.value() / avgPower : 1.0;
-        return HeadCount{std::ceil(out)};
+        return HeadCount{out}.ceil();
     }
 
     EmployPlannerMemory memory_;

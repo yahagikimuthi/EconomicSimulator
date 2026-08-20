@@ -90,7 +90,7 @@ class DemandForecastManager final {
     }
 
     [[nodiscard]] static auto guard(const GoodsQuantity expect) noexcept -> GoodsQuantity {
-        return GoodsQuantity{std::max(expect.value(), 0.0)};
+        return GoodsQuantity{std::max(expect.value(), std::numeric_limits<double>::epsilon())};
     }
 
     DemandForecastManagerMemory memory_;

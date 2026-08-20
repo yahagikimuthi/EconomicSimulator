@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <optional>
 
 #include "components/labor_demander/common.hpp"
@@ -50,7 +51,7 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
-        return HeadCount{employPlan * (1.0 + planOfferRate())};
+        return HeadCount{employPlan.value() * (1.0 + planOfferRate())}.ceil();
     }
 
     void reset() noexcept {
@@ -74,7 +75,7 @@ class OfferPlanner final {
         const auto alpha       = rng_.randNormal(0.0, adjustVol_);
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
         const auto next        = rateCache_.cache() + (shouldRaise ? alpha : -alpha);
-        return std::max(0.0, next);
+        return std::max(std::numeric_limits<double>::epsilon(), next);
     }
 
     OfferPlannerMemory      memory_;
