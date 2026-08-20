@@ -26,49 +26,51 @@ void Engine::run() {
 
 void Engine::runLabor() noexcept {
     for (BtoCFirm& firm : bToCFirms_) {
-        labor::adjustWorkforce(firm.index, firm.consumerGoods, firm.labor, laborMarket_);
+        labor::adjustWorkforce(
+            firm.index, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
+        );
     }
 
     for (HHold& hhold : hholds_) {
-        labor::jobEntry(hhold.index, hhold.labor, laborMarket_);
+        labor::jobEntry(hhold.index, hhold.laborSupplier, laborMarket_);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        labor::offer(firm.labor);
+        labor::offer(firm.laborDemander);
     }
 
     for (HHold& hhold : hholds_) {
-        labor::acceptOffer(hhold.labor);
+        labor::acceptOffer(hhold.laborSupplier);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        labor::registerMember(firm.consumerGoods, firm.labor);
+        labor::registerMember(firm.consumerGoodsSupplier, firm.laborDemander);
     }
 
     for (HHold& hhold : hholds_) {
-        labor::recordRosterEntry(hhold.labor);
+        labor::recordRosterEntry(hhold.laborSupplier);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        labor::acceptResignation(firm.labor);
+        labor::acceptResignation(firm.laborDemander);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        labor::endStep(firm.finance, firm.labor);
+        labor::endStep(firm.finance, firm.laborDemander);
     }
     for (HHold& hhold : hholds_) {
-        labor::endStep(hhold.finance, hhold.labor, dropBox_);
+        labor::endStep(hhold.finance, hhold.laborSupplier, dropBox_);
     }
 }
 
 void Engine::runProductionGoods() noexcept {
     for (HHold& hhold : hholds_) {
-        production_goods::product(hhold.labor, Market::productionGoods);
+        production_goods::product(hhold.laborSupplier, Market::productionGoods);
     }
 
     for (BtoBFirm& firm : bToBFirms_) {
         production_goods::postGoods(
-            firm.index, firm.productionGoodsSupplier, firm.labor, productionGoodsMarket_
+            firm.index, firm.productionGoodsSupplier, firm.laborDemander, productionGoodsMarket_
         );
     }
 
@@ -77,14 +79,18 @@ void Engine::runProductionGoods() noexcept {
             firm.index,
             firm.finance,
             firm.productionGoodsDemander,
-            firm.labor,
+            firm.laborDemander,
             productionGoodsMarket_
         );
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
         production_goods::purchase(
-            firm.index, firm.finance, firm.productionGoods, firm.labor, productionGoodsMarket_
+            firm.index,
+            firm.finance,
+            firm.productionGoodsDemander,
+            firm.laborDemander,
+            productionGoodsMarket_
         );
     }
 
@@ -97,7 +103,7 @@ void Engine::runProductionGoods() noexcept {
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        production_goods::afterTrade(firm.productionGoods);
+        production_goods::afterTrade(firm.productionGoodsDemander);
     }
 
     for (BtoBFirm& firm : bToBFirms_) {
@@ -107,33 +113,39 @@ void Engine::runProductionGoods() noexcept {
 
 void Engine::runConsumerGoods() noexcept {
     for (HHold& hhold : hholds_) {
-        consumer_goods::product(hhold.labor, Market::consumerGoods);
+        consumer_goods::product(hhold.laborSupplier, Market::consumerGoods);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        consumer_goods::postGoods(firm.consumerGoods, firm.labor, consumerGoodsMarket_);
+        consumer_goods::postGoods(
+            firm.consumerGoodsSupplier, firm.laborDemander, consumerGoodsMarket_
+        );
     }
 
     for (HHold& hhold : hholds_) {
         consumer_goods::purchase(
-            hhold.finance, hhold.consumerGoods, hhold.labor, consumerGoodsMarket_, currentStep_
+            hhold.finance,
+            hhold.consumerGoodsDemander,
+            hhold.laborSupplier,
+            consumerGoodsMarket_,
+            currentStep_
         );
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        consumer_goods::trade(firm.consumerGoods);
+        consumer_goods::trade(firm.consumerGoodsSupplier);
     }
 
     for (HHold& hhold : hholds_) {
-        consumer_goods::afterTrade(hhold.consumerGoods);
+        consumer_goods::afterTrade(hhold.consumerGoodsDemander);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        consumer_goods::endStep(firm.consumerGoods);
+        consumer_goods::endStep(firm.consumerGoodsSupplier);
     }
 
     for (HHold& hhold : hholds_) {
-        consumer_goods::endStep(hhold.consumerGoods);
+        consumer_goods::endStep(hhold.consumerGoodsDemander);
     }
 }
 
