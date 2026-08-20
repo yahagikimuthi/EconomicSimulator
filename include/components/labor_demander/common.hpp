@@ -18,8 +18,8 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
 };
 
 struct RecruitPlan final {
-    Wage      wage;
-    HeadCount offer;
+    const Wage      wage;
+    const HeadCount offer;
 };
 
 struct RecruitResult final {
@@ -45,7 +45,7 @@ class Memory final {
 template <typename T>
 class Cache final {
   public:
-    [[nodiscard]] explicit Cache(const T t) noexcept;
+    [[nodiscard]] explicit Cache(const T t) noexcept : cache_{t} {}
     [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
 
     void next(const T next) noexcept { next_ = next; }

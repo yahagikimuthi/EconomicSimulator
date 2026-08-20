@@ -17,14 +17,16 @@ class ConsumerGoodsDemander final {
     using Entry   = ConsumerGoodsEntry;
 
   public:
-    [[nodiscard]] explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
+        : mpc_{masterRng.random(config::mpc)},
+          myPhase_{instanceCnt_++ % config::maxPurchaseFrequency} {}
 
     void request(
         const Money asset,
         const Step  step,
         Market&     market,
-        const int   frequency = config::goods_demander::maxPurchaseFrequency,
-        const int   sampleCnt = config::goods_demander::goodsSampleCnt
+        const int   frequency = config::maxPurchaseFrequency,
+        const int   sampleCnt = config::goodsSampleCnt
     ) noexcept {
         if (shouldPass(step, frequency)) return;
         const auto budget = asset * mpc_;
@@ -48,6 +50,7 @@ class ConsumerGoodsDemander final {
     std::optional<const Request&> myRequest_{std::nullopt};
     const double                  mpc_;
     const Step                    myPhase_;
+    static inline int             instanceCnt_{};
 };
 }  // namespace abm::consumer_goods::demander
 

@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cstdint>
+#include <filesystem>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <random>
@@ -46,8 +47,20 @@ struct HHold final {  // NOLINT
 
 class Logger final {
   public:
-    [[nodiscard]] explicit Logger();
-    auto isValid() const noexcept -> bool { return file_.isValid(); }
+    [[nodiscard]] explicit Logger()
+        : file_{[]() -> HighFive::File {
+              namespace fs        = std::filesystem;
+              const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
+              const auto path     = fs::path{filepath};
+              if (path.has_parent_path()) fs::create_directories(path.parent_path());
+              return HighFive::File{
+                  filepath,
+                  HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
+              };
+          }()} {}
+
+    [[nodiscard]] auto isValid() const noexcept -> bool { return file_.isValid(); }
+
     void save(const CensusDropBox& dropBox, Step step);
 
   private:
@@ -78,10 +91,8 @@ class Engine final {
     void check() const noexcept;
 
     [[nodiscard]] static auto generateSeed() noexcept -> PCG32Seed {
-        if (not config::setting::useRuntimeRandomSeed)
-            return {
-                .state = config::setting::fixedSeedState, .stream = config::setting::fixedSeedStream
-            };
+        if (not setting::useRuntimeRandomSeed)
+            return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};
 
         auto       rd     = std::random_device{};
         const auto state  = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};

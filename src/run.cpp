@@ -162,7 +162,7 @@ void Engine::reset() noexcept {
 void Engine::check() const noexcept {}
 
 void Logger::save(const CensusDropBox& dropBox, const Step step) {
-    namespace name = config::save_name;
+    namespace name = setting::save_name;
     auto groupPath = std::string{"/step_" + std::to_string(step.value())};
     auto group     = HighFive::Group{file_.createGroup(groupPath)};
 

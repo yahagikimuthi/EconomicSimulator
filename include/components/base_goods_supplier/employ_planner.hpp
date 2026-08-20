@@ -13,7 +13,8 @@ namespace abm::base_goods::supplier {
 // 前回の取引結果中、需要量が必要
 class DemandForecastManagerMemory final {
   public:
-    [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
+        : totalDemand_{GoodsQuantity{masterRng.random(config::lastDemand)}} {}
 
     [[nodiscard]] auto rememberLastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
         return totalDemand_.log;
@@ -30,7 +31,10 @@ class DemandForecastManagerMemory final {
 
 class DemandForecastManager final {
   public:
-    [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
+        : memory_{masterRng},
+          cache_{GoodsQuantity{masterRng.random(config::demandForecast)}},
+          adjustment_{masterRng.random(config::demandForecastAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeTradeResult(memory_);
@@ -64,7 +68,8 @@ class DemandForecastManager final {
 // 前回の取引計画中、供給量が必要
 class EmployPlannerMemory final {
   public:
-    [[nodiscard]] explicit EmployPlannerMemory(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit EmployPlannerMemory(RandomGenerator& masterRng) noexcept
+        : supply_{GoodsQuantity{masterRng.random(config::lastSupply)}} {}
     [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log;
     }
@@ -78,7 +83,10 @@ class EmployPlannerMemory final {
 
 class EmployPlanner final {
   public:
-    [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept
+        : demandForecastManager_{masterRng},
+          memory_{masterRng},
+          cache_{HeadCount{masterRng.random(config::desiredEmploy)}} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(memory_); }
 
@@ -99,6 +107,7 @@ class EmployPlanner final {
     }
 
   private:
+    //! 目標在庫率のこと考えてないね
     [[nodiscard]] auto calc(
         const double        firmProductPower,
         const HeadCount     employee,

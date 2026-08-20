@@ -68,7 +68,8 @@ class ConsumerGoodsEntry final {
     using Request = ConsumerGoodsRequest;
 
   public:
-    [[nodiscard]] ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept;
+    [[nodiscard]] ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
+        : price{p}, supply{s} {}
     [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
         return *requestBox_.emplace_back(amount, *this);
     }

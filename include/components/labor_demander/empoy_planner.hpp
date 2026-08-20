@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "components/labor_demander/common.hpp"
+#include "config.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
 
@@ -17,8 +18,8 @@ class EmployPlanner final {
 class OfferPlannerMemory final {
   public:
     [[nodiscard]] explicit OfferPlannerMemory(RandomGenerator& masterRng) noexcept
-        : applicants_{HeadCount{masterRng.rand(10, 20)}},
-          employPlan_{HeadCount{masterRng.rand(10, 20)}} {}
+        : applicants_{HeadCount{masterRng.random(config::lastApplicants)}},
+          employPlan_{HeadCount{masterRng.random(config::lastEmployPlan)}} {}
     [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.log;
     }
@@ -38,11 +39,11 @@ class OfferPlannerMemory final {
 
 class OfferPlanner final {
   public:
-    [[nodiscard]] explicit OfferPlanner(RandomGenerator& rng) noexcept
-        : memory_{rng},
-          cache_{rng.rand(0.1, 0.2)},
-          rng_{pcg32{rng.makeUint64(), rng.makeUint64()}},
-          adjustVol_{rng.rand(0.1, 0.2)} {}
+    [[nodiscard]] explicit OfferPlanner(RandomGenerator& masterRng) noexcept
+        : memory_{masterRng},
+          rateCache_{masterRng.random(config::offerRate)},
+          rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          adjustVol_{masterRng.random(config::offerRateAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeRecruitResult(memory_);
@@ -54,15 +55,15 @@ class OfferPlanner final {
 
     void reset() noexcept {
         memory_.reset();
-        cache_.reset();
+        rateCache_.reset();
     }
 
   private:
     [[nodiscard]] auto planOfferRate() noexcept -> double {
         const auto nextRate = calcOfferRate();
         memory_.clearLog();
-        if (not nextRate) return cache_.cache();
-        cache_.next(*nextRate);
+        if (not nextRate) return rateCache_.cache();
+        rateCache_.next(*nextRate);
         return *nextRate;
     }
 
@@ -72,12 +73,12 @@ class OfferPlanner final {
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = rng_.randNormal(0.0, adjustVol_);
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
-        const auto next        = cache_.cache() + (shouldRaise ? alpha : -alpha);
+        const auto next        = rateCache_.cache() + (shouldRaise ? alpha : -alpha);
         return std::max(0.0, next);
     }
 
     OfferPlannerMemory      memory_;
-    Cache<double>           cache_;
+    Cache<double>           rateCache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };

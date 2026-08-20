@@ -2,6 +2,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
+#include "config.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
@@ -11,7 +12,9 @@
 namespace abm::base_goods::supplier {
 class Producer final {
   public:
-    [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept
+        : firmProductPower_{masterRng.random(config::productPower)},
+          inventory_{masterRng.random(config::inventory)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(*this); }
     void endStep(const GoodsQuantity unsoldAmount, CensusDropBox& dropBox) noexcept {

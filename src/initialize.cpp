@@ -1,7 +1,6 @@
 #include "core/engine.hpp"
 
 #include <cstdlib>
-#include <filesystem>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
@@ -40,16 +39,4 @@ Engine::Engine(const int totalStep) noexcept
     for (; agentId < cnt::bToCFirm + cnt::bToBFirm + cnt::hhold; ++agentId) {
     }
 }
-
-Logger::Logger()
-    : file_{[]() -> HighFive::File {
-          const auto filepath =
-              static_cast<std::string>(config::setting::simulationResultOutputPath);
-          const auto path = std::filesystem::path{filepath};
-          if (path.has_parent_path()) std::filesystem::create_directories(path.parent_path());
-          return HighFive::File{
-              filepath,
-              HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
-          };
-      }()} {}
 }  // namespace abm

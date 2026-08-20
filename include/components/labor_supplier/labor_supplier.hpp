@@ -7,6 +7,7 @@
 
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
+#include "config.hpp"
 #include "core/base.hpp"
 #include "core/forward.hpp"
 #include "util.hpp"
@@ -18,7 +19,7 @@ class LikelihoodChangingJob final {
   public:
     [[nodiscard]] explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
-          threshold_{masterRng.rand(0.05, 0.1)} {}
+          threshold_{masterRng.random(config::changingJobThreshold)} {}
 
     auto shouldChangingJobs() const noexcept -> bool { return threshold_ < rng_.rand(); }
 

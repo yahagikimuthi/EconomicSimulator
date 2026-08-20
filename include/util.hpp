@@ -10,10 +10,17 @@
 #include <random>
 #include <ranges>
 #include <utility>
+#include <variant>
 
+#include "config.hpp"
 #include "core/base.hpp"
 
 namespace abm {
+template <typename... Ts>
+struct Overloaded final : Ts... {
+    using Ts::operator()...;
+};
+
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
@@ -23,6 +30,11 @@ class RandomGenerator final {
 
     [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) noexcept -> double {
         auto dist = std::uniform_real_distribution<double>{min, limit};
+        return dist(rng_);
+    }
+
+    [[nodiscard]] auto randInt(const int min, const int max) noexcept -> int {
+        auto dist = std::uniform_int_distribution<int>{min, max};
         return dist(rng_);
     }
 
@@ -92,6 +104,27 @@ class RandomGenerator final {
 
     [[nodiscard]] auto makeUint64() noexcept -> std::uint64_t {
         return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
+    }
+
+    [[nodiscard]] auto random(const RandomParameter& param) noexcept -> double {
+        return std::visit(
+            Overloaded{
+                [&](const UniformParameter<int>& uniformParam) -> double {
+                    return randInt(
+                        static_cast<int>(uniformParam.min), static_cast<int>(uniformParam.limit)
+                    );
+                },
+                [&](const UniformParameter<double>& uniformParam) -> double {
+                    return rand(uniformParam.min, uniformParam.limit);
+                },
+                [&](const NormalParameter& normalParam) -> double {
+                    return randNormal(
+                        normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
+                    );
+                }
+            },
+            param
+        );
     }
 
   private:

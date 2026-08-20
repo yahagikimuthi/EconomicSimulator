@@ -5,6 +5,7 @@
 #include <optional>
 
 #include "components/base_goods_supplier/common.hpp"
+#include "config.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
 
@@ -14,7 +15,9 @@ namespace abm::base_goods::supplier {
 // 前回の取引結果中、売上高が必要
 class MarkupPlannerMemory final {
   public:
-    [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept
+        : supply_{GoodsQuantity{masterRng.random(config::lastSupply)}},
+          salesAmount_{GoodsQuantity{masterRng.random(config::lastSalesAmount)}} {}
     [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log;
     }

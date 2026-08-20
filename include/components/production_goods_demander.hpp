@@ -10,19 +10,20 @@
 #include "util.hpp"
 #include "world/goods.hpp"
 
-namespace abm {
+namespace abm::production_goods::demander {
 class ProductionGoodsDemander final {
     using Request = ProductionGoodsRequest;
     using Market  = ProductionGoodsMarket;
 
   public:
-    [[nodiscard]] explicit ProductionGoodsDemander(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
+        : mpc_{masterRng.random(config::mpc)} {}
 
     void request(
         const AgentID id,
         const Money   asset,
         Market&       market,
-        const int     sampleCnt = config::goods_demander::goodsSampleCnt
+        const int     sampleCnt = config::goodsSampleCnt
     ) noexcept {
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
@@ -39,4 +40,8 @@ class ProductionGoodsDemander final {
     std::optional<const Request&> myRequest_{std::nullopt};
     const double                  mpc_;
 };
-}  // namespace abm
+}  // namespace abm::production_goods::demander
+
+namespace abm {
+using ProductionGoodsDemander = production_goods::demander::ProductionGoodsDemander;
+}

@@ -46,7 +46,7 @@ class HumanResource final {
               return Wage{std::ranges::fold_left(wages, 0.0, std::plus{})};
           }()} {}
 
-    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
+    [[nodiscard]] auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
         -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
         sumWage_ += wage;
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);

@@ -6,6 +6,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
+#include "config.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "util.hpp"
@@ -13,7 +14,9 @@
 namespace abm::base_goods::supplier {
 class PricePlanner final {
   public:
-    [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          adjustVol_{masterRng.random(config::priceAdjustVol)} {}
 
     [[nodiscard]] auto plan(const GoodsQuantity supply, const double markup, const Money totalCost)
         const noexcept -> Price {

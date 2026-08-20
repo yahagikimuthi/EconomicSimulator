@@ -17,7 +17,7 @@ namespace abm::analysis {
 }
 
 void analysisData() {
-    namespace name = config::save_name;
+    namespace name = setting::save_name;
     auto pipeline  = Pipeline{};
 
     pipeline.requireData(name::firmAssets);

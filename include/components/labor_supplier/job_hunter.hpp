@@ -40,8 +40,8 @@ class JobHunter final {
         F1&&         isAligned,
         F2&&         makeEntrySheet,
         LaborMarket& market,
-        const int    sampleCnt = config::labor_supplier::jobSampleCnt,
-        const int    entryCnt  = config::labor_supplier::jobEntryCnt
+        const int    sampleCnt = config::jobSampleCnt,
+        const int    entryCnt  = config::jobEntryCnt
     ) noexcept {
         std::ranges::view auto alignedRequests{
             pickAndSortJobs(market, sampleCnt, entryCnt) |

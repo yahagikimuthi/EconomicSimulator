@@ -18,8 +18,7 @@ class InputDataManager final {
   public:
     [[nodiscard]] InputDataManager()
         : inFile_{[]() -> HighFive::File {
-              const auto filepath =
-                  static_cast<std::string>(config::setting::simulationResultOutputPath);
+              const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
 
               if (const auto path = std::filesystem::path{filepath}; path.has_parent_path())
                   std::filesystem::create_directories(path.parent_path());
@@ -29,7 +28,7 @@ class InputDataManager final {
             std::cerr << "Failed to load the file\n"
                       << "Path: "
                       << std::filesystem::absolute(
-                             static_cast<std::string>(config::setting::simulationResultOutputPath)
+                             static_cast<std::string>(setting::simulationResultOutputPath)
                          )
                       << '\n';
             std::abort();
@@ -75,7 +74,7 @@ class OutputDataManager final {
   public:
     [[nodiscard]] OutputDataManager()
         : outFile_{[]() -> HighFive::File {
-              const auto filepath = static_cast<std::string>(config::setting::metricDataOutputPath);
+              const auto filepath = static_cast<std::string>(setting::metricDataOutputPath);
               if (const auto path = std::filesystem::path{filepath}; path.has_parent_path()) {
                   std::filesystem::create_directories(path.parent_path());
               }
@@ -88,7 +87,7 @@ class OutputDataManager final {
             std::cerr << "Failed to create the file\n"
                       << "Path: "
                       << std::filesystem::absolute(
-                             static_cast<std::string>(config::setting::metricDataOutputPath)
+                             static_cast<std::string>(setting::metricDataOutputPath)
                          )
                       << '\n';
             std::abort();
