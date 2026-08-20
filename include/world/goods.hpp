@@ -114,7 +114,9 @@ class ConsumerGoodsMarket final {
 
     auto pickEntry(const int sampleCnt) noexcept -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
-        auto toDouble    = [](const Entry& entry) -> double { return entry.supply.value(); };
+        auto toDouble = [] [[nodiscard]] (const Entry& entry) -> double {
+            return entry.supply.value();
+        };
         auto betterEntry = std::ref(rng_.discreteDistribution(entryBox_, totalSupply_, toDouble));
         if (sampleCnt <= 1) return betterEntry.get();
 
@@ -201,7 +203,9 @@ class ProductionGoodsMarket final {
 
     auto pickEntry(const AgentID id, const int sampleCnt) noexcept -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
-        auto toDouble = [](const Entry& entry) -> double { return entry.supply.value(); };
+        auto toDouble = [] [[nodiscard]] (const Entry& entry) -> double {
+            return entry.supply.value();
+        };
         std::optional<Entry&> betterEntry{std::nullopt};
         for (const auto _ : std::views::iota(0, sampleCnt)) {
             auto& sample = rng_.discreteDistribution(entryBox_, totalSupply_, toDouble);

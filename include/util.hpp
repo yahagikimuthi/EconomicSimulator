@@ -109,15 +109,15 @@ class RandomGenerator final {
     [[nodiscard]] auto random(const RandomParameter& param) noexcept -> double {
         return std::visit(
             Overloaded{
-                [&](const UniformParameter<int>& uniformParam) -> double {
+                [&] [[nodiscard]] (const UniformParameter<int>& uniformParam) -> double {
                     return randInt(
                         static_cast<int>(uniformParam.min), static_cast<int>(uniformParam.limit)
                     );
                 },
-                [&](const UniformParameter<double>& uniformParam) -> double {
+                [&] [[nodiscard]] (const UniformParameter<double>& uniformParam) -> double {
                     return rand(uniformParam.min, uniformParam.limit);
                 },
-                [&](const NormalParameter& normalParam) -> double {
+                [&] [[nodiscard]] (const NormalParameter& normalParam) -> double {
                     return randNormal(
                         normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
                     );

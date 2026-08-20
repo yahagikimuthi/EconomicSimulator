@@ -82,9 +82,11 @@ class LaborDemander final {
     void offer() noexcept { recruitSystem_.offer(); }
 
     void registerMember(Workspace& workspace) noexcept {
-        recruitSystem_.registerMember([&](const AgentID id, const Wage wage) -> RosterEntry& {
-            return humanResource_.addRoster(id, wage, workspace);
-        });
+        recruitSystem_.registerMember(
+            [&] [[nodiscard]] (const AgentID id, const Wage wage) -> RosterEntry& {
+                return humanResource_.addRoster(id, wage, workspace);
+            }
+        );
     };
 
     void acceptResignation() noexcept { humanResource_.acceptResignation(); }
