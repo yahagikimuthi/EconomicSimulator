@@ -21,10 +21,10 @@ class OfferPlannerMemory final {
     [[nodiscard]] explicit OfferPlannerMemory(RandomGenerator& masterRng) noexcept
         : applicants_{HeadCount{masterRng.random(setting::lastApplicants)}},
           employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}} {}
-    [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
+    [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.log;
     }
-    [[nodiscard]] auto rememberLastEmployPlan() const noexcept -> std::optional<HeadCount> {
+    [[nodiscard]] auto lastEmployPlan() const noexcept -> std::optional<HeadCount> {
         return employPlan_.log;
     }
     void clearLog() noexcept { applicants_.clearLog(), employPlan_.clearLog(); }
@@ -69,8 +69,8 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto calcOfferRate() const noexcept -> std::optional<double> {
-        const auto lastApplicants = memory_.rememberLastApplicants();
-        const auto lastEmployPlan = memory_.rememberLastEmployPlan();
+        const auto lastApplicants = memory_.lastApplicants();
+        const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = rng_.randNormal(0.0, adjustVol_);
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;

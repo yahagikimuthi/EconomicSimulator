@@ -17,6 +17,11 @@ class Ledger final {
   public:
     [[nodiscard]] Ledger() noexcept = default;
 
+    void makeNewPage(const GoodsQuantity supply) noexcept {
+        supply_    = supply;
+        inventory_ = supply;
+    }
+
     [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity { return inventory_; }
     [[nodiscard]] auto canTradeAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
         const auto out = std::max(inventory_.value(), demand.value());

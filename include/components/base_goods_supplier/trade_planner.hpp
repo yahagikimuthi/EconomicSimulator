@@ -49,7 +49,7 @@ class DemandForecastManagerMemory final {
     [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
         : totalDemand_{GoodsQuantity{masterRng.random(setting::lastDemand)}} {}
 
-    [[nodiscard]] auto rememberLastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
+    [[nodiscard]] auto lastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
         return totalDemand_.log;
     }
     void clearLog() noexcept { totalDemand_.clearLog(); }
@@ -76,13 +76,13 @@ class DemandForecastManager final {
         const auto next = calcNext();
         memory_.clearLog();
         if (not next) return cache_.cache();
-        cache_.memorize(*next);
+        cache_.next(*next);
         return *next;
     }
 
   private:
     [[nodiscard]] auto calcNext() const noexcept -> std::optional<GoodsQuantity> {
-        const auto lastTotalDemand = memory_.rememberLastTotalDemand();
+        const auto lastTotalDemand = memory_.lastTotalDemand();
         if (not lastTotalDemand) return std::nullopt;
         const auto lastForecast = cache_.cache();
         const auto out          = lastForecast + (adjustment_ * (*lastTotalDemand - lastForecast));

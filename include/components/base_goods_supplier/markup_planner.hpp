@@ -19,10 +19,10 @@ class MarkupPlannerMemory final {
     [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept
         : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}},
           salesAmount_{GoodsQuantity{masterRng.random(setting::lastSalesAmount)}} {}
-    [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
+    [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log;
     }
-    [[nodiscard]] auto rememberLastSalesAmount() const noexcept -> std::optional<GoodsQuantity> {
+    [[nodiscard]] auto lastSalesAmount() const noexcept -> std::optional<GoodsQuantity> {
         return salesAmount_.log;
     }
 
@@ -55,7 +55,7 @@ class MarkupPlanner final {
         const auto next = calcNextMarkup(targetIvRatio);
         memory_.clearLog();
         if (not next) return cache_.cache();
-        cache_.memorize(*next);
+        cache_.next(*next);
         return *next;
     }
 
@@ -68,8 +68,8 @@ class MarkupPlanner final {
     // isSold = (前期供給 - 前期売上) / 前回供給 < 定数
     [[nodiscard]] auto calcNextMarkup(const double targetInvRatio
     ) const noexcept -> std::optional<double> {
-        const auto lastSupply      = memory_.rememberLastSupply();
-        const auto lastSalesAmount = memory_.rememberLastSalesAmount();
+        const auto lastSupply      = memory_.lastSupply();
+        const auto lastSalesAmount = memory_.lastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
         ASSERT(*lastSupply >= GoodsQuantity{0.0});
         const auto inventory = *lastSupply - *lastSalesAmount;

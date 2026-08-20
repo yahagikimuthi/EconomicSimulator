@@ -18,10 +18,10 @@ class WagePlannerMemory final {
     void listenRecruitResult(const RecruitResult& result) noexcept {
         applicants_.next = result.applicants;
     }
-    [[nodiscard]] auto rememberLastApplicants() const noexcept -> std::optional<HeadCount> {
+    [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.log;
     }
-    [[nodiscard]] auto rememberLastEmployPlan() const noexcept -> std::optional<HeadCount> {
+    [[nodiscard]] auto lastEmployPlan() const noexcept -> std::optional<HeadCount> {
         return employPlan_.log;
     }
     void clearLog() noexcept { employPlan_.clearLog(), applicants_.clearLog(); }
@@ -63,8 +63,8 @@ class WagePlanner final {
 
   private:
     [[nodiscard]] auto calcWage() const noexcept -> std::optional<Wage> {
-        const auto lastApplicants = memory_.rememberLastApplicants();
-        const auto lastEmployPlan = memory_.rememberLastEmployPlan();
+        const auto lastApplicants = memory_.lastApplicants();
+        const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;

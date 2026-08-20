@@ -33,7 +33,8 @@ class TradingSystem final {
 
     void endStep(IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
-        mediator.publishTradeResult(result);
+        if (not result) return;
+        mediator.publishTradeResult(*result);
     }
 
     void reset() noexcept {

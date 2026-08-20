@@ -91,9 +91,9 @@ class Engine final {
     void check() const noexcept;
 
     [[nodiscard]] static auto generateSeed() noexcept -> PCG32Seed {
-        if (not setting::useRuntimeRandomSeed)
+        if constexpr (not setting::useRuntimeRandomSeed) {
             return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};
-
+        }
         auto       rd     = std::random_device{};
         const auto state  = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
         const auto stream = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};

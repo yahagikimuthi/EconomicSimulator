@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cmath>
 #include <optional>
 
 #include "components/base_goods_supplier/common.hpp"
@@ -15,7 +14,7 @@ class EmployPlannerMemory final {
   public:
     [[nodiscard]] explicit EmployPlannerMemory(RandomGenerator& masterRng) noexcept
         : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}} {}
-    [[nodiscard]] auto rememberLastSupply() const noexcept -> std::optional<GoodsQuantity> {
+    [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log;
     }
     void clearLog() noexcept { supply_.clearLog(); }
@@ -41,7 +40,7 @@ class EmployPlanner final {
         const auto out = calc(firmProductPower, employee, targetProduction);
         memory_.clearLog();
         if (not out) return cache_.cache();
-        cache_.memorize(*out);
+        cache_.next(*out);
         return *out;
     }
 
@@ -61,7 +60,7 @@ class EmployPlanner final {
         ASSERT(employee >= HeadCount{0.0});
         ASSERT(targetProduction >= GoodsQuantity{0.0});
 
-        const auto lastSupply = memory_.rememberLastSupply();
+        const auto lastSupply = memory_.lastSupply();
         if (not lastSupply) return std::nullopt;
         ASSERT(*lastSupply >= GoodsQuantity{0.0});
         const auto isEmploying = employee == HeadCount{0.0};

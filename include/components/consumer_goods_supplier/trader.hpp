@@ -28,8 +28,10 @@ class Trader final {
 
     void post(const TradePlan& plan, Market& market) noexcept {
         ASSERT(plan.supply >= GoodsQuantity{0.0});
+        isActive_ = true;
         if (plan.supply == GoodsQuantity{0.0}) return;
         myEntry_ = market.entry(plan.price, plan.supply);
+        ledger_.makeNewPage(plan.supply);
     }
 
     void trade() noexcept {
@@ -44,11 +46,16 @@ class Trader final {
         );
     }
 
-    [[nodiscard]] auto publishTradeResult() const noexcept -> TradeResult {
+    [[nodiscard]] auto publishTradeResult() const noexcept -> std::optional<TradeResult> {
+        if (not isActive_) return std::nullopt;
         return ledger_.publishResult();
     }
 
-    void reset() noexcept { myEntry_.reset(); }
+    void reset() noexcept {
+        myEntry_.reset();
+        ledger_.reset();
+        isActive_ = false;
+    }
 
   private:
     [[nodiscard]] auto requestBoxRef() noexcept -> std::span<RefWrap<Request>> {
@@ -78,5 +85,7 @@ class Trader final {
     Ledger                  ledger_;
     std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
+
+    bool isActive_{false};
 };
 }  // namespace abm::consumer_goods::supplier

@@ -46,7 +46,7 @@ class Cache final {
         cache_ = *next_;
         next_.reset();
     }
-    void memorize(const T next) noexcept { next_ = next; }
+    void next(const T next) noexcept { next_ = next; }
 
   private:
     T                cache_;
