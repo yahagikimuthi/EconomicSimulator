@@ -87,6 +87,11 @@ class DemandForecastManager final {
         return *next;
     }
 
+    void reset() noexcept {
+        memory_.reset();
+        cache_.reset();
+    }
+
   private:
     [[nodiscard]] auto calcNext() const noexcept -> std::optional<GoodsQuantity> {
         const auto lastTotalDemand = memory_.lastTotalDemand();
@@ -130,7 +135,10 @@ class TradePlanner final {
         return demandForecast / (1.0 - targetInvRatio_);
     }
 
-    void reset() noexcept { markupPlanner_.reset(); }
+    void reset() noexcept {
+        markupPlanner_.reset();
+        demandForecast_.reset();
+    }
 
   private:
     MarkupPlanner         markupPlanner_;

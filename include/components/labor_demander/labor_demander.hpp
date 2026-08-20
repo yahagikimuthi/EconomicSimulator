@@ -28,38 +28,29 @@ class RecruitSystem final {
         IMediator auto& mediator
     ) noexcept {
         ASSERT(desiredEmploy > HeadCount{0.0});
-        isRecruiting_   = true;
         const auto plan = planner_.plan(desiredEmploy, mediator);
         recruiter_.post(id, plan, laborMarket);
     }
 
-    void offer() noexcept {
-        if (not isRecruiting_) return;
-        recruiter_.offer();
-    }
+    void offer() noexcept { recruiter_.offer(); }
 
     template <AddRosterFn F>
     void registerMember(F&& addRoster) noexcept {
-        if (not isRecruiting_) return;
         recruiter_.registerMember(std::forward<F>(addRoster));
     }
 
     void endStep(IMediator auto& mediator) noexcept {
-        if (not isRecruiting_) return;
         const auto result = recruiter_.publishResult();
         if (not result) return;
         mediator.publishRecruitResult(*result);
     }
 
     void reset() noexcept {
-        if (not isRecruiting_) return;
         planner_.reset();
         recruiter_.reset();
-        isRecruiting_ = false;
     }
 
   private:
-    bool           isRecruiting_{false};
     RecruitPlanner planner_;
     Recruiter      recruiter_;
 };

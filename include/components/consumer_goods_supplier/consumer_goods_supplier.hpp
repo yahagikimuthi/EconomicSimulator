@@ -38,6 +38,8 @@ class ConsumerGoodsSupplier final {
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
   private:
+    void reset() noexcept { tradingSystem_.reset(); }
+
     ProducingSystem producingSystem_;
     TradingSystem   tradingSystem_;
     Mediator        mediator_;

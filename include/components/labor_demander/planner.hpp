@@ -22,7 +22,8 @@ class RecruitPlanner final {
         ASSERT(desiredEmploy >= HeadCount{0.0});
 
         const auto plan = RecruitPlan{
-            .wage = wagePlanner_.plan(), .offer = employPlanSystem_.plan(desiredEmploy, mediator)
+            .wage  = wagePlanner_.plan(),
+            .offer = employPlanSystem_.planOffer(desiredEmploy, mediator)
         };
         mediator.publishRecruitPlan(plan);
         return plan;

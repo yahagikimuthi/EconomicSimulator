@@ -9,8 +9,11 @@
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
+
+// 要求雇用数を雇用計画に変換するための意味論的クラス
 class EmployPlanner final {
   public:
+    EmployPlanner() = delete;  // インスタンス化は想定しない
     [[nodiscard]] static auto plan(const HeadCount desiredEmploy) noexcept -> HeadCount {
         return desiredEmploy;
     }
@@ -99,7 +102,7 @@ class EmployPlanningSystem final {
         offerPlanner_.acceptMediator(mediator);
     }
 
-    [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
+    [[nodiscard]] auto planOffer(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> HeadCount {
         ASSERT(desiredEmploy >= HeadCount{0.0});
 
