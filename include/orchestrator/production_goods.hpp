@@ -38,5 +38,14 @@ void afterTrade(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander
 
 void endStep(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.endStep(); }
 
-void endStep(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander.endStep(); }
+void endStep(
+    FirmFinance&             finance,
+    ProductionGoodsSupplier& productionGoodsSupplier,
+    ProductionGoodsDemander& productionGoodsDemander
+) noexcept {
+    productionGoodsDemander.endStep([&](const demander::TradeResult& result) -> void {
+        finance.assetPlus(-result.purchased);
+        productionGoodsSupplier.addProductionEquip(result.tradeAmount);
+    });
+}
 }  // namespace abm::production_goods

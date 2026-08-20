@@ -1,8 +1,10 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <concepts>
 #include <optional>
 #include <pcg_random.hpp>
+#include <utility>
 
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
@@ -11,6 +13,45 @@
 #include "world/goods.hpp"
 
 namespace abm::production_goods::demander {
+
+struct ATradeResult {
+    const Price         price;
+    const GoodsQuantity tradeAmount;
+};
+
+struct TradeResult {
+    const Money         purchased;
+    const GoodsQuantity tradeAmount;
+};
+
+class Ledger {
+  public:
+    [[nodiscard]] Ledger() noexcept = default;
+
+    void readTradeResult(const ATradeResult& result) noexcept {
+        purchasing_ += result.price * result.tradeAmount;
+        purchaseAmount_ += result.tradeAmount;
+    }
+
+    void reset() noexcept {
+        purchasing_     = Money{0.0};
+        purchaseAmount_ = GoodsQuantity{0.0};
+    }
+
+    [[nodiscard]] auto publishTradeResult() const noexcept -> TradeResult {
+        return {.purchased = purchasing_, .tradeAmount = purchaseAmount_};
+    }
+
+  private:
+    Money         purchasing_{0.0};
+    GoodsQuantity purchaseAmount_{0.0};
+};
+
+template <typename F>
+concept ReadResultFn = requires(F f, const TradeResult& result) {
+    { f(result) } -> std::same_as<void>;
+};
+
 class ProductionGoodsDemander final {
     using Request = ProductionGoodsRequest;
     using Market  = ProductionGoodsMarket;
@@ -32,11 +73,27 @@ class ProductionGoodsDemander final {
         myRequest_ = pickedEntry->request(budget / pickedEntry->price);
     }
 
-    void afterTrade() noexcept {}
+    void afterTrade() noexcept {
+        if (not myRequest_) return;
+        ledger_.readTradeResult(
+            {.price = myRequest_->entry.price, .tradeAmount = myRequest_->tradeAmount}
+        );
+    }
 
-    void endStep() noexcept {}
+    template <ReadResultFn F>
+    void endStep(F&& readResult) noexcept {
+        const auto result = ledger_.publishTradeResult();
+        std::forward<F>(readResult)(result);
+        reset();
+    }
 
   private:
+    void reset() noexcept {
+        ledger_.reset();
+        myRequest_.reset();
+    }
+
+    Ledger                        ledger_;
     std::optional<const Request&> myRequest_{std::nullopt};
     const double                  mpc_;
 };

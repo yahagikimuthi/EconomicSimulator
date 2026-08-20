@@ -3,7 +3,9 @@
 #include <tbb/concurrent_vector.h>
 #include <optional>
 #include <pcg_random.hpp>
+#include <utility>
 
+#include "components/others.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "setting.hpp"
@@ -11,6 +13,26 @@
 #include "world/goods.hpp"
 
 namespace abm::consumer_goods::demander {
+
+struct ATradeResult {
+    const Price         price;
+    const GoodsQuantity purchaseAmount;
+};
+
+class Ledger {
+  public:
+    [[nodiscard]] Ledger() noexcept = default;
+
+    void reset() noexcept { purchasing_ = Money{0.0}; }
+    void readTradeResult(const ATradeResult& result) noexcept {
+        purchasing_ += result.price * result.purchaseAmount;
+    }
+    [[nodiscard]] auto purchased() const noexcept -> Money { return purchasing_; }
+
+  private:
+    Money purchasing_{0.0};
+};
+
 class ConsumerGoodsDemander final {
     using Market  = ConsumerGoodsMarket;
     using Request = ConsumerGoodsRequest;
@@ -36,17 +58,30 @@ class ConsumerGoodsDemander final {
         myRequest_ = pickedEntry->request(budget / pickedEntry->price);
     }
 
-    void afterTrade() noexcept {}
+    void afterTrade() noexcept {
+        if (not myRequest_) return;
+        ledger_.readTradeResult(
+            {.price = myRequest_->entry.price, .purchaseAmount = myRequest_->tradeAmount}
+        );
+    }
 
-    void endStep() noexcept { myRequest_.reset(); }
+    template <AssetMinusFn F>
+    void endStep(F&& assetMinus) noexcept {
+        std::forward<F>(assetMinus)(ledger_.purchased());
+        reset();
+    }
 
   private:
     [[nodiscard]] auto shouldPass(const Step step, const int frequency) const noexcept -> bool {
         return step % frequency != myPhase_;
     }
 
-    void reset() noexcept { myRequest_.reset(); }
+    void reset() noexcept {
+        myRequest_.reset();
+        ledger_.reset();
+    }
 
+    Ledger                        ledger_;
     std::optional<const Request&> myRequest_{std::nullopt};
     const double                  mpc_;
     const Step                    myPhase_;

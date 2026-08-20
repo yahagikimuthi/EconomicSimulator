@@ -50,7 +50,6 @@ class EmployPlanner final {
     }
 
   private:
-    //! 目標在庫率のこと考えてないね
     [[nodiscard]] auto calc(
         const double        firmProductPower,
         const HeadCount     employee,
@@ -58,7 +57,6 @@ class EmployPlanner final {
     ) noexcept -> std::optional<HeadCount> {
         ASSERT(firmProductPower >= 0.0);
         ASSERT(employee >= HeadCount{0.0});
-        ASSERT(targetProduction >= GoodsQuantity{0.0});
 
         const auto lastSupply = memory_.lastSupply();
         if (not lastSupply) return std::nullopt;

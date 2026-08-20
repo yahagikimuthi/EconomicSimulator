@@ -40,5 +40,7 @@ void afterTrade(ConsumerGoodsDemander& goodsDemander) noexcept { goodsDemander.a
 
 void endStep(ConsumerGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.endStep(); }
 
-void endStep(ConsumerGoodsDemander& goodsDemander) noexcept { goodsDemander.endStep(); }
+void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) noexcept {
+    goodsDemander.endStep([&](const Money purchase) -> void { finance.assetPlus(-purchase); });
+}
 }  // namespace abm::consumer_goods

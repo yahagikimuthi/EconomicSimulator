@@ -13,7 +13,7 @@ namespace abm::base_goods::supplier {
 class Producer final {
   public:
     [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept
-        : firmProductPower_{masterRng.random(setting::productPower)},
+        : baseProductPower{masterRng.random(setting::productPower)},
           inventory_{masterRng.random(setting::inventory)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradeResult(*this); }
@@ -24,11 +24,11 @@ class Producer final {
     }
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
     [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity { return inventory_; }
-    [[nodiscard]] auto firmProductPower() const noexcept -> double { return firmProductPower_; }
+    [[nodiscard]] auto firmProductPower() const noexcept -> double { return baseProductPower; }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.totalInput();
-        const auto production  = workerInput * firmProductPower_;
+        const auto production  = workerInput * baseProductPower;
         const auto out         = production + inventory_;
         inventory_             = GoodsQuantity{0.0};
         return out;
@@ -37,10 +37,15 @@ class Producer final {
         inventory_ += result.unsoldAmount;
     }
 
+    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
+        productionGoods_ += productionGoods;
+    }
+
   private:
     Workspace     workspace_;
-    const double  firmProductPower_;
+    const double  baseProductPower;
     GoodsQuantity inventory_;
+    GoodsQuantity productionGoods_{0.0};
 };
 
 class ProducingSystem final {
@@ -59,6 +64,10 @@ class ProducingSystem final {
         const auto inventory    = producer_.inventory();
         const auto productPower = producer_.firmProductPower();
         return employPlanner_.plan(productPower, employee, requiresSupply - inventory);
+    }
+
+    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
+        producer_.addProducingEquip(productionGoods);
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }

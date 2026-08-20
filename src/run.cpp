@@ -107,7 +107,9 @@ void Engine::runProductionGoods() noexcept {
     }
 
     for (BtoBFirm& firm : bToBFirms_) {
-        production_goods::endStep(firm.productionGoodsDemander);
+        production_goods::endStep(
+            firm.finance, firm.productionGoodsSupplier, firm.productionGoodsDemander
+        );
     }
 }
 
@@ -145,7 +147,7 @@ void Engine::runConsumerGoods() noexcept {
     }
 
     for (HHold& hhold : hholds_) {
-        consumer_goods::endStep(hhold.consumerGoodsDemander);
+        consumer_goods::endStep(hhold.finance, hhold.consumerGoodsDemander);
     }
 }
 
