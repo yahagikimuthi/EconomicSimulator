@@ -46,7 +46,8 @@ class RecruitSystem final {
     void endStep(IMediator auto& mediator) noexcept {
         if (not isRecruiting_) return;
         const auto result = recruiter_.publishResult();
-        mediator.publishRecruitResult(result);
+        if (not result) return;
+        mediator.publishRecruitResult(*result);
     }
 
     void reset() noexcept {
