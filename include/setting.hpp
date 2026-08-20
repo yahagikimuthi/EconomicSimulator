@@ -93,7 +93,9 @@ constexpr RandomParameter hhold = UniformParameter<double>{.min = 10.0, .limit =
 namespace abm::setting::save_name {
 constexpr auto firmAssets        = "firmAssets"sv;
 constexpr auto postedEmployments = "postedEmployments"sv;
+constexpr auto postedWages       = "postedWages"sv;
 constexpr auto employments       = "employments"sv;
+constexpr auto sumWages          = "sumWages"sv;
 constexpr auto prices            = "prices"sv;
 constexpr auto supplies          = "supplies"sv;
 constexpr auto markups           = "markups"sv;

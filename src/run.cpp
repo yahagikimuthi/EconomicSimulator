@@ -181,7 +181,9 @@ void Logger::save(const CensusDropBox& dropBox, const Step step) {
 
     create(name::firmAssets, dropBox.firmAssets);
     create(name::postedEmployments, dropBox.postedEmployments);
+    create(name::postedWages, dropBox.postedWages);
     create(name::employments, dropBox.employments);
+    create(name::sumWages, dropBox.sumWages);
     create(name::prices, dropBox.prices);
     create(name::supplies, dropBox.supplies);
     create(name::markups, dropBox.markups);
