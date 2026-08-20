@@ -2,7 +2,7 @@
 
 #include <compare>
 
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 
 namespace abm {
 class Money final {

@@ -2,7 +2,7 @@
 
 #include <compare>
 
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 #include "core/values/common.hpp"
 
 namespace abm {

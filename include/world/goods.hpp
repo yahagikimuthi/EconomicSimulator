@@ -7,7 +7,7 @@
 #include <ranges>
 #include <vector>
 
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"

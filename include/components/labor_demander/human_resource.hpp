@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"

@@ -2,7 +2,7 @@
 
 #include <pcg_random.hpp>
 
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 #include "core/values/common.hpp"
 #include "setting.hpp"
 #include "util.hpp"

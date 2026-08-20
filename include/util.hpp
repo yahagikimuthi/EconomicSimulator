@@ -12,7 +12,7 @@
 #include <utility>
 #include <variant>
 
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 #include "setting.hpp"
 
 namespace abm {

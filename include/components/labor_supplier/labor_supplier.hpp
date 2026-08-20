@@ -7,7 +7,7 @@
 
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
-#include "core/base.hpp"
+#include "core/assertion.hpp"
 #include "core/forward.hpp"
 #include "setting.hpp"
 #include "util.hpp"

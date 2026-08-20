@@ -1,5 +1,4 @@
-#include "analysis/analysis.hpp"
-#include "core/engine.hpp"
+#include "abm.hpp"
 
 auto main() -> int {
     auto engine = abm::Engine{1000};
