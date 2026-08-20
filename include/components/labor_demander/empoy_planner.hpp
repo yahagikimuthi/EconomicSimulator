@@ -30,6 +30,7 @@ class OfferPlannerMemory final {
     void clearLog() noexcept { applicants_.clearLog(), employPlan_.clearLog(); }
     void reset() noexcept { applicants_.reset(), employPlan_.reset(); }
     void listenRecruitResult(const RecruitResult& result) noexcept {
+        ASSERT(result.applicants >= HeadCount{0.0});
         applicants_.next = result.applicants;
     }
 
@@ -65,6 +66,8 @@ class OfferPlanner final {
         memory_.clearLog();
         if (not nextRate) return rateCache_.cache();
         rateCache_.next(*nextRate);
+
+        ASSERT(*nextRate > 0.0);
         return *nextRate;
     }
 
@@ -98,6 +101,8 @@ class EmployPlanningSystem final {
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> HeadCount {
+        ASSERT(desiredEmploy >= HeadCount{0.0});
+
         const auto employPlan = EmployPlanner::plan(desiredEmploy);
         mediator.publishEmployPlan(employPlan);
         const auto offerPlan = offerPlanner_.plan(employPlan);

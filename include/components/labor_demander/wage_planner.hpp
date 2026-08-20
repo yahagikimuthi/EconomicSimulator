@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <limits>
 #include <optional>
 #include <pcg_random.hpp>
 
@@ -14,8 +16,12 @@ class WagePlannerMemory final {
     [[nodiscard]] explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}},
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
-    void listenEmployPlan(const HeadCount employPlan) noexcept { employPlan_.next = employPlan; }
+    void listenEmployPlan(const HeadCount employPlan) noexcept {
+        ASSERT(employPlan >= HeadCount{0.0});
+        employPlan_.next = employPlan;
+    }
     void listenRecruitResult(const RecruitResult& result) noexcept {
+        ASSERT(result.applicants >= HeadCount{0.0});
         applicants_.next = result.applicants;
     }
     [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
@@ -53,6 +59,8 @@ class WagePlanner final {
         memory_.clearLog();
         if (not next) return cache_.cache();
         cache_.next(*next);
+
+        ASSERT(*next >= Wage{0.0});
         return *next;
     }
 

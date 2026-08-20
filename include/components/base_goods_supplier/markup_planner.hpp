@@ -27,9 +27,15 @@ class MarkupPlannerMemory final {
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
+        ASSERT(result.soldAmount >= GoodsQuantity{0.0});
         salesAmount_.next = result.soldAmount;
     }
-    void listenTradePlan(const TradePlan& plan) noexcept { supply_.next = plan.supply; }
+
+    void listenTradePlan(const TradePlan& plan) noexcept {
+        ASSERT(plan.supply >= GoodsQuantity{0.0});
+        supply_.next = plan.supply;
+    }
+
     void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }
     void reset() noexcept { supply_.reset(), salesAmount_.reset(); }
 
@@ -52,6 +58,8 @@ class MarkupPlanner final {
     }
 
     [[nodiscard]] auto plan(const double targetIvRatio) noexcept -> double {
+        ASSERT(0.0 < targetIvRatio and targetIvRatio < 1.0);
+
         const auto next = calcNextMarkup(targetIvRatio);
         memory_.clearLog();
         if (not next) return cache_.cache();
@@ -82,10 +90,10 @@ class MarkupPlanner final {
     [[nodiscard]] auto calcNextMarkup(const bool isSold) const noexcept -> double {
         const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto nextMarkup = cache_.cache() + (isSold ? alpha : -alpha);
-        return markupGuard(nextMarkup);
+        return guard(nextMarkup);
     }
 
-    [[nodiscard]] static auto markupGuard(const double markup) noexcept -> double {
+    [[nodiscard]] static auto guard(const double markup) noexcept -> double {
         return std::max(markup, std::numeric_limits<double>::epsilon());
     }
 

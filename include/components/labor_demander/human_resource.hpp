@@ -25,10 +25,14 @@ class EmptyRosterPool final {
     auto popBackEntry() noexcept -> RosterEntry& {
         ASSERT(not empty());
         auto& back = pool_.back().get();
+        ASSERT(not back.isOccupied);
         pool_.pop_back();
         return back;
     }
-    void add(RosterEntry& entry) noexcept { pool_.emplace_back(std::ref(entry)); }
+    void add(RosterEntry& entry) noexcept {
+        ASSERT(not entry.isOccupied);
+        pool_.emplace_back(std::ref(entry));
+    }
 
   private:
     std::vector<RefWrap<RosterEntry>> pool_;
@@ -68,7 +72,9 @@ class HumanResource final {
         resignationBox.clear();
     }
 
-    void layOffs(const HeadCount layOffsCnt) noexcept PRE(layOffsCnt >= HeadCount{0.0}) {
+    void layOffs(const HeadCount layOffsCnt) noexcept {
+        ASSERT(layOffsCnt >= HeadCount{0.0});
+
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : companyBoard_.roster) {
             if (currentLayOffs >= layOffsCnt) break;
@@ -86,7 +92,8 @@ class HumanResource final {
         return HeadCount{static_cast<double>(rosterSize)};
     }
 
-    [[nodiscard]] auto sumWage() const noexcept -> Wage POST(wage : wage >= Wage{0.0}) {
+    [[nodiscard]] auto sumWage() const noexcept -> Wage {
+        ASSERT(sumWage_ >= Wage{0.0});
         return sumWage_;
     }
 

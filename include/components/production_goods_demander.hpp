@@ -29,11 +29,16 @@ class Ledger {
     [[nodiscard]] Ledger() noexcept = default;
 
     void readTradeResult(const ATradeResult& result) noexcept {
+        ASSERT(result.price >= Price{0.0});
+        ASSERT(result.tradeAmount >= GoodsQuantity{0.0});
+
         purchasing_ += result.price * result.tradeAmount;
         purchaseAmount_ += result.tradeAmount;
     }
 
     void reset() noexcept {
+        ASSERT(purchasing_ >= Money{0.0});
+        ASSERT(purchaseAmount_ >= GoodsQuantity{0.0});
         purchasing_     = Money{0.0};
         purchaseAmount_ = GoodsQuantity{0.0};
     }
@@ -83,6 +88,9 @@ class ProductionGoodsDemander final {
     template <ReadResultFn F>
     void endStep(F&& readResult) noexcept {
         const auto result = ledger_.publishTradeResult();
+        ASSERT(result.purchased >= Money{0.0});
+        ASSERT(result.tradeAmount >= GoodsQuantity{0.0});
+
         std::forward<F>(readResult)(result);
         reset();
     }

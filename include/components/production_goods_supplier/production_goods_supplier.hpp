@@ -24,11 +24,15 @@ class ProductionGoodsSupplier final {
     }
 
     void post(const AgentID id, const Money totalCost, Market& market) noexcept {
+        ASSERT(totalCost >= Money{0.0});
+
         const auto supply = producingSystem_.produce();
         tradingSystem_.post(id, supply, totalCost, market);
     }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
+        ASSERT(employee >= HeadCount{0.0});
+
         const auto targetSupply = tradingSystem_.requiresSupply();
         return producingSystem_.calcDesiredEmploy(targetSupply, employee);
     }

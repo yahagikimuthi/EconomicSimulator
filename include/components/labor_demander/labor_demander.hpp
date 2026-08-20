@@ -102,7 +102,6 @@ class LaborDemander final {
     void endStep() noexcept {
         recruitSystem_.endStep(mediator_);
         recruitSystem_.reset();
-        recruitSystem_.reset();
     }
 
   private:

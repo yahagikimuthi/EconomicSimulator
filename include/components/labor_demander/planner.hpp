@@ -19,6 +19,8 @@ class RecruitPlanner final {
 
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, IMediator auto& mediator) noexcept
         -> RecruitPlan {
+        ASSERT(desiredEmploy >= HeadCount{0.0});
+
         const auto plan = RecruitPlan{
             .wage = wagePlanner_.plan(), .offer = employPlanSystem_.plan(desiredEmploy, mediator)
         };

@@ -17,6 +17,10 @@ class Employment final {
     [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_.has_value(); }
 
     void startWorking(RosterEntry& rosterEntry) noexcept {
+        if (isEmployed()) {
+            ASSERT(rosterEntry_->firmId() != rosterEntry.firmId());
+            ASSERT(rosterEntry_->wage < rosterEntry.wage);
+        }
         resign();
         rosterEntry_ = rosterEntry;
     }

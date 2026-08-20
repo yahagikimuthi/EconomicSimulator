@@ -8,7 +8,6 @@
 
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
-#include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
 #include "setting.hpp"
 #include "world/common.hpp"
@@ -62,7 +61,7 @@ void Engine::runLabor() noexcept {
         labor::endStep(hhold.finance, hhold.laborSupplier, dropBox_);
     }
 }
-
+/*
 void Engine::runProductionGoods() noexcept {
     for (HHold& hhold : hholds_) {
         production_goods::product(hhold.laborSupplier, Market::productionGoods);
@@ -112,6 +111,7 @@ void Engine::runProductionGoods() noexcept {
         );
     }
 }
+*/
 
 void Engine::runConsumerGoods() noexcept {
     for (HHold& hhold : hholds_) {

@@ -18,31 +18,52 @@ class Ledger final {
     [[nodiscard]] Ledger() noexcept = default;
 
     void makeNewPage(const GoodsQuantity supply) noexcept {
+        ASSERT(supply >= GoodsQuantity{0.0});
         supply_    = supply;
         inventory_ = supply;
     }
 
-    [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity { return inventory_; }
+    [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity {
+        ASSERT(inventory_ >= GoodsQuantity{0.0});
+        return inventory_;
+    }
+
     [[nodiscard]] auto canTradeAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
+        ASSERT(demand >= GoodsQuantity{0.0});
+
         const auto out = std::max(inventory_.value(), demand.value());
+        ASSERT(out >= 0.0);
         return GoodsQuantity{out};
     }
+
     [[nodiscard]] auto isExcessDemand(const GoodsQuantity demand) const noexcept -> bool {
+        ASSERT(demand >= GoodsQuantity{0.0});
         return demand > inventory_;
     }
+
     void readResult(const ATradeResult& result) noexcept {
+        ASSERT(result.salesAmount >= GoodsQuantity{0.0});
+        ASSERT(result.price >= Price{0.0});
+        ASSERT(result.demand >= GoodsQuantity{0.0});
+
         inventory_ -= result.salesAmount;
         currentSales_ += result.price * result.salesAmount;
         totalDemand_ += result.demand;
     }
 
     [[nodiscard]] auto publishResult() const noexcept -> TradeResult {
-        return {
+        const auto out = TradeResult{
             .soldAmount   = supply_ - inventory_,
             .unsoldAmount = inventory_,
             .totalDemand  = totalDemand_,
             .sales        = currentSales_
         };
+
+        ASSERT(out.soldAmount >= GoodsQuantity{0.0});
+        ASSERT(out.unsoldAmount >= GoodsQuantity{0.0});
+        ASSERT(out.totalDemand >= GoodsQuantity{0.0});
+        ASSERT(out.sales >= Money{0.0});
+        return out;
     }
 
     void reset() noexcept {

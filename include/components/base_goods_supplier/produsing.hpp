@@ -6,7 +6,6 @@
 #include "core/values/labor.hpp"
 #include "setting.hpp"
 #include "util.hpp"
-#include "world/common.hpp"
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
@@ -17,27 +16,37 @@ class Producer final {
           inventory_{masterRng.random(setting::inventory)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradeResult(*this); }
-    void endStep(const GoodsQuantity unsoldAmount, CensusDropBox& dropBox) noexcept {
+    void endStep(const GoodsQuantity unsoldAmount) noexcept {
+        ASSERT(unsoldAmount >= GoodsQuantity{0.0});
         inventory_ = unsoldAmount;
-        dropBox.inventories.emplace_back(inventory_.value());
         workspace_.resetInput();
     }
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
-    [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity { return inventory_; }
+    [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity {
+        ASSERT(inventory_ >= GoodsQuantity{0.0});
+        return inventory_;
+    }
     [[nodiscard]] auto firmProductPower() const noexcept -> double { return baseProductPower; }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.totalInput();
-        const auto production  = workerInput * baseProductPower;
-        const auto out         = production + inventory_;
-        inventory_             = GoodsQuantity{0.0};
+        ASSERT(workerInput >= GoodsQuantity{0.0});
+        const auto production = workerInput * baseProductPower;
+        ASSERT(inventory_ >= GoodsQuantity{0.0});
+        const auto out = production + inventory_;
+        inventory_     = GoodsQuantity{0.0};
+
+        ASSERT(out >= GoodsQuantity{0.0});
         return out;
     }
+
     void listenTradeResult(const TradeResult& result) noexcept {
+        ASSERT(result.unsoldAmount >= GoodsQuantity{0.0});
         inventory_ += result.unsoldAmount;
     }
 
     void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
+        ASSERT(productionGoods >= GoodsQuantity{0.0});
         productionGoods_ += productionGoods;
     }
 

@@ -19,7 +19,10 @@ class EmployPlannerMemory final {
     }
     void clearLog() noexcept { supply_.clearLog(); }
     void reset() noexcept { supply_.reset(); }
-    void listenTradePlan(const TradePlan& plan) noexcept { supply_.next = plan.supply; }
+    void listenTradePlan(const TradePlan& plan) noexcept {
+        ASSERT(plan.supply >= GoodsQuantity{0.0});
+        supply_.next = plan.supply;
+    }
 
   private:
     Memory<GoodsQuantity> supply_;
@@ -37,6 +40,9 @@ class EmployPlanner final {
         const HeadCount     employee,
         const GoodsQuantity targetProduction
     ) noexcept -> HeadCount {
+        ASSERT(firmProductPower >= 0.0);
+        ASSERT(employee >= HeadCount{0.0});
+
         const auto out = calc(firmProductPower, employee, targetProduction);
         memory_.clearLog();
         if (not out) return cache_.cache();

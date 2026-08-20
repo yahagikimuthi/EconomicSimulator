@@ -67,6 +67,7 @@ class ConsumerGoodsDemander final {
 
     template <AssetMinusFn F>
     void endStep(F&& assetMinus) noexcept {
+        ASSERT(ledger_.purchased() >= Money{0.0});
         std::forward<F>(assetMinus)(ledger_.purchased());
         reset();
     }

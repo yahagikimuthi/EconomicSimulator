@@ -20,6 +20,10 @@ class PricePlanner final {
 
     [[nodiscard]] auto plan(const GoodsQuantity supply, const double markup, const Money totalCost)
         const noexcept -> Price {
+        ASSERT(supply >= GoodsQuantity{0.0});
+        ASSERT(markup > 0.0);
+        ASSERT(totalCost >= Money{0.0});
+
         const auto price = calcPrice(supply, markup, totalCost);
         const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
         return price * (1.0 + alpha);
@@ -32,10 +36,10 @@ class PricePlanner final {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
         const auto price = Price{avgCost.value() * (1.0 + markup)};
-        return priceGuard(price);
+        return guard(price);
     }
 
-    [[nodiscard]] static auto priceGuard(const Price price) noexcept -> Price {
+    [[nodiscard]] static auto guard(const Price price) noexcept -> Price {
         return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
     }
 
@@ -55,6 +59,7 @@ class DemandForecastManagerMemory final {
     void clearLog() noexcept { totalDemand_.clearLog(); }
     void reset() noexcept { totalDemand_.reset(); }
     void listenTradeResult(const TradeResult& result) noexcept {
+        ASSERT(result.totalDemand >= GoodsQuantity{0.0});
         totalDemand_.next = result.totalDemand;
     }
 
@@ -77,6 +82,8 @@ class DemandForecastManager final {
         memory_.clearLog();
         if (not next) return cache_.cache();
         cache_.next(*next);
+
+        ASSERT(*next >= GoodsQuantity{0.0});
         return *next;
     }
 

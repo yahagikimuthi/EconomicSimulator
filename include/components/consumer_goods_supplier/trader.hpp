@@ -28,6 +28,8 @@ class Trader final {
 
     void post(const TradePlan& plan, Market& market) noexcept {
         ASSERT(plan.supply >= GoodsQuantity{0.0});
+        ASSERT(plan.price > Price{0.0});
+
         isActive_ = true;
         if (plan.supply == GoodsQuantity{0.0}) return;
         myEntry_ = market.entry(plan.price, plan.supply);
@@ -81,7 +83,8 @@ class Trader final {
         }
     }
 
-    [[nodiscard]] auto      isPosting() const noexcept -> bool { return myEntry_.has_value(); }
+    [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
+
     Ledger                  ledger_;
     std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
