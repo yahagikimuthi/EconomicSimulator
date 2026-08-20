@@ -6,6 +6,7 @@
 #include <pcg_random.hpp>
 
 #include "components/labor_demander/common.hpp"
+#include "core/values/integrate.hpp"
 #include "core/values/labor.hpp"
 #include "setting.hpp"
 #include "util.hpp"
@@ -81,7 +82,7 @@ class WagePlanner final {
     }
 
     [[nodiscard]] static auto wageGuard(const Wage wage) noexcept -> Wage {
-        return Wage{std::max(wage.value(), std::numeric_limits<double>::epsilon())};
+        return max(wage, Wage{std::numeric_limits<double>::epsilon()});
     }
 
     WagePlannerMemory       memory_;

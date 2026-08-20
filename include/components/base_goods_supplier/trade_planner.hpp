@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <limits>
 #include <pcg_random.hpp>
 
@@ -8,6 +7,7 @@
 #include "components/base_goods_supplier/markup_planner.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/integrate.hpp"
 #include "setting.hpp"
 #include "util.hpp"
 
@@ -40,7 +40,7 @@ class PricePlanner final {
     }
 
     [[nodiscard]] static auto guard(const Price price) noexcept -> Price {
-        return Price{std::max(price.value(), std::numeric_limits<double>::epsilon())};
+        return max(price, Price{std::numeric_limits<double>::epsilon()});
     }
 
     mutable RandomGenerator rng_;
@@ -102,7 +102,7 @@ class DemandForecastManager final {
     }
 
     [[nodiscard]] static auto guard(const GoodsQuantity expect) noexcept -> GoodsQuantity {
-        return GoodsQuantity{std::max(expect.value(), std::numeric_limits<double>::epsilon())};
+        return max(expect, GoodsQuantity{std::numeric_limits<double>::epsilon()});
     }
 
     DemandForecastManagerMemory memory_;

@@ -5,6 +5,7 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/integrate.hpp"
 
 namespace abm::base_goods::supplier {
 struct ATradeResult final {
@@ -31,8 +32,8 @@ class Ledger final {
     [[nodiscard]] auto canTradeAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
         ASSERT(demand >= GoodsQuantity{0.0});
 
-        const auto out = std::max(inventory_.value(), demand.value());
-        ASSERT(out >= 0.0);
+        const auto out = max(inventory_, demand);
+        ASSERT(out >= GoodsQuantity{0.0});
         return GoodsQuantity{out};
     }
 
