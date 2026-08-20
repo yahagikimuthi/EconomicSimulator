@@ -68,6 +68,7 @@ class LaborDemander final {
     [[nodiscard]] explicit LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
         : recruitSystem_{masterRng}, humanResource_{std::move(board)} {
         recruitSystem_.acceptMediator(mediator_);
+        mediator_.subscribeRecruitPlan(memory_);
     }
 
     void adjustWorkforce(
@@ -109,6 +110,7 @@ class LaborDemander final {
     RecruitSystem recruitSystem_;
     HumanResource humanResource_;
     Mediator      mediator_;
+    CentralMemory memory_;
 };
 }  // namespace abm::labor::demander
 

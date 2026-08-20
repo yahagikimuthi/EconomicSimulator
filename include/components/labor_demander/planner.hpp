@@ -24,6 +24,7 @@ class RecruitPlanner final {
         const auto plan = RecruitPlan{
             .wage = wagePlanner_.plan(), .offer = employPlanSystem_.plan(desiredEmploy, mediator)
         };
+        mediator.publishRecruitPlan(plan);
         return plan;
     }
 

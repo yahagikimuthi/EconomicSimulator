@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <concepts>
 #include <optional>
 #include <variant>
 
@@ -11,6 +12,7 @@
 
 namespace abm::labor::demander::mediator {
 using EmployPlanListener    = std::variant<std::optional<planner::WagePlannerMemory&>>;
+using RecruitPlanListener   = std::variant<std::optional<CentralMemory&>>;
 using RecruitResultListener = std::variant<
     std::optional<planner::WagePlannerMemory&>,
     std::optional<planner::OfferPlannerMemory&>>;
@@ -39,6 +41,16 @@ class Mediator final {
         }
     }
 
+    template <typename T>
+    void subscribeRecruitPlan(T& t) noexcept {
+        auto& arr = recruitPlanListeners_;
+        if constexpr (std::same_as<T, CentralMemory>) {
+            arr[0] = t;
+        } else {
+            static_assert(false);
+        }
+    }
+
     void publishEmployPlan(const HeadCount employPlan) noexcept {
         for (auto opt : employPlanListeners_) {
             std::visit(
@@ -50,20 +62,34 @@ class Mediator final {
             );
         }
     }
+
+    void publishRecruitPlan(const RecruitPlan& plan) noexcept {
+        for (auto opt : recruitPlanListeners_) {
+            std::visit(
+                [&](auto&& listener) -> void {
+                    if (not listener) return;
+                    listener->listenRecruitPlan(plan);
+                },
+                opt
+            );
+        }
+    }
+
     void publishRecruitResult(const RecruitResult& result) noexcept {
-        for (auto ptr : recruitResultListeners_) {
+        for (auto opt : recruitResultListeners_) {
             std::visit(
                 [&](auto&& listener) -> void {
                     if (not listener) return;
                     listener->listenRecruitResult(result);
                 },
-                ptr
+                opt
             );
         }
     }
 
   private:
     std::array<EmployPlanListener, 1>    employPlanListeners_;
+    std::array<RecruitPlanListener, 1>   recruitPlanListeners_;
     std::array<RecruitResultListener, 2> recruitResultListeners_;
 };
 }  // namespace abm::labor::demander::mediator

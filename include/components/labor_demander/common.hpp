@@ -6,6 +6,7 @@
 
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "world/common.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander {
@@ -59,11 +60,46 @@ class Cache final {
     std::optional<T> next_;
 };
 
-template <typename T, typename U = std::monostate>
-concept IMediator = requires(T t, U& u, HeadCount employPlan, RecruitResult& result) {
-    { t.publishEmployPlan(employPlan) } -> std::same_as<void>;
-    { t.publishRecruitResult(result) } -> std::same_as<void>;
-    { t.subscribeEmployPlan(u) } -> std::same_as<void>;
-    { t.subscribeRecruitResult(u) } -> std::same_as<void>;
+class CentralMemory {
+  public:
+    [[nodiscard]] CentralMemory() noexcept = default;
+
+    void logging(CensusDropBox& dropBox) noexcept {
+        if (employPlan_) {
+            ASSERT(employPlan_ >= HeadCount{0.0});
+            dropBox.postedEmployments.emplace_back(employPlan_->value());
+        }
+        if (wagePlan_) {
+            ASSERT(wagePlan_ >= Wage{0.0});
+            dropBox.postedWages.emplace_back(wagePlan_->value());
+        }
+        employPlan_.reset();
+        wagePlan_.reset();
+    }
+
+    void listenEmployPlan(const HeadCount employPlan) noexcept {
+        ASSERT(employPlan_ >= HeadCount{0.0});
+        employPlan_ = employPlan;
+    }
+
+    void listenRecruitPlan(const RecruitPlan& plan) noexcept {
+        ASSERT(plan.wage >= Wage{0.0});
+        wagePlan_ = plan.wage;
+    }
+
+  private:
+    std::optional<HeadCount> employPlan_{std::nullopt};
+    std::optional<Wage>      wagePlan_{std::nullopt};
 };
+
+template <typename T, typename U = std::monostate>
+concept IMediator =
+    requires(T t, U& u, HeadCount employPlan, RecruitPlan plan, RecruitResult result) {
+        { t.publishEmployPlan(employPlan) } -> std::same_as<void>;
+        { t.publishRecruitPlan(plan) } -> std::same_as<void>;
+        { t.publishRecruitResult(result) } -> std::same_as<void>;
+        { t.subscribeEmployPlan(u) } -> std::same_as<void>;
+        { t.subscribeRecruitPlan(u) } -> std::same_as<void>;
+        { t.subscribeRecruitResult(u) } -> std::same_as<void>;
+    };
 }  // namespace abm::labor::demander
