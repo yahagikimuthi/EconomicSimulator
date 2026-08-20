@@ -4,13 +4,15 @@
 
 #include "core/base.hpp"
 #include "core/values/common.hpp"
+#include "setting.hpp"
+#include "util.hpp"
 #include "world/common.hpp"
 
 namespace abm {
 class AgentIndex final {
   public:
-    [[nodiscard]] explicit AgentIndex(const AgentID id) : id_{id} {}
-    [[nodiscard]] auto id() const -> AgentID POST(id : id >= AgentID{0}) { return id_; }
+    [[nodiscard]] explicit AgentIndex(const AgentID id) noexcept : id_{id} {}
+    [[nodiscard]] auto id() const noexcept -> AgentID POST(id : id >= AgentID{0}) { return id_; }
 
   private:
     const AgentID id_;
@@ -18,24 +20,30 @@ class AgentIndex final {
 
 class BaseFinance {
   public:
-    void assetPlus(const Money plus) { asset_ += plus; }
+    void assetPlus(const Money plus) noexcept { asset_ += plus; }
 
-    [[nodiscard]] auto asset() const -> Money { return asset_; }
+    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
 
   protected:
-    [[nodiscard]] explicit BaseFinance(const Money asset) : asset_{asset} {}
+    [[nodiscard]] explicit BaseFinance(const Money asset) noexcept : asset_{asset} {}
     Money asset_;
 };
 
 class FirmFinance final : public BaseFinance {
   public:
-    [[nodiscard]] explicit FirmFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
-    void endStep(CensusDropBox& dropBox) const { dropBox.firmAssets.emplace_back(asset_.value()); }
+    [[nodiscard]] explicit FirmFinance(RandomGenerator& masterRng) noexcept
+        : BaseFinance::BaseFinance(Money{masterRng.random(setting::agent_finance::firm)}) {}
+    void endStep(CensusDropBox& dropBox) const noexcept {
+        dropBox.firmAssets.emplace_back(asset_.value());
+    }
 };
 
 class HHoldFinance final : public BaseFinance {
   public:
-    [[nodiscard]] explicit HHoldFinance(const Money asset) : BaseFinance::BaseFinance(asset) {}
-    void endStep(CensusDropBox& dropBox) const { dropBox.hholdAssets.emplace_back(asset_.value()); }
+    [[nodiscard]] explicit HHoldFinance(RandomGenerator& masterRng) noexcept
+        : BaseFinance::BaseFinance(Money{masterRng.random(setting::agent_finance::hhold)}) {}
+    void endStep(CensusDropBox& dropBox) const noexcept {
+        dropBox.hholdAssets.emplace_back(asset_.value());
+    }
 };
 }  // namespace abm

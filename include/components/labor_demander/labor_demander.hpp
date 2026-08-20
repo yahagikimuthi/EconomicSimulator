@@ -64,7 +64,7 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    [[nodiscard]] LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
+    [[nodiscard]] explicit LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
         : recruitSystem_{masterRng}, humanResource_{std::move(board)} {
         recruitSystem_.acceptMediator(mediator_);
     }

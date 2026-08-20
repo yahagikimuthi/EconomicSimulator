@@ -60,7 +60,7 @@ constexpr RandomParameter demandForecastAdjustVol =
 constexpr RandomParameter lastSupply      = UniformParameter<double>{.min = 10.0, .limit = 20.0};
 constexpr RandomParameter lastSalesAmount = UniformParameter<double>{.min = 10.0, .limit = 20.0};
 constexpr RandomParameter desiredEmploy   = UniformParameter<int>{.min = 10, .limit = 20};
-constexpr RandomParameter markup          = UniformParameter<double>{.min = 0.1, .limit = 0.2};
+constexpr RandomParameter lastMarkup      = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter markupAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter targetInvRatio  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter productPower    = UniformParameter<double>{.min = 1.0, .limit = 10.0};
@@ -84,6 +84,11 @@ constexpr auto bToCFirm = 2;
 constexpr auto bToBFirm = 2;
 constexpr auto hhold    = 1000;
 }  // namespace abm::setting::agent_count
+
+namespace abm::setting::agent_finance {
+constexpr RandomParameter firm  = UniformParameter<double>{.min = 100.0, .limit = 1000.0};
+constexpr RandomParameter hhold = UniformParameter<double>{.min = 10.0, .limit = 100.0};
+}  // namespace abm::setting::agent_finance
 
 namespace abm::setting::save_name {
 constexpr auto firmAssets        = "firmAssets"sv;

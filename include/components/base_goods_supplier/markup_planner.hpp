@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <limits>
 #include <optional>
+#include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "core/values/goods.hpp"
@@ -39,7 +40,11 @@ class MarkupPlannerMemory final {
 
 class MarkupPlanner final {
   public:
-    [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng) noexcept
+        : memory_{masterRng},
+          cache_{masterRng.random(setting::lastMarkup)},
+          rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          adjustVol_{masterRng.random(setting::markupAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeTradePlan(memory_);
@@ -85,8 +90,8 @@ class MarkupPlanner final {
     }
 
     MarkupPlannerMemory     memory_;
-    mutable RandomGenerator rng_;
     Cache<double>           cache_;
+    mutable RandomGenerator rng_;
     const double            adjustVol_;
 };
 }  // namespace abm::base_goods::supplier

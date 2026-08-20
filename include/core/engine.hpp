@@ -25,24 +25,24 @@ namespace abm {
 struct BtoCFirm final {  // NOLINT
     AgentIndex              index;
     FirmFinance             finance;
-    LaborDemander           labor;
-    ConsumerGoodsSupplier   consumerGoods;
-    ProductionGoodsDemander productionGoods;
+    LaborDemander           laborDemander;
+    ConsumerGoodsSupplier   consumerGoodsSupplier;
+    ProductionGoodsDemander productionGoodsDemander;
 };
 
 struct BtoBFirm final {  // NOLINT
     AgentIndex              index;
     FirmFinance             finance;
-    LaborDemander           labor;
-    ProductionGoodsSupplier productionGoodsSupplier;
+    LaborDemander           laborDemander;
     ProductionGoodsDemander productionGoodsDemander;
+    ProductionGoodsSupplier productionGoodsSupplier;
 };
 
 struct HHold final {  // NOLINT
     AgentIndex            index;
     HHoldFinance          finance;
-    LaborSupplier         labor;
-    ConsumerGoodsDemander consumerGoods;
+    LaborSupplier         laborSupplier;
+    ConsumerGoodsDemander consumerGoodsDemander;
 };
 
 class Logger final {
