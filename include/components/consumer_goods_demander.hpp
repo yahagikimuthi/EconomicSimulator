@@ -14,12 +14,12 @@
 
 namespace abm::consumer_goods::demander {
 
-struct ATradeResult {
+struct ATradeResult final {
     const Price         price;
     const GoodsQuantity purchaseAmount;
 };
 
-class Ledger {
+class Ledger final {
   public:
     [[nodiscard]] Ledger() noexcept = default;
 

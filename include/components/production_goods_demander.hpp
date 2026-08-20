@@ -14,12 +14,12 @@
 
 namespace abm::production_goods::demander {
 
-struct ATradeResult {
+struct ATradeResult final {
     const Price         price;
     const GoodsQuantity tradeAmount;
 };
 
-struct TradeResult {
+struct TradeResult final {
     const Money         purchased;
     const GoodsQuantity tradeAmount;
 };
