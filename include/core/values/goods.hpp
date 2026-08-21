@@ -1,114 +1,21 @@
 #pragma once
 
-#include <compare>
-
 #include "core/assertion.hpp"
 #include "core/values/common.hpp"
 
 namespace abm {
-class Price final {
+class Price final : public ValueObjectMixin<Price> {
   public:
-    [[nodiscard]] constexpr explicit Price(const double value) noexcept : value_{value} {}
-    [[nodiscard]] constexpr auto value() const noexcept -> double { return value_; }
-    [[nodiscard]] constexpr auto operator<=>(const Price&) const noexcept -> auto = default;
-
-    constexpr auto operator+=(const Price other) noexcept -> Price& {
-        value_ += other.value();
-        return *this;
-    }
-    constexpr auto operator-=(const Price other) noexcept -> Price& {
-        value_ -= other.value();
-        return *this;
-    }
-    constexpr auto operator*=(const double other) noexcept -> Price& {
-        value_ += other;
-        return *this;
-    }
-    constexpr auto operator/=(const double other) noexcept -> Price& {
-        ASSERT(other != 0.0);
-        value_ /= other;
-        return *this;
-    }
+    [[nodiscard]] constexpr explicit Price(const double value) noexcept
+        : ValueObjectMixin<Price>::ValueObjectMixin(value) {}
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
-
-  private:
-    double value_;
 };
 
-[[nodiscard]] constexpr auto operator+(Price lhs, const Price rhs) noexcept -> Price {
-    lhs += rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator-(Price lhs, const Price rhs) noexcept -> Price {
-    lhs -= rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator*(Price lhs, const double rhs) noexcept -> Price {
-    lhs *= rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator*(const double lhs, const Price rhs) noexcept -> Price {
-    return rhs * lhs;
-}
-[[nodiscard]] constexpr auto operator/(Price lhs, const double rhs) noexcept -> Price {
-    ASSERT(rhs != 0.0);
-    lhs /= rhs;
-    return lhs;
-}
-
-class GoodsQuantity final {
+class GoodsQuantity final : public ValueObjectMixin<GoodsQuantity> {
   public:
-    [[nodiscard]] explicit constexpr GoodsQuantity(const double value) noexcept : value_{value} {}
-    [[nodiscard]] auto value() const noexcept -> double { return value_; }
-    [[nodiscard]] auto operator<=>(const GoodsQuantity&) const noexcept -> auto = default;
-
-    constexpr auto operator+=(const GoodsQuantity other) noexcept -> GoodsQuantity& {
-        value_ += other.value();
-        return *this;
-    }
-    constexpr auto operator-=(const GoodsQuantity other) noexcept -> GoodsQuantity& {
-        value_ -= other.value();
-        return *this;
-    }
-    constexpr auto operator/(const GoodsQuantity other) const noexcept -> double {
-        ASSERT(other != GoodsQuantity{0.0});
-        return value_ / other.value();
-    }
-    constexpr auto operator*=(const double other) noexcept -> GoodsQuantity& {
-        value_ += other;
-        return *this;
-    }
-    constexpr auto operator/=(const double other) noexcept -> GoodsQuantity& {
-        ASSERT(other != 0.0);
-        value_ /= other;
-        return *this;
-    }
-
-  private:
-    double value_;
+    [[nodiscard]] explicit constexpr GoodsQuantity(const double value) noexcept
+        : ValueObjectMixin<GoodsQuantity>::ValueObjectMixin(value) {}
 };
-[[nodiscard]] constexpr auto operator+(GoodsQuantity lhs, GoodsQuantity rhs) noexcept
-    -> GoodsQuantity {
-    lhs += rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator-(GoodsQuantity lhs, GoodsQuantity rhs) noexcept
-    -> GoodsQuantity {
-    lhs -= rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator*(GoodsQuantity lhs, double rhs) noexcept -> GoodsQuantity {
-    lhs *= rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator*(double lhs, GoodsQuantity rhs) noexcept -> GoodsQuantity {
-    return rhs * lhs;
-}
-[[nodiscard]] constexpr auto operator/(GoodsQuantity lhs, double rhs) noexcept -> GoodsQuantity {
-    ASSERT(rhs != 0.0);
-    lhs /= rhs;
-    return lhs;
-}
 
 [[nodiscard]] constexpr auto operator*(Price lhs, GoodsQuantity rhs) noexcept -> Money {
     return Money{lhs.value() * rhs.value()};

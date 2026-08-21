@@ -5,55 +5,72 @@
 #include "core/assertion.hpp"
 
 namespace abm {
-class Money final {
+template <typename Derived>
+class ValueObjectMixin {
+    friend Derived;
+
   public:
-    [[nodiscard]] explicit constexpr Money(const double value) noexcept : value_{value} {}
     [[nodiscard]] constexpr auto value() const noexcept -> double { return value_; }
-    [[nodiscard]] constexpr auto operator<=>(const Money&) const noexcept -> auto = default;
 
-    constexpr auto operator+=(const Money other) noexcept -> Money& {
-        value_ += other.value();
-        return *this;
+    [[nodiscard]] friend constexpr auto operator<=>(Derived lhs, Derived rhs) noexcept -> auto {
+        return lhs.value_ <=> rhs.value_;
     }
-    constexpr auto operator-=(const Money other) noexcept -> Money& {
-        value_ -= other.value();
-        return *this;
+    [[nodiscard]] friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept -> bool {
+        return lhs.value_ == rhs.value_;
     }
-    constexpr auto operator*=(const double other) noexcept -> Money& {
-        value_ *= other;
-        return *this;
+    friend constexpr auto operator+=(Derived& lhs, Derived rhs) noexcept -> Derived& {
+        lhs.value_ += rhs.value_;
+        return lhs;
     }
-    constexpr auto operator/=(const double other) noexcept -> Money& {
-        ASSERT(other != 0.0);
-        value_ /= other;
-        return *this;
+    [[nodiscard]] friend constexpr auto operator+(Derived lhs, Derived rhs) noexcept -> Derived {
+        lhs += rhs;
+        return lhs;
     }
-
-    [[nodiscard]] constexpr auto operator-() const noexcept -> Money { return Money{-value_}; }
+    friend constexpr auto operator-=(Derived& lhs, Derived rhs) noexcept -> Derived& {
+        lhs.value_ -= rhs.value_;
+        return lhs;
+    }
+    [[nodiscard]] friend constexpr auto operator-(Derived lhs, Derived rhs) noexcept -> Derived {
+        lhs -= rhs;
+        return lhs;
+    }
+    [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> double {
+        return lhs.value_ / rhs.value_;
+    }
+    friend constexpr auto operator*=(Derived& lhs, double rhs) noexcept -> Derived& {
+        lhs.value_ *= rhs;
+        return lhs;
+    }
+    [[nodiscard]] friend constexpr auto operator*(Derived lhs, double rhs) noexcept -> Derived {
+        lhs *= rhs;
+        return lhs;
+    }
+    [[nodiscard]] friend constexpr auto operator*(double lhs, Derived rhs) noexcept -> Derived {
+        return rhs * lhs;
+    }
+    friend constexpr auto operator/=(Derived& lhs, double rhs) noexcept -> Derived& {
+        lhs.value_ /= rhs;
+        return lhs;
+    }
+    [[nodiscard]] friend constexpr auto operator/(Derived lhs, double rhs) noexcept -> Derived {
+        lhs /= rhs;
+        return lhs;
+    }
+    [[nodiscard]] friend constexpr auto operator-(Derived lhs) noexcept -> Derived {
+        return Derived{-lhs.value_};
+    }
 
   private:
+    [[nodiscard]] explicit constexpr ValueObjectMixin(const double value) noexcept
+        : value_{value} {}
     double value_;
 };
-[[nodiscard]] constexpr auto operator+(Money lhs, Money rhs) noexcept -> Money {
-    lhs += rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator-(Money lhs, Money rhs) noexcept -> Money {
-    lhs -= rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator*(Money lhs, double rhs) noexcept -> Money {
-    lhs *= rhs;
-    return lhs;
-}
-[[nodiscard]] constexpr auto operator*(double lhs, Money rhs) noexcept -> Money {
-    return rhs * lhs;
-}
-[[nodiscard]] constexpr auto operator/(Money lhs, double rhs) noexcept -> Money {
-    ASSERT(rhs != 0.0);
-    lhs /= rhs;
-    return lhs;
-}
+
+class Money final : public ValueObjectMixin<Money> {
+  public:
+    [[nodiscard]] explicit constexpr Money(const double value) noexcept
+        : ValueObjectMixin<Money>::ValueObjectMixin(value) {}
+};
 
 class AgentID final {
   public:
