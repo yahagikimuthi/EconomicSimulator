@@ -3,7 +3,6 @@
 #include <array>
 #include <concepts>
 #include <optional>
-#include <print>
 #include <variant>
 
 #include "components/labor_demander/common.hpp"
@@ -11,14 +10,15 @@
 #include "components/labor_demander/wage_planner.hpp"
 #include "core/values/labor.hpp"
 
-namespace abm::labor::demander::mediator {
-using EmployPlanListener    = std::variant<std::optional<planner::WagePlannerMemory&>>;
-using RecruitPlanListener   = std::variant<std::optional<CentralMemory&>>;
-using RecruitResultListener = std::variant<
-    std::optional<planner::WagePlannerMemory&>,
-    std::optional<planner::OfferPlannerMemory&>>;
-
+namespace abm::labor::demander {
 class Mediator final {
+    template <typename T>
+    using Opt                 = std::optional<T>;
+    using EmployPlanListener  = std::variant<Opt<planner::WagePlannerMemory&>>;
+    using RecruitPlanListener = std::variant<Opt<CentralMemory&>>;
+    using RecruitResultListener =
+        std::variant<Opt<planner::WagePlannerMemory&>, Opt<planner::OfferPlannerMemory&>>;
+
   public:
     [[nodiscard]] constexpr Mediator() noexcept = default;
 
@@ -30,6 +30,7 @@ class Mediator final {
             static_assert(false);
         }
     }
+
     template <typename T>
     void subscribeRecruitResult(T& t) noexcept {
         auto& arr = recruitResultListeners_;
@@ -93,8 +94,4 @@ class Mediator final {
     std::array<RecruitPlanListener, 1>   recruitPlanListeners_;
     std::array<RecruitResultListener, 2> recruitResultListeners_;
 };
-}  // namespace abm::labor::demander::mediator
-
-namespace abm::labor::demander {
-using Mediator = mediator::Mediator;
-}
+}  // namespace abm::labor::demander
