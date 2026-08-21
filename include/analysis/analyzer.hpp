@@ -12,7 +12,7 @@ namespace abm::analysis {
 
 class Analyzer final {
   public:
-    [[nodiscard]] constexpr Analyzer() noexcept = default;
+    [[nodiscard]] Analyzer() noexcept = default;
     void requireData(std::string_view name) noexcept { requireDatas_.emplace_back(name); }
 
     template <LogicType Logic>

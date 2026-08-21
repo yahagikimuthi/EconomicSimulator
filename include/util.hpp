@@ -24,6 +24,9 @@ struct Overloaded final : Ts... {
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
+template <typename T>
+constexpr void ignore(T&& _) noexcept {}
+
 class RandomGenerator final {
   public:
     [[nodiscard]] explicit constexpr RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}

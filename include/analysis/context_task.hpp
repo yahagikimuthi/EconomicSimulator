@@ -13,7 +13,7 @@
 namespace abm::analysis {
 class DataContext final {
   public:
-    [[nodiscard]] constexpr DataContext() noexcept = default;
+    [[nodiscard]] DataContext() noexcept = default;
     void set(std::string_view name, std::vector<double>&& data) noexcept {
         cache_.try_emplace(name, std::move(data));
     }
