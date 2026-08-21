@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <limits>
 #include <optional>
 #include <pcg_random.hpp>
@@ -74,7 +75,7 @@ class WagePlanner final {
         const auto lastApplicants = memory_.lastApplicants();
         const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
-        const auto alpha       = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
+        const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
         const auto plan        = Wage{cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
         return wageGuard(plan);

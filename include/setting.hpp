@@ -38,8 +38,8 @@ namespace abm::labor::demander::setting {
 constexpr RandomParameter lastApplicants     = UniformParameter<int>{.min = 10, .limit = 20};
 constexpr RandomParameter lastEmployPlan     = UniformParameter<int>{.min = 10, .limit = 20};
 constexpr RandomParameter offerRate          = UniformParameter<double>{.min = 0.0, .limit = 1.0};
-constexpr RandomParameter offerRateAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.1};
-constexpr RandomParameter lastWage      = UniformParameter<double>{.min = 100.0, .limit = 1000.0};
+constexpr RandomParameter offerRateAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
+constexpr RandomParameter lastWage      = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 constexpr RandomParameter wageAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 }  // namespace abm::labor::demander::setting
 
@@ -53,7 +53,7 @@ constexpr RandomParameter changingJobThreshold =
 }  // namespace abm::labor::supplier::setting
 
 namespace abm::base_goods::supplier::setting {
-constexpr RandomParameter lastDemand     = UniformParameter<double>{.min = 10.0, .limit = 20.0};
+constexpr RandomParameter lastDemand     = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 constexpr RandomParameter demandForecast = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 constexpr RandomParameter demandForecastAdjustVol =
     UniformParameter<double>{.min = 0.1, .limit = 0.2};
@@ -63,7 +63,7 @@ constexpr RandomParameter desiredEmploy   = UniformParameter<int>{.min = 10, .li
 constexpr RandomParameter lastMarkup      = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter markupAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter targetInvRatio  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
-constexpr RandomParameter productPower    = UniformParameter<double>{.min = 1.0, .limit = 10.0};
+constexpr RandomParameter productPower    = UniformParameter<double>{.min = 0.0, .limit = 2.0};
 constexpr RandomParameter priceAdjustVol  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter inventory       = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting

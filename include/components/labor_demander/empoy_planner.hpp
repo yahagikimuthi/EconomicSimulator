@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <limits>
 #include <optional>
 
@@ -78,7 +79,7 @@ class OfferPlanner final {
         const auto lastApplicants = memory_.lastApplicants();
         const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
-        const auto alpha       = rng_.randNormal(0.0, adjustVol_);
+        const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
         const auto next        = rateCache_.cache() + (shouldRaise ? alpha : -alpha);
         return std::max(std::numeric_limits<double>::epsilon(), next);
