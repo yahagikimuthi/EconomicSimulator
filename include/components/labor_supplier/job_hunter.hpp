@@ -33,7 +33,7 @@ class MyEntries final {
 
 class JobHunter final {
   public:
-    [[nodiscard]] JobHunter() noexcept = default;
+    [[nodiscard]] constexpr JobHunter() noexcept = default;
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(

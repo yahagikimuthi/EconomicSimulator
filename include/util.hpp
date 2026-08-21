@@ -26,19 +26,20 @@ using RefWrap = std::reference_wrapper<T>;
 
 class RandomGenerator final {
   public:
-    [[nodiscard]] explicit RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
+    [[nodiscard]] explicit constexpr RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
 
-    [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) noexcept -> double {
+    [[nodiscard]] constexpr auto rand(const double min = 0.0, const double limit = 1.0) noexcept
+        -> double {
         auto dist = std::uniform_real_distribution<double>{min, limit};
         return dist(rng_);
     }
 
-    [[nodiscard]] auto randInt(const int min, const int max) noexcept -> int {
+    [[nodiscard]] constexpr auto randInt(const int min, const int max) noexcept -> int {
         auto dist = std::uniform_int_distribution<int>{min, max};
         return dist(rng_);
     }
 
-    [[nodiscard]] auto randNormal(
+    [[nodiscard]] constexpr auto randNormal(
         const double mean = 0.0,
         const double div  = 1.0,
         const double min  = -std::numeric_limits<double>::infinity(),
@@ -49,7 +50,7 @@ class RandomGenerator final {
         return std::clamp(out, min, max);
     }
 
-    [[nodiscard]] auto rand(const int min, const int limit) noexcept -> int {
+    [[nodiscard]] constexpr auto rand(const int min, const int limit) noexcept -> int {
         auto dist = std::uniform_int_distribution<int>{min, limit};
         return dist(rng_);
     }
@@ -102,11 +103,11 @@ class RandomGenerator final {
         std::ranges::sample(std::forward<Range>(r), out, n, rng_);
     }
 
-    [[nodiscard]] auto makeUint64() noexcept -> std::uint64_t {
+    [[nodiscard]] constexpr auto makeUint64() noexcept -> std::uint64_t {
         return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
     }
 
-    [[nodiscard]] auto random(const RandomParameter& param) noexcept -> double {
+    [[nodiscard]] constexpr auto random(const RandomParameter& param) noexcept -> double {
         return std::visit(
             Overloaded{
                 [&] [[nodiscard]] (const UniformParameter<int>& uniformParam) -> double {

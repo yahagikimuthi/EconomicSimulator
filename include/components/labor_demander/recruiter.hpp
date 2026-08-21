@@ -18,7 +18,7 @@
 namespace abm::labor::demander::recruiter {
 class OfferApplicants final {
   public:
-    [[nodiscard]] OfferApplicants() noexcept = default;
+    [[nodiscard]] constexpr OfferApplicants() noexcept = default;
 
     void add(Entry& entry) noexcept { applicants_.emplace_back(std::ref(entry)); }
     void clear() noexcept { applicants_.clear(); }
@@ -43,7 +43,7 @@ struct EmployResult final {
 
 class Ledger final {
   public:
-    [[nodiscard]] Ledger() = default;
+    [[nodiscard]] constexpr Ledger() = default;
 
     void makeNewPage(const HeadCount offerPlan) noexcept {
         ASSERT(offerPlan >= HeadCount{0.0});
@@ -93,7 +93,7 @@ class Ledger final {
 
 class Recruiter final {
   public:
-    [[nodiscard]] Recruiter() noexcept = default;
+    [[nodiscard]] constexpr Recruiter() noexcept = default;
 
     void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) noexcept {
         isActive_ = true;

@@ -22,7 +22,7 @@ using TradeResultListener =
 
 class Mediator final {
   public:
-    [[nodiscard]] Mediator() noexcept = default;
+    [[nodiscard]] constexpr Mediator() noexcept = default;
 
     template <typename T>
     void subscribeTradePlan(T& t) noexcept {

@@ -12,7 +12,7 @@
 namespace abm::base_goods::supplier {
 class Producer final {
   public:
-    [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower{masterRng.random(setting::productPower)},
           inventory_{masterRng.random(setting::inventory)} {}
 
@@ -64,7 +64,7 @@ class Producer final {
 
 class ProducingSystem final {
   public:
-    [[nodiscard]] explicit ProducingSystem(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr ProducingSystem(RandomGenerator& masterRng) noexcept
         : employPlanner_{masterRng}, producer_{masterRng} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {

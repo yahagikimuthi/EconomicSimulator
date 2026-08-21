@@ -24,7 +24,7 @@ struct TradeResult final {
 template <typename T>
 class Memory final {
   public:
-    [[nodiscard]] explicit Memory(const T l) noexcept : log{l} {}
+    [[nodiscard]] constexpr explicit Memory(const T l) noexcept : log{l} {}
 
     void reset() noexcept {
         if (not next) return;
@@ -39,7 +39,7 @@ class Memory final {
 template <typename T>
 class Cache final {
   public:
-    [[nodiscard]] explicit Cache(const T cache) noexcept : cache_{cache} {}
+    [[nodiscard]] explicit constexpr Cache(const T cache) noexcept : cache_{cache} {}
     [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
 
     void reset() noexcept {
@@ -56,7 +56,7 @@ class Cache final {
 
 class CentralMemory {
   public:
-    [[nodiscard]] CentralMemory() noexcept = default;
+    [[nodiscard]] constexpr CentralMemory() noexcept = default;
 
     void listenTradePlan(const TradePlan& plan) noexcept {
         ASSERT(plan.price >= Price{0.0});

@@ -21,7 +21,6 @@
 #include "world/labor.hpp"
 
 namespace abm {
-
 struct BtoCFirm final {  // NOLINT
     AgentIndex              index;
     FirmFinance             finance;
@@ -90,7 +89,7 @@ class Engine final {
     void reset() noexcept;
     void check() const noexcept;
 
-    [[nodiscard]] static auto generateSeed() noexcept -> PCG32Seed {
+    [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
             return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};
         }

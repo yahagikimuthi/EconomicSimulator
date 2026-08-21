@@ -19,7 +19,7 @@ struct CompanyBoard final {
     std::deque<RosterEntry>                      roster;
     tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
 
-    [[nodiscard]] CompanyBoard(const AgentID i, const Market type) noexcept
+    [[nodiscard]] constexpr CompanyBoard(const AgentID i, const Market type) noexcept
         : firmId{i}, firmType{type} {}
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
@@ -30,7 +30,7 @@ struct CompanyBoard final {
 
 class RosterEntry final {
   public:
-    [[nodiscard]] RosterEntry(
+    [[nodiscard]] constexpr RosterEntry(
         const AgentID i, const Wage w, CompanyBoard& board, Workspace& space
     ) noexcept
         : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {}
@@ -65,7 +65,9 @@ struct LaborEntry final {
     std::optional<RosterEntry&> rosterEntry{std::nullopt};
     const LaborRequest&         request;
 
-    [[nodiscard]] LaborEntry(const AgentID i, const double power, const LaborRequest& req) noexcept
+    [[nodiscard]] constexpr LaborEntry(
+        const AgentID i, const double power, const LaborRequest& req
+    ) noexcept
         : hholdID{i}, productPower{power}, request{req} {}
 };
 
@@ -73,7 +75,8 @@ class LaborRequest final {
     using Entry = LaborEntry;
 
   public:
-    [[nodiscard]] LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {}
+    [[nodiscard]] constexpr LaborRequest(const AgentID i, const Wage w) noexcept
+        : firmID{i}, wage{w} {}
     auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
         return *entryBox_.emplace_back(id, productPower, *this);
     }
@@ -94,7 +97,7 @@ class LaborMarket final {
     using Request = LaborRequest;
 
   public:
-    [[nodiscard]] explicit LaborMarket(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr LaborMarket(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {

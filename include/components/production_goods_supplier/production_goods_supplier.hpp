@@ -20,7 +20,7 @@ class ProductionGoodsSupplier final {
     using CentralMemory   = base_goods::supplier::CentralMemory;
 
   public:
-    [[nodiscard]] explicit ProductionGoodsSupplier(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr ProductionGoodsSupplier(RandomGenerator& masterRng) noexcept
         : producingSystem_{masterRng}, tradingSystem_{masterRng} {
         producingSystem_.acceptMediator(mediator_);
         tradingSystem_.acceptMediator(mediator_);

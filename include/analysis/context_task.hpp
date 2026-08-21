@@ -13,7 +13,7 @@
 namespace abm::analysis {
 class DataContext final {
   public:
-    [[nodiscard]] DataContext() noexcept = default;
+    [[nodiscard]] constexpr DataContext() noexcept = default;
     void set(std::string_view name, std::vector<double>&& data) noexcept {
         cache_.try_emplace(name, std::move(data));
     }
@@ -47,14 +47,14 @@ concept LogicType = requires(Logic logic, const DataContext& ctx) {
 
 class IMetricTask {
   public:
-    [[nodiscard]] explicit IMetricTask(std::string&& outName) noexcept
+    [[nodiscard]] constexpr explicit IMetricTask(std::string&& outName) noexcept
         : outName_{std::move(outName)} {}
 
-    virtual ~IMetricTask() noexcept                             = default;
-    IMetricTask(const IMetricTask&) noexcept                    = default;
-    auto operator=(const IMetricTask&) noexcept -> IMetricTask& = delete;
-    IMetricTask(IMetricTask&&) noexcept                         = default;
-    auto operator=(IMetricTask&&) noexcept -> IMetricTask&      = delete;
+    virtual ~IMetricTask() noexcept                                       = default;
+    constexpr IMetricTask(const IMetricTask&) noexcept                    = default;
+    constexpr auto operator=(const IMetricTask&) noexcept -> IMetricTask& = delete;
+    constexpr IMetricTask(IMetricTask&&) noexcept                         = default;
+    constexpr auto operator=(IMetricTask&&) noexcept -> IMetricTask&      = delete;
 
     void reserve(const std::size_t n) noexcept { results_.reserve(n); }
 
@@ -65,7 +65,7 @@ class IMetricTask {
     }
 
   protected:
-    void pushBackData(const double data) noexcept { results_.emplace_back(data); }
+    constexpr void pushBackData(const double data) noexcept { results_.emplace_back(data); }
 
   private:
     std::vector<double> results_;
@@ -75,7 +75,7 @@ class IMetricTask {
 template <LogicType Logic>
 class MetricTask final : public IMetricTask {
   public:
-    MetricTask(std::string&& outName, const Logic& logic) noexcept
+    [[nodiscard]] constexpr MetricTask(std::string&& outName, const Logic& logic) noexcept
         : IMetricTask(std::move(outName)), logic_{logic} {}
 
     void process(const DataContext& ctx) noexcept override { pushBackData(logic_(ctx)); }

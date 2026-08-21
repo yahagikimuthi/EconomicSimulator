@@ -9,7 +9,7 @@
 namespace abm::labor::demander::planner {
 class RecruitPlanner final {
   public:
-    [[nodiscard]] explicit RecruitPlanner(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr RecruitPlanner(RandomGenerator& masterRng) noexcept
         : wagePlanner_{masterRng}, offerPlanner_{masterRng} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {

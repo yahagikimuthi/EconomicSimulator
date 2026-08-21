@@ -26,7 +26,7 @@ struct TradeResult final {
 
 class Ledger {
   public:
-    [[nodiscard]] Ledger() noexcept = default;
+    [[nodiscard]] constexpr Ledger() noexcept = default;
 
     void readTradeResult(const ATradeResult& result) noexcept {
         ASSERT(result.price >= Price{0.0});
@@ -62,7 +62,7 @@ class ProductionGoodsDemander final {
     using Market  = ProductionGoodsMarket;
 
   public:
-    [[nodiscard]] explicit ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
         : mpc_{masterRng.random(setting::mpc)} {}
 
     void request(

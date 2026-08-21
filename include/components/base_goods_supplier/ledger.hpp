@@ -1,7 +1,5 @@
 #pragma once
 
-#include <algorithm>
-
 #include "components/base_goods_supplier/common.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
@@ -16,7 +14,7 @@ struct ATradeResult final {
 
 class Ledger final {
   public:
-    [[nodiscard]] Ledger() noexcept = default;
+    [[nodiscard]] constexpr Ledger() noexcept = default;
 
     void makeNewPage(const GoodsQuantity supply) noexcept {
         ASSERT(supply >= GoodsQuantity{0.0});

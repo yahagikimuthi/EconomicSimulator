@@ -13,7 +13,6 @@
 #include "world/goods.hpp"
 
 namespace abm::consumer_goods::demander {
-
 struct ATradeResult final {
     const Price         price;
     const GoodsQuantity purchaseAmount;
@@ -21,7 +20,7 @@ struct ATradeResult final {
 
 class Ledger final {
   public:
-    [[nodiscard]] Ledger() noexcept = default;
+    [[nodiscard]] constexpr Ledger() noexcept = default;
 
     void reset() noexcept { purchasing_ = Money{0.0}; }
     void readTradeResult(const ATradeResult& result) noexcept {
@@ -39,7 +38,7 @@ class ConsumerGoodsDemander final {
     using Entry   = ConsumerGoodsEntry;
 
   public:
-    [[nodiscard]] explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
         : mpc_{masterRng.random(setting::mpc)},
           myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}
 

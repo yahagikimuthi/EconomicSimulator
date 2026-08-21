@@ -19,7 +19,7 @@ using RecruitResultListener = std::variant<
 
 class Mediator final {
   public:
-    [[nodiscard]] Mediator() noexcept = default;
+    [[nodiscard]] constexpr Mediator() noexcept = default;
 
     template <typename T>
     void subscribeEmployPlan(T& t) noexcept {

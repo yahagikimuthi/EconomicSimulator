@@ -16,12 +16,12 @@
 namespace abm {
 class Workspace final {
   public:
-    [[nodiscard]] Workspace() noexcept = default;
-    ~Workspace() noexcept              = default;
-    Workspace(const Workspace& other) noexcept;
-    auto operator=(const Workspace& other) noexcept -> Workspace&;
-    Workspace(Workspace&& other) noexcept;
-    auto operator=(Workspace&& other) noexcept -> Workspace&;
+    [[nodiscard]] constexpr Workspace() noexcept = default;
+    constexpr ~Workspace() noexcept              = default;
+    constexpr Workspace(const Workspace& other) noexcept;
+    constexpr auto operator=(const Workspace& other) noexcept -> Workspace&;
+    constexpr Workspace(Workspace&& other) noexcept;
+    constexpr auto operator=(Workspace&& other) noexcept -> Workspace&;
 
     void addInput(const double workerProductPower) noexcept {
         totalInput_.fetch_add(workerProductPower);
@@ -35,18 +35,18 @@ class Workspace final {
     std::atomic<double> totalInput_;
 };
 
-inline Workspace::Workspace(const Workspace& other) noexcept
+constexpr Workspace::Workspace(const Workspace& other) noexcept
     : totalInput_{other.totalInput_.load()} {}
-inline auto Workspace::operator=(const Workspace& other) noexcept -> Workspace& {
+constexpr auto Workspace::operator=(const Workspace& other) noexcept -> Workspace& {
     if (this == &other) return *this;
     const double input{other.totalInput_.load()};
     totalInput_.store(input);
     return *this;
 }
-inline Workspace::Workspace(Workspace&& other) noexcept : totalInput_{other.totalInput_.load()} {
+constexpr Workspace::Workspace(Workspace&& other) noexcept : totalInput_{other.totalInput_.load()} {
     other.totalInput_.store(0.0);
 }
-inline auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
+constexpr auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     if (this == &other) return *this;
     const double input{other.totalInput_.load()};
     totalInput_.store(input);
@@ -60,7 +60,9 @@ struct ConsumerGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ConsumerGoodsEntry& entry;
-    [[nodiscard]] ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
+    [[nodiscard]] constexpr ConsumerGoodsRequest(
+        const GoodsQuantity a, const ConsumerGoodsEntry& e
+    ) noexcept
         : amount{a}, entry{e} {}
 };
 
@@ -68,7 +70,7 @@ class ConsumerGoodsEntry final {
     using Request = ConsumerGoodsRequest;
 
   public:
-    [[nodiscard]] ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
+    [[nodiscard]] constexpr ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
         : price{p}, supply{s} {}
     [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
         return *requestBox_.emplace_back(amount, *this);
@@ -104,7 +106,7 @@ class ConsumerGoodsMarket final {
     using Entry = ConsumerGoodsEntry;
 
   public:
-    [[nodiscard]] explicit ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
     [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
         totalSupply_.fetch_add(supply.value());
@@ -139,7 +141,7 @@ struct ProductionGoodsRequest final {
     GoodsQuantity       tradeAmount{0.0};
 
     const ProductionGoodsEntry& entry;
-    [[nodiscard]] ProductionGoodsRequest(
+    [[nodiscard]] constexpr ProductionGoodsRequest(
         const GoodsQuantity a, const ProductionGoodsEntry& e
     ) noexcept
         : amount{a}, entry{e} {}
@@ -149,7 +151,7 @@ class ProductionGoodsEntry final {
     using Request = ProductionGoodsRequest;
 
   public:
-    [[nodiscard]] ProductionGoodsEntry(
+    [[nodiscard]] constexpr ProductionGoodsEntry(
         const AgentID i, const Price p, const GoodsQuantity s
     ) noexcept
         : id{i}, price{p}, supply{s} {}
@@ -192,7 +194,7 @@ class ProductionGoodsMarket final {
     using Entry = ProductionGoodsEntry;
 
   public:
-    [[nodiscard]] explicit ProductionGoodsMarket(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr ProductionGoodsMarket(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
