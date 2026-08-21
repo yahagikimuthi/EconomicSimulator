@@ -60,7 +60,9 @@ class LaborDemander final {
     [[nodiscard]] explicit constexpr LaborDemander(
         RandomGenerator& masterRng, CompanyBoard&& board
     ) noexcept
-        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {
+        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
+
+    void setMediator() noexcept {
         recruitSystem_.acceptMediator(mediator_);
         mediator_.subscribeRecruitPlan(memory_);
     }

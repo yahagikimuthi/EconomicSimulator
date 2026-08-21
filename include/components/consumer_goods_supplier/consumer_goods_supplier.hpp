@@ -21,7 +21,9 @@ class ConsumerGoodsSupplier final {
 
   public:
     [[nodiscard]] explicit ConsumerGoodsSupplier(RandomGenerator& masterRng) noexcept
-        : producingSystem_{masterRng}, tradingSystem_{masterRng} {
+        : producingSystem_{masterRng}, tradingSystem_{masterRng} {}
+
+    void setMediator() noexcept {
         producingSystem_.acceptMediator(mediator_);
         tradingSystem_.acceptMediator(mediator_);
         mediator_.subscribeMarkupPlan(memory_);

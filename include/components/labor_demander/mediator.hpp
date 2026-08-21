@@ -3,6 +3,7 @@
 #include <array>
 #include <concepts>
 #include <optional>
+#include <print>
 #include <variant>
 
 #include "components/labor_demander/common.hpp"

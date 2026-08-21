@@ -92,6 +92,10 @@ Engine::Engine(const int totalStep) noexcept
             .productionGoodsDemander = createProductionGoodsDemander(rng_)
         });
     }
+    for (BtoCFirm& firm : bToCFirms_) {
+        firm.laborDemander.setMediator();
+        firm.consumerGoodsSupplier.setMediator();
+    }
 
     bToBFirms_.reserve(cnt::bToBFirm);
     for (; agentId < cnt::bToCFirm + cnt::bToBFirm; ++agentId) {
@@ -102,6 +106,10 @@ Engine::Engine(const int totalStep) noexcept
             .productionGoodsDemander = createProductionGoodsDemander(rng_),
             .productionGoodsSupplier = createProductionGoodsSupplier(rng_)
         });
+    }
+    for (BtoBFirm& firm : bToBFirms_) {
+        firm.laborDemander.setMediator();
+        firm.productionGoodsSupplier.setMediator();
     }
 
     hholds_.reserve(cnt::hhold);

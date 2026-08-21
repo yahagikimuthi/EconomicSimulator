@@ -19,7 +19,7 @@ class WagePlannerMemory final {
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenEmployPlan(const HeadCount employPlan) noexcept {
         ASSERT(employPlan >= HeadCount{0.0});
-        employPlan_.next = employPlan;
+        employPlan_.next.emplace(employPlan);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.applicants >= HeadCount{0.0});
