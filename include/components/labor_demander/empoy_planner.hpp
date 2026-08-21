@@ -56,7 +56,7 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
-        return HeadCount{employPlan.value() * (1.0 + planOfferRate())}.ceil();
+        return HeadCount{employPlan * (1.0 + planOfferRate())}.ceil();
     }
 
     void reset() noexcept {
