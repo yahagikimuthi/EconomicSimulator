@@ -2,7 +2,6 @@
 
 #include <pcg_random.hpp>
 
-#include "core/assertion.hpp"
 #include "core/values/common.hpp"
 #include "setting.hpp"
 #include "util.hpp"
@@ -12,7 +11,7 @@ namespace abm {
 class AgentIndex final {
   public:
     [[nodiscard]] explicit constexpr AgentIndex(const AgentID id) noexcept : id_{id} {}
-    [[nodiscard]] auto id() const noexcept -> AgentID POST(id : id >= AgentID{0}) { return id_; }
+    [[nodiscard]] auto id() const noexcept -> AgentID { return id_; }
 
   private:
     const AgentID id_;

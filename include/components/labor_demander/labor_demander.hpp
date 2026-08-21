@@ -87,12 +87,16 @@ class LaborDemander final {
 
     void acceptResignation() noexcept { humanResource_.acceptResignation(); }
 
-    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
-        return humanResource_.employeeCnt();
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
+        const auto out = humanResource_.employeeCnt();
+        ASSERT(out >= HeadCount{0.0});
+        return out;
     }
 
-    [[nodiscard]] auto sumWage() const noexcept -> Money POST(wage : wage >= Money{0.0}) {
-        return static_cast<Money>(humanResource_.sumWage());
+    [[nodiscard]] auto sumWage() const noexcept -> Money {
+        const auto out = humanResource_.sumWage();
+        ASSERT(out >= Wage{0.0});
+        return static_cast<Money>(out);
     }
 
     void endStep(CensusDropBox& dropBox) noexcept {

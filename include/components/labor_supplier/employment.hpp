@@ -28,8 +28,10 @@ class Employment final {
     [[nodiscard]] auto contractFirmId() const noexcept -> AgentID {
         return isEmployed() ? rosterEntry_->firmId() : AgentID{-1};
     }
-    [[nodiscard]] auto wage() const noexcept -> Wage POST(wage : wage >= Wage{0.0}) {
-        return isEmployed() ? rosterEntry_->wage : Wage{0.0};
+    [[nodiscard]] auto wage() const noexcept -> Wage {
+        const auto out = isEmployed() ? rosterEntry_->wage : Wage{0.0};
+        ASSERT(out >= Wage{0.0});
+        return out;
     }
 
     void work(const Market phase) noexcept {

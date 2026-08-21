@@ -60,8 +60,10 @@ class LaborSupplier final {
 
     void product(const Market phase) noexcept { employment_.work(phase); }
 
-    [[nodiscard]] auto wage() const noexcept -> Money POST(wage : wage >= Money{0.0}) {
-        return static_cast<Money>(employment_.wage());
+    [[nodiscard]] auto wage() const noexcept -> Money {
+        const auto out = employment_.wage();
+        ASSERT(out >= Wage{0.0});
+        return static_cast<Money>(out);
     }
 
   private:

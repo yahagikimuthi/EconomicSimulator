@@ -51,7 +51,9 @@ class HumanResource final {
           }()} {}
 
     [[nodiscard]] auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
-        -> RosterEntry& PRE(id >= AgentID{0}) PRE(wage > Wage{0.0}) {
+        -> RosterEntry& {
+        ASSERT(wage > Wage{0.0});
+
         sumWage_ += wage;
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
         auto* newRoster = &emptyRosterPool_.popBackEntry();
@@ -86,10 +88,12 @@ class HumanResource final {
         }
     }
 
-    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount POST(cnt : cnt >= HeadCount{0.0}) {
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const auto rosterSize = std::size_t{companyBoard_.roster.size() - emptyRosterPool_.size()};
-        return HeadCount{static_cast<double>(rosterSize)};
+        const auto out        = HeadCount{rosterSize};
+        ASSERT(out >= HeadCount{0.0});
+        return out;
     }
 
     [[nodiscard]] auto sumWage() const noexcept -> Wage {
