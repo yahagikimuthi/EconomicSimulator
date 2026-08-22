@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <print>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -16,37 +17,30 @@
 #include "world/common.hpp"
 
 namespace abm {
-namespace {
-void foo() {}
-}  // namespace
-
-auto Engine::calcSumAsset() const noexcept -> double {
-    const auto firmAsset = std::ranges::fold_left(
-        bToCFirms_ | std::views::transform([](const BtoCFirm& firm) -> double {
+auto Engine::calcSumAsset() const noexcept -> long double {
+    const long double firmAsset = std::ranges::fold_left(
+        bToCFirms_ | std::views::transform([](const BtoCFirm& firm) -> long double {
             return firm.finance.asset().value();
         }),
-        0.0,
+        0LL,
         std::plus{}
     );
-    const auto hholdAsset = std::ranges::fold_left(
-        hholds_ | std::views::transform([](const HHold& hhold) -> double {
+    const long double hholdAsset = std::ranges::fold_left(
+        hholds_ | std::views::transform([](const HHold& hhold) -> long double {
             return hhold.finance.asset().value();
         }),
-        0.0,
+        0LL,
         std::plus{}
     );
     return firmAsset + hholdAsset;
 }
-
+//! 546ステップ目が明らかにおかしい
 void Engine::run() {
+    std::println("{}", calcSumAsset());
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
-        if (currentStep_ == Step{600}) {
-            foo();
-        }
         runLabor();
         runConsumerGoods();
         logging();
-        check();
         reset();
     }
     if (isAnalysis_) {
@@ -55,6 +49,19 @@ void Engine::run() {
 }
 
 void Engine::runLabor() noexcept {
+    const auto totalCost =
+        std::ranges::fold_left(bToCFirms_, 0.0, [](double acc, BtoCFirm& firm) -> double {
+            return acc + firm.laborDemander.sumWage().value();
+        });
+    const auto sumWage =
+        std::ranges::fold_left(hholds_, 0.0, [](double acc, HHold& hhold) -> double {
+            return acc + hhold.laborSupplier.wage().value();
+        });
+
+    std::println("ステップ: {}", currentStep_.value());
+    std::println("企業が支払う総賃金: {}", totalCost);
+    std::println("家計が受ける装賃金: {}", sumWage);
+
     for (BtoCFirm& firm : bToCFirms_) {
         labor::adjustWorkforce(
             firm.index, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
@@ -92,57 +99,6 @@ void Engine::runLabor() noexcept {
         labor::endStep(hhold.finance, hhold.laborSupplier, dropBox_);
     }
 }
-/*
-void Engine::runProductionGoods() noexcept {
-    for (HHold& hhold : hholds_) {
-        production_goods::product(hhold.laborSupplier, Market::productionGoods);
-    }
-
-    for (BtoBFirm& firm : bToBFirms_) {
-        production_goods::postGoods(
-            firm.index, firm.productionGoodsSupplier, firm.laborDemander, productionGoodsMarket_
-        );
-    }
-
-    for (BtoBFirm& firm : bToBFirms_) {
-        production_goods::purchase(
-            firm.index,
-            firm.finance,
-            firm.productionGoodsDemander,
-            firm.laborDemander,
-            productionGoodsMarket_
-        );
-    }
-
-    for (BtoCFirm& firm : bToCFirms_) {
-        production_goods::purchase(
-            firm.index,
-            firm.finance,
-            firm.productionGoodsDemander,
-            firm.laborDemander,
-            productionGoodsMarket_
-        );
-    }
-
-    for (BtoBFirm& firm : bToBFirms_) {
-        production_goods::trade(firm.productionGoodsSupplier);
-    }
-
-    for (BtoBFirm& firm : bToBFirms_) {
-        production_goods::afterTrade(firm.productionGoodsDemander);
-    }
-
-    for (BtoCFirm& firm : bToCFirms_) {
-        production_goods::afterTrade(firm.productionGoodsDemander);
-    }
-
-    for (BtoBFirm& firm : bToBFirms_) {
-        production_goods::endStep(
-            firm.finance, firm.productionGoodsSupplier, firm.productionGoodsDemander
-        );
-    }
-}
-*/
 
 void Engine::runConsumerGoods() noexcept {
     for (HHold& hhold : hholds_) {
@@ -157,11 +113,7 @@ void Engine::runConsumerGoods() noexcept {
 
     for (HHold& hhold : hholds_) {
         consumer_goods::purchase(
-            hhold.finance,
-            hhold.consumerGoodsDemander,
-            hhold.laborSupplier,
-            consumerGoodsMarket_,
-            currentStep_
+            hhold.finance, hhold.consumerGoodsDemander, consumerGoodsMarket_, currentStep_
         );
     }
 

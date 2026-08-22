@@ -90,8 +90,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
             .index         = AgentIndex{AgentID{agentId}},
             .finance       = FirmFinance{rng_},
             .laborDemander = createLaborDemander(rng_, AgentID{agentId}, Market::consumerGoods),
-            .consumerGoodsSupplier   = createConsumerGoodsSupplier(rng_),
-            .productionGoodsDemander = createProductionGoodsDemander(rng_)
+            .consumerGoodsSupplier = createConsumerGoodsSupplier(rng_)
         });
     }
     for (BtoCFirm& firm : bToCFirms_) {

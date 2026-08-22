@@ -22,11 +22,10 @@
 
 namespace abm {
 struct BtoCFirm final {  // NOLINT
-    AgentIndex              index;
-    FirmFinance             finance;
-    LaborDemander           laborDemander;
-    ConsumerGoodsSupplier   consumerGoodsSupplier;
-    ProductionGoodsDemander productionGoodsDemander;
+    AgentIndex            index;
+    FirmFinance           finance;
+    LaborDemander         laborDemander;
+    ConsumerGoodsSupplier consumerGoodsSupplier;
 };
 
 struct BtoBFirm final {  // NOLINT
@@ -79,19 +78,16 @@ class Engine final {
     [[nodiscard]] explicit Engine(const int totalStep, const bool isAnalysis) noexcept;
 
     void run();
-    void testRun();
 
   private:
     void runLabor() noexcept;
     void runProductionGoods() noexcept;
     void runConsumerGoods() noexcept;
-    void update() noexcept;
     void logging();
     void reset() noexcept;
     void check() const noexcept;
-    void analysis() const noexcept;
 
-    [[nodiscard]] auto calcSumAsset() const noexcept -> double;
+    [[nodiscard]] auto calcSumAsset() const noexcept -> long double;
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
