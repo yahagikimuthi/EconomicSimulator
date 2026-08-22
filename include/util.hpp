@@ -49,7 +49,7 @@ class RandomGenerator final {
         const double max  = std::numeric_limits<double>::infinity()
     ) noexcept -> double {
         auto       dist = std::normal_distribution<double>{mean, div};
-        const auto out  = double{dist(rng_)};
+        const auto out  = dist(rng_);
         return std::clamp(out, min, max);
     }
 
