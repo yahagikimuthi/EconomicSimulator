@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "core/assertion.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
@@ -30,6 +31,9 @@ class Employment final {
     }
     [[nodiscard]] auto wage() const noexcept -> Wage {
         const auto out = isEmployed() ? rosterEntry_->wage : Wage{0.0};
+        if (isEmployed()) {
+            ASSERT(rosterEntry_->isOccupied);
+        }
         ASSERT(out >= Wage{0.0});
         return out;
     }
