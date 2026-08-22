@@ -30,7 +30,7 @@ class Ledger final {
     [[nodiscard]] auto tradableAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
         ASSERT(demand >= GoodsQuantity{0.0});
 
-        const auto out = max(inventory_, demand);
+        const auto out = min(inventory_, demand);
         ASSERT(out >= GoodsQuantity{0.0});
         return out;
     }

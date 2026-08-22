@@ -7,11 +7,21 @@
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 
-namespace abm {
+namespace abm::value_object {
 template <typename T>
-    requires std::same_as<T, Money> or std::same_as<T, Price> or std::same_as<T, GoodsQuantity> or
-                 std::same_as<T, Wage> or std::same_as<T, HeadCount>
+concept ComputableObject =
+    std::same_as<T, Money> or std::same_as<T, Price> or std::same_as<T, GoodsQuantity> or
+    std::same_as<T, HeadCount> or std::same_as<T, Wage>;
+}
+
+namespace abm {
+template <value_object::ComputableObject T>
 [[nodiscard]] constexpr auto max(const T a, const T b) noexcept -> T {
     return T{std::max(a.value(), b.value())};
+}
+
+template <value_object::ComputableObject T>
+[[nodiscard]] constexpr auto min(const T a, const T b) noexcept -> T {
+    return T{std::min(a.value(), b.value())};
 }
 }  // namespace abm

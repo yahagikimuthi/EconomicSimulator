@@ -39,7 +39,7 @@ class Trader final {
         auto       requestBox = requestBoxRef();
         const auto demand     = myEntry_->totalDemand();
         if (demand == GoodsQuantity{0.0}) return;
-        const auto tradeAmount    = ledger_.canTradeAmount(demand);
+        const auto tradeAmount    = ledger_.tradableAmount(demand);
         const auto isExcessDemand = ledger_.isExcessDemand(demand);
         isExcessDemand ? performRationedTrade(requestBox) : myEntry_->performFullTrade();
         ledger_.readResult({.price = myEntry_->price, .demand = demand, .salesAmount = tradeAmount}
