@@ -25,7 +25,7 @@ template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
 template <typename T>
-constexpr void ignore(T&& _) noexcept {}
+constexpr void ignore([[maybe_unused]] T&& _) noexcept {}
 
 class RandomGenerator final {
   public:
