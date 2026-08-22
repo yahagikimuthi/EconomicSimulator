@@ -9,9 +9,9 @@
 #include <vector>
 
 #include "core/assertion.hpp"
+#include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "util.hpp"
 #include "world/goods.hpp"
 #include "world/labor.hpp"
 
@@ -80,7 +80,7 @@ class HumanResource final {
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
-        const auto rosterSize = std::size_t{companyBoard_.roster.size() - emptyRosterPool_.size()};
+        const auto rosterSize = companyBoard_.roster.size() - emptyRosterPool_.size();
         const auto out        = HeadCount{rosterSize};
         ASSERT(out >= HeadCount{0.0});
         return out;

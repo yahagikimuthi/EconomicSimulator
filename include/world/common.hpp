@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "setting.hpp"
+#include "core/setting.hpp"
 
 namespace abm {
 enum class Market : char { labor, consumerGoods, productionGoods };

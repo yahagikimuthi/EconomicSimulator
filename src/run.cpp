@@ -1,4 +1,4 @@
-#include "core/engine.hpp"
+#include "abm.hpp"
 
 #include <algorithm>
 #include <highfive/H5DataSet.hpp>
@@ -8,10 +8,11 @@
 #include <string_view>
 #include <vector>
 
+#include "analysis/analysis.hpp"
+#include "core/setting.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
 #include "orchestrator/updates_loggings.hpp"
-#include "setting.hpp"
 #include "world/common.hpp"
 
 namespace abm {
@@ -47,6 +48,9 @@ void Engine::run() {
         logging();
         check();
         reset();
+    }
+    if (isAnalysis_) {
+        analysis::analysisData();
     }
 }
 
@@ -194,10 +198,8 @@ void Engine::reset() noexcept {
     productionGoodsMarket_.clear();
     consumerGoodsMarket_.clear();
 }
-//399ステップ目で失敗
-void Engine::check() const noexcept {
-    ASSERT(calcSumAsset() > 0.0);
-}
+// 399ステップ目で失敗
+void Engine::check() const noexcept { ASSERT(calcSumAsset() > 0.0); }
 
 void Logger::save(const CensusDropBox& dropBox, const Step step) {
     namespace name = setting::save_name;

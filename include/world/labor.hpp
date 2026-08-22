@@ -8,9 +8,9 @@
 
 #include "core/assertion.hpp"
 #include "core/forward.hpp"
+#include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "util.hpp"
 #include "world/common.hpp"
 
 namespace abm {

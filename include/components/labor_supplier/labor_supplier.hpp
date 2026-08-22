@@ -9,8 +9,8 @@
 #include "components/labor_supplier/job_hunter.hpp"
 #include "core/assertion.hpp"
 #include "core/forward.hpp"
-#include "setting.hpp"
-#include "util.hpp"
+#include "core/setting.hpp"
+#include "core/util.hpp"
 #include "world/common.hpp"
 #include "world/labor.hpp"
 

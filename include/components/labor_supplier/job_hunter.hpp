@@ -10,8 +10,8 @@
 #include <span>
 
 #include "components/labor_supplier/common.hpp"
-#include "setting.hpp"
-#include "util.hpp"
+#include "core/setting.hpp"
+#include "core/util.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {

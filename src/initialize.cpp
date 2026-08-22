@@ -1,4 +1,4 @@
-#include "core/engine.hpp"
+#include "abm.hpp"
 
 #include <cstdlib>
 #include <highfive/H5DataSet.hpp>
@@ -15,8 +15,8 @@
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
-#include "setting.hpp"
-#include "util.hpp"
+#include "core/setting.hpp"
+#include "core/util.hpp"
 #include "world/goods.hpp"
 #include "world/labor.hpp"
 
@@ -68,13 +68,14 @@ namespace {
 }  // namespace abm
 
 namespace abm {
-Engine::Engine(const int totalStep) noexcept
+Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     : totalStep_{totalStep},
       seed_{generateSeed()},
       rng_{pcg32{seed_.state, seed_.stream}},
       laborMarket_{rng_},
       productionGoodsMarket_{rng_},
-      consumerGoodsMarket_{rng_} {
+      consumerGoodsMarket_{rng_},
+      isAnalysis_{isAnalysis} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";
         std::abort();

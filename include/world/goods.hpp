@@ -9,9 +9,9 @@
 
 #include "core/assertion.hpp"
 #include "core/forward.hpp"
+#include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "util.hpp"
 
 namespace abm {
 class Workspace final {

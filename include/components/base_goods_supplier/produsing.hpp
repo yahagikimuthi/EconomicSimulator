@@ -2,10 +2,10 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
+#include "core/setting.hpp"
+#include "core/util.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
-#include "setting.hpp"
-#include "util.hpp"
 #include "world/common.hpp"
 #include "world/goods.hpp"
 

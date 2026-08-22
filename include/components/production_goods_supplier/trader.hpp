@@ -8,8 +8,8 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
+#include "core/util.hpp"
 #include "core/values/goods.hpp"
-#include "util.hpp"
 #include "world/goods.hpp"
 
 namespace abm::production_goods::supplier {

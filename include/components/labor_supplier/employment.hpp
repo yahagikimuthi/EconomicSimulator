@@ -2,9 +2,9 @@
 
 #include <optional>
 
+#include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "util.hpp"
 #include "world/common.hpp"
 #include "world/labor.hpp"
 

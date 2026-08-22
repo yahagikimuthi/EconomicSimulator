@@ -3,8 +3,8 @@
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/empoy_planner.hpp"
 #include "components/labor_demander/wage_planner.hpp"
+#include "core/util.hpp"
 #include "core/values/labor.hpp"
-#include "util.hpp"
 
 namespace abm::labor::demander::planner {
 class RecruitPlanner final {

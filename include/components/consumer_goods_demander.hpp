@@ -6,10 +6,10 @@
 #include <utility>
 
 #include "components/others.hpp"
+#include "core/setting.hpp"
+#include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "setting.hpp"
-#include "util.hpp"
 #include "world/goods.hpp"
 
 namespace abm::consumer_goods::demander {

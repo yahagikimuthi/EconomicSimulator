@@ -10,9 +10,9 @@
 #include <vector>
 
 #include "components/labor_demander/common.hpp"
+#include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "util.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::recruiter {
