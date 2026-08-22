@@ -12,15 +12,13 @@
 
 namespace abm::labor::demander {
 class Mediator final {
-    template <typename T>
-    using Opt                = std::optional<T>;
-    using EmployPlanListener = std::variant<
-        Opt<planner::WagePlannerMemory&>,
-        Opt<planner::OfferPlannerMemory&>,
-        Opt<CentralMemory&>>;
-    using RecruitPlanListener = std::variant<Opt<CentralMemory&>>;
-    using RecruitResultListener =
-        std::variant<Opt<planner::WagePlannerMemory&>, Opt<planner::OfferPlannerMemory&>>;
+    template <typename... Ts>
+    using Listener = std::variant<std::optional<Ts&>...>;
+
+    using EmployPlanListener =
+        Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory, CentralMemory>;
+    using RecruitPlanListener   = Listener<CentralMemory>;
+    using RecruitResultListener = Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
   public:
     [[nodiscard]] constexpr Mediator() noexcept = default;
