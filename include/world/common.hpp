@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstddef>
 #include <vector>
 
 #include "setting.hpp"
@@ -23,10 +22,9 @@ struct CensusDropBox final {
     std::vector<double> wages;
 
     [[nodiscard]] constexpr CensusDropBox() noexcept {
-        constexpr std::size_t firmCnt{static_cast<std::size_t>(
-            setting::agent_count::bToCFirm + setting::agent_count::bToBFirm
-        )};
-        constexpr std::size_t hholdCnt{static_cast<std::size_t>(setting::agent_count::hhold)};
+        const auto firmCnt  = setting::agent_count::bToCFirm + setting::agent_count::bToBFirm;
+        const auto hholdCnt = setting::agent_count::hhold;
+
         firmAssets.reserve(firmCnt);
         postedEmployments.reserve(firmCnt);
         postedWages.reserve(firmCnt);
@@ -46,6 +44,7 @@ struct CensusDropBox final {
         postedEmployments.clear();
         postedWages.clear();
         employments.clear();
+        sumWages.clear();
         prices.clear();
         supplies.clear();
         markups.clear();
