@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cmath>
-
+#include "core/assertion.hpp"
 #include "core/values/common.hpp"
 
 namespace abm {
