@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 #include <concepts>
 
 #include "core/values/common.hpp"
@@ -31,5 +32,10 @@ template <value_object::ComputableObject T>
 template <value_object::ComputableObject T>
 [[nodiscard]] constexpr auto ceil(const T a) noexcept -> T {
     return T{std::ceil(a.value())};
+}
+
+template <value_object::ComputableObject T>
+[[nodiscard]] constexpr auto clamp(const T val, const T low, const T high) noexcept -> T {
+    return std::clamp(val.value(), low.value(), high.value());
 }
 }  // namespace abm
