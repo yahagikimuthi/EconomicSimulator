@@ -16,7 +16,6 @@ class Producer final {
         : baseProductPower{masterRng.random(setting::productPower)},
           inventory_{masterRng.random(setting::inventory)} {}
 
-    void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradeResult(*this); }
     void endStep(const GoodsQuantity unsoldAmount) noexcept {
         ASSERT(unsoldAmount >= GoodsQuantity{0.0});
         inventory_ = unsoldAmount;
@@ -70,7 +69,7 @@ class ProducingSystem final {
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         employPlanner_.acceptMediator(mediator);
-        producer_.acceptMediator(mediator);
+        mediator.subscribeTradeResult(producer_);
     }
 
     [[nodiscard]] auto calcDesiredEmploy(
