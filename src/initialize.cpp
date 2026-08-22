@@ -5,6 +5,7 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5PropertyList.hpp>
 #include <iostream>
+#include <pcg_random.hpp>
 #include <utility>
 
 #include "components/common.hpp"

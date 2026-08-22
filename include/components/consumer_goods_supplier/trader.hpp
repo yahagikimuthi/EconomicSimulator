@@ -48,7 +48,7 @@ class Trader final {
         );
     }
 
-    [[nodiscard]] auto publishTradeResult() const noexcept -> std::optional<TradeResult> {
+    [[nodiscard]] auto publishResult() const noexcept -> std::optional<TradeResult> {
         if (not isActive_) return std::nullopt;
         return ledger_.publishResult();
     }
@@ -90,7 +90,6 @@ class Trader final {
     Ledger                  ledger_;
     std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
-
-    bool isActive_{false};
+    bool                    isActive_{false};
 };
 }  // namespace abm::consumer_goods::supplier

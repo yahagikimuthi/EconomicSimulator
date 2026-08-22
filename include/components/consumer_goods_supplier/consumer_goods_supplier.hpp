@@ -6,6 +6,7 @@
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/consumer_goods_supplier/trading_system.hpp"
+#include "components/others.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "util.hpp"
@@ -40,8 +41,10 @@ class ConsumerGoodsSupplier final {
         tradingSystem_.post(supply, totalCost, market, mediator_);
     }
     void trade() noexcept { tradingSystem_.trade(); }
-    void endStep(CensusDropBox& dropBox) noexcept {
-        tradingSystem_.endStep(mediator_);
+
+    template <AssetPlusFn F>
+    void endStep(F&& assetPlus, CensusDropBox& dropBox) noexcept {
+        tradingSystem_.endStep(std::forward<F>(assetPlus), mediator_);
         reset(dropBox);
     }
 

@@ -1,10 +1,12 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <optional>
 
 #include "components/labor_demander/common.hpp"
+#include "core/values/integrate.hpp"
 #include "core/values/labor.hpp"
 #include "setting.hpp"
 #include "util.hpp"
@@ -63,7 +65,9 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
-        return HeadCount{employPlan * (1.0 + planOfferRate())}.ceil();
+        const auto out     = employPlan * (1.0 + planOfferRate());
+        const auto guarded = min(out, HeadCount{::abm::setting::agent_count::hhold});
+        return ceil(guarded);
     }
 
     void reset() noexcept {
@@ -89,7 +93,12 @@ class OfferPlanner final {
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto shouldRaise = *lastEmployResult < *lastEmployPlan;
         const auto next        = rateCache_.cache() + (shouldRaise ? alpha : -alpha);
-        return std::max(std::numeric_limits<double>::epsilon(), next);
+        const auto guarded     = std::clamp(
+            next,
+            std::numeric_limits<double>::epsilon(),
+            static_cast<double>(::abm::setting::agent_count::hhold)
+        );
+        return guarded;
     }
 
     OfferPlannerMemory      memory_;

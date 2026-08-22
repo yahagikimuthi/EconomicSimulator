@@ -1,7 +1,9 @@
 #include "core/engine.hpp"
 
+#include <algorithm>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -13,8 +15,33 @@
 #include "world/common.hpp"
 
 namespace abm {
+namespace {
+void foo() {}
+}  // namespace
+
+auto Engine::calcSumAsset() const noexcept -> double {
+    const auto firmAsset = std::ranges::fold_left(
+        bToCFirms_ | std::views::transform([](const BtoCFirm& firm) -> double {
+            return firm.finance.asset().value();
+        }),
+        0.0,
+        std::plus{}
+    );
+    const auto hholdAsset = std::ranges::fold_left(
+        hholds_ | std::views::transform([](const HHold& hhold) -> double {
+            return hhold.finance.asset().value();
+        }),
+        0.0,
+        std::plus{}
+    );
+    return firmAsset + hholdAsset;
+}
+
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
+        if (currentStep_ == Step{600}) {
+            foo();
+        }
         runLabor();
         runConsumerGoods();
         logging();
@@ -143,7 +170,7 @@ void Engine::runConsumerGoods() noexcept {
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
-        consumer_goods::endStep(firm.consumerGoodsSupplier, dropBox_);
+        consumer_goods::endStep(firm.finance, firm.consumerGoodsSupplier, dropBox_);
     }
 
     for (HHold& hhold : hholds_) {
@@ -167,8 +194,10 @@ void Engine::reset() noexcept {
     productionGoodsMarket_.clear();
     consumerGoodsMarket_.clear();
 }
-
-void Engine::check() const noexcept {}
+//399ステップ目で失敗
+void Engine::check() const noexcept {
+    ASSERT(calcSumAsset() > 0.0);
+}
 
 void Logger::save(const CensusDropBox& dropBox, const Step step) {
     namespace name = setting::save_name;

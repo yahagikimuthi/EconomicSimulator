@@ -10,9 +10,12 @@
 namespace abm::value_object {
 template <typename T>
 concept ComputableObject =
-    std::same_as<T, Money> or std::same_as<T, Price> or std::same_as<T, GoodsQuantity> or
-    std::same_as<T, HeadCount> or std::same_as<T, Wage>;
-}
+    (std::same_as<T, Money> or std::same_as<T, Price> or std::same_as<T, GoodsQuantity> or
+     std::same_as<T, HeadCount> or std::same_as<T, Wage>) and
+    requires(T t) {
+        { t.value() } -> std::same_as<double>;
+    };
+}  // namespace abm::value_object
 
 namespace abm {
 template <value_object::ComputableObject T>
@@ -23,5 +26,10 @@ template <value_object::ComputableObject T>
 template <value_object::ComputableObject T>
 [[nodiscard]] constexpr auto min(const T a, const T b) noexcept -> T {
     return T{std::min(a.value(), b.value())};
+}
+
+template <value_object::ComputableObject T>
+[[nodiscard]] constexpr auto ceil(const T a) noexcept -> T {
+    return T{std::ceil(a.value())};
 }
 }  // namespace abm

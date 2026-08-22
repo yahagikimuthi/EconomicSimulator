@@ -21,24 +21,52 @@ void analysisData() {
     namespace name = setting::save_name;
     auto analyzer  = Analyzer{};
 
-    auto registerMean = [&](std::string&& outName, std::string_view readName) -> void {
-        analyzer.requireData(readName);
-        analyzer.registerMetric(std::move(outName), [&](const DataContext& ctx) -> double {
-            return calcMean(ctx.get(readName));
-        });
-    };
+    analyzer.requireData(name::firmAssets);
+    analyzer.requireData(name::postedEmployments);
+    analyzer.requireData(name::postedWages);
+    analyzer.requireData(name::employments);
+    analyzer.requireData(name::sumWages);
+    analyzer.requireData(name::prices);
+    analyzer.requireData(name::supplies);
+    analyzer.requireData(name::markups);
+    analyzer.requireData(name::inventories);
+    analyzer.requireData(name::householdAssets);
+    analyzer.requireData(name::wages);
 
-    registerMean("avgFirmAssets", name::firmAssets);
-    registerMean("avgPostedEmployments", name::postedEmployments);
-    registerMean("avgPostedWages", name::postedWages);
-    registerMean("avgEmployments", name::employments);
-    registerMean("avgSumWages", name::sumWages);
-    registerMean("avgPrices", name::prices);
-    registerMean("avgSupplies", name::supplies);
-    registerMean("avgMarkups", name::markups);
-    registerMean("inventories", name::inventories);
-    registerMean("avgHholdAssets", name::householdAssets);
-    registerMean("avgWages", name::wages);
+    analyzer.registerMetric("avgFirmAssets", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::firmAssets));
+    });
+    analyzer.registerMetric("avgPostedEmployments", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::postedEmployments));
+    });
+    analyzer.registerMetric("avgPostedWages", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::postedWages));
+    });
+    analyzer.registerMetric("avgEmployments", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::employments));
+    });
+    analyzer.registerMetric("avgSumWages", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::sumWages));
+    });
+    analyzer.registerMetric("avgPrices", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::prices));
+    });
+    analyzer.registerMetric("avgSupplies", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::supplies));
+    });
+    analyzer.registerMetric("avgMarkups", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::supplies));
+    });
+    analyzer.registerMetric("avgInventories", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::supplies));
+    });
+    analyzer.registerMetric("avgHholdAssets", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::supplies));
+    });
+    analyzer.registerMetric("avgWages", [](const DataContext& ctx) -> double {
+        return calcMean(ctx.get(name::supplies));
+    });
+
     analyzer.execute();
 }
 }  // namespace abm::analysis

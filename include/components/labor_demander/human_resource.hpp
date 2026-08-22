@@ -41,20 +41,12 @@ class EmptyRosterPool final {
 class HumanResource final {
   public:
     [[nodiscard]] explicit constexpr HumanResource(CompanyBoard&& companyBoard) noexcept
-        : companyBoard_{std::move(companyBoard)}, sumWage_{[&]() -> Wage {
-              const auto& roster = companyBoard_.roster;
-
-              auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
-                           std::views::transform(&RosterEntry::wage) |
-                           std::views::transform([](Wage wage) -> double { return wage.value(); });
-              return Wage{std::ranges::fold_left(wages, 0.0, std::plus{})};
-          }()} {}
+        : companyBoard_{std::move(companyBoard)} {}
 
     [[nodiscard]] auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
         -> RosterEntry& {
         ASSERT(wage > Wage{0.0});
 
-        sumWage_ += wage;
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
         auto* newRoster = &emptyRosterPool_.popBackEntry();
         ASSERT(newRoster != nullptr);
@@ -69,7 +61,6 @@ class HumanResource final {
             ASSERT(resignEntry.isOccupied);
             resignEntry.isOccupied = false;
             emptyRosterPool_.add(resignEntry);
-            sumWage_ -= resignEntry.wage;
         }
         resignationBox.clear();
     }
@@ -84,7 +75,6 @@ class HumanResource final {
             entry.isOccupied = false;
             emptyRosterPool_.add(entry);
             ++currentLayOffs;
-            sumWage_ -= entry.wage;
         }
     }
 
@@ -97,14 +87,19 @@ class HumanResource final {
     }
 
     [[nodiscard]] auto sumWage() const noexcept -> Wage {
-        ASSERT(sumWage_ >= Wage{0.0});
-        return sumWage_;
+        const auto& roster = companyBoard_.roster;
+
+        auto wages =
+            roster | std::views::filter(&RosterEntry::isOccupied) |
+            std::views::transform([](const RosterEntry& e) -> double { return e.wage.value(); });
+        const auto sumWage = std::ranges::fold_left(wages, 0.0, std::plus{});
+        ASSERT(sumWage >= 0.0);
+        return Wage{sumWage};
     }
 
   private:
     CompanyBoard    companyBoard_;
     EmptyRosterPool emptyRosterPool_;
-    Wage            sumWage_;
 };
 }  // namespace abm::labor::demander::human_resource
 

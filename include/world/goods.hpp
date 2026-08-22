@@ -121,7 +121,6 @@ class ConsumerGoodsMarket final {
         totalSupply_.fetch_add(supply.value());
         return *entryBox_.emplace_back(price, supply);
     }
-    void clear() noexcept { entryBox_.clear(), totalSupply_.store(0.0); }
 
     auto pickEntry(const int sampleCnt) noexcept -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
@@ -138,6 +137,8 @@ class ConsumerGoodsMarket final {
         }
         return betterEntry.get();
     }
+
+    void clear() noexcept { entryBox_.clear(), totalSupply_.store(0.0); }
 
   private:
     tbb::concurrent_vector<Entry> entryBox_;

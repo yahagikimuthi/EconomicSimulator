@@ -89,6 +89,8 @@ class Engine final {
     void reset() noexcept;
     void check() const noexcept;
 
+    [[nodiscard]] auto calcSumAsset() const noexcept -> double;
+
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
             return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};

@@ -31,6 +31,7 @@ class Producer final {
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.totalInput();
+        workspace_.resetInput();
         ASSERT(workerInput >= GoodsQuantity{0.0});
         const auto production = workerInput * baseProductPower;
         ASSERT(inventory_ >= GoodsQuantity{0.0});
@@ -51,7 +52,7 @@ class Producer final {
         productionGoods_ += productionGoods;
     }
 
-    void logging(CensusDropBox& dropBox) noexcept {
+    void reset(CensusDropBox& dropBox) noexcept {
         dropBox.inventories.emplace_back(inventory_.value());
     }
 
@@ -89,7 +90,7 @@ class ProducingSystem final {
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity { return producer_.produce(); }
 
     void reset(CensusDropBox& dropBox) noexcept {
-        producer_.logging(dropBox);
+        producer_.reset(dropBox);
         employPlanner_.reset();
     }
 

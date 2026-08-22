@@ -65,7 +65,7 @@ class JobHunter final {
     }
     [[nodiscard]] auto huntedResult() noexcept -> std::optional<Entry&> { return acceptedEntry_; }
 
-    void endStep() noexcept { myEntries_.clear(), acceptedEntry_.reset(); }
+    void reset() noexcept { myEntries_.clear(), acceptedEntry_.reset(); }
 
   private:
     [[nodiscard]] auto takeOfferedEntry() noexcept -> std::optional<Entry&> {

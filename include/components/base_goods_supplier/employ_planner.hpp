@@ -1,9 +1,11 @@
 #pragma once
 
+#include <algorithm>
 #include <optional>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/integrate.hpp"
 #include "core/values/labor.hpp"
 #include "setting.hpp"
 #include "util.hpp"
@@ -70,8 +72,9 @@ class EmployPlanner final {
         const auto isEmploying = employee != HeadCount{0.0};
         const auto avgPower =
             isEmploying ? lastSupply->value() / employee.value() : firmProductPower;
-        const auto out = avgPower != 0.0 ? targetProduction.value() / avgPower : 1.0;
-        return HeadCount{out}.ceil();
+        const auto out     = avgPower != 0.0 ? targetProduction.value() / avgPower : 1.0;
+        const auto guarded = std::min(out, static_cast<double>(::abm::setting::agent_count::hhold));
+        return ceil(HeadCount{guarded});
     }
 
     EmployPlannerMemory memory_;

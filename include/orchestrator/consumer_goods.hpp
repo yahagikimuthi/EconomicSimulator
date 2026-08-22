@@ -38,8 +38,10 @@ void trade(ConsumerGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trade(
 
 void afterTrade(ConsumerGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
-void endStep(ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox) noexcept {
-    goodsSupplier.endStep(dropBox);
+void endStep(
+    FirmFinance& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
+) noexcept {
+    goodsSupplier.endStep([&](const Money sales) -> void { finance.assetPlus(sales); }, dropBox);
 }
 
 void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) noexcept {

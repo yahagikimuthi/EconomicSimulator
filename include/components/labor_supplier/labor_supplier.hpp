@@ -55,7 +55,7 @@ class LaborSupplier final {
 
     void endStep(CensusDropBox& dropBox) noexcept {
         dropBox.wages.emplace_back(wage().value());
-        jobHunter_.endStep();
+        jobHunter_.reset();
     }
 
     void product(const Market phase) noexcept { employment_.work(phase); }
