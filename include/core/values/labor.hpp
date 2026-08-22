@@ -21,10 +21,6 @@ class [[nodiscard]] HeadCount final : public value_object::ValueObjectMixin<Head
     [[nodiscard]] explicit constexpr HeadCount(const std::size_t value) noexcept
         : ValueObjectMixin<HeadCount>::ValueObjectMixin(static_cast<double>(value)) {}
 
-    constexpr auto ceil() noexcept -> HeadCount& {
-        value_ = std::ceil(value_);
-        return *this;
-    }
     constexpr auto operator++() noexcept -> HeadCount& {
         ++value_;
         return *this;

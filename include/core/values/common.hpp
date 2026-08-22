@@ -35,6 +35,7 @@ class ValueObjectMixin {
         return lhs;
     }
     [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> double {
+        ASSERT(rhs.value_ != 0.0);
         return lhs.value_ / rhs.value_;
     }
     friend constexpr auto operator*=(Derived& lhs, double rhs) noexcept -> Derived& {
@@ -49,10 +50,12 @@ class ValueObjectMixin {
         return rhs * lhs;
     }
     friend constexpr auto operator/=(Derived& lhs, double rhs) noexcept -> Derived& {
+        ASSERT(rhs != 0.0);
         lhs.value_ /= rhs;
         return lhs;
     }
     [[nodiscard]] friend constexpr auto operator/(Derived lhs, double rhs) noexcept -> Derived {
+        ASSERT(rhs != 0.0);
         lhs /= rhs;
         return lhs;
     }
