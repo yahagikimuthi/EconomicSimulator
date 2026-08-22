@@ -68,17 +68,17 @@ class CentralMemory {
         if (employPlan_) {
             ASSERT(employPlan_ >= HeadCount{0.0});
             dropBox.postedEmployments.emplace_back(employPlan_->value());
+            employPlan_.reset();
         }
         if (wagePlan_) {
             ASSERT(wagePlan_ >= Wage{0.0});
             dropBox.postedWages.emplace_back(wagePlan_->value());
+            wagePlan_.reset();
         }
-        employPlan_.reset();
-        wagePlan_.reset();
     }
 
     void listenEmployPlan(const HeadCount employPlan) noexcept {
-        ASSERT(employPlan_ >= HeadCount{0.0});
+        ASSERT(employPlan >= HeadCount{0.0});
         employPlan_ = employPlan;
     }
 

@@ -45,7 +45,7 @@ constexpr RandomParameter wageAdjustVol = UniformParameter<double>{.min = 0.1, .
 
 namespace abm::labor::supplier::setting {
 constexpr RandomParameter productPower =
-    NormalParameter{.mean = 1.0, .dev = 1.0 / 3.0, .min = 0.0, .max = 1.0};
+    NormalParameter{.mean = 1.0, .dev = 1.0 / 3.0, .min = 0.0, .max = 2.0};
 constexpr auto            jobSampleCnt = 2;
 constexpr auto            jobEntryCnt  = 2;
 constexpr RandomParameter changingJobThreshold =
@@ -81,8 +81,8 @@ constexpr RandomParameter mpc            = UniformParameter<double>{.min = 0.5, 
 
 namespace abm::setting::agent_count {
 constexpr auto bToCFirm = 2;
-constexpr auto bToBFirm = 2;
-constexpr auto hhold    = 1000;
+constexpr auto bToBFirm = 0;
+constexpr auto hhold    = 100;
 }  // namespace abm::setting::agent_count
 
 namespace abm::setting::agent_finance {

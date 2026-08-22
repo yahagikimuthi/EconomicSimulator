@@ -1,7 +1,7 @@
 #pragma once
 
 namespace abm {
-struct LaborEntry;
+class LaborEntry;
 class LaborRequest;
 struct ConsumerGoodsRequest;
 class ConsumerGoodsEntry;

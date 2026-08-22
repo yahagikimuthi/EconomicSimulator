@@ -10,17 +10,18 @@
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
 
-namespace abm::base_goods::supplier::mediator {
-template <typename T>
-using Opt = std::optional<T>;
-
-using TradePlanListener =
-    std::variant<Opt<EmployPlannerMemory&>, Opt<MarkupPlannerMemory&>, Opt<CentralMemory&>>;
-using MarkupPlanListener = std::variant<Opt<CentralMemory&>>;
-using TradeResultListener =
-    std::variant<Opt<DemandForecastManagerMemory&>, Opt<MarkupPlannerMemory&>, Opt<Producer&>>;
+namespace abm::base_goods::supplier {
 
 class Mediator final {
+    template <typename T>
+    using Opt = std::optional<T>;
+
+    using TradePlanListener =
+        std::variant<Opt<EmployPlannerMemory&>, Opt<MarkupPlannerMemory&>, Opt<CentralMemory&>>;
+    using MarkupPlanListener = std::variant<Opt<CentralMemory&>>;
+    using TradeResultListener =
+        std::variant<Opt<DemandForecastManagerMemory&>, Opt<MarkupPlannerMemory&>, Opt<Producer&>>;
+
   public:
     [[nodiscard]] constexpr Mediator() noexcept = default;
 
@@ -103,8 +104,4 @@ class Mediator final {
     std::array<MarkupPlanListener, 1>  markupPlanListeners_;
     std::array<TradeResultListener, 3> tradeResultListeners_;
 };
-}  // namespace abm::base_goods::supplier::mediator
-
-namespace abm::base_goods::supplier {
-using Mediator = mediator::Mediator;
-}
+}  // namespace abm::base_goods::supplier

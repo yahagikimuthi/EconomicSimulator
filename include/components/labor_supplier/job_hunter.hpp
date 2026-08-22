@@ -24,7 +24,7 @@ class MyEntries final {
     [[nodiscard]] auto takeOfferedEntry() noexcept -> std::ranges::view auto {
         return entries_ |
                std::views::transform([](RefWrap<Entry> ref) -> Entry& { return ref.get(); }) |
-               std::views::filter(&Entry::isOffer);
+               std::views::filter([](Entry& e) -> bool { return e.isOffer(); });
     }
 
   private:
@@ -58,17 +58,17 @@ class JobHunter final {
 
     void accept() noexcept {
         if (acceptedEntry_) return;
-        const auto acceptEntry = takeAcceptEntry();
-        if (not acceptEntry) return;
-        acceptEntry->isAccept = true;
-        acceptedEntry_        = acceptEntry;
+        const auto offeredEntry = takeOfferedEntry();
+        if (not offeredEntry) return;
+        offeredEntry->accept();
+        acceptedEntry_ = offeredEntry;
     }
     [[nodiscard]] auto huntedResult() noexcept -> std::optional<Entry&> { return acceptedEntry_; }
 
     void endStep() noexcept { myEntries_.clear(), acceptedEntry_.reset(); }
 
   private:
-    [[nodiscard]] auto takeAcceptEntry() noexcept -> std::optional<Entry&> {
+    [[nodiscard]] auto takeOfferedEntry() noexcept -> std::optional<Entry&> {
         auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);
         if (offered.empty()) return std::nullopt;
         return offered.front();
@@ -91,7 +91,7 @@ class JobHunter final {
             sortRequests,
             sortRequests.begin() + static_cast<int>(k),
             std::ranges::greater{},
-            [](const RefWrap<Request>& requestRef) -> double {
+            [](const RefWrap<Request> requestRef) -> double {
                 return requestRef.get().wage.value();
             }
         );

@@ -65,6 +65,7 @@ class LaborDemander final {
     void setMediator() noexcept {
         recruitSystem_.acceptMediator(mediator_);
         mediator_.subscribeRecruitPlan(memory_);
+        mediator_.subscribeEmployPlan(memory_);
     }
 
     void adjustWorkforce(
@@ -106,6 +107,7 @@ class LaborDemander final {
         memory_.logging(dropBox);
         dropBox.employments.emplace_back(employeeCnt().value());
         dropBox.employments.emplace_back(sumWage().value());
+        reset();
     }
 
   private:

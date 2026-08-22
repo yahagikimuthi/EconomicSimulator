@@ -12,6 +12,8 @@
 #include "util.hpp"
 
 namespace abm::labor::demander::planner {
+// 前回雇用計画が必要
+// 前回雇用結果中、応募者数が必要
 class WagePlannerMemory final {
   public:
     [[nodiscard]] explicit constexpr WagePlannerMemory(RandomGenerator& masterRng) noexcept
@@ -19,7 +21,7 @@ class WagePlannerMemory final {
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenEmployPlan(const HeadCount employPlan) noexcept {
         ASSERT(employPlan >= HeadCount{0.0});
-        employPlan_.next.emplace(employPlan);
+        employPlan_.next = employPlan;
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.applicants >= HeadCount{0.0});
@@ -77,7 +79,7 @@ class WagePlanner final {
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
-        const auto plan        = Wage{cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha)};
+        const auto plan        = cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
         return wageGuard(plan);
     }
 

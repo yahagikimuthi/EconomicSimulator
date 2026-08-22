@@ -6,6 +6,7 @@
 #include <iterator>
 #include <vector>
 
+#include "core/assertion.hpp"
 #include "core/forward.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
@@ -24,7 +25,7 @@ struct CompanyBoard final {
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
     }
-    auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
+    constexpr auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
         -> RosterEntry&;
 };
 
@@ -49,26 +50,38 @@ class RosterEntry final {
     Workspace&    workspace_;
 };
 
-inline auto CompanyBoard::addRoster(
+constexpr auto CompanyBoard::addRoster(
     const AgentID id, const Wage wage, Workspace& workspace
 ) noexcept -> RosterEntry& {
     return roster.emplace_back(id, wage, *this, workspace);
 }
 
-struct LaborEntry final {
-    const AgentID hholdID;
-    const double  productPower;
-
-    bool isOffer{false};
-    bool isAccept{false};
-
-    std::optional<RosterEntry&> rosterEntry{std::nullopt};
-    const LaborRequest&         request;
-
+class LaborEntry final {
+  public:
     [[nodiscard]] constexpr LaborEntry(
         const AgentID i, const double power, const LaborRequest& req
     ) noexcept
         : hholdID{i}, productPower{power}, request{req} {}
+    const AgentID hholdID;
+    const double  productPower;
+
+    void offer() noexcept { isOffer_ = true; }
+    void accept() noexcept { isAccept_ = true; }
+    void setRoster(RosterEntry& rosterEntry) noexcept { rosterEntry_ = rosterEntry; }
+
+    [[nodiscard]] auto isOffer() const noexcept -> bool { return isOffer_; }
+    [[nodiscard]] auto isAccept() const noexcept -> bool { return isAccept_; }
+    [[nodiscard]] auto rosterEntry() const noexcept -> RosterEntry& {
+        ASSERT(rosterEntry_);
+        return *rosterEntry_;
+    }
+
+    const LaborRequest& request;
+
+  private:
+    std::optional<RosterEntry&> rosterEntry_{std::nullopt};
+    bool                        isOffer_{false};
+    bool                        isAccept_{false};
 };
 
 class LaborRequest final {
@@ -77,7 +90,7 @@ class LaborRequest final {
   public:
     [[nodiscard]] constexpr LaborRequest(const AgentID i, const Wage w) noexcept
         : firmID{i}, wage{w} {}
-    auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
+    [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
         return *entryBox_.emplace_back(id, productPower, *this);
     }
 

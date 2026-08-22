@@ -20,26 +20,32 @@ class EmployPlanner final {
     }
 };
 
+// 前回雇用計画が必要
+// 前回雇用結果中、雇用数が必要
 class OfferPlannerMemory final {
   public:
     [[nodiscard]] explicit constexpr OfferPlannerMemory(RandomGenerator& masterRng) noexcept
-        : applicants_{HeadCount{masterRng.random(setting::lastApplicants)}},
+        : employResult_{HeadCount{masterRng.random(setting::lastApplicants)}},
           employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}} {}
-    [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
-        return applicants_.log;
+    [[nodiscard]] auto lastEmployResult() const noexcept -> std::optional<HeadCount> {
+        return employResult_.log;
     }
     [[nodiscard]] auto lastEmployPlan() const noexcept -> std::optional<HeadCount> {
         return employPlan_.log;
     }
-    void clearLog() noexcept { applicants_.clearLog(), employPlan_.clearLog(); }
-    void reset() noexcept { applicants_.reset(), employPlan_.reset(); }
+    void clearLog() noexcept { employResult_.clearLog(), employPlan_.clearLog(); }
+    void reset() noexcept { employResult_.reset(), employPlan_.reset(); }
+    void listenEmployPlan(const HeadCount employPlan) noexcept {
+        ASSERT(employPlan >= HeadCount{0.0});
+        employPlan_.next = employPlan;
+    }
     void listenRecruitResult(const RecruitResult& result) noexcept {
-        ASSERT(result.applicants >= HeadCount{0.0});
-        applicants_.next = result.applicants;
+        ASSERT(result.employ >= HeadCount{0.0});
+        employResult_.next = result.applicants;
     }
 
   private:
-    Memory<HeadCount> applicants_;
+    Memory<HeadCount> employResult_;
     Memory<HeadCount> employPlan_;
 };
 
@@ -53,6 +59,7 @@ class OfferPlanner final {
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeRecruitResult(memory_);
+        mediator.subscribeEmployPlan(memory_);
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
@@ -76,11 +83,11 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto calcOfferRate() const noexcept -> std::optional<double> {
-        const auto lastApplicants = memory_.lastApplicants();
-        const auto lastEmployPlan = memory_.lastEmployPlan();
-        if (not lastApplicants or not lastEmployPlan) return std::nullopt;
+        const auto lastEmployResult = memory_.lastEmployResult();
+        const auto lastEmployPlan   = memory_.lastEmployPlan();
+        if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
-        const auto shouldRaise = *lastApplicants < *lastEmployPlan;
+        const auto shouldRaise = *lastEmployResult < *lastEmployPlan;
         const auto next        = rateCache_.cache() + (shouldRaise ? alpha : -alpha);
         return std::max(std::numeric_limits<double>::epsilon(), next);
     }

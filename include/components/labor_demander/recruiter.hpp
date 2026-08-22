@@ -73,19 +73,16 @@ class Ledger final {
     }
 
     void reset() noexcept {
-        ASSERT(offerPlan_ >= HeadCount{0.0});
         ASSERT(remainOffer_ >= HeadCount{0.0});
         ASSERT(applicants_ >= HeadCount{0.0});
         ASSERT(employ_ >= HeadCount{0.0});
 
-        offerPlan_   = HeadCount{0.0};
         remainOffer_ = HeadCount{0.0};
         applicants_  = HeadCount{0.0};
         employ_      = HeadCount{0.0};
     }
 
   private:
-    HeadCount offerPlan_{0.0};
     HeadCount remainOffer_{0.0};
     HeadCount applicants_{0.0};
     HeadCount employ_{0.0};
@@ -105,16 +102,16 @@ class Recruiter final {
 
     void offer() noexcept {
         if (not isPosting()) return;
-        const auto entryBox = packEntry();
+        auto entryBox = packEntry();
         if (entryBox.empty()) return;
 
         auto applicants = sortApplicants(ledger_.remainOffer(), entryBox) |
                           std::views::take(ledger_.remainOffer().value());
 
         auto offerCnt = HeadCount{0.0};
-        for (RefWrap<LaborEntry> entryRef : applicants) {
-            auto& entry   = entryRef.get();
-            entry.isOffer = true;
+        for (auto entryRef : applicants) {
+            auto& entry = entryRef.get();
+            entry.offer();
             offerApplicants_.add(entry);
             ++offerCnt;
         }
@@ -128,8 +125,9 @@ class Recruiter final {
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
         for (auto& acceptApplicant : acceptApplicants) {
-            acceptApplicant.rosterEntry =
-                std::forward<F>(addRoster)(acceptApplicant.hholdID, myRequest_->wage);
+            acceptApplicant.setRoster(
+                std::forward<F>(addRoster)(acceptApplicant.hholdID, myRequest_->wage)
+            );
             ++employCnt;
         }
         ledger_.readEmployResult({.employ = employCnt});
@@ -141,7 +139,6 @@ class Recruiter final {
     }
 
     void reset() noexcept {
-        if (not isPosting()) return;
         myRequest_.reset();
         ledger_.reset();
         offerApplicants_.clear();
@@ -168,8 +165,8 @@ class Recruiter final {
     ) noexcept -> std::span<RefWrap<Entry>> {
         ASSERT(offer >= HeadCount{0.0});
 
-        const auto k{std::min(entryBox.size(), static_cast<std::size_t>(offer.value()))};
-        const auto isOver{entryBox.size() > static_cast<std::size_t>(offer.value())};
+        const auto k      = std::min(entryBox.size(), static_cast<std::size_t>(offer.value()));
+        const auto isOver = entryBox.size() > static_cast<std::size_t>(offer.value());
 
         if (not isOver) return entryBox;
 

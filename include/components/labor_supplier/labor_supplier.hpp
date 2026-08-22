@@ -50,7 +50,7 @@ class LaborSupplier final {
     void recordRosterEntry() noexcept {
         const auto acceptedEntry = jobHunter_.huntedResult();
         if (not acceptedEntry) return;
-        employment_.startWorking(*acceptedEntry->rosterEntry);
+        employment_.startWorking(acceptedEntry->rosterEntry());
     }
 
     void endStep(CensusDropBox& dropBox) noexcept {

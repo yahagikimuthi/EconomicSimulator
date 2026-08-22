@@ -13,8 +13,11 @@
 namespace abm::labor::demander {
 class Mediator final {
     template <typename T>
-    using Opt                 = std::optional<T>;
-    using EmployPlanListener  = std::variant<Opt<planner::WagePlannerMemory&>>;
+    using Opt                = std::optional<T>;
+    using EmployPlanListener = std::variant<
+        Opt<planner::WagePlannerMemory&>,
+        Opt<planner::OfferPlannerMemory&>,
+        Opt<CentralMemory&>>;
     using RecruitPlanListener = std::variant<Opt<CentralMemory&>>;
     using RecruitResultListener =
         std::variant<Opt<planner::WagePlannerMemory&>, Opt<planner::OfferPlannerMemory&>>;
@@ -24,8 +27,23 @@ class Mediator final {
 
     template <typename T>
     void subscribeEmployPlan(T& t) noexcept {
+        auto& arr = employPlanListeners_;
         if constexpr (std::is_same_v<T, planner::WagePlannerMemory>) {
-            employPlanListeners_[0] = t;
+            arr[0] = t;
+        } else if constexpr (std::is_same_v<T, planner::OfferPlannerMemory>) {
+            arr[1] = t;
+        } else if constexpr (std::is_same_v<T, CentralMemory>) {
+            arr[2] = t;
+        } else {
+            static_assert(false);
+        }
+    }
+
+    template <typename T>
+    void subscribeRecruitPlan(T& t) noexcept {
+        auto& arr = recruitPlanListeners_;
+        if constexpr (std::same_as<T, CentralMemory>) {
+            arr[0] = t;
         } else {
             static_assert(false);
         }
@@ -38,16 +56,6 @@ class Mediator final {
             arr[0] = t;
         } else if constexpr (std::is_same_v<T, planner::OfferPlannerMemory>) {
             arr[1] = t;
-        } else {
-            static_assert(false);
-        }
-    }
-
-    template <typename T>
-    void subscribeRecruitPlan(T& t) noexcept {
-        auto& arr = recruitPlanListeners_;
-        if constexpr (std::same_as<T, CentralMemory>) {
-            arr[0] = t;
         } else {
             static_assert(false);
         }
@@ -90,7 +98,7 @@ class Mediator final {
     }
 
   private:
-    std::array<EmployPlanListener, 1>    employPlanListeners_;
+    std::array<EmployPlanListener, 3>    employPlanListeners_;
     std::array<RecruitPlanListener, 1>   recruitPlanListeners_;
     std::array<RecruitResultListener, 2> recruitResultListeners_;
 };
