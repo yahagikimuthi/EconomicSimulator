@@ -4,14 +4,14 @@
 #include "core/values/common.hpp"
 
 namespace abm {
-class Price final : public ValueObjectMixin<Price> {
+class Price final : public value_object::ValueObjectMixin<Price> {
   public:
     [[nodiscard]] constexpr explicit Price(const double value) noexcept
         : ValueObjectMixin<Price>::ValueObjectMixin(value) {}
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
-class GoodsQuantity final : public ValueObjectMixin<GoodsQuantity> {
+class GoodsQuantity final : public value_object::ValueObjectMixin<GoodsQuantity> {
   public:
     [[nodiscard]] explicit constexpr GoodsQuantity(const double value) noexcept
         : ValueObjectMixin<GoodsQuantity>::ValueObjectMixin(value) {}

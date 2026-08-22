@@ -27,12 +27,12 @@ class Ledger final {
         return inventory_;
     }
 
-    [[nodiscard]] auto canTradeAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
+    [[nodiscard]] auto tradableAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
         ASSERT(demand >= GoodsQuantity{0.0});
 
         const auto out = max(inventory_, demand);
         ASSERT(out >= GoodsQuantity{0.0});
-        return GoodsQuantity{out};
+        return out;
     }
 
     [[nodiscard]] auto isExcessDemand(const GoodsQuantity demand) const noexcept -> bool {

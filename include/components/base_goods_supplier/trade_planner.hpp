@@ -26,7 +26,7 @@ class PricePlanner final {
 
         const auto price = calcPrice(supply, markup, totalCost);
         const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
-        return price * (1.0 + alpha);
+        return guard(price * (1.0 + alpha));
     }
 
   private:
@@ -36,7 +36,7 @@ class PricePlanner final {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
         const auto price = Price{avgCost.value() * (1.0 + markup)};
-        return guard(price);
+        return price;
     }
 
     [[nodiscard]] static auto guard(const Price price) noexcept -> Price {

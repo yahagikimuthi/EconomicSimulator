@@ -1,19 +1,18 @@
 #pragma once
 
 #include <cmath>
-#include <compare>
 
 #include "core/values/common.hpp"
 
 namespace abm {
-class [[nodiscard]] Wage final : public ValueObjectMixin<Wage> {
+class [[nodiscard]] Wage final : public value_object::ValueObjectMixin<Wage> {
   public:
     [[nodiscard]] explicit constexpr Wage(const double value) noexcept
         : ValueObjectMixin<Wage>::ValueObjectMixin(value) {}
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
-class [[nodiscard]] HeadCount final : public ValueObjectMixin<HeadCount> {
+class [[nodiscard]] HeadCount final : public value_object::ValueObjectMixin<HeadCount> {
   public:
     [[nodiscard]] explicit constexpr HeadCount(const double value) noexcept
         : ValueObjectMixin<HeadCount>::ValueObjectMixin(value) {}

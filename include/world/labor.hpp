@@ -34,7 +34,9 @@ class RosterEntry final {
     [[nodiscard]] constexpr RosterEntry(
         const AgentID i, const Wage w, CompanyBoard& board, Workspace& space
     ) noexcept
-        : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {}
+        : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
+        ASSERT(w > Wage{0.0});
+    }
     void addInput(const double productPower) noexcept;
     void resign() noexcept { companyBoard_.resign(*this); }
 
@@ -53,6 +55,7 @@ class RosterEntry final {
 constexpr auto CompanyBoard::addRoster(
     const AgentID id, const Wage wage, Workspace& workspace
 ) noexcept -> RosterEntry& {
+    ASSERT(wage > Wage{0.0});
     return roster.emplace_back(id, wage, *this, workspace);
 }
 
@@ -61,7 +64,9 @@ class LaborEntry final {
     [[nodiscard]] constexpr LaborEntry(
         const AgentID i, const double power, const LaborRequest& req
     ) noexcept
-        : hholdID{i}, productPower{power}, request{req} {}
+        : hholdID{i}, productPower{power}, request{req} {
+        ASSERT(power > 0.0);
+    }
     const AgentID hholdID;
     const double  productPower;
 
@@ -89,8 +94,11 @@ class LaborRequest final {
 
   public:
     [[nodiscard]] constexpr LaborRequest(const AgentID i, const Wage w) noexcept
-        : firmID{i}, wage{w} {}
+        : firmID{i}, wage{w} {
+        ASSERT(w > Wage{0.0});
+    }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
+        ASSERT(productPower > 0.0);
         return *entryBox_.emplace_back(id, productPower, *this);
     }
 
@@ -114,6 +122,7 @@ class LaborMarket final {
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
+        ASSERT(wage > Wage{0.0});
         return *requestBox_.emplace_back(id, wage);
     }
 

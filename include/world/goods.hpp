@@ -24,6 +24,7 @@ class Workspace final {
     constexpr auto operator=(Workspace&& other) noexcept -> Workspace&;
 
     void addInput(const double workerProductPower) noexcept {
+        ASSERT(workerProductPower > 0.0);
         totalInput_.fetch_add(workerProductPower);
     }
     [[nodiscard]] auto totalInput() const noexcept -> GoodsQuantity {
@@ -63,7 +64,9 @@ struct ConsumerGoodsRequest final {
     [[nodiscard]] constexpr ConsumerGoodsRequest(
         const GoodsQuantity a, const ConsumerGoodsEntry& e
     ) noexcept
-        : amount{a}, entry{e} {}
+        : amount{a}, entry{e} {
+        ASSERT(a > GoodsQuantity{0.0});
+    }
 };
 
 class ConsumerGoodsEntry final {
@@ -71,8 +74,12 @@ class ConsumerGoodsEntry final {
 
   public:
     [[nodiscard]] constexpr ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
-        : price{p}, supply{s} {}
+        : price{p}, supply{s} {
+        ASSERT(p > Price{0.0});
+        ASSERT(s > GoodsQuantity{0.0});
+    }
     [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
+        ASSERT(amount > GoodsQuantity{0.0});
         return *requestBox_.emplace_back(amount, *this);
     }
     void requestBox(std::vector<RefWrap<Request>>& out) noexcept {
@@ -109,6 +116,8 @@ class ConsumerGoodsMarket final {
     [[nodiscard]] explicit constexpr ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
     [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
+        ASSERT(price > Price{0.0});
+        ASSERT(supply > GoodsQuantity{0.0});
         totalSupply_.fetch_add(supply.value());
         return *entryBox_.emplace_back(price, supply);
     }
@@ -144,7 +153,9 @@ struct ProductionGoodsRequest final {
     [[nodiscard]] constexpr ProductionGoodsRequest(
         const GoodsQuantity a, const ProductionGoodsEntry& e
     ) noexcept
-        : amount{a}, entry{e} {}
+        : amount{a}, entry{e} {
+        ASSERT(a >= GoodsQuantity{0.0});
+    }
 };
 
 class ProductionGoodsEntry final {

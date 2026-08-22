@@ -4,7 +4,7 @@
 
 #include "core/assertion.hpp"
 
-namespace abm {
+namespace abm::value_object {
 template <typename Derived>
 class ValueObjectMixin {
     friend Derived;
@@ -65,8 +65,9 @@ class ValueObjectMixin {
         : value_{value} {}
     double value_;
 };
-
-class Money final : public ValueObjectMixin<Money> {
+}  // namespace abm::value_object
+namespace abm {
+class Money final : public value_object::ValueObjectMixin<Money> {
   public:
     [[nodiscard]] explicit constexpr Money(const double value) noexcept
         : ValueObjectMixin<Money>::ValueObjectMixin(value) {}

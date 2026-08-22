@@ -13,14 +13,12 @@
 namespace abm::base_goods::supplier {
 
 class Mediator final {
-    template <typename T>
-    using Opt = std::optional<T>;
-
-    using TradePlanListener =
-        std::variant<Opt<EmployPlannerMemory&>, Opt<MarkupPlannerMemory&>, Opt<CentralMemory&>>;
-    using MarkupPlanListener = std::variant<Opt<CentralMemory&>>;
+    template <typename... Ts>
+    using Listener           = std::variant<std::optional<Ts&>...>;
+    using TradePlanListener  = Listener<EmployPlannerMemory, MarkupPlannerMemory, CentralMemory>;
+    using MarkupPlanListener = Listener<CentralMemory>;
     using TradeResultListener =
-        std::variant<Opt<DemandForecastManagerMemory&>, Opt<MarkupPlannerMemory&>, Opt<Producer&>>;
+        Listener<DemandForecastManagerMemory, MarkupPlannerMemory, Producer>;
 
   public:
     [[nodiscard]] constexpr Mediator() noexcept = default;
