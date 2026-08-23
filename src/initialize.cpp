@@ -65,9 +65,7 @@ namespace {
     return ProductionGoodsSupplier{masterRng};
 }
 }  // namespace
-}  // namespace abm
 
-namespace abm {
 Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     : totalStep_{totalStep},
       seed_{generateSeed()},
@@ -87,8 +85,8 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     int agentId{};
     for (; agentId < cnt::bToCFirm; ++agentId) {
         bToCFirms_.emplace_back(BtoCFirm{
-            .index         = AgentIndex{AgentID{agentId}},
-            .finance       = FirmFinance{rng_},
+            .index         = createAgentIndex(AgentID{agentId}),
+            .finance       = createFirmFinance(rng_),
             .laborDemander = createLaborDemander(rng_, AgentID{agentId}, Market::consumerGoods),
             .consumerGoodsSupplier   = createConsumerGoodsSupplier(rng_),
             .productionGoodsDemander = createProductionGoodsDemander(rng_)
