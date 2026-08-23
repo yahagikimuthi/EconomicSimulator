@@ -20,7 +20,7 @@ class Employment final {
     void startWorking(RosterEntry& rosterEntry) noexcept {
         if (isEmployed()) {
             ASSERT(rosterEntry_->firmId() != rosterEntry.firmId());
-            ASSERT(rosterEntry_->wage < rosterEntry.wage);
+            ASSERT(rosterEntry_->wage <= rosterEntry.wage);
         }
         resign();
         rosterEntry_ = rosterEntry;
@@ -30,12 +30,10 @@ class Employment final {
         return isEmployed() ? rosterEntry_->firmId() : AgentID{-1};
     }
     [[nodiscard]] auto wage() const noexcept -> Wage {
-        const auto out = isEmployed() ? rosterEntry_->wage : Wage{0.0};
-        if (isEmployed()) {
-            ASSERT(rosterEntry_->isOccupied);
-        }
-        ASSERT(out >= Wage{0.0});
-        return out;
+        if (not isEmployed()) return Wage{0.0};
+        ASSERT(rosterEntry_->isOccupied);
+        ASSERT(rosterEntry_->wage > Wage{0.0});
+        return rosterEntry_->wage;
     }
 
     void work(const Market phase) noexcept {
