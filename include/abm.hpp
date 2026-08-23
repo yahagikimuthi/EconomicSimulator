@@ -85,9 +85,6 @@ class Engine final {
     void runConsumerGoods() noexcept;
     void logging();
     void reset() noexcept;
-    void check() const noexcept;
-
-    [[nodiscard]] auto calcSumAsset() const noexcept -> long double;
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
