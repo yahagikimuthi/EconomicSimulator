@@ -2,6 +2,7 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <print>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -15,9 +16,19 @@
 #include "world/common.hpp"
 
 namespace abm {
+
+template <typename T>
+    requires requires(T t) { t.finance.asset().value(); }
+[[nodiscard]] constexpr auto calcSumAsset(std::vector<T>& agents) noexcept -> double {
+    return std::ranges::fold_left(agents, 0.0, [](const double acc, const T& agent) -> double {
+        return acc + agent.finance.asset().value();
+    });
+}
+
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
         runLabor();
+        runProductionGoods();
         runConsumerGoods();
         logging();
         reset();
@@ -27,7 +38,15 @@ void Engine::run() {
     }
 }
 
-void Engine::runLabor() noexcept {  // NOLINT
+void Engine::runLabor() noexcept {
+    const auto bToBs  = calcSumAsset(bToBFirms_);
+    const auto bToCs  = calcSumAsset(bToCFirms_);
+    const auto hholds = calcSumAsset(hholds_);
+
+    std::println("ステップ: {}", currentStep_.value());
+    std::println("{}", bToBs + bToCs + hholds);
+    std::println();
+
     for (BtoCFirm& firm : bToCFirms_) {
         labor::adjustWorkforce(
             firm.index, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
@@ -175,6 +194,11 @@ void Engine::logging() {
     for (BtoCFirm& firm : bToCFirms_) {
         firm_finance::logging(dropBox_, firm.finance);
     }
+
+    for (BtoBFirm& firm : bToBFirms_) {
+        firm_finance::logging(dropBox_, firm.finance);
+    }
+
     for (HHold& hhold : hholds_) {
         hhold_finance::logging(dropBox_, hhold.finance);
     }
