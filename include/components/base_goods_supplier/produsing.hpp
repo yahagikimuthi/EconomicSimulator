@@ -31,7 +31,7 @@ class ProducingSystem final {
 
     [[nodiscard]] auto calcDesiredProductionGoods(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return (requiresSupply / baseProductPower_) - productionGoods_;
+        return (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - productionGoods_;
     }
 
     void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
@@ -43,7 +43,7 @@ class ProducingSystem final {
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput          = workspace_.totalInput();
-        const auto productionGoodsInput = productionGoods_;
+        const auto productionGoodsInput = productionGoods_ * producerGoodsEfficiency_;
         workspace_.resetInput();
         ASSERT(workerInput >= GoodsQuantity{0.0});
         ASSERT(productionGoodsInput >= GoodsQuantity{0.0});
