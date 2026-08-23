@@ -22,10 +22,11 @@
 
 namespace abm {
 struct BtoCFirm final {  // NOLINT
-    AgentIndex            index;
-    FirmFinance           finance;
-    LaborDemander         laborDemander;
-    ConsumerGoodsSupplier consumerGoodsSupplier;
+    AgentIndex              index;
+    FirmFinance             finance;
+    LaborDemander           laborDemander;
+    ConsumerGoodsSupplier   consumerGoodsSupplier;
+    ProductionGoodsDemander productionGoodsDemander;
 };
 
 struct BtoBFirm final {  // NOLINT

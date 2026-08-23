@@ -9,6 +9,7 @@
 #include "components/others.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
+#include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
 #include "world/goods.hpp"
@@ -49,6 +50,11 @@ class ConsumerGoodsSupplier final {
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
+
+    void addProductionEquip(const GoodsQuantity productionGoods) noexcept {
+        ASSERT(productionGoods >= GoodsQuantity{0.0});
+        producingSystem_.addProducingEquip(productionGoods);
+    }
 
   private:
     void reset(CensusDropBox& dropBox) noexcept {

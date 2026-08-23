@@ -10,6 +10,7 @@
 #include "core/setting.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
+#include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
 #include "world/common.hpp"
 
@@ -32,12 +33,20 @@ void Engine::runLabor() noexcept {  // NOLINT
             firm.index, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
         );
     }
+    for (BtoBFirm& firm : bToBFirms_) {
+        labor::adjustWorkforce(
+            firm.index, firm.productionGoodsSupplier, firm.laborDemander, laborMarket_
+        );
+    }
 
     for (HHold& hhold : hholds_) {
         labor::jobEntry(hhold.index, hhold.laborSupplier, laborMarket_);
     }
 
     for (BtoCFirm& firm : bToCFirms_) {
+        labor::offer(firm.laborDemander);
+    }
+    for (BtoBFirm& firm : bToBFirms_) {
         labor::offer(firm.laborDemander);
     }
 
@@ -48,6 +57,9 @@ void Engine::runLabor() noexcept {  // NOLINT
     for (BtoCFirm& firm : bToCFirms_) {
         labor::registerMember(firm.consumerGoodsSupplier, firm.laborDemander);
     }
+    for (BtoBFirm& firm : bToBFirms_) {
+        labor::registerMember(firm.productionGoodsSupplier, firm.laborDemander);
+    }
 
     for (HHold& hhold : hholds_) {
         labor::recordRosterEntry(hhold.laborSupplier);
@@ -56,17 +68,67 @@ void Engine::runLabor() noexcept {  // NOLINT
     for (BtoCFirm& firm : bToCFirms_) {
         labor::acceptResignation(firm.laborDemander);
     }
+    for (BtoBFirm& firm : bToBFirms_) {
+        labor::acceptResignation(firm.laborDemander);
+    }
 
     for (BtoCFirm& firm : bToCFirms_) {
+        labor::endStep(firm.finance, firm.laborDemander, dropBox_);
+    }
+    for (BtoBFirm& firm : bToBFirms_) {
         labor::endStep(firm.finance, firm.laborDemander, dropBox_);
     }
 
     for (HHold& hhold : hholds_) {
         labor::endStep(hhold.finance, hhold.laborSupplier, dropBox_);
     }
-
-    //! 249ステップ目で企業と家計の資産変動差が1を超える
 }
+
+void Engine::runProductionGoods() noexcept {
+    for (HHold& hhold : hholds_) {
+        production_goods::product(hhold.laborSupplier, Market::productionGoods);
+    }
+
+    for (BtoBFirm& firm : bToBFirms_) {
+        production_goods::postGoods(
+            firm.index, firm.productionGoodsSupplier, firm.laborDemander, productionGoodsMarket_
+        );
+    }
+
+    for (BtoCFirm& firm : bToCFirms_) {
+        production_goods::purchase(
+            firm.index, firm.finance, firm.productionGoodsDemander, productionGoodsMarket_
+        );
+    }
+    for (BtoBFirm& firm : bToBFirms_) {
+        production_goods::purchase(
+            firm.index, firm.finance, firm.productionGoodsDemander, productionGoodsMarket_
+        );
+    }
+
+    for (BtoBFirm& firm : bToBFirms_) {
+        production_goods::trade(firm.productionGoodsSupplier);
+    }
+
+    for (BtoCFirm& firm : bToCFirms_) {
+        production_goods::afterTrade(firm.productionGoodsDemander);
+    }
+    for (BtoBFirm& firm : bToBFirms_) {
+        production_goods::afterTrade(firm.productionGoodsDemander);
+    }
+
+    for (BtoBFirm& firm : bToBFirms_) {
+        production_goods::endStep(
+            firm.finance, firm.productionGoodsSupplier, firm.productionGoodsDemander
+        );
+    }
+    for (BtoCFirm& firm : bToCFirms_) {
+        production_goods::endStep(
+            firm.finance, firm.consumerGoodsSupplier, firm.productionGoodsDemander
+        );
+    }
+}
+
 void Engine::runConsumerGoods() noexcept {
     for (HHold& hhold : hholds_) {
         consumer_goods::product(hhold.laborSupplier, Market::consumerGoods);

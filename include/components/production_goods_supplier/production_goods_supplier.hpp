@@ -1,10 +1,12 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <utility>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
+#include "components/others.hpp"
 #include "components/production_goods_supplier/trading_system.hpp"
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
@@ -52,8 +54,9 @@ class ProductionGoodsSupplier final {
         producingSystem_.addProducingEquip(productionGoods);
     }
 
-    void endStep(CensusDropBox& dropBox) noexcept {
-        tradingSystem_.endStep(mediator_);
+    template <AssetPlusFn F>
+    void endStep(F&& assetPlus, CensusDropBox& dropBox) noexcept {
+        tradingSystem_.endStep(std::forward<F>(assetPlus), mediator_);
         reset(dropBox);
     }
 

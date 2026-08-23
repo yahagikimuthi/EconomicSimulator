@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/base_goods_supplier/trade_planner.hpp"
+#include "components/others.hpp"
 #include "components/production_goods_supplier/common.hpp"
 #include "components/production_goods_supplier/trader.hpp"
 #include "core/util.hpp"
@@ -36,9 +37,10 @@ class TradingSystem final {
 
     void trade() noexcept { trader_.trade(); }
 
-    void endStep(IMediator auto& mediator) noexcept {
+    void endStep(AssetPlusFn auto&& assetPlus, IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
         if (not result) return;
+        assetPlus(result->sales);
         mediator.publishTradeResult(*result);
     }
 
