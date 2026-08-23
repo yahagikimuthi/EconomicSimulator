@@ -12,3 +12,4 @@ scripts/__pycache__/
 .github/
 core.*
 uml/
+tests/
