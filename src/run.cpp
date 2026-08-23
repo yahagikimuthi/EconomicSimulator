@@ -97,12 +97,20 @@ void Engine::runProductionGoods() noexcept {
 
     for (BtoCFirm& firm : bToCFirms_) {
         production_goods::purchase(
-            firm.index, firm.finance, firm.productionGoodsDemander, productionGoodsMarket_
+            firm.index,
+            firm.finance,
+            firm.productionGoodsDemander,
+            firm.consumerGoodsSupplier,
+            productionGoodsMarket_
         );
     }
     for (BtoBFirm& firm : bToBFirms_) {
         production_goods::purchase(
-            firm.index, firm.finance, firm.productionGoodsDemander, productionGoodsMarket_
+            firm.index,
+            firm.finance,
+            firm.productionGoodsDemander,
+            firm.productionGoodsSupplier,
+            productionGoodsMarket_
         );
     }
 
