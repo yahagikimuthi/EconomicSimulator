@@ -66,7 +66,7 @@ constexpr RandomParameter priceAdjustVol  = UniformParameter<double>{.min = 0.1,
 constexpr RandomParameter targetInvRatio  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter productPower    = UniformParameter<double>{.min = 0.01, .limit = 2.0};
 constexpr RandomParameter producerGoodsEfficiency =
-    UniformParameter<double>{.min = 0.01, .limit = 1.0};
+    UniformParameter<double>{.min = 1.0, .limit = 10.0};
 constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
 
@@ -82,9 +82,9 @@ constexpr RandomParameter mpc            = UniformParameter<double>{.min = 0.5, 
 }  // namespace abm::production_goods::demander::setting
 
 namespace abm::setting::agent_count {
-constexpr auto bToCFirm = 2;
-constexpr auto bToBFirm = 0;
-constexpr auto hhold    = 10;
+constexpr auto bToCFirm = 10;
+constexpr auto bToBFirm = 10;
+constexpr auto hhold    = 10000;
 }  // namespace abm::setting::agent_count
 
 namespace abm::setting::agent_finance {
