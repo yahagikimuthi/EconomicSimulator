@@ -1,6 +1,3 @@
 #include "abm.hpp"
 
-auto main() -> int {
-    auto engine = abm::Engine{1000, false};
-    engine.run();
-}
+auto main() -> int { abm::run(1000, true); }
