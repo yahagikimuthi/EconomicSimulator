@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <utility>
 
 #include "components/labor_demander/common.hpp"
@@ -24,11 +25,12 @@ class RecruitSystem final {
     void post(
         const AgentID   id,
         const HeadCount desiredEmploy,
+        const Money     salesPerWorker,
         LaborMarket&    laborMarket,
         IMediator auto& mediator
     ) noexcept {
         ASSERT(desiredEmploy > HeadCount{0.0});
-        const auto plan = planner_.plan(desiredEmploy, mediator);
+        const auto plan = planner_.plan(desiredEmploy, salesPerWorker, mediator);
         recruiter_.post(id, plan, laborMarket);
     }
 
@@ -69,10 +71,17 @@ class LaborDemander final {
     }
 
     void adjustWorkforce(
-        const AgentID id, const HeadCount adjustment, LaborMarket& laborMarket
+        const AgentID   id,
+        const HeadCount adjustment,
+        const Money     salesForecast,
+        LaborMarket&    laborMarket
     ) noexcept {
         if (adjustment > HeadCount{0.0}) {
-            recruitSystem_.post(id, adjustment, laborMarket, mediator_);
+            const auto employee       = humanResource_.employeeCnt();
+            const auto isEmploying    = employee != HeadCount{0.0};
+            const auto salesPerWorker = isEmploying ? salesForecast.value() / employee.value()
+                                                    : std::numeric_limits<double>::infinity();
+            recruitSystem_.post(id, adjustment, Money{salesPerWorker}, laborMarket, mediator_);
         } else if (adjustment < HeadCount{0.0}) {
             humanResource_.layOffs(-adjustment);
         }

@@ -30,6 +30,7 @@ class ProductionGoodsSupplier final {
         tradingSystem_.acceptMediator(mediator_);
         mediator_.subscribeMarkupPlan(memory_);
         mediator_.subscribeTradePlan(memory_);
+        mediator_.subscribeTradeResult(memory_);
     }
 
     void post(const AgentID id, const Money totalCost, Market& market) noexcept {
@@ -59,6 +60,8 @@ class ProductionGoodsSupplier final {
         tradingSystem_.endStep(std::forward<F>(assetPlus), mediator_);
         reset(dropBox);
     }
+
+    [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 
   private:
     void reset(CensusDropBox& dropBox) noexcept {

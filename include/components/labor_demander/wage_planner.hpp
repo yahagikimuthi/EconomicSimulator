@@ -57,8 +57,13 @@ class WagePlanner final {
         mediator.subscribeRecruitResult(memory_);
     }
 
-    [[nodiscard]] auto plan() noexcept -> Wage {
-        const auto next = calcWage();
+    [[nodiscard]] auto plan(const Money salesPerWorker) noexcept -> Wage {
+        const auto next = [&]() -> std::optional<Wage> {
+            if (salesPerWorker == Money{0.0}) {
+                return calcWage(Money{std::numeric_limits<double>::infinity()});
+            }
+            return calcWage(salesPerWorker);
+        }();
         memory_.clearLog();
         if (not next) return cache_.cache();
         cache_.next(*next);
@@ -73,14 +78,15 @@ class WagePlanner final {
     }
 
   private:
-    [[nodiscard]] auto calcWage() const noexcept -> std::optional<Wage> {
+    [[nodiscard]] auto calcWage(const Money salesPerWorker) const noexcept -> std::optional<Wage> {
         const auto lastApplicants = memory_.lastApplicants();
         const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
         const auto plan        = cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
-        return wageGuard(plan);
+        const auto guarded     = min(plan, static_cast<Wage>(salesPerWorker));
+        return wageGuard(guarded);
     }
 
     [[nodiscard]] static auto wageGuard(const Wage wage) noexcept -> Wage {

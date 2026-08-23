@@ -2,6 +2,7 @@
 
 #include <array>
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 #include "components/base_goods_supplier/common.hpp"
@@ -18,7 +19,7 @@ class Mediator final {
     using TradePlanListener  = Listener<EmployPlannerMemory, MarkupPlannerMemory, CentralMemory>;
     using MarkupPlanListener = Listener<CentralMemory>;
     using TradeResultListener =
-        Listener<DemandForecastManagerMemory, MarkupPlannerMemory, Producer>;
+        Listener<DemandForecastManagerMemory, MarkupPlannerMemory, Producer, CentralMemory>;
 
   public:
     [[nodiscard]] constexpr Mediator() noexcept = default;
@@ -56,6 +57,8 @@ class Mediator final {
             arr[1] = t;
         } else if constexpr (std::is_same_v<T, Producer>) {
             arr[2] = t;
+        } else if constexpr (std::is_same_v<T, CentralMemory>) {
+            arr[3] = t;
         } else {
             static_assert(false);
         }
@@ -100,6 +103,6 @@ class Mediator final {
   private:
     std::array<TradePlanListener, 3>   tradePlanListeners_;
     std::array<MarkupPlanListener, 1>  markupPlanListeners_;
-    std::array<TradeResultListener, 3> tradeResultListeners_;
+    std::array<TradeResultListener, 4> tradeResultListeners_;
 };
 }  // namespace abm::base_goods::supplier

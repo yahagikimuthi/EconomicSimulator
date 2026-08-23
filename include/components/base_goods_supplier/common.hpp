@@ -70,6 +70,8 @@ class CentralMemory {
         markupPlan_ = markup;
     }
 
+    void listenTradeResult(const TradeResult& result) noexcept { lastSales_ = result.sales; }
+
     void logging(CensusDropBox& dropBox) noexcept {
         if (pricePlan_) dropBox.prices.emplace_back(pricePlan_->value());
         if (markupPlan_) dropBox.markups.emplace_back(*markupPlan_);
@@ -79,10 +81,13 @@ class CentralMemory {
         supplyPlan_.reset();
     }
 
+    [[nodiscard]] auto lastSales() const noexcept -> Money { return lastSales_; }
+
   private:
     std::optional<Price>         pricePlan_{std::nullopt};
     std::optional<double>        markupPlan_{std::nullopt};
     std::optional<GoodsQuantity> supplyPlan_{std::nullopt};
+    Money                        lastSales_{0.0};
 };
 
 template <typename T, typename U = std::monostate>

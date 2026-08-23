@@ -70,10 +70,13 @@ class ValueObjectMixin {
 };
 }  // namespace abm::value_object
 namespace abm {
+class Wage;
 class Money final : public value_object::ValueObjectMixin<Money> {
   public:
     [[nodiscard]] explicit constexpr Money(const double value) noexcept
         : ValueObjectMixin<Money>::ValueObjectMixin(value) {}
+
+    [[nodiscard]] explicit constexpr operator Wage() const noexcept;
 };
 
 class AgentID final {

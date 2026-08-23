@@ -11,6 +11,8 @@ class [[nodiscard]] Wage final : public value_object::ValueObjectMixin<Wage> {
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
+constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
+
 class [[nodiscard]] HeadCount final : public value_object::ValueObjectMixin<HeadCount> {
   public:
     [[nodiscard]] explicit constexpr HeadCount(const double value) noexcept

@@ -30,6 +30,7 @@ class ConsumerGoodsSupplier final {
         tradingSystem_.acceptMediator(mediator_);
         mediator_.subscribeMarkupPlan(memory_);
         mediator_.subscribeTradePlan(memory_);
+        mediator_.subscribeTradeResult(memory_);
     }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
@@ -55,6 +56,8 @@ class ConsumerGoodsSupplier final {
         ASSERT(productionGoods >= GoodsQuantity{0.0});
         producingSystem_.addProducingEquip(productionGoods);
     }
+
+    [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 
   private:
     void reset(CensusDropBox& dropBox) noexcept {

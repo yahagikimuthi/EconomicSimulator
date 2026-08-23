@@ -19,7 +19,9 @@ void adjustWorkforce(
     LaborMarket&           laborMarket
 ) noexcept {
     const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
-    laborDemander.adjustWorkforce(index.id(), desiredEmploy, laborMarket);
+    laborDemander.adjustWorkforce(
+        index.id(), desiredEmploy, goodsSupplier.salesForecast(), laborMarket
+    );
 }
 
 void adjustWorkforce(
@@ -29,7 +31,9 @@ void adjustWorkforce(
     LaborMarket&             laborMarket
 ) noexcept {
     const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
-    laborDemander.adjustWorkforce(index.id(), desiredEmploy, laborMarket);
+    laborDemander.adjustWorkforce(
+        index.id(), desiredEmploy, goodsSupplier.salesForecast(), laborMarket
+    );
 }
 
 void jobEntry(
