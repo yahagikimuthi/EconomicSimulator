@@ -5,34 +5,46 @@
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/integrate.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
-class Producer final {
+class ProducingSystem final {
   public:
-    [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
-        : baseProductPower{masterRng.random(setting::productPower)},
+    [[nodiscard]] explicit constexpr ProducingSystem(RandomGenerator& masterRng) noexcept
+        : employPlanner_{masterRng},
+          baseProductPower_{masterRng.random(setting::productPower)},
+          producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)},
           inventory_{masterRng.random(setting::inventory)} {}
 
-    void endStep(const GoodsQuantity unsoldAmount) noexcept {
-        ASSERT(unsoldAmount >= GoodsQuantity{0.0});
-        inventory_ = unsoldAmount;
-        workspace_.resetInput();
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        employPlanner_.acceptMediator(mediator);
     }
+
+    [[nodiscard]] auto calcDesiredEmploy(
+        const GoodsQuantity requiresSupply, const HeadCount employee
+    ) noexcept -> HeadCount {
+        const auto inventory    = inventory_;
+        const auto productPower = baseProductPower_;
+        return employPlanner_.plan(productPower, employee, requiresSupply - inventory);
+    }
+
+    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
+        ASSERT(productionGoods >= GoodsQuantity{0.0});
+        productionGoods_ += productionGoods;
+    }
+
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
-    [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity {
-        ASSERT(inventory_ >= GoodsQuantity{0.0});
-        return inventory_;
-    }
-    [[nodiscard]] auto firmProductPower() const noexcept -> double { return baseProductPower; }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
-        const auto workerInput = workspace_.totalInput();
+        const auto workerInput          = workspace_.totalInput();
+        const auto productionGoodsInput = productionGoods_;
         workspace_.resetInput();
         ASSERT(workerInput >= GoodsQuantity{0.0});
-        const auto production = workerInput * baseProductPower;
+        ASSERT(productionGoodsInput >= GoodsQuantity{0.0});
+        const auto production = baseProductPower_ * min(workerInput, productionGoodsInput);
         ASSERT(inventory_ >= GoodsQuantity{0.0});
         const auto out = production + inventory_;
         inventory_     = GoodsQuantity{0.0};
@@ -42,59 +54,20 @@ class Producer final {
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
-        ASSERT(result.unsoldAmount >= GoodsQuantity{0.0});
         inventory_ += result.unsoldAmount;
-    }
-
-    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
-        ASSERT(productionGoods >= GoodsQuantity{0.0});
-        productionGoods_ += productionGoods;
     }
 
     void reset(CensusDropBox& dropBox) noexcept {
         dropBox.inventories.emplace_back(inventory_.value());
-    }
-
-  private:
-    Workspace     workspace_;
-    const double  baseProductPower;
-    GoodsQuantity inventory_;
-    GoodsQuantity productionGoods_{0.0};
-};
-
-class ProducingSystem final {
-  public:
-    [[nodiscard]] explicit constexpr ProducingSystem(RandomGenerator& masterRng) noexcept
-        : employPlanner_{masterRng}, producer_{masterRng} {}
-
-    void acceptMediator(IMediator auto& mediator) noexcept {
-        employPlanner_.acceptMediator(mediator);
-        mediator.subscribeTradeResult(producer_);
-    }
-
-    [[nodiscard]] auto calcDesiredEmploy(
-        const GoodsQuantity requiresSupply, const HeadCount employee
-    ) noexcept -> HeadCount {
-        const auto inventory    = producer_.inventory();
-        const auto productPower = producer_.firmProductPower();
-        return employPlanner_.plan(productPower, employee, requiresSupply - inventory);
-    }
-
-    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
-        producer_.addProducingEquip(productionGoods);
-    }
-
-    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }
-
-    [[nodiscard]] auto produce() noexcept -> GoodsQuantity { return producer_.produce(); }
-
-    void reset(CensusDropBox& dropBox) noexcept {
-        producer_.reset(dropBox);
         employPlanner_.reset();
     }
 
   private:
     EmployPlanner employPlanner_;
-    Producer      producer_;
+    Workspace     workspace_;
+    const double  baseProductPower_;
+    const double  producerGoodsEfficiency_;
+    GoodsQuantity inventory_;
+    GoodsQuantity productionGoods_{0.0};
 };
 }  // namespace abm::base_goods::supplier

@@ -62,10 +62,12 @@ constexpr RandomParameter lastSalesAmount = UniformParameter<double>{.min = 10.0
 constexpr RandomParameter desiredEmploy   = UniformParameter<int>{.min = 10, .limit = 20};
 constexpr RandomParameter lastMarkup      = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter markupAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
+constexpr RandomParameter priceAdjustVol  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter targetInvRatio  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter productPower    = UniformParameter<double>{.min = 0.01, .limit = 2.0};
-constexpr RandomParameter priceAdjustVol  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
-constexpr RandomParameter inventory       = UniformParameter<double>{.min = 10.0, .limit = 100.0};
+constexpr RandomParameter producerGoodsEfficiency =
+    UniformParameter<double>{.min = 0.01, .limit = 1.0};
+constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
 
 namespace abm::consumer_goods::demander::setting {
