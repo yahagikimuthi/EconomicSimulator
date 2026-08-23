@@ -35,11 +35,10 @@ list(REMOVE_ITEM LIB_SOURCES ${MAIN_SOURCES})
 # テスト用ソース
 file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
 
-# --- 共通コンパイル/リンク設定 ---
+# 共通コンパイル/リンク設定
 add_library(project_warnings INTERFACE)
 target_compile_options(project_warnings INTERFACE
     -O0
-    -g
     -Wall
     -Werror
     -Wextra
@@ -60,10 +59,10 @@ target_link_options(project_warnings INTERFACE
     -fcontracts
 )
 
-# --- 0. モジュール・共有ロジック用ライブラリ ---
+# モジュール・共有ロジック用ライブラリ
 add_library(EconomicSimulator_lib STATIC)
 
-# C++ モジュールインターフェースファイルの登録 (FILE_SET CXX_MODULES)
+# C++ モジュールインターフェースファイルの登録
 target_sources(EconomicSimulator_lib
     PRIVATE
         ${LIB_SOURCES}
@@ -85,16 +84,16 @@ target_include_directories(EconomicSimulator_lib PUBLIC
 
 target_compile_definitions(EconomicSimulator_lib PUBLIC HIGHFIVE_HAS_NO_EXCEPTIONS)
 
-# --- 1. メイン実行ファイル ターゲット ---
+# メイン実行ファイル ターゲット
 add_executable(EconomicSimulator)
 target_sources(EconomicSimulator PRIVATE ${MAIN_SOURCES})
 target_link_libraries(EconomicSimulator PRIVATE EconomicSimulator_lib)
 
-# --- 2. テスト用 ターゲット ---
+# テスト用 ターゲット
 add_executable(EconomicSimulator_test)
 target_sources(EconomicSimulator_test PRIVATE ${TEST_SOURCES})
 target_link_libraries(EconomicSimulator_test PRIVATE EconomicSimulator_lib)
 target_include_directories(EconomicSimulator_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
-# CTestにテストターゲットを登録
+# CTestにテストターゲット
 add_test(NAME UnitTests COMMAND EconomicSimulator_test)
