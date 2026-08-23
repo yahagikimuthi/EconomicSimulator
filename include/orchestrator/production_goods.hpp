@@ -23,7 +23,7 @@ void postGoods(
 }
 
 void purchase(
-    const AgentIndex&         index,
+    const AgentIndex&        index,
     const FirmFinance&       finance,
     ProductionGoodsDemander& goodsDemander,
     const LaborDemander&     laborSupplier,
