@@ -31,6 +31,7 @@ class ConsumerGoodsSupplier final {
         mediator_.subscribeMarkupPlan(memory_);
         mediator_.subscribeTradePlan(memory_);
         mediator_.subscribeTradeResult(memory_);
+        mediator_.subscribeTradeResult(producingSystem_);
     }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {

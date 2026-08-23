@@ -19,7 +19,7 @@ class Mediator final {
     using TradePlanListener  = Listener<EmployPlannerMemory, MarkupPlannerMemory, CentralMemory>;
     using MarkupPlanListener = Listener<CentralMemory>;
     using TradeResultListener =
-        Listener<DemandForecastManagerMemory, MarkupPlannerMemory, Producer, CentralMemory>;
+        Listener<DemandForecastManagerMemory, MarkupPlannerMemory, ProducingSystem, CentralMemory>;
 
   public:
     [[nodiscard]] constexpr Mediator() noexcept = default;
@@ -55,7 +55,7 @@ class Mediator final {
             arr[0] = t;
         } else if constexpr (std::is_same_v<T, MarkupPlannerMemory>) {
             arr[1] = t;
-        } else if constexpr (std::is_same_v<T, Producer>) {
+        } else if constexpr (std::is_same_v<T, ProducingSystem>) {
             arr[2] = t;
         } else if constexpr (std::is_same_v<T, CentralMemory>) {
             arr[3] = t;

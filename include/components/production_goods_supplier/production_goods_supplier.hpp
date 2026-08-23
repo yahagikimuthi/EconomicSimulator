@@ -31,6 +31,7 @@ class ProductionGoodsSupplier final {
         mediator_.subscribeMarkupPlan(memory_);
         mediator_.subscribeTradePlan(memory_);
         mediator_.subscribeTradeResult(memory_);
+        mediator_.subscribeTradeResult(producingSystem_);
     }
 
     void post(const AgentID id, const Money totalCost, Market& market) noexcept {
