@@ -73,6 +73,7 @@ class ProductionGoodsDemander final {
         Market&             market,
         const int           sampleCnt = setting::goodsSampleCnt
     ) noexcept {
+        if (desiredPurchaseAmount <= GoodsQuantity{0.0}) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
         const auto pickedEntry = market.pickEntry(id, sampleCnt);
