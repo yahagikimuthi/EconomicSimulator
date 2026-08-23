@@ -40,12 +40,12 @@ constexpr RandomParameter lastEmployPlan     = UniformParameter<int>{.min = 10, 
 constexpr RandomParameter offerRate          = UniformParameter<double>{.min = 0.0, .limit = 1.0};
 constexpr RandomParameter offerRateAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter lastWage      = UniformParameter<double>{.min = 10.0, .limit = 100.0};
-constexpr RandomParameter wageAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
+constexpr RandomParameter wageAdjustVol = UniformParameter<double>{.min = 0.001, .limit = 0.005};
 }  // namespace abm::labor::demander::setting
 
 namespace abm::labor::supplier::setting {
 constexpr RandomParameter productPower =
-    NormalParameter{.mean = 1.0, .dev = 1.0 / 3.0, .min = 0.0, .max = 2.0};
+    NormalParameter{.mean = 1.0, .dev = 1.0 / 3.0, .min = 0.01, .max = 2.0};
 constexpr auto            jobSampleCnt = 2;
 constexpr auto            jobEntryCnt  = 2;
 constexpr RandomParameter changingJobThreshold =
@@ -63,7 +63,7 @@ constexpr RandomParameter desiredEmploy   = UniformParameter<int>{.min = 10, .li
 constexpr RandomParameter lastMarkup      = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter markupAdjustVol = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter targetInvRatio  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
-constexpr RandomParameter productPower    = UniformParameter<double>{.min = 0.0, .limit = 2.0};
+constexpr RandomParameter productPower    = UniformParameter<double>{.min = 0.01, .limit = 2.0};
 constexpr RandomParameter priceAdjustVol  = UniformParameter<double>{.min = 0.1, .limit = 0.2};
 constexpr RandomParameter inventory       = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
