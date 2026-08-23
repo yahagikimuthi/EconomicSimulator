@@ -60,6 +60,11 @@ class ConsumerGoodsSupplier final {
 
     [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 
+    [[nodiscard]] auto requiresProductionGoods() noexcept -> GoodsQuantity {
+        const auto requiresSupply = tradingSystem_.requiresSupply();
+        return producingSystem_.calcDesiredProductionGoods(requiresSupply);
+    }
+
   private:
     void reset(CensusDropBox& dropBox) noexcept {
         tradingSystem_.reset();

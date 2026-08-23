@@ -10,6 +10,7 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/integrate.hpp"
 #include "world/goods.hpp"
 
 namespace abm::production_goods::demander {
@@ -66,16 +67,18 @@ class ProductionGoodsDemander final {
         : mpc_{masterRng.random(setting::mpc)} {}
 
     void request(
-        const AgentID id,
-        const Money   asset,
-        Market&       market,
-        const int     sampleCnt = setting::goodsSampleCnt
+        const AgentID       id,
+        const Money         asset,
+        const GoodsQuantity desiredPurchaseAmount,
+        Market&             market,
+        const int           sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
         const auto pickedEntry = market.pickEntry(id, sampleCnt);
         if (not pickedEntry) return;
-        myRequest_ = pickedEntry->request(budget / pickedEntry->price);
+        const auto purchaseAmount = min(desiredPurchaseAmount, budget / pickedEntry->price);
+        myRequest_                = pickedEntry->request(purchaseAmount);
     }
 
     void afterTrade() noexcept {

@@ -26,9 +26,12 @@ class ProducingSystem final {
     [[nodiscard]] auto calcDesiredEmploy(
         const GoodsQuantity requiresSupply, const HeadCount employee
     ) noexcept -> HeadCount {
-        const auto inventory    = inventory_;
-        const auto productPower = baseProductPower_;
-        return employPlanner_.plan(productPower, employee, requiresSupply - inventory);
+        return employPlanner_.plan(baseProductPower_, employee, requiresSupply - inventory_);
+    }
+
+    [[nodiscard]] auto calcDesiredProductionGoods(const GoodsQuantity requiresSupply
+    ) const noexcept -> GoodsQuantity {
+        return (requiresSupply / baseProductPower_) - productionGoods_;
     }
 
     void addProducingEquip(const GoodsQuantity productionGoods) noexcept {

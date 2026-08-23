@@ -26,10 +26,23 @@ void postGoods(
 void purchase(
     const AgentIndex&        index,
     const FirmFinance&       finance,
-    ProductionGoodsDemander& goodsDemander,
+    ProductionGoodsDemander& productionGoodsDemander,
+    ConsumerGoodsSupplier&   consumerGoodsSupplier,
     ProductionGoodsMarket&   market
 ) noexcept {
-    goodsDemander.request(index.id(), finance.asset(), market);
+    const auto desired = consumerGoodsSupplier.requiresProductionGoods();
+    productionGoodsDemander.request(index.id(), finance.asset(), desired, market);
+}
+
+void purchase(
+    const AgentIndex&        index,
+    const FirmFinance&       finance,
+    ProductionGoodsDemander& productionGoodsDemander,
+    ProductionGoodsSupplier& productionGoodsSupplier,
+    ProductionGoodsMarket&   market
+) noexcept {
+    const auto desired = productionGoodsSupplier.requiresProductionGoods();
+    productionGoodsDemander.request(index.id(), finance.asset(), desired, market);
 }
 
 void trade(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trade(); }

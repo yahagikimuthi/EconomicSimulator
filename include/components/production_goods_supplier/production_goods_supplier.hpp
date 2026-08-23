@@ -48,6 +48,11 @@ class ProductionGoodsSupplier final {
         return producingSystem_.calcDesiredEmploy(targetSupply, employee);
     }
 
+    [[nodiscard]] auto requiresProductionGoods() noexcept -> GoodsQuantity {
+        const auto requiresSupply = tradingSystem_.requiresSupply();
+        return producingSystem_.calcDesiredProductionGoods(requiresSupply);
+    }
+
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     void trade() noexcept { tradingSystem_.trade(); }
