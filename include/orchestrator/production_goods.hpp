@@ -50,6 +50,14 @@ void trade(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trad
 void afterTrade(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
 void endStep(
+    FirmFinance& finance, ProductionGoodsSupplier& productionGoodsSupplier, CensusDropBox& dropBox
+) noexcept {
+    productionGoodsSupplier.endStep(
+        [&](const Money sales) -> void { finance.assetPlus(sales); }, dropBox
+    );
+}
+
+void endStep(
     FirmFinance&             finance,
     ProductionGoodsSupplier& productionGoodsSupplier,
     ProductionGoodsDemander& productionGoodsDemander
@@ -70,4 +78,5 @@ void endStep(
         consumerGoodsSupplier.addProductionEquip(result.tradeAmount);
     });
 }
+
 }  // namespace abm::production_goods

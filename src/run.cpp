@@ -39,14 +39,6 @@ void Engine::run() {
 }
 
 void Engine::runLabor() noexcept {
-    const auto bToBs  = calcSumAsset(bToBFirms_);
-    const auto bToCs  = calcSumAsset(bToCFirms_);
-    const auto hholds = calcSumAsset(hholds_);
-
-    std::println("ステップ: {}", currentStep_.value());
-    std::println("{}", bToBs + bToCs + hholds);
-    std::println();
-
     for (BtoCFirm& firm : bToCFirms_) {
         labor::adjustWorkforce(
             firm.index, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
@@ -104,6 +96,13 @@ void Engine::runLabor() noexcept {
 }
 
 void Engine::runProductionGoods() noexcept {
+    auto bToBs  = calcSumAsset(bToBFirms_);
+    auto bToCs  = calcSumAsset(bToCFirms_);
+    auto hholds = calcSumAsset(hholds_);
+
+    std::println("中間財市場開始,ステップ: {}", currentStep_.value());
+    std::println("{}", bToBs + bToCs + hholds);
+
     for (HHold& hhold : hholds_) {
         production_goods::product(hhold.laborSupplier, Market::productionGoods);
     }
@@ -148,12 +147,21 @@ void Engine::runProductionGoods() noexcept {
         production_goods::endStep(
             firm.finance, firm.productionGoodsSupplier, firm.productionGoodsDemander
         );
+        production_goods::endStep(firm.finance, firm.productionGoodsSupplier, dropBox_);
     }
     for (BtoCFirm& firm : bToCFirms_) {
         production_goods::endStep(
             firm.finance, firm.consumerGoodsSupplier, firm.productionGoodsDemander
         );
     }
+
+    bToBs  = calcSumAsset(bToBFirms_);
+    bToCs  = calcSumAsset(bToCFirms_);
+    hholds = calcSumAsset(hholds_);
+
+    std::println("労働市場終了");
+    std::println("{}", bToBs + bToCs + hholds);
+    std::println();
 }
 
 void Engine::runConsumerGoods() noexcept {
