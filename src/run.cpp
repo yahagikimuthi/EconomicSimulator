@@ -31,8 +31,8 @@ template <typename T, typename F>
     requires std::invocable<F, T&> and requires(std::vector<T>& agents, F&& f) {
         std::for_each(std::execution::par, agents.begin(), agents.end(), std::forward<F>(f));
     }
-void forEach(std::vector<T>& agents, F&& f) {
-    std::for_each(std::execution::par, agents.begin(), agents.end(), std::forward<F>(f));
+void forEach(std::vector<T>& agents, F f) {
+    std::for_each(std::execution::par, agents.begin(), agents.end(), (f));
 }
 }  // namespace
 
@@ -217,9 +217,12 @@ void Logger::save(const CensusDropBox& dropBox, const Step step) {
     auto groupPath = std::string{"/step_" + std::to_string(step.value())};
     auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
-    auto create{[&group](std::string_view dataName, const std::vector<double>& data) -> void {
-        group.createDataSet(static_cast<std::string>(dataName), data);
-    }};
+    auto create{
+        [&group](std::string_view dataName, const tbb::concurrent_vector<double>& data) -> void {
+            std::vector<double> vec(data.begin(), data.end());
+            group.createDataSet(static_cast<std::string>(dataName), vec);
+        }
+    };
 
     create(name::firmAssets, dropBox.firmAssets);
     create(name::postedEmployments, dropBox.postedEmployments);
