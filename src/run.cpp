@@ -27,6 +27,9 @@ template <typename T>
 
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
+        if (currentStep_ == Step{500}) {
+            ignore();
+        }
         runLabor();
         runProductionGoods();
         runConsumerGoods();

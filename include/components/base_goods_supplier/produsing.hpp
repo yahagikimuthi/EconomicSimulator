@@ -2,6 +2,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
+#include "core/assertion.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
@@ -11,12 +12,49 @@
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
+class Producer {
+  public:
+    [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
+        : baseProductPower_{masterRng.random(setting::productPower)},
+          producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)} {}
+
+    [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
+        const auto workerInput = workspace_.totalInput();
+        workspace_.resetInput();
+        const auto productionEquipInput = productionGoods_ * producerGoodsEfficiency_;
+        const auto input = baseProductPower_ * min(workerInput, productionEquipInput);
+        return input;
+    }
+
+    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
+        ASSERT(productionGoods >= GoodsQuantity{0.0});
+        productionGoods_ += productionGoods;
+    }
+
+    [[nodiscard]] auto baseProductPower() const noexcept -> double { return baseProductPower_; }
+
+    [[nodiscard]] auto calcDesiredProductionGoods(const GoodsQuantity requiresSupply
+    ) const noexcept -> GoodsQuantity {
+        return max(
+            (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - productionGoods_,
+            GoodsQuantity{0.0}
+        );
+    }
+
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
+
+  private:
+    Workspace     workspace_;
+    const double  baseProductPower_;
+    const double  producerGoodsEfficiency_;
+    GoodsQuantity productionGoods_{0.0};
+};
+
 class ProducingSystem final {
   public:
     [[nodiscard]] explicit constexpr ProducingSystem(RandomGenerator& masterRng) noexcept
         : employPlanner_{masterRng},
-          baseProductPower_{masterRng.random(setting::productPower)},
-          producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)},
+          producer_{masterRng},
           inventory_{masterRng.random(setting::inventory)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
@@ -26,32 +64,26 @@ class ProducingSystem final {
     [[nodiscard]] auto calcDesiredEmploy(
         const GoodsQuantity requiresSupply, const HeadCount employee
     ) noexcept -> HeadCount {
-        return employPlanner_.plan(baseProductPower_, employee, requiresSupply - inventory_);
+        return employPlanner_.plan(
+            producer_.baseProductPower(), employee, requiresSupply - inventory_
+        );
     }
 
     [[nodiscard]] auto calcDesiredProductionGoods(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - productionGoods_;
+        return producer_.calcDesiredProductionGoods(requiresSupply);
     }
 
     void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
-        ASSERT(productionGoods >= GoodsQuantity{0.0});
-        productionGoods_ += productionGoods;
+        producer_.addProducingEquip(productionGoods);
     }
 
-    [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
-        const auto workerInput          = workspace_.totalInput();
-        const auto productionGoodsInput = productionGoods_ * producerGoodsEfficiency_;
-        workspace_.resetInput();
-        ASSERT(workerInput >= GoodsQuantity{0.0});
-        ASSERT(productionGoodsInput >= GoodsQuantity{0.0});
-        const auto production = baseProductPower_ * min(workerInput, productionGoodsInput);
+        const auto out = producer_.produce() + inventory_;
         ASSERT(inventory_ >= GoodsQuantity{0.0});
-        const auto out = production + inventory_;
-        inventory_     = GoodsQuantity{0.0};
-
+        inventory_ = GoodsQuantity{0.0};
         ASSERT(out >= GoodsQuantity{0.0});
         return out;
     }
@@ -67,10 +99,7 @@ class ProducingSystem final {
 
   private:
     EmployPlanner employPlanner_;
-    Workspace     workspace_;
-    const double  baseProductPower_;
-    const double  producerGoodsEfficiency_;
+    Producer      producer_;
     GoodsQuantity inventory_;
-    GoodsQuantity productionGoods_{0.0};
 };
 }  // namespace abm::base_goods::supplier
