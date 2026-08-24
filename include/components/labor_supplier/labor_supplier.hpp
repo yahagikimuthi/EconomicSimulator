@@ -1,9 +1,7 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <optional>
 #include <pcg_random.hpp>
-#include <vector>
 
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
@@ -33,7 +31,7 @@ namespace abm::labor::supplier {
 class LaborSupplier final {
   public:
     [[nodiscard]] explicit constexpr LaborSupplier(RandomGenerator& masterRng) noexcept
-        : employment_{masterRng}, likelihoodChangingJob_{masterRng} {}
+        : jobHunter_{masterRng}, employment_{masterRng}, likelihoodChangingJob_{masterRng} {}
 
     void entry(const AgentID id, LaborMarket& market) noexcept {
         employment_.updateStatus();

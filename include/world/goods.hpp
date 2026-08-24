@@ -113,8 +113,7 @@ class ConsumerGoodsMarket final {
     using Entry = ConsumerGoodsEntry;
 
   public:
-    [[nodiscard]] explicit constexpr ConsumerGoodsMarket(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+    [[nodiscard]] ConsumerGoodsMarket() noexcept = default;
     [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
         ASSERT(price > Price{0.0});
         ASSERT(supply > GoodsQuantity{0.0});
@@ -122,16 +121,17 @@ class ConsumerGoodsMarket final {
         return *entryBox_.emplace_back(price, supply);
     }
 
-    auto pickEntry(const int sampleCnt) noexcept -> std::optional<Entry&> {
+    auto pickEntry(const int sampleCnt, RandomGenerator& rng) noexcept -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
         auto toDouble = [] [[nodiscard]] (const Entry& entry) -> double {
             return entry.supply.value();
         };
-        auto betterEntry = std::ref(rng_.discreteDistribution(entryBox_, totalSupply_, toDouble));
+        auto betterEntry =
+            std::ref(rng.discreteDistribution(entryBox_, totalSupply_.load(), toDouble));
         if (sampleCnt <= 1) return betterEntry.get();
 
         for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
-            auto& sample = rng_.discreteDistribution(entryBox_, totalSupply_, toDouble);
+            auto& sample = rng.discreteDistribution(entryBox_, totalSupply_.load(), toDouble);
             if (sample.price >= betterEntry.get().price) continue;
             betterEntry = std::ref(sample);
         }
@@ -142,7 +142,6 @@ class ConsumerGoodsMarket final {
 
   private:
     tbb::concurrent_vector<Entry> entryBox_;
-    RandomGenerator               rng_;
     std::atomic<double>           totalSupply_;
 };
 
@@ -206,8 +205,7 @@ class ProductionGoodsMarket final {
     using Entry = ProductionGoodsEntry;
 
   public:
-    [[nodiscard]] explicit constexpr ProductionGoodsMarket(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+    [[nodiscard]] ProductionGoodsMarket() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
@@ -215,14 +213,15 @@ class ProductionGoodsMarket final {
         return *entryBox_.emplace_back(id, price, supply);
     }
 
-    auto pickEntry(const AgentID id, const int sampleCnt) noexcept -> std::optional<Entry&> {
+    auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
+        -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
         auto toDouble = [] [[nodiscard]] (const Entry& entry) -> double {
             return entry.supply.value();
         };
         std::optional<Entry&> betterEntry{std::nullopt};
         for (const auto _ : std::views::iota(0, sampleCnt)) {
-            auto& sample = rng_.discreteDistribution(entryBox_, totalSupply_, toDouble);
+            auto& sample = rng.discreteDistribution(entryBox_, totalSupply_.load(), toDouble);
             if (sample.id == id) continue;
             if (not betterEntry) {
                 betterEntry = sample;
@@ -237,7 +236,6 @@ class ProductionGoodsMarket final {
 
   private:
     tbb::concurrent_vector<Entry> entryBox_;
-    RandomGenerator               rng_;
     std::atomic<double>           totalSupply_;
 };
 }  // namespace abm

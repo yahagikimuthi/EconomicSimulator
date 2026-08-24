@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <optional>
 #include <pcg_random.hpp>
 #include <utility>
@@ -39,7 +38,8 @@ class ConsumerGoodsDemander final {
 
   public:
     [[nodiscard]] explicit constexpr ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
-        : mpc_{masterRng.random(setting::mpc)},
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          mpc_{masterRng.random(setting::mpc)},
           myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}
 
     void request(
@@ -52,7 +52,7 @@ class ConsumerGoodsDemander final {
         if (shouldPass(step, frequency)) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
-        auto pickedEntry = market.pickEntry(sampleCnt);
+        auto pickedEntry = market.pickEntry(sampleCnt, rng_);
         if (not pickedEntry) return;
         myRequest_ = pickedEntry->request(budget / pickedEntry->price);
     }
@@ -82,6 +82,7 @@ class ConsumerGoodsDemander final {
     }
 
     Ledger                        ledger_;
+    RandomGenerator               rng_;
     std::optional<const Request&> myRequest_{std::nullopt};
     const double                  mpc_;
     const Step                    myPhase_;

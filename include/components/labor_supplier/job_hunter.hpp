@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <cstddef>
 #include <functional>
@@ -33,7 +32,8 @@ class MyEntries final {
 
 class JobHunter final {
   public:
-    [[nodiscard]] constexpr JobHunter() noexcept = default;
+    [[nodiscard]] explicit constexpr JobHunter(RandomGenerator& masterRng) noexcept
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(
@@ -74,12 +74,12 @@ class JobHunter final {
         return offered.front();
     }
 
-    [[nodiscard]] static auto pickAndSortJobs(
+    [[nodiscard]] auto pickAndSortJobs(
         LaborMarket& market, const int sampleCnt, const int entryCnt
     ) noexcept -> std::span<RefWrap<Request>> {
         static thread_local auto sampleRequest = std::vector<RefWrap<Request>>{};
         sampleRequest.clear();
-        market.pickRequest(sampleRequest, sampleCnt);
+        market.pickRequest(sampleRequest, sampleCnt, rng_);
         sortSample(sampleRequest, entryCnt);
         return sampleRequest;
     }
@@ -98,6 +98,7 @@ class JobHunter final {
     }
 
     MyEntries             myEntries_;
+    RandomGenerator       rng_;
     std::optional<Entry&> acceptedEntry_{std::nullopt};
 };
 }  // namespace abm::labor::supplier

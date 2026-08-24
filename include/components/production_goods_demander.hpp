@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <concepts>
 #include <optional>
 #include <pcg_random.hpp>
@@ -64,7 +63,8 @@ class ProductionGoodsDemander final {
 
   public:
     [[nodiscard]] explicit constexpr ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
-        : mpc_{masterRng.random(setting::mpc)} {}
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          mpc_{masterRng.random(setting::mpc)} {}
 
     void request(
         const AgentID       id,
@@ -76,7 +76,7 @@ class ProductionGoodsDemander final {
         if (desiredPurchaseAmount <= GoodsQuantity{0.0}) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
-        const auto pickedEntry = market.pickEntry(id, sampleCnt);
+        const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto purchaseAmount = min(desiredPurchaseAmount, budget / pickedEntry->price);
         myRequest_                = pickedEntry->request(purchaseAmount);
@@ -106,6 +106,7 @@ class ProductionGoodsDemander final {
     }
 
     Ledger                        ledger_;
+    RandomGenerator               rng_;
     std::optional<const Request&> myRequest_{std::nullopt};
     const double                  mpc_;
 };

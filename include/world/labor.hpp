@@ -118,21 +118,22 @@ class LaborMarket final {
     using Request = LaborRequest;
 
   public:
-    [[nodiscard]] explicit constexpr LaborMarket(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+    [[nodiscard]] LaborMarket() noexcept = default;
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
         ASSERT(wage > Wage{0.0});
         return *requestBox_.emplace_back(id, wage);
     }
 
-    void pickRequest(std::vector<RefWrap<Request>>& out, const int n) noexcept {
+    void pickRequest(
+        std::vector<RefWrap<Request>>& out, const int n, RandomGenerator& rng
+    ) noexcept {
         ASSERT(out.empty());
         if (n >= static_cast<int>(requestBox_.size())) {
             packAllRequest(out);
             return;
         }
-        packPartRequest(out, n);
+        packPartRequest(out, n, rng);
     }
 
     void clear() noexcept { requestBox_.clear(); }
@@ -143,8 +144,10 @@ class LaborMarket final {
             out.emplace_back(std::ref(request));
         }
     }
-    void packPartRequest(std::vector<RefWrap<Request>>& out, const int n) noexcept {
-        rng_.sample(
+    void packPartRequest(
+        std::vector<RefWrap<Request>>& out, const int n, RandomGenerator& rng
+    ) noexcept {
+        rng.sample(
             requestBox_ | std::views::transform([](Request& req) -> RefWrap<Request> {
                 return std::ref(req);
             }),
@@ -154,6 +157,5 @@ class LaborMarket final {
     }
 
     tbb::concurrent_vector<LaborRequest> requestBox_;
-    RandomGenerator                      rng_;
 };
 }  // namespace abm
