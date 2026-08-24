@@ -13,3 +13,4 @@ scripts/__pycache__/
 core.*
 uml/
 tests/
+*.supp/
