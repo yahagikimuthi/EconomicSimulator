@@ -8,15 +8,6 @@
 #include "world/common.hpp"
 
 namespace abm {
-class AgentIndex final {
-  public:
-    [[nodiscard]] explicit constexpr AgentIndex(const AgentID id) noexcept : id_{id} {}
-    [[nodiscard]] auto id() const noexcept -> AgentID { return id_; }
-
-  private:
-    const AgentID id_;
-};
-
 class BaseFinance {
   public:
     void assetPlus(const Money plus) noexcept { asset_ += plus; }

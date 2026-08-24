@@ -16,13 +16,14 @@
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
+#include "core/values/common.hpp"
 #include "world/common.hpp"
 #include "world/goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
 struct BtoCFirm final {  // NOLINT
-    AgentIndex              index;
+    const AgentID           id;
     FirmFinance             finance;
     LaborDemander           laborDemander;
     ConsumerGoodsSupplier   consumerGoodsSupplier;
@@ -30,7 +31,7 @@ struct BtoCFirm final {  // NOLINT
 };
 
 struct BtoBFirm final {  // NOLINT
-    AgentIndex              index;
+    const AgentID           id;
     FirmFinance             finance;
     LaborDemander           laborDemander;
     ProductionGoodsDemander productionGoodsDemander;
@@ -38,7 +39,7 @@ struct BtoBFirm final {  // NOLINT
 };
 
 struct HHold final {  // NOLINT
-    AgentIndex            index;
+    const AgentID         id;
     HHoldFinance          finance;
     LaborSupplier         laborSupplier;
     ConsumerGoodsDemander consumerGoodsDemander;

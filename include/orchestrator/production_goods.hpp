@@ -15,34 +15,34 @@ void product(LaborSupplier& laborSupplier, const EMarket phase) noexcept {
 }
 
 void postGoods(
-    const AgentIndex&        index,
+    const AgentID&           id,
     ProductionGoodsSupplier& goodsSupplier,
     const LaborDemander&     laborDemander,
     ProductionGoodsMarket&   market
 ) noexcept {
-    goodsSupplier.post(index.id(), laborDemander.sumWage(), market);
+    goodsSupplier.post(id, laborDemander.sumWage(), market);
 }
 
 void purchase(
-    const AgentIndex&        index,
+    const AgentID&           id,
     const FirmFinance&       finance,
     ProductionGoodsDemander& productionGoodsDemander,
     ConsumerGoodsSupplier&   consumerGoodsSupplier,
     ProductionGoodsMarket&   market
 ) noexcept {
     const auto desired = consumerGoodsSupplier.requiresProductionGoods();
-    productionGoodsDemander.request(index.id(), finance.asset(), desired, market);
+    productionGoodsDemander.request(id, finance.asset(), desired, market);
 }
 
 void purchase(
-    const AgentIndex&        index,
+    const AgentID&           id,
     const FirmFinance&       finance,
     ProductionGoodsDemander& productionGoodsDemander,
     ProductionGoodsSupplier& productionGoodsSupplier,
     ProductionGoodsMarket&   market
 ) noexcept {
     const auto desired = productionGoodsSupplier.requiresProductionGoods();
-    productionGoodsDemander.request(index.id(), finance.asset(), desired, market);
+    productionGoodsDemander.request(id, finance.asset(), desired, market);
 }
 
 void trade(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trade(); }

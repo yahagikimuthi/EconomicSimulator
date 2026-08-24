@@ -52,18 +52,18 @@ void Engine::run() {
 void Engine::runLabor() noexcept {
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
         labor::adjustWorkforce(
-            firm.index, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
+            firm.id, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
         );
     });
 
     forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
         labor::adjustWorkforce(
-            firm.index, firm.productionGoodsSupplier, firm.laborDemander, laborMarket_
+            firm.id, firm.productionGoodsSupplier, firm.laborDemander, laborMarket_
         );
     });
 
     forEach(hholds_, [&](HHold& hhold) -> void {
-        labor::jobEntry(hhold.index, hhold.laborSupplier, laborMarket_);
+        labor::jobEntry(hhold.id, hhold.laborSupplier, laborMarket_);
     });
 
     forEach(bToCFirms_, [](BtoCFirm& firm) -> void { labor::offer(firm.laborDemander); });
@@ -106,13 +106,13 @@ void Engine::runProductionGoods() noexcept {
 
     forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
         production_goods::postGoods(
-            firm.index, firm.productionGoodsSupplier, firm.laborDemander, productionGoodsMarket_
+            firm.id, firm.productionGoodsSupplier, firm.laborDemander, productionGoodsMarket_
         );
     });
 
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
         production_goods::purchase(
-            firm.index,
+            firm.id,
             firm.finance,
             firm.productionGoodsDemander,
             firm.consumerGoodsSupplier,
@@ -122,7 +122,7 @@ void Engine::runProductionGoods() noexcept {
 
     forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
         production_goods::purchase(
-            firm.index,
+            firm.id,
             firm.finance,
             firm.productionGoodsDemander,
             firm.productionGoodsSupplier,

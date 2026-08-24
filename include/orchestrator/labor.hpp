@@ -11,33 +11,27 @@
 
 namespace abm::labor {
 void adjustWorkforce(
-    const AgentIndex&      index,
+    const AgentID&         id,
     ConsumerGoodsSupplier& goodsSupplier,
     LaborDemander&         laborDemander,
     LaborMarket&           laborMarket
 ) noexcept {
     const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
-    laborDemander.adjustWorkforce(
-        index.id(), desiredEmploy, goodsSupplier.salesForecast(), laborMarket
-    );
+    laborDemander.adjustWorkforce(id, desiredEmploy, goodsSupplier.salesForecast(), laborMarket);
 }
 
 void adjustWorkforce(
-    const AgentIndex&        index,
+    const AgentID&           id,
     ProductionGoodsSupplier& goodsSupplier,
     LaborDemander&           laborDemander,
     LaborMarket&             laborMarket
 ) noexcept {
     const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
-    laborDemander.adjustWorkforce(
-        index.id(), desiredEmploy, goodsSupplier.salesForecast(), laborMarket
-    );
+    laborDemander.adjustWorkforce(id, desiredEmploy, goodsSupplier.salesForecast(), laborMarket);
 }
 
-void jobEntry(
-    const AgentIndex& index, LaborSupplier& laborSupplier, LaborMarket& laborMarket
-) noexcept {
-    laborSupplier.entry(index.id(), laborMarket);
+void jobEntry(const AgentID& id, LaborSupplier& laborSupplier, LaborMarket& laborMarket) noexcept {
+    laborSupplier.entry(id, laborMarket);
 }
 
 void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer(); }

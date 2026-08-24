@@ -17,15 +17,10 @@
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "world/goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
 namespace {
-[[nodiscard]] auto createAgentIndex(const AgentID id) noexcept -> AgentIndex {
-    return AgentIndex{id};
-}
-
 [[nodiscard]] auto createFirmFinance(RandomGenerator& masterRng) noexcept -> FirmFinance {
     return FirmFinance{masterRng};
 }
@@ -82,7 +77,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     int agentId{};
     for (; agentId < cnt::bToCFirm; ++agentId) {
         bToCFirms_.emplace_back(BtoCFirm{
-            .index         = createAgentIndex(AgentID{agentId}),
+            .id            = AgentID{agentId},
             .finance       = createFirmFinance(rng_),
             .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::consumerGoods),
             .consumerGoodsSupplier   = createConsumerGoodsSupplier(rng_),
@@ -97,7 +92,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     bToBFirms_.reserve(cnt::bToBFirm);
     for (; agentId < cnt::bToCFirm + cnt::bToBFirm; ++agentId) {
         bToBFirms_.emplace_back(BtoBFirm{
-            .index         = createAgentIndex(AgentID{agentId}),
+            .id            = AgentID{agentId},
             .finance       = createFirmFinance(rng_),
             .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::productionGoods),
             .productionGoodsDemander = createProductionGoodsDemander(rng_),
@@ -112,7 +107,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     hholds_.reserve(cnt::hhold);
     for (; agentId < cnt::bToCFirm + cnt::bToBFirm + cnt::hhold; ++agentId) {
         hholds_.emplace_back(HHold{
-            .index                 = createAgentIndex(AgentID{agentId}),
+            .id                    = AgentID{agentId},
             .finance               = createHHoldFinance(rng_),
             .laborSupplier         = createLaborSupplier(rng_),
             .consumerGoodsDemander = createConsumerGoodsDemander(rng_)
