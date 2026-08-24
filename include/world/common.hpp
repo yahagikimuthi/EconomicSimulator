@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <tbb/concurrent_vector.h>
 
 #include "core/setting.hpp"
 
@@ -8,18 +8,18 @@ namespace abm {
 enum class Market : char { labor, consumerGoods, productionGoods };
 
 struct CensusDropBox final {
-    std::vector<double> firmAssets;
-    std::vector<double> postedEmployments;
-    std::vector<double> postedWages;
-    std::vector<double> employments;
-    std::vector<double> sumWages;
-    std::vector<double> prices;
-    std::vector<double> supplies;
-    std::vector<double> markups;
-    std::vector<double> inventories;
+    tbb::concurrent_vector<double> firmAssets;
+    tbb::concurrent_vector<double> postedEmployments;
+    tbb::concurrent_vector<double> postedWages;
+    tbb::concurrent_vector<double> employments;
+    tbb::concurrent_vector<double> sumWages;
+    tbb::concurrent_vector<double> prices;
+    tbb::concurrent_vector<double> supplies;
+    tbb::concurrent_vector<double> markups;
+    tbb::concurrent_vector<double> inventories;
 
-    std::vector<double> hholdAssets;
-    std::vector<double> wages;
+    tbb::concurrent_vector<double> hholdAssets;
+    tbb::concurrent_vector<double> wages;
 
     [[nodiscard]] constexpr CensusDropBox() noexcept {
         const auto firmCnt  = setting::agent_count::bToCFirm + setting::agent_count::bToBFirm;
