@@ -78,6 +78,12 @@ class RandomGenerator final {
         std::unreachable();
     }
 
+    template <std::ranges::random_access_range Container>
+        requires requires(Container& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
+    void shuffle(Container&& c) noexcept {
+        std::ranges::shuffle(std::forward<Container>(c), rng_);
+    }
+
     template <std::ranges::input_range Range, std::weakly_incrementable Out>
         requires requires(Range& range, Out outIt, int n, pcg32 rng) {
             std::ranges::sample(range, outIt, n, rng);
