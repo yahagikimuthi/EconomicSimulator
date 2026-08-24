@@ -77,8 +77,7 @@ constexpr RandomParameter mpc                  = UniformParameter<double>{.min =
 }  // namespace abm::consumer_goods::demander::setting
 
 namespace abm::production_goods::demander::setting {
-constexpr auto            goodsSampleCnt = 2;
-constexpr RandomParameter mpc            = UniformParameter<double>{.min = 0.5, .limit = 0.8};
+constexpr auto goodsSampleCnt = 2;
 }  // namespace abm::production_goods::demander::setting
 
 namespace abm::setting::agent_count {

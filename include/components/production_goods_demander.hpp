@@ -63,8 +63,7 @@ class ProductionGoodsDemander final {
 
   public:
     [[nodiscard]] explicit constexpr ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
-          mpc_{masterRng.random(setting::mpc)} {}
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void request(
         const AgentID       id,
@@ -74,11 +73,10 @@ class ProductionGoodsDemander final {
         const int           sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         if (desiredPurchaseAmount <= GoodsQuantity{0.0}) return;
-        const auto budget = asset * mpc_;
-        if (budget <= Money{0.0}) return;
+        if (asset <= Money{0.0}) return;
         const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
-        const auto purchaseAmount = min(desiredPurchaseAmount, budget / pickedEntry->price);
+        const auto purchaseAmount = min(desiredPurchaseAmount, asset / pickedEntry->price);
         myRequest_                = pickedEntry->request(purchaseAmount);
     }
 
@@ -108,7 +106,6 @@ class ProductionGoodsDemander final {
     Ledger                        ledger_;
     RandomGenerator               rng_;
     std::optional<const Request&> myRequest_{std::nullopt};
-    const double                  mpc_;
 };
 }  // namespace abm::production_goods::demander
 
