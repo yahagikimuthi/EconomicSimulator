@@ -12,7 +12,7 @@
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
-class Producer {
+class Producer final {
   public:
     [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower_{masterRng.random(setting::productPower)},
