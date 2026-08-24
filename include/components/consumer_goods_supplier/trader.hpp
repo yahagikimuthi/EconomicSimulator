@@ -70,12 +70,12 @@ class Trader final {
         auto remainAmount = ledger_.inventory();
         for (RefWrap<Request> reqRef : requestBox) {
             auto&      req       = reqRef.get();
-            const auto reqAmount = req.amount;
+            const auto reqAmount = req.requiresAmount;
             if (remainAmount <= reqAmount) {
-                req.tradeAmount = remainAmount;
+                req.trade(remainAmount);
                 return;
             }
-            req.tradeAmount = reqAmount;
+            req.trade(reqAmount);
             remainAmount -= reqAmount;
         }
         ASSERT(false);

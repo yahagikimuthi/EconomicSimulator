@@ -69,10 +69,10 @@ class Trader final {
             auto&      req       = reqRef.get();
             const auto reqAmount = req.amount;
             if (remainAmount <= reqAmount) {
-                req.tradeAmount = remainAmount;
+                req.trade(remainAmount);
                 return;
             }
-            req.tradeAmount = reqAmount;
+            req.trade(reqAmount);
             remainAmount -= reqAmount;
         }
     }

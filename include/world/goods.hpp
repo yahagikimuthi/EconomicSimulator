@@ -56,17 +56,28 @@ constexpr auto Workspace::operator=(Workspace&& other) noexcept -> Workspace& {
     return *this;
 }
 
-struct ConsumerGoodsRequest final {
-    const GoodsQuantity amount;
-    GoodsQuantity       tradeAmount{0.0};
-
-    const ConsumerGoodsEntry& entry;
+class ConsumerGoodsRequest final {
+  public:
     [[nodiscard]] constexpr ConsumerGoodsRequest(
         const GoodsQuantity a, const ConsumerGoodsEntry& e
     ) noexcept
-        : amount{a}, entry{e} {
+        : requiresAmount{a}, entry{e} {
         ASSERT(a > GoodsQuantity{0.0});
     }
+    [[nodiscard]] constexpr auto price() const noexcept -> Price;
+    [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
+
+    void trade(const GoodsQuantity tradeAmount) noexcept {
+        ASSERT(tradeAmount >= GoodsQuantity{0.0});
+        ASSERT(tradeAmount_ == GoodsQuantity{0.0});
+        tradeAmount_ = tradeAmount;
+    }
+
+    const GoodsQuantity       requiresAmount;
+    const ConsumerGoodsEntry& entry;
+
+  private:
+    GoodsQuantity tradeAmount_{0.0};
 };
 
 class ConsumerGoodsEntry final {
@@ -89,7 +100,7 @@ class ConsumerGoodsEntry final {
     [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
         const auto demand = GoodsQuantity{std::ranges::fold_left(
             requestBox_ | std::ranges::views::transform([](const Request& req) -> double {
-                return req.amount.value();
+                return req.requiresAmount.value();
             }),
             0.0,
             std::plus<>{}
@@ -102,7 +113,7 @@ class ConsumerGoodsEntry final {
     const GoodsQuantity supply;
 
     void performFullTrade() noexcept {
-        for (Request& req : requestBox_) req.tradeAmount = req.amount;
+        for (Request& req : requestBox_) req.trade(req.requiresAmount);
     }
 
   private:
@@ -145,17 +156,27 @@ class ConsumerGoodsMarket final {
     std::atomic<double>           totalSupply_;
 };
 
-struct ProductionGoodsRequest final {
-    const GoodsQuantity amount;
-    GoodsQuantity       tradeAmount{0.0};
-
-    const ProductionGoodsEntry& entry;
+class ProductionGoodsRequest final {
+  public:
     [[nodiscard]] constexpr ProductionGoodsRequest(
         const GoodsQuantity a, const ProductionGoodsEntry& e
     ) noexcept
         : amount{a}, entry{e} {
         ASSERT(a >= GoodsQuantity{0.0});
     }
+    [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
+
+    void trade(const GoodsQuantity tradeAmount) noexcept {
+        ASSERT(tradeAmount_ == GoodsQuantity{0.0});
+        ASSERT(tradeAmount >= GoodsQuantity{0.0});
+        tradeAmount_ = tradeAmount;
+    }
+
+    const GoodsQuantity         amount;
+    const ProductionGoodsEntry& entry;
+
+  private:
+    GoodsQuantity tradeAmount_{0.0};
 };
 
 class ProductionGoodsEntry final {
@@ -190,7 +211,7 @@ class ProductionGoodsEntry final {
     }
 
     void performFullTrade() noexcept {
-        for (Request& req : requestBox_) req.tradeAmount = req.amount;
+        for (Request& req : requestBox_) req.trade(req.amount);
     }
 
     const AgentID       id;

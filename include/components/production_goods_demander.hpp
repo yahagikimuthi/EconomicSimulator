@@ -83,7 +83,7 @@ class ProductionGoodsDemander final {
     void afterTrade() noexcept {
         if (not myRequest_) return;
         ledger_.readTradeResult(
-            {.price = myRequest_->entry.price, .tradeAmount = myRequest_->tradeAmount}
+            {.price = myRequest_->entry.price, .tradeAmount = myRequest_->tradeAmount()}
         );
     }
 

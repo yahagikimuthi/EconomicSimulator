@@ -3,9 +3,9 @@
 namespace abm {
 class LaborEntry;
 class LaborRequest;
-struct ConsumerGoodsRequest;
+class ConsumerGoodsRequest;
 class ConsumerGoodsEntry;
-struct ProductionGoodsRequest;
+class ProductionGoodsRequest;
 class ProductionGoodsEntry;
 class Workspace;
 class RosterEntry;

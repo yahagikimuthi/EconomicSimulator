@@ -32,7 +32,7 @@ struct RecruitResult final {
 template <typename T>
 class Memory final {
   public:
-    [[nodiscard]] explicit constexpr Memory(const T l) noexcept : log_{l} {}
+    [[nodiscard]] explicit constexpr Memory(const T log) noexcept : log_{log} {}
 
     void reset() noexcept {
         if (not next_) return;
@@ -51,7 +51,7 @@ class Memory final {
 template <typename T>
 class Cache final {
   public:
-    [[nodiscard]] explicit constexpr Cache(const T t) noexcept : cache_{t} {}
+    [[nodiscard]] explicit constexpr Cache(const T cache) noexcept : cache_{cache} {}
     [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
 
     void next(const T next) noexcept { next_ = next; }

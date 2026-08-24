@@ -24,7 +24,7 @@ struct TradeResult final {
 template <typename T>
 class Memory final {
   public:
-    [[nodiscard]] constexpr explicit Memory(const T l) noexcept : log_{l} {}
+    [[nodiscard]] constexpr explicit Memory(const T log) noexcept : log_{log} {}
 
     void reset() noexcept {
         if (not next_) return;
