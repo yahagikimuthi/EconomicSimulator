@@ -12,6 +12,10 @@
 #include "world/goods.hpp"
 
 namespace abm::consumer_goods::demander {
+using Request = ConsumerGoodsRequest;
+using Entry   = ConsumerGoodsEntry;
+using Market  = ConsumerGoodsMarket;
+
 struct ATradeResult final {
     const Price         price;
     const GoodsQuantity purchaseAmount;
@@ -31,14 +35,43 @@ class Ledger final {
     Money purchasing_{0.0};
 };
 
-class ConsumerGoodsDemander final {
-    using Market  = ConsumerGoodsMarket;
-    using Request = ConsumerGoodsRequest;
-    using Entry   = ConsumerGoodsEntry;
+class Trader final {
+  public:
+    [[nodiscard]] explicit constexpr Trader(RandomGenerator& masterRng)
+        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
+    void request(
+        const Money budget, Market& market, const int sampleCnt = setting::goodsSampleCnt
+    ) noexcept {
+        auto pickedEntry = market.pickEntry(sampleCnt, rng_);
+        if (not myRequest_) return;
+        myRequest_ = pickedEntry->request(budget / pickedEntry->price);
+    }
+
+    void afterTrade() noexcept {
+        if (not myRequest_) return;
+        ledger_.readTradeResult(
+            {.price = myRequest_->entry.price, .purchaseAmount = myRequest_->tradeAmount}
+        );
+    }
+
+    [[nodiscard]] auto purchased() const noexcept -> Money { return ledger_.purchased(); }
+
+    void reset() noexcept {
+        ledger_.reset();
+        myRequest_.reset();
+    }
+
+  private:
+    Ledger                        ledger_;
+    RandomGenerator               rng_;
+    std::optional<const Request&> myRequest_{std::nullopt};
+};
+
+class ConsumerGoodsDemander final {
   public:
     [[nodiscard]] explicit constexpr ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+        : trader_{masterRng},
           mpc_{masterRng.random(setting::mpc)},
           myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}
 
@@ -52,23 +85,17 @@ class ConsumerGoodsDemander final {
         if (shouldPass(step, frequency)) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
-        auto pickedEntry = market.pickEntry(sampleCnt, rng_);
-        if (not pickedEntry) return;
-        myRequest_ = pickedEntry->request(budget / pickedEntry->price);
+        trader_.request(budget, market, sampleCnt);
     }
 
-    void afterTrade() noexcept {
-        if (not myRequest_) return;
-        ledger_.readTradeResult(
-            {.price = myRequest_->entry.price, .purchaseAmount = myRequest_->tradeAmount}
-        );
-    }
+    void afterTrade() noexcept { trader_.afterTrade(); }
 
     template <AssetMinusFn F>
     void endStep(F&& assetMinus) noexcept {
-        ASSERT(ledger_.purchased() >= Money{0.0});
-        std::forward<F>(assetMinus)(ledger_.purchased());
-        reset();
+        const auto purchased = trader_.purchased();
+        ASSERT(purchased >= Money{0.0});
+        std::forward<F>(assetMinus)(purchased);
+        trader_.reset();
     }
 
   private:
@@ -76,17 +103,10 @@ class ConsumerGoodsDemander final {
         return step % frequency != myPhase_;
     }
 
-    void reset() noexcept {
-        myRequest_.reset();
-        ledger_.reset();
-    }
-
-    Ledger                        ledger_;
-    RandomGenerator               rng_;
-    std::optional<const Request&> myRequest_{std::nullopt};
-    const double                  mpc_;
-    const Step                    myPhase_;
-    static inline int             instanceCnt_{};
+    Trader            trader_;
+    const double      mpc_;
+    const Step        myPhase_;
+    static inline int instanceCnt_{};
 };
 }  // namespace abm::consumer_goods::demander
 
