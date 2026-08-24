@@ -2,7 +2,6 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <print>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -16,7 +15,7 @@
 #include "world/common.hpp"
 
 namespace abm {
-
+namespace {
 template <typename T>
     requires requires(T t) { t.finance.asset().value(); }
 [[nodiscard]] constexpr auto calcSumAsset(std::vector<T>& agents) noexcept -> double {
@@ -24,6 +23,7 @@ template <typename T>
         return acc + agent.finance.asset().value();
     });
 }
+}  // namespace
 
 void Engine::run() {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
@@ -96,13 +96,6 @@ void Engine::runLabor() noexcept {
 }
 
 void Engine::runProductionGoods() noexcept {
-    auto bToBs  = calcSumAsset(bToBFirms_);
-    auto bToCs  = calcSumAsset(bToCFirms_);
-    auto hholds = calcSumAsset(hholds_);
-
-    std::println("中間財市場開始,ステップ: {}", currentStep_.value());
-    std::println("{}", bToBs + bToCs + hholds);
-
     for (HHold& hhold : hholds_) {
         production_goods::product(hhold.laborSupplier, Market::productionGoods);
     }
@@ -154,14 +147,6 @@ void Engine::runProductionGoods() noexcept {
             firm.finance, firm.consumerGoodsSupplier, firm.productionGoodsDemander
         );
     }
-
-    bToBs  = calcSumAsset(bToBFirms_);
-    bToCs  = calcSumAsset(bToCFirms_);
-    hholds = calcSumAsset(hholds_);
-
-    std::println("労働市場終了");
-    std::println("{}", bToBs + bToCs + hholds);
-    std::println();
 }
 
 void Engine::runConsumerGoods() noexcept {
