@@ -20,8 +20,12 @@ class Producer {
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.totalInput();
+        ASSERT(workerInput >= GoodsQuantity{0.0});
+
         workspace_.resetInput();
         const auto productionEquipInput = productionGoods_ * producerGoodsEfficiency_;
+        ASSERT(productionGoods_ >= GoodsQuantity{0.0});
+
         const auto input = baseProductPower_ * min(workerInput, productionEquipInput);
         return input;
     }
