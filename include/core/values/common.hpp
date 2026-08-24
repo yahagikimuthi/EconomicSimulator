@@ -69,6 +69,7 @@ class ValueObjectMixin {
     double value_;
 };
 }  // namespace abm::value_object
+
 namespace abm {
 class Wage;
 class Money final : public value_object::ValueObjectMixin<Money> {
