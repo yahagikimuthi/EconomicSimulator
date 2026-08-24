@@ -49,13 +49,13 @@ target_compile_options(project_warnings INTERFACE
     -Wunreachable-code
     -Wimplicit-fallthrough
     -D_GLIBCXX_DEBUG
-    -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
+    -fsanitize=thread,undefined,float-divide-by-zero,float-cast-overflow
     -fno-omit-frame-pointer
     -fcontracts
     -D_GLIBCXX_ASSERTIONS
 )
 target_link_options(project_warnings INTERFACE
-    -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
+    -fsanitize=thread,undefined,float-divide-by-zero,float-cast-overflow
     -fcontracts
 )
 

@@ -83,8 +83,8 @@ constexpr RandomParameter mpc            = UniformParameter<double>{.min = 0.5, 
 
 namespace abm::setting::agent_count {
 constexpr auto bToCFirm = 10;
-constexpr auto bToBFirm = 10;
-constexpr auto hhold    = 100;
+constexpr auto bToBFirm = 100;
+constexpr auto hhold    = 10000;
 }  // namespace abm::setting::agent_count
 
 namespace abm::setting::agent_finance {

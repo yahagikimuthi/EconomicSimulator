@@ -117,7 +117,7 @@ class Engine final {
     bool isAnalysis_;
 };
 
-constexpr void run(const int step, const bool isAnalysis) {
+inline void run(const int step, const bool isAnalysis) {
     auto engine = Engine{step, isAnalysis};
     engine.run();
 }
