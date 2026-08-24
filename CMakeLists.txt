@@ -38,7 +38,7 @@ file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "tests/*.cpp")
 # 共通コンパイル/リンク設定
 add_library(project_warnings INTERFACE)
 target_compile_options(project_warnings INTERFACE
-    -O1
+    -O0
     -Wall
     -Werror
     -Wextra
@@ -48,14 +48,14 @@ target_compile_options(project_warnings INTERFACE
     -Wpedantic
     -Wunreachable-code
     -Wimplicit-fallthrough
-    #-D_GLIBCXX_DEBUG
-    -fsanitize=thread,undefined,float-divide-by-zero,float-cast-overflow
+    -D_GLIBCXX_DEBUG
+    -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
     -fno-omit-frame-pointer
     -fcontracts
     -D_GLIBCXX_ASSERTIONS
 )
 target_link_options(project_warnings INTERFACE
-    -fsanitize=thread,undefined,float-divide-by-zero,float-cast-overflow
+    -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
     -fcontracts
 )
 
