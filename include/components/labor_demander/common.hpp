@@ -31,16 +31,20 @@ struct RecruitResult final {
 template <typename T>
 class Memory final {
   public:
-    [[nodiscard]] explicit constexpr Memory(const T l) noexcept : log{l} {}
+    [[nodiscard]] explicit constexpr Memory(const T l) noexcept : log_{l} {}
 
     void reset() noexcept {
-        if (not next) return;
-        log = next, next.reset();
+        if (not next_) return;
+        log_ = next_, next_.reset();
     }
-    void clearLog() noexcept { log.reset(); }
+    void clearLog() noexcept { log_.reset(); }
+    void next(const T next) noexcept { next_ = next; }
 
-    std::optional<T> log;
-    std::optional<T> next{std::nullopt};
+    [[nodiscard]] auto log() const noexcept -> std::optional<T> { return log_; }
+
+  private:
+    std::optional<T> log_;
+    std::optional<T> next_{std::nullopt};
 };
 
 template <typename T>

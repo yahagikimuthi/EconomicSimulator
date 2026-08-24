@@ -55,13 +55,13 @@ class DemandForecastManagerMemory final {
         : totalDemand_{GoodsQuantity{masterRng.random(setting::lastDemand)}} {}
 
     [[nodiscard]] auto lastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
-        return totalDemand_.log;
+        return totalDemand_.log();
     }
     void clearLog() noexcept { totalDemand_.clearLog(); }
     void reset() noexcept { totalDemand_.reset(); }
     void listenTradeResult(const TradeResult& result) noexcept {
         ASSERT(result.totalDemand >= GoodsQuantity{0.0});
-        totalDemand_.next = result.totalDemand;
+        totalDemand_.next(result.totalDemand);
     }
 
   private:

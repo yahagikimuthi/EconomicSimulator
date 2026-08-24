@@ -17,13 +17,13 @@ class EmployPlannerMemory final {
     [[nodiscard]] explicit constexpr EmployPlannerMemory(RandomGenerator& masterRng) noexcept
         : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}} {}
     [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
-        return supply_.log;
+        return supply_.log();
     }
     void clearLog() noexcept { supply_.clearLog(); }
     void reset() noexcept { supply_.reset(); }
     void listenTradePlan(const TradePlan& plan) noexcept {
         ASSERT(plan.supply >= GoodsQuantity{0.0});
-        supply_.next = plan.supply;
+        supply_.next(plan.supply);
     }
 
   private:

@@ -20,20 +20,20 @@ class MarkupPlannerMemory final {
         : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}},
           salesAmount_{GoodsQuantity{masterRng.random(setting::lastSalesAmount)}} {}
     [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
-        return supply_.log;
+        return supply_.log();
     }
     [[nodiscard]] auto lastSalesAmount() const noexcept -> std::optional<GoodsQuantity> {
-        return salesAmount_.log;
+        return salesAmount_.log();
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
         ASSERT(result.soldAmount >= GoodsQuantity{0.0});
-        salesAmount_.next = result.soldAmount;
+        salesAmount_.next(result.soldAmount);
     }
 
     void listenTradePlan(const TradePlan& plan) noexcept {
         ASSERT(plan.supply >= GoodsQuantity{0.0});
-        supply_.next = plan.supply;
+        supply_.next(plan.supply);
     }
 
     void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }

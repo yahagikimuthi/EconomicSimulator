@@ -30,20 +30,20 @@ class OfferPlannerMemory final {
         : employResult_{HeadCount{masterRng.random(setting::lastApplicants)}},
           employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}} {}
     [[nodiscard]] auto lastEmployResult() const noexcept -> std::optional<HeadCount> {
-        return employResult_.log;
+        return employResult_.log();
     }
     [[nodiscard]] auto lastEmployPlan() const noexcept -> std::optional<HeadCount> {
-        return employPlan_.log;
+        return employPlan_.log();
     }
     void clearLog() noexcept { employResult_.clearLog(), employPlan_.clearLog(); }
     void reset() noexcept { employResult_.reset(), employPlan_.reset(); }
     void listenEmployPlan(const HeadCount employPlan) noexcept {
         ASSERT(employPlan >= HeadCount{0.0});
-        employPlan_.next = employPlan;
+        employPlan_.next(employPlan);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.employ >= HeadCount{0.0});
-        employResult_.next = result.applicants;
+        employResult_.next(result.applicants);
     }
 
   private:

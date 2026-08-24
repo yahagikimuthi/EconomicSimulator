@@ -21,17 +21,17 @@ class WagePlannerMemory final {
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenEmployPlan(const HeadCount employPlan) noexcept {
         ASSERT(employPlan >= HeadCount{0.0});
-        employPlan_.next = employPlan;
+        employPlan_.next(employPlan);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.applicants >= HeadCount{0.0});
-        applicants_.next = result.applicants;
+        applicants_.next(result.applicants);
     }
     [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
-        return applicants_.log;
+        return applicants_.log();
     }
     [[nodiscard]] auto lastEmployPlan() const noexcept -> std::optional<HeadCount> {
-        return employPlan_.log;
+        return employPlan_.log();
     }
     void clearLog() noexcept { employPlan_.clearLog(), applicants_.clearLog(); }
     void reset() noexcept {
