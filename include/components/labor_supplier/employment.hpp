@@ -27,13 +27,10 @@ class Employment final {
     }
 
     [[nodiscard]] auto contractFirmId() const noexcept -> AgentID {
-        return isEmployed() ? rosterEntry_->firmId() : AgentID{-1};
+        return rosterEntry_.transform(&RosterEntry::firmId).value_or(AgentID{-1});
     }
     [[nodiscard]] auto wage() const noexcept -> Wage {
-        if (not isEmployed()) return Wage{0.0};
-        ASSERT(rosterEntry_->isOccupied);
-        ASSERT(rosterEntry_->wage > Wage{0.0});
-        return rosterEntry_->wage;
+        return rosterEntry_.transform(&RosterEntry::wage).value_or(Wage{0.0});
     }
 
     void work(const EMarket phase) noexcept {
