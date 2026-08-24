@@ -70,9 +70,6 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
     : totalStep_{totalStep},
       seed_{generateSeed()},
       rng_{pcg32{seed_.state, seed_.stream}},
-      laborMarket_{rng_},
-      productionGoodsMarket_{rng_},
-      consumerGoodsMarket_{rng_},
       isAnalysis_{isAnalysis} {
     if (not logger_.isValid()) {
         std::cerr << "can not create file\n";
