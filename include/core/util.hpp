@@ -78,28 +78,6 @@ class RandomGenerator final {
         std::unreachable();
     }
 
-    template <std::ranges::range Container, typename Proj = std::identity>
-        requires requires(Container container, Proj proj) {
-            { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
-        }
-    [[nodiscard]] auto discreteDistribution(Container&& container, Proj&& proj = {}) noexcept
-        -> decltype(auto) {
-        auto total = 0.0;
-        for (const auto& elem : std::forward<Container>(container)) {
-            const double weight = std::invoke(std::forward<Proj>(proj), elem);
-            ASSERT(weight >= 0.0 && "weight is required >= 0");
-            total += weight;
-        }
-        ASSERT(total >= 0.0 && "total is required >= 0");
-        return discreteDistribution(std::forward<Container>(container), total, proj);
-    }
-
-    template <std::ranges::random_access_range Container>
-        requires requires(Container& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
-    void shuffle(Container&& c) noexcept {
-        std::ranges::shuffle(std::forward<Container>(c), rng_);
-    }
-
     template <std::ranges::input_range Range, std::weakly_incrementable Out>
         requires requires(Range& range, Out outIt, int n, pcg32 rng) {
             std::ranges::sample(range, outIt, n, rng);
