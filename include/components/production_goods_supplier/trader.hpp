@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <optional>
 #include <pcg_random.hpp>
 #include <span>

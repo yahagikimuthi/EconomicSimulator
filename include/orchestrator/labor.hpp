@@ -1,7 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
-
 #include "components/common.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"

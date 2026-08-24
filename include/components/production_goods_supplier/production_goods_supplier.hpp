@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <utility>
 
 #include "components/base_goods_supplier/common.hpp"

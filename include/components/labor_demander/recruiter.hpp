@@ -1,6 +1,5 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <cstddef>
 #include <functional>
