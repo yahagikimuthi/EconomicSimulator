@@ -10,7 +10,7 @@
 #include "world/goods.hpp"
 
 namespace abm::production_goods {
-void product(LaborSupplier& laborSupplier, const Market phase) noexcept {
+void product(LaborSupplier& laborSupplier, const EMarket phase) noexcept {
     laborSupplier.product(phase);
 }
 

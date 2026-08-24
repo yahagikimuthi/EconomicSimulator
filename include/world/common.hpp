@@ -5,7 +5,7 @@
 #include "core/setting.hpp"
 
 namespace abm {
-enum class Market : char { labor, consumerGoods, productionGoods };
+enum class EMarket : char { labor, consumerGoods, productionGoods };
 
 struct CensusDropBox final {
     tbb::concurrent_vector<double> firmAssets;

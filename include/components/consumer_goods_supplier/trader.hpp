@@ -7,17 +7,15 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
+#include "components/consumer_goods_supplier/common.hpp"
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
 #include "world/goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 class Trader final {
-    using Entry        = ConsumerGoodsEntry;
-    using Request      = ConsumerGoodsRequest;
     using TradePlan    = base_goods::supplier::TradePlan;
     using Ledger       = base_goods::supplier::Ledger;
-    using Market       = ConsumerGoodsMarket;
     using ATradeResult = base_goods::supplier::ATradeResult;
     using TradeResult  = base_goods::supplier::TradeResult;
 

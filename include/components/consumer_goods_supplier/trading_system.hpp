@@ -6,12 +6,10 @@
 #include "components/others.hpp"
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
-#include "world/goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 class TradingSystem final {
     using TradePlanner = base_goods::supplier::TradePlanner;
-    using Market       = ConsumerGoodsMarket;
 
   public:
     [[nodiscard]] explicit constexpr TradingSystem(RandomGenerator& masterRng) noexcept

@@ -56,7 +56,7 @@ class LaborSupplier final {
         jobHunter_.reset();
     }
 
-    void product(const Market phase) noexcept { employment_.work(phase); }
+    void product(const EMarket phase) noexcept { employment_.work(phase); }
 
     [[nodiscard]] auto wage() const noexcept -> Money {
         const auto out = employment_.wage();

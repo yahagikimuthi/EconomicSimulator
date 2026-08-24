@@ -16,11 +16,11 @@
 namespace abm {
 struct CompanyBoard final {
     const AgentID                                firmId;
-    const Market                                 firmType;
+    const EMarket                                firmType;
     std::deque<RosterEntry>                      roster;
     tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
 
-    [[nodiscard]] constexpr CompanyBoard(const AgentID i, const Market type) noexcept
+    [[nodiscard]] constexpr CompanyBoard(const AgentID i, const EMarket type) noexcept
         : firmId{i}, firmType{type} {}
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
@@ -41,7 +41,7 @@ class RosterEntry final {
     void resign() noexcept { companyBoard_.resign(*this); }
 
     [[nodiscard]] auto firmId() const -> AgentID { return companyBoard_.firmId; }
-    [[nodiscard]] auto firmType() const -> Market { return companyBoard_.firmType; }
+    [[nodiscard]] auto firmType() const -> EMarket { return companyBoard_.firmType; }
 
     const AgentID hholdId;
     const Wage    wage;

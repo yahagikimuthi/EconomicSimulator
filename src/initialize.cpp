@@ -35,7 +35,7 @@ namespace {
 }
 
 [[nodiscard]] auto createLaborDemander(
-    RandomGenerator& masterRng, const AgentID id, const Market firmType
+    RandomGenerator& masterRng, const AgentID id, const EMarket firmType
 ) noexcept -> LaborDemander {
     CompanyBoard board{id, firmType};
     return LaborDemander{masterRng, std::move(board)};
@@ -84,7 +84,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
         bToCFirms_.emplace_back(BtoCFirm{
             .index         = createAgentIndex(AgentID{agentId}),
             .finance       = createFirmFinance(rng_),
-            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, Market::consumerGoods),
+            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::consumerGoods),
             .consumerGoodsSupplier   = createConsumerGoodsSupplier(rng_),
             .productionGoodsDemander = createProductionGoodsDemander(rng_)
         });
@@ -99,7 +99,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
         bToBFirms_.emplace_back(BtoBFirm{
             .index         = createAgentIndex(AgentID{agentId}),
             .finance       = createFirmFinance(rng_),
-            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, Market::productionGoods),
+            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::productionGoods),
             .productionGoodsDemander = createProductionGoodsDemander(rng_),
             .productionGoodsSupplier = createProductionGoodsSupplier(rng_)
         });

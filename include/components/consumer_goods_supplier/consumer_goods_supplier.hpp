@@ -17,7 +17,6 @@
 namespace abm::consumer_goods::supplier {
 class ConsumerGoodsSupplier final {
     using ProducingSystem = base_goods::supplier::ProducingSystem;
-    using Market          = ConsumerGoodsMarket;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
 

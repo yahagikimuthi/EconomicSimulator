@@ -7,6 +7,7 @@
 namespace abm::labor::supplier {
 using Entry   = LaborEntry;
 using Request = LaborRequest;
+using Market  = LaborMarket;
 
 template <typename F>
 concept IsAlignedFn = requires(F f, const Request& request) {

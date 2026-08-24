@@ -9,7 +9,7 @@
 #include "world/common.hpp"
 
 namespace abm::consumer_goods {
-void product(LaborSupplier& laborSupplier, const Market phase) noexcept {
+void product(LaborSupplier& laborSupplier, const EMarket phase) noexcept {
     laborSupplier.product(phase);
 }
 

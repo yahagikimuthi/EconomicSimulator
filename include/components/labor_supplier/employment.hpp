@@ -36,7 +36,7 @@ class Employment final {
         return rosterEntry_->wage;
     }
 
-    void work(const Market phase) noexcept {
+    void work(const EMarket phase) noexcept {
         if (shouldWork(phase)) rosterEntry_->addInput(productPower_);
     }
 
@@ -48,7 +48,7 @@ class Employment final {
     }
 
   private:
-    [[nodiscard]] auto shouldWork(const Market phase) const noexcept -> bool {
+    [[nodiscard]] auto shouldWork(const EMarket phase) const noexcept -> bool {
         if (not isEmployed()) return false;
         return rosterEntry_->firmType() == phase;
     }

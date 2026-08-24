@@ -12,7 +12,6 @@
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
 #include "world/goods.hpp"
-#include "world/labor.hpp"
 
 namespace abm::labor::demander {
 class RecruitSystem final {
@@ -26,7 +25,7 @@ class RecruitSystem final {
         const AgentID   id,
         const HeadCount desiredEmploy,
         const Money     salesPerWorker,
-        LaborMarket&    laborMarket,
+        Market&         laborMarket,
         IMediator auto& mediator
     ) noexcept {
         ASSERT(desiredEmploy > HeadCount{0.0});
@@ -71,10 +70,7 @@ class LaborDemander final {
     }
 
     void adjustWorkforce(
-        const AgentID   id,
-        const HeadCount adjustment,
-        const Money     salesForecast,
-        LaborMarket&    laborMarket
+        const AgentID id, const HeadCount adjustment, const Money salesForecast, Market& laborMarket
     ) noexcept {
         if (adjustment > HeadCount{0.0}) {
             const auto employee       = humanResource_.employeeCnt();

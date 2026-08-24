@@ -12,6 +12,7 @@
 namespace abm::labor::demander {
 using Entry   = LaborEntry;
 using Request = LaborRequest;
+using Market  = LaborMarket;
 
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {

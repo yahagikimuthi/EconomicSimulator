@@ -101,7 +101,7 @@ void Engine::runLabor() noexcept {
 
 void Engine::runProductionGoods() noexcept {
     forEach(hholds_, [](HHold& hhold) -> void {
-        production_goods::product(hhold.laborSupplier, Market::productionGoods);
+        production_goods::product(hhold.laborSupplier, EMarket::productionGoods);
     });
 
     forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
@@ -157,7 +157,7 @@ void Engine::runProductionGoods() noexcept {
 
 void Engine::runConsumerGoods() noexcept {
     forEach(hholds_, [](HHold& hhold) -> void {
-        consumer_goods::product(hhold.laborSupplier, Market::consumerGoods);
+        consumer_goods::product(hhold.laborSupplier, EMarket::consumerGoods);
     });
 
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {

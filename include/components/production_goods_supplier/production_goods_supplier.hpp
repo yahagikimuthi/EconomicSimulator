@@ -11,12 +11,10 @@
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
-#include "world/goods.hpp"
 
 namespace abm::production_goods::supplier {
 class ProductionGoodsSupplier final {
     using ProducingSystem = base_goods::supplier::ProducingSystem;
-    using Market          = ProductionGoodsMarket;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
 

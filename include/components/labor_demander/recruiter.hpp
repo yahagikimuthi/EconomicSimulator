@@ -12,7 +12,6 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/labor.hpp"
 
 namespace abm::labor::demander::recruiter {
 class OfferApplicants final {
@@ -91,7 +90,7 @@ class Recruiter final {
   public:
     [[nodiscard]] constexpr Recruiter() noexcept = default;
 
-    void post(const AgentID id, const RecruitPlan& plan, LaborMarket& laborMarket) noexcept {
+    void post(const AgentID id, const RecruitPlan& plan, Market& laborMarket) noexcept {
         isActive_ = true;
         ASSERT(plan.wage >= Wage{0.0});
         if (not shouldPost(plan)) return;
@@ -178,10 +177,10 @@ class Recruiter final {
         return entryBox;
     }
 
-    std::optional<LaborRequest&> myRequest_{std::nullopt};
-    Ledger                       ledger_;
-    OfferApplicants              offerApplicants_;
-    bool                         isActive_{false};
+    std::optional<Request&> myRequest_{std::nullopt};
+    Ledger                  ledger_;
+    OfferApplicants         offerApplicants_;
+    bool                    isActive_{false};
 };
 }  // namespace abm::labor::demander::recruiter
 
