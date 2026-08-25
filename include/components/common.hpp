@@ -19,13 +19,27 @@ class BaseFinance {
     Money asset_;
 };
 
-class FirmFinance final : public BaseFinance {
+class FirmFinance final {
   public:
     [[nodiscard]] explicit constexpr FirmFinance(RandomGenerator& masterRng) noexcept
-        : BaseFinance::BaseFinance(Money{masterRng.random(setting::agent_finance::firm)}) {}
+        : asset_{masterRng.random(setting::agent_finance::firm)}, thisPeriodProfit_{0.0} {}
+
     void endStep(CensusDropBox& dropBox) const noexcept {
         dropBox.firmAssets.emplace_back(asset_.value());
     }
+
+    void assetPlus(const Money plus) noexcept {
+        asset_ += plus;
+        thisPeriodProfit_ += plus;
+    }
+
+    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
+
+    void reset() noexcept { thisPeriodProfit_ = Money{0.0}; }
+
+  private:
+    Money asset_;
+    Money thisPeriodProfit_;
 };
 
 class HHoldFinance final : public BaseFinance {
