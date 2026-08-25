@@ -9,9 +9,9 @@ class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
                                  value_object::CompareMixin<Wage>,
                                  value_object::AddMixin<Wage>,
                                  value_object::ScholarMixin<Wage> {
-    friend class value_object::CompareMixin<Wage>;
-    friend class value_object::AddMixin<Wage>;
-    friend class value_object::ScholarMixin<Wage>;
+    friend class CompareMixin<Wage>;
+    friend class AddMixin<Wage>;
+    friend class ScholarMixin<Wage>;
 
   public:
     [[nodiscard]] explicit constexpr Wage(const double value) noexcept
@@ -25,9 +25,9 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
                                       value_object::CompareMixin<HeadCount>,
                                       value_object::AddMixin<HeadCount>,
                                       value_object::ScholarMixin<HeadCount> {
-    friend class value_object::CompareMixin<HeadCount>;
-    friend class value_object::AddMixin<HeadCount>;
-    friend class value_object::ScholarMixin<HeadCount>;
+    friend class CompareMixin<HeadCount>;
+    friend class AddMixin<HeadCount>;
+    friend class ScholarMixin<HeadCount>;
 
   public:
     [[nodiscard]] explicit constexpr HeadCount(const double value) noexcept
