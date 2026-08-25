@@ -60,9 +60,11 @@ constexpr auto CompanyBoard::addRoster(
 }
 
 class LaborEntry final {
+    using Request = LaborRequest;
+
   public:
     [[nodiscard]] constexpr LaborEntry(
-        const AgentID i, const double power, const LaborRequest& req
+        const AgentID i, const double power, const Request& req
     ) noexcept
         : hholdID{i}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
@@ -81,7 +83,7 @@ class LaborEntry final {
         return *rosterEntry_;
     }
 
-    const LaborRequest& request;
+    const Request& request;
 
   private:
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
