@@ -36,4 +36,10 @@ class HHoldFinance final : public BaseFinance {
         dropBox.hholdAssets.emplace_back(asset_.value());
     }
 };
+
+class GovernmentFinance final : public BaseFinance {
+  public:
+    [[nodiscard]] explicit constexpr GovernmentFinance() noexcept
+        : BaseFinance::BaseFinance(Money{0.0}) {}
+};
 }  // namespace abm
