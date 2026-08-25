@@ -2,6 +2,7 @@
 
 #include "components/common.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
@@ -51,12 +52,23 @@ void recordRosterEntry(LaborSupplier& laborSuppler) noexcept { laborSuppler.reco
 void acceptResignation(LaborDemander& laborDemander) noexcept { laborDemander.acceptResignation(); }
 
 void endStep(FirmFinance& finance, LaborDemander& laborDemander, CensusDropBox& dropBox) noexcept {
-    laborDemander.endStep(dropBox);
-    finance.assetPlus(-laborDemander.sumWage());
+    laborDemander.endStep(
+        [&](const Money totalCost) -> void { finance.assetPlus(-totalCost); }, dropBox
+    );
 }
 
-void endStep(HHoldFinance& finance, LaborSupplier& laborSupplier, CensusDropBox& dropBox) noexcept {
-    finance.assetPlus(laborSupplier.wage());
-    laborSupplier.endStep(dropBox);
+void endStep(
+    HHoldFinance&  finance,
+    LaborSupplier& laborSupplier,
+    Government&    government,
+    CensusDropBox& dropBox
+) noexcept {
+    laborSupplier.endStep(
+        [&](const Money wage) -> void {
+            const auto incomeAfterTax = government.collectIncomeTax(wage);
+            finance.assetPlus(incomeAfterTax);
+        },
+        dropBox
+    );
 }
 }  // namespace abm::labor

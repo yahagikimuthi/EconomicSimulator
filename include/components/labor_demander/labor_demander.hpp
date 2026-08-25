@@ -8,6 +8,7 @@
 #include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
+#include "components/others.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
@@ -107,16 +108,21 @@ class LaborDemander final {
         return static_cast<Money>(out);
     }
 
-    void endStep(CensusDropBox& dropBox) noexcept {
+    template <AssetMinusFn F>
+    void endStep(F&& assetMinus, CensusDropBox& dropBox) noexcept {
         recruitSystem_.endStep(mediator_);
-        memory_.logging(dropBox);
-        dropBox.employments.emplace_back(employeeCnt().value());
-        dropBox.employments.emplace_back(sumWage().value());
-        reset();
+        const auto totalCost = sumWage();
+        std::forward<F>(assetMinus)(totalCost);
+        dropBox.sumWages.emplace_back(totalCost.value());
+        reset(dropBox);
     }
 
   private:
-    void reset() noexcept { recruitSystem_.reset(); }
+    void reset(CensusDropBox& dropBox) noexcept {
+        memory_.logging(dropBox);
+        dropBox.employments.emplace_back(employeeCnt().value());
+        recruitSystem_.reset();
+    }
 
     RecruitSystem recruitSystem_;
     HumanResource humanResource_;

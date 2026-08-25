@@ -2,9 +2,11 @@
 
 #include <optional>
 #include <pcg_random.hpp>
+#include <utility>
 
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
+#include "components/others.hpp"
 #include "core/assertion.hpp"
 #include "core/forward.hpp"
 #include "core/setting.hpp"
@@ -51,9 +53,10 @@ class LaborSupplier final {
         employment_.startWorking(acceptedEntry->rosterEntry());
     }
 
-    void endStep(CensusDropBox& dropBox) noexcept {
-        dropBox.wages.emplace_back(wage().value());
-        jobHunter_.reset();
+    template <AssetPlusFn F>
+    void endStep(F&& assetPlus, CensusDropBox& dropBox) noexcept {
+        std::forward<F>(assetPlus)(wage());
+        reset(dropBox);
     }
 
     void product(const EMarket phase) noexcept { employment_.work(phase); }
@@ -79,6 +82,11 @@ class LaborSupplier final {
 
     [[nodiscard]] auto makeEntrySheet(const AgentID id, Request& request) const noexcept -> Entry& {
         return request.entry(id, employment_.productPower());
+    }
+
+    void reset(CensusDropBox& dropBox) noexcept {
+        dropBox.wages.emplace_back(wage().value());
+        jobHunter_.reset();
     }
 
     JobHunter             jobHunter_;

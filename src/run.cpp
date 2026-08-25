@@ -95,7 +95,7 @@ void Engine::runLabor() noexcept {
     });
 
     forEach(hholds_, [&](HHold& hhold) -> void {
-        labor::endStep(hhold.finance, hhold.laborSupplier, dropBox_);
+        labor::endStep(hhold.finance, hhold.laborSupplier, government_, dropBox_);
     });
 }
 
