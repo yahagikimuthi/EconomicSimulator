@@ -5,6 +5,7 @@
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <random>
+#include <vector>
 
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
