@@ -24,8 +24,7 @@ struct Overloaded final : Ts... {
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
-template <typename T>
-constexpr void ignore(T&& _) noexcept {}
+constexpr void ignore(auto&& _) noexcept {}
 
 constexpr void ignore() noexcept {}
 
@@ -67,14 +66,14 @@ class RandomGenerator final {
     [[nodiscard]] auto discreteDistribution(
         Container&& container, const double total, Proj&& proj = {}
     ) noexcept -> decltype(auto) {
-        ASSERT(total >= 0.0);
+        ASSERT(total > 0.0);
         const auto target     = rand(0.0, total);
         auto       currentCnt = 0.0;
         for (auto& elem : std::forward<Container>(container)) {
             currentCnt += std::invoke(std::forward<Proj>(proj), elem);
             if (currentCnt >= target) return elem;
         }
-        ASSERT(false && "runtime error");
+        ASSERT(false);
         std::unreachable();
     }
 
@@ -99,15 +98,15 @@ class RandomGenerator final {
     [[nodiscard]] constexpr auto random(const RandomParameter& param) noexcept -> double {
         return std::visit(
             Overloaded{
-                [&] [[nodiscard]] (const UniformParameter<int>& uniformParam) -> double {
+                [&](const UniformParameter<int>& uniformParam) -> double {
                     return randInt(
                         static_cast<int>(uniformParam.min), static_cast<int>(uniformParam.limit)
                     );
                 },
-                [&] [[nodiscard]] (const UniformParameter<double>& uniformParam) -> double {
+                [&](const UniformParameter<double>& uniformParam) -> double {
                     return rand(uniformParam.min, uniformParam.limit);
                 },
-                [&] [[nodiscard]] (const NormalParameter& normalParam) -> double {
+                [&](const NormalParameter& normalParam) -> double {
                     return randNormal(
                         normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
                     );
