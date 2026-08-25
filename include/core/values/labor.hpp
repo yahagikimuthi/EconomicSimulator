@@ -4,33 +4,37 @@
 #include "core/values/common.hpp"
 
 namespace abm {
-class [[nodiscard]] Wage final : public value_object::BaseValueObjectMixin<double>,
-                                 public value_object::ComparableMixin<Wage>,
-                                 public value_object::ScholarMixin<Wage> {
-    friend class value_object::ComparableMixin<Wage>;
+class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
+                                 value_object::CompareMixin<Wage>,
+                                 value_object::AddMixin<Wage>,
+                                 value_object::ScholarMixin<Wage> {
+    friend class value_object::CompareMixin<Wage>;
+    friend class value_object::AddMixin<Wage>;
     friend class value_object::ScholarMixin<Wage>;
 
   public:
     [[nodiscard]] explicit constexpr Wage(const double value) noexcept
-        : BaseValueObjectMixin<double>(value) {}
+        : BaseValueObject<double>(value) {}
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
 constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
 
-class [[nodiscard]] HeadCount final : public value_object::BaseValueObjectMixin<double>,
-                                      public value_object::ComparableMixin<HeadCount>,
-                                      public value_object::ScholarMixin<HeadCount> {
-    friend class value_object::ComparableMixin<HeadCount>;
+class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<double>,
+                                      value_object::CompareMixin<HeadCount>,
+                                      value_object::AddMixin<HeadCount>,
+                                      value_object::ScholarMixin<HeadCount> {
+    friend class value_object::CompareMixin<HeadCount>;
+    friend class value_object::AddMixin<HeadCount>;
     friend class value_object::ScholarMixin<HeadCount>;
 
   public:
     [[nodiscard]] explicit constexpr HeadCount(const double value) noexcept
-        : BaseValueObjectMixin<double>(value) {}
+        : BaseValueObject<double>(value) {}
     [[nodiscard]] explicit constexpr HeadCount(const int value) noexcept
-        : BaseValueObjectMixin<double>(static_cast<double>(value)) {}
+        : BaseValueObject<double>(static_cast<double>(value)) {}
     [[nodiscard]] explicit constexpr HeadCount(const std::size_t value) noexcept
-        : BaseValueObjectMixin<double>(static_cast<double>(value)) {}
+        : BaseValueObject<double>(static_cast<double>(value)) {}
 
     constexpr auto operator++() noexcept -> HeadCount& {
         ++value_;
