@@ -7,15 +7,13 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
+#include "core/values/mixin.hpp"
 
 namespace abm::value_object {
 template <typename T>
-concept ComputableObject =
-    (std::same_as<T, Money> or std::same_as<T, Price> or std::same_as<T, GoodsQuantity> or
-     std::same_as<T, HeadCount> or std::same_as<T, Wage> or std::same_as<T, MarkupRate>) and
-    requires(T t) {
-        { t.value() } -> std::same_as<double>;
-    };
+concept ComputableObject = (std::derived_from<T, BaseValueObject<double>>) and requires(T t) {
+    { t.value() } -> std::same_as<double>;
+};
 }  // namespace abm::value_object
 
 namespace abm {
@@ -35,7 +33,7 @@ template <value_object::ComputableObject T>
 }
 
 template <value_object::ComputableObject T>
-[[nodiscard]] constexpr auto clamp(const T val, const T low, const T high) noexcept -> T {
-    return std::clamp(val.value(), low.value(), high.value());
+[[nodiscard]] constexpr auto clamp(T val, T low, T high) noexcept -> T {
+    return T{std::clamp(val.value(), low.value(), high.value())};
 }
 }  // namespace abm
