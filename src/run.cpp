@@ -21,7 +21,7 @@ namespace abm {
 namespace {
 template <typename T>
     requires requires(T t) { t.finance.asset().value(); }
-[[nodiscard]] auto calcSumAsset(std::vector<T>& agents) noexcept -> double {
+[[nodiscard]] auto calcSumAsset(const std::vector<T>& agents) noexcept -> double {
     return std::ranges::fold_left(agents, 0.0, [](const double acc, const T& agent) -> double {
         return acc + agent.finance.asset().value();
     });
