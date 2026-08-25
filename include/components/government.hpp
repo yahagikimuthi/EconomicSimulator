@@ -4,6 +4,7 @@
 #include "core/setting.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
+#include "core/values/others.hpp"
 
 namespace abm::government {
 
@@ -17,7 +18,7 @@ class FlatTaxStrategy {
     [[nodiscard]] explicit constexpr FlatTaxStrategy(const double rate) noexcept : rate_{rate} {}
 
   private:
-    double rate_;
+    TaxRate rate_;
 };
 
 class IncomeTaxStrategy : public FlatTaxStrategy {
