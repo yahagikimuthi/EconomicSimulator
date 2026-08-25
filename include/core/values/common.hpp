@@ -1,8 +1,5 @@
 #pragma once
 
-#include <compare>
-
-#include "core/assertion.hpp"
 #include "core/values/mixin.hpp"
 
 namespace abm {
