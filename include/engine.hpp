@@ -9,6 +9,7 @@
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
@@ -101,6 +102,7 @@ class Engine final {
     std::vector<BtoCFirm> bToCFirms_;
     std::vector<BtoBFirm> bToBFirms_;
     std::vector<HHold>    hholds_;
+    Government            government_;
 
     CensusDropBox dropBox_;
 
