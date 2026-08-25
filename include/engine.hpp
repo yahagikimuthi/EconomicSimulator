@@ -1,4 +1,3 @@
-#pragma once
 
 #include <tbb/concurrent_vector.h>
 #include <cstdint>
@@ -117,9 +116,4 @@ class Engine final {
 
     bool isAnalysis_;
 };
-
-inline void run(const int step, const bool isAnalysis) {
-    auto engine = Engine{step, isAnalysis};
-    engine.run();
-}
 }  // namespace abm
