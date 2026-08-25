@@ -56,4 +56,11 @@ class MarkupRate final : public value_object::BaseValueObject<double>,
     [[nodiscard]] explicit constexpr MarkupRate(const double value) noexcept
         : BaseValueObject<double>(value) {}
 };
+
+[[nodiscard]] constexpr auto operator*(Price lhs, MarkupRate rhs) noexcept -> Price {
+    return Price{lhs.value() * rhs.value()};
+}
+[[nodiscard]] constexpr auto operator*(MarkupRate lhs, Price rhs) noexcept -> Price {
+    return rhs * lhs;
+}
 }  // namespace abm
