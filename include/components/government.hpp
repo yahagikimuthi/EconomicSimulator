@@ -3,6 +3,7 @@
 #include "components/common.hpp"
 #include "core/setting.hpp"
 #include "core/values/common.hpp"
+#include "core/values/labor.hpp"
 
 namespace abm::government {
 
@@ -65,11 +66,27 @@ class Government final {
         return profit - tax;
     }
 
+    [[nodiscard]] auto provideUnemploymentBenefit(const Wage wage) noexcept -> Money {
+        if (wage > Wage{0.0}) return Money{0.0};
+        ++nextUnemploymentHHoldCnt_;
+        const auto cnt     = lastUnemploymentHHoldCnt_ != 0 ? lastUnemploymentHHoldCnt_ : 1;
+        const auto provide = finance_.asset() / cnt;
+        finance_.assetPlus(-provide);
+        return provide;
+    }
+
+    void reset() noexcept {
+        lastUnemploymentHHoldCnt_ = nextUnemploymentHHoldCnt_;
+        nextUnemploymentHHoldCnt_ = 0;
+    }
+
   private:
     GovernmentFinance    finance_;
     IncomeTaxStrategy    incomeTaxStrategy_;
     SalesTaxStrategy     salesTaxStrategy_;
     CorporateTaxStrategy corporateTaxStrategy_;
+    int                  lastUnemploymentHHoldCnt_{};
+    int                  nextUnemploymentHHoldCnt_{};
 };
 }  // namespace abm::government
 

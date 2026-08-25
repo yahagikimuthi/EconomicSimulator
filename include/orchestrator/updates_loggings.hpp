@@ -2,6 +2,7 @@
 
 #include "components/common.hpp"
 #include "components/government.hpp"
+#include "components/labor_supplier/labor_supplier.hpp"
 #include "world/common.hpp"
 
 namespace abm::firm_finance {
@@ -13,7 +14,15 @@ void endAllStep(FirmFinance& finance, Government& government, CensusDropBox& dro
 }  // namespace abm::firm_finance
 
 namespace abm::hhold_finance {
-void endAllStep(const HHoldFinance& finance, CensusDropBox& dropBox) noexcept {
+void endAllStep(
+    HHoldFinance&        finance,
+    const LaborSupplier& laborSupplier,
+    Government&          government,
+    CensusDropBox&       dropBox
+) noexcept {
+    const auto wage                = laborSupplier.wage();
+    const auto unemploymentBenefit = government.provideUnemploymentBenefit(static_cast<Wage>(wage));
+    finance.assetPlus(unemploymentBenefit);
     finance.endStep(dropBox);
 }
 }  // namespace abm::hhold_finance

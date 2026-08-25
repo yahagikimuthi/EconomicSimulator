@@ -202,7 +202,7 @@ void Engine::logging() {
     });
 
     forEach(hholds_, [&](HHold& hhold) -> void {
-        hhold_finance::endAllStep(hhold.finance, dropBox_);
+        hhold_finance::endAllStep(hhold.finance, hhold.laborSupplier, government_, dropBox_);
     });
 
     logger_.save(dropBox_, currentStep_);
