@@ -5,19 +5,38 @@
 #include "core/assertion.hpp"
 
 namespace abm::value_object {
+template <typename T>
+class BaseValueObjectMixin {
+  public:
+    [[nodiscard]] constexpr auto value() const noexcept -> T { return value_; }
+
+  protected:
+    [[nodiscard]] explicit constexpr BaseValueObjectMixin(const T value) : value_{value} {}
+
+    T value_;
+};
+
 template <typename Derived>
-class ValueObjectMixin {
+class ComparableMixin {
     friend Derived;
 
   public:
-    [[nodiscard]] constexpr auto value() const noexcept -> double { return value_; }
-
     [[nodiscard]] friend constexpr auto operator<=>(Derived lhs, Derived rhs) noexcept -> auto {
         return lhs.value_ <=> rhs.value_;
     }
     [[nodiscard]] friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept -> bool {
         return lhs.value_ == rhs.value_;
     }
+
+  private:
+    [[nodiscard]] explicit constexpr ComparableMixin() = default;
+};
+
+template <typename Derived>
+class ScholarMixin {
+    friend Derived;
+
+  public:
     friend constexpr auto operator+=(Derived& lhs, Derived rhs) noexcept -> Derived& {
         lhs.value_ += rhs.value_;
         return lhs;
@@ -64,38 +83,41 @@ class ValueObjectMixin {
     }
 
   private:
-    [[nodiscard]] explicit constexpr ValueObjectMixin(const double value) noexcept
-        : value_{value} {}
-    double value_;
+    [[nodiscard]] explicit constexpr ScholarMixin() = default;
 };
 }  // namespace abm::value_object
 
 namespace abm {
 class Wage;
-class Money final : public value_object::ValueObjectMixin<Money> {
+class Money final : public value_object::BaseValueObjectMixin<double>,
+                    public value_object::ComparableMixin<Money>,
+                    public value_object::ScholarMixin<Money> {
+    friend value_object::ComparableMixin<Money>;
+    friend value_object::ScholarMixin<Money>;
+
   public:
     [[nodiscard]] explicit constexpr Money(const double value) noexcept
-        : ValueObjectMixin<Money>(value) {}
+        : BaseValueObjectMixin<double>(value) {}
 
     [[nodiscard]] explicit constexpr operator Wage() const noexcept;
 };
 
-class AgentID final {
-  public:
-    [[nodiscard]] explicit constexpr AgentID(const int value) noexcept : value_{value} {
-        ASSERT(value >= -1);
-    }
-    [[nodiscard]] constexpr auto operator<=>(const AgentID&) const noexcept -> auto = default;
+class AgentID final : public value_object::BaseValueObjectMixin<int>,
+                      public value_object::ComparableMixin<AgentID> {
+    friend class value_object::ComparableMixin<AgentID>;
 
-  private:
-    int value_;
+  public:
+    [[nodiscard]] explicit constexpr AgentID(const int value) noexcept
+        : BaseValueObjectMixin<int>(value) {}
 };
 
-class Step final {
+class Step final : public value_object::BaseValueObjectMixin<int>,
+                   public value_object::ComparableMixin<Step> {
+    friend class value_object::ComparableMixin<Step>;
+
   public:
-    [[nodiscard]] explicit constexpr Step(const int value) noexcept : value_{value} {}
-    [[nodiscard]] constexpr auto value() const noexcept -> int { return value_; }
-    [[nodiscard]] constexpr auto operator<=>(const Step&) const noexcept -> auto = default;
+    [[nodiscard]] explicit constexpr Step(const int value) noexcept
+        : BaseValueObjectMixin<int>(value) {}
 
     constexpr auto operator++() -> Step& {
         ++value_;
@@ -104,8 +126,5 @@ class Step final {
     [[nodiscard]] constexpr auto operator%(const int other) const noexcept -> Step {
         return Step{value_ % other};
     }
-
-  private:
-    int value_;
 };
 }  // namespace abm
