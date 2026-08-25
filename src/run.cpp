@@ -36,7 +36,7 @@ void forEach(std::vector<T>& agents, F f) {
 }
 }  // namespace
 
-void Engine::run() {
+void Engine::run() noexcept {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
         runLabor();
         runProductionGoods();
@@ -192,7 +192,7 @@ void Engine::runConsumerGoods() noexcept {
     });
 }
 
-void Engine::endAllStep() {
+void Engine::endAllStep() noexcept {
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
         firm_finance::endAllStep(firm.finance, government_, dropBox_);
     });
@@ -216,7 +216,7 @@ void Engine::reset() noexcept {
     government_.reset();
 }
 
-void Logger::save(const CensusDropBox& dropBox, const Step step) {
+void Logger::save(const CensusDropBox& dropBox, const Step step) noexcept {
     namespace name = setting::save_name;
     auto groupPath = std::string{"/step_" + std::to_string(step.value())};
     auto group     = HighFive::Group{file_.createGroup(groupPath)};

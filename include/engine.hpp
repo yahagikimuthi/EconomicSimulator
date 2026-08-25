@@ -47,7 +47,7 @@ struct HHold final {  // NOLINT
 
 class Logger final {
   public:
-    [[nodiscard]] explicit Logger()
+    [[nodiscard]] explicit Logger() noexcept
         : file_{[]() -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
@@ -61,7 +61,7 @@ class Logger final {
 
     [[nodiscard]] auto isValid() const noexcept -> bool { return file_.isValid(); }
 
-    void save(const CensusDropBox& dropBox, Step step);
+    void save(const CensusDropBox& dropBox, Step step) noexcept;
 
   private:
     HighFive::File file_;
@@ -79,13 +79,13 @@ class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int totalStep, const bool isAnalysis) noexcept;
 
-    void run();
+    void run() noexcept;
 
   private:
     void runLabor() noexcept;
     void runProductionGoods() noexcept;
     void runConsumerGoods() noexcept;
-    void endAllStep();
+    void endAllStep() noexcept;
     void reset() noexcept;
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
