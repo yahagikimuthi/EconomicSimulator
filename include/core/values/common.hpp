@@ -8,9 +8,9 @@ class Money final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Money>,
                     value_object::AddMixin<Money>,
                     value_object::ScholarMixin<Money> {
-    friend class value_object::CompareMixin<Money>;
-    friend class value_object::AddMixin<Money>;
-    friend class value_object::ScholarMixin<Money>;
+    friend class CompareMixin<Money>;
+    friend class AddMixin<Money>;
+    friend class ScholarMixin<Money>;
 
   public:
     [[nodiscard]] explicit constexpr Money(const double value) noexcept
@@ -21,7 +21,7 @@ class Money final : public value_object::BaseValueObject<double>,
 
 class AgentID final : public value_object::BaseValueObject<int>,
                       public value_object::CompareMixin<AgentID> {
-    friend class value_object::CompareMixin<AgentID>;
+    friend class CompareMixin<AgentID>;
 
   public:
     [[nodiscard]] explicit constexpr AgentID(const int value) noexcept
@@ -29,7 +29,7 @@ class AgentID final : public value_object::BaseValueObject<int>,
 };
 
 class Step final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Step> {
-    friend class value_object::CompareMixin<Step>;
+    friend class CompareMixin<Step>;
 
   public:
     [[nodiscard]] explicit constexpr Step(const int value) noexcept : BaseValueObject<int>(value) {}
