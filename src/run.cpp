@@ -181,7 +181,7 @@ void Engine::runConsumerGoods() noexcept {
     });
 
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
-        consumer_goods::endStep(firm.finance, firm.consumerGoodsSupplier, dropBox_);
+        consumer_goods::endStep(firm.finance, firm.consumerGoodsSupplier, government_, dropBox_);
     });
 
     forEach(hholds_, [](HHold& hhold) -> void {

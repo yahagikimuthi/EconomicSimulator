@@ -3,6 +3,7 @@
 #include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "core/values/common.hpp"
@@ -35,9 +36,18 @@ void trade(ConsumerGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trade(
 void afterTrade(ConsumerGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
 void endStep(
-    FirmFinance& finance, ConsumerGoodsSupplier& goodsSupplier, CensusDropBox& dropBox
+    FirmFinance&           finance,
+    ConsumerGoodsSupplier& goodsSupplier,
+    Government&            government,
+    CensusDropBox&         dropBox
 ) noexcept {
-    goodsSupplier.endStep([&](const Money sales) -> void { finance.assetPlus(sales); }, dropBox);
+    goodsSupplier.endStep(
+        [&](const Money sales) -> void {
+            const auto salesAfterTax = government.collectSalesTax(sales);
+            finance.assetPlus(salesAfterTax);
+        },
+        dropBox
+    );
 }
 
 void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) noexcept {
