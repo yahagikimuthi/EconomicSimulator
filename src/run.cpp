@@ -32,7 +32,7 @@ template <typename T, typename F>
         std::for_each(std::execution::par, agents.begin(), agents.end(), std::forward<F>(f));
     }
 void forEach(std::vector<T>& agents, F f) {
-    std::for_each(std::execution::par, agents.begin(), agents.end(), (f));
+    std::for_each(agents.begin(), agents.end(), (f));
 }
 }  // namespace
 
