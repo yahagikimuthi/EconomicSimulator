@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <algorithm>
 #include <atomic>
 #include <functional>
 #include <pcg_random.hpp>

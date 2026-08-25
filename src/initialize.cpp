@@ -3,7 +3,6 @@
 #include <cstdlib>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <highfive/H5PropertyList.hpp>
 #include <iostream>
 #include <pcg_random.hpp>
 #include <utility>
@@ -17,7 +16,8 @@
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "world/labor.hpp"
+#include "core/values/common.hpp"
+#include "world/common.hpp"
 
 namespace abm {
 namespace {

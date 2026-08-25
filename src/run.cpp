@@ -1,5 +1,6 @@
 #include "engine.hpp"
 
+#include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <execution>
 #include <highfive/H5DataSet.hpp>
@@ -11,6 +12,7 @@
 
 #include "analysis/analysis.hpp"
 #include "core/setting.hpp"
+#include "core/values/common.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
 #include "orchestrator/production_goods.hpp"

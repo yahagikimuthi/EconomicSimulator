@@ -4,6 +4,8 @@
 #include <deque>
 #include <functional>
 #include <iterator>
+#include <optional>
+#include <ranges>
 #include <vector>
 
 #include "core/assertion.hpp"
