@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "core/assertion.hpp"
-#include "core/forward.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
@@ -51,6 +50,7 @@ class Workspace final {
     std::atomic<double> totalInput_;
 };
 
+class ConsumerGoodsEntry;
 class ConsumerGoodsRequest final {
   public:
     [[nodiscard]] constexpr ConsumerGoodsRequest(
@@ -151,6 +151,7 @@ class ConsumerGoodsMarket final {
     std::atomic<double>           totalSupply_;
 };
 
+class ProductionGoodsEntry;
 class ProductionGoodsRequest final {
   public:
     [[nodiscard]] constexpr ProductionGoodsRequest(

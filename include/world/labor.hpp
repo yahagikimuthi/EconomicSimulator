@@ -7,13 +7,14 @@
 #include <vector>
 
 #include "core/assertion.hpp"
-#include "core/forward.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
 
 namespace abm {
+class RosterEntry;
+class Workspace;
 struct CompanyBoard final {
     const AgentID                                firmId;
     const EMarket                                firmType;
@@ -61,6 +62,7 @@ constexpr auto CompanyBoard::addRoster(
     return roster.emplace_back(id, wage, *this, workspace);
 }
 
+class LaborRequest;
 class LaborEntry final {
     using Request = LaborRequest;
 

@@ -8,7 +8,6 @@
 #include "components/labor_supplier/job_hunter.hpp"
 #include "components/others.hpp"
 #include "core/assertion.hpp"
-#include "core/forward.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "world/common.hpp"
