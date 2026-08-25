@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/common.hpp"
+#include "core/setting.hpp"
 #include "core/values/common.hpp"
 
 namespace abm::government {
@@ -38,7 +39,10 @@ class CorporateTaxStrategy final : public FlatTaxStrategy {
 
 class Government final {
   public:
-    [[nodiscard]] explicit constexpr Government();
+    [[nodiscard]] explicit constexpr Government() noexcept
+        : incomeTaxStrategy_{setting::incomeTaxRate},
+          salesTaxStrategy_{setting::salesTaxRate},
+          corporateTaxStrategy_{setting::corporateTaxRate} {}
 
     [[nodiscard]] auto collectIncomeTax(const Money income) noexcept -> Money {
         const auto tax = incomeTaxStrategy_.calculate(income);
