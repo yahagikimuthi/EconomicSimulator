@@ -41,7 +41,7 @@ class Employment final {
 
     void updateStatus() noexcept {
         if (not isEmployed()) return;
-        if (not rosterEntry_->isOccupied) rosterEntry_.reset();
+        if (not rosterEntry_->isOccupied()) rosterEntry_.reset();
     }
 
   private:

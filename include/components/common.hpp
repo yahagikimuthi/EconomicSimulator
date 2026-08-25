@@ -22,7 +22,7 @@ class BaseFinance {
 class FirmFinance final {
   public:
     [[nodiscard]] explicit constexpr FirmFinance(RandomGenerator& masterRng) noexcept
-        : asset_{masterRng.random(setting::agent_finance::firm)}, thisPeriodProfit_{0.0} {}
+        : asset_{masterRng.random(setting::agent_finance::firm)} {}
 
     void endStep(CensusDropBox& dropBox) const noexcept {
         dropBox.firmAssets.emplace_back(asset_.value());
@@ -39,7 +39,7 @@ class FirmFinance final {
 
   private:
     Money asset_;
-    Money thisPeriodProfit_;
+    Money thisPeriodProfit_{0.0};
 };
 
 class HHoldFinance final : public BaseFinance {

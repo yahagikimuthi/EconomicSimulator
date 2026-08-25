@@ -25,12 +25,12 @@ class EmptyRosterPool final {
     auto popBackEntry() noexcept -> RosterEntry& {
         ASSERT(not empty());
         auto& back = pool_.back().get();
-        ASSERT(not back.isOccupied);
+        ASSERT(not back.isOccupied());
         pool_.pop_back();
         return back;
     }
     void add(RosterEntry& entry) noexcept {
-        ASSERT(not entry.isOccupied);
+        ASSERT(not entry.isOccupied());
         pool_.emplace_back(std::ref(entry));
     }
 
@@ -58,8 +58,8 @@ class HumanResource final {
     void acceptResignation() noexcept {
         auto& resignationBox = companyBoard_.resignationBox;
         for (RosterEntry& resignEntry : resignationBox) {
-            ASSERT(resignEntry.isOccupied);
-            resignEntry.isOccupied = false;
+            ASSERT(resignEntry.isOccupied());
+            resignEntry.disable();
             emptyRosterPool_.add(resignEntry);
         }
         resignationBox.clear();
@@ -71,8 +71,8 @@ class HumanResource final {
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : companyBoard_.roster) {
             if (currentLayOffs >= layOffsCnt) break;
-            if (not entry.isOccupied) continue;
-            entry.isOccupied = false;
+            if (not entry.isOccupied()) continue;
+            entry.disable();
             emptyRosterPool_.add(entry);
             ++currentLayOffs;
         }

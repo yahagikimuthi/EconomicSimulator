@@ -39,17 +39,19 @@ class RosterEntry final {
     }
     void addInput(const double productPower) noexcept;
     void resign() noexcept { companyBoard_.resign(*this); }
+    void disable() noexcept { isOccupied_ = false; }
 
-    [[nodiscard]] auto firmId() const -> AgentID { return companyBoard_.firmId; }
-    [[nodiscard]] auto firmType() const -> EMarket { return companyBoard_.firmType; }
+    [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
+    [[nodiscard]] auto firmType() const noexcept -> EMarket { return companyBoard_.firmType; }
+    [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
 
     const AgentID hholdId;
     const Wage    wage;
-    bool          isOccupied{true};
 
   private:
     CompanyBoard& companyBoard_;
     Workspace&    workspace_;
+    bool          isOccupied_{true};
 };
 
 constexpr auto CompanyBoard::addRoster(
