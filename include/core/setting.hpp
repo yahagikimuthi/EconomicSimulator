@@ -87,6 +87,12 @@ namespace abm::production_goods::demander::setting {
 inline constexpr auto goodsSampleCnt = 2;
 }  // namespace abm::production_goods::demander::setting
 
+namespace abm::government::setting {
+inline constexpr auto incomeTaxRate    = 0.1;
+inline constexpr auto salesTaxRate     = 0.1;
+inline constexpr auto corporateTaxRate = 0.1;
+}  // namespace abm::government::setting
+
 namespace abm::setting::agent_count {
 inline constexpr auto bToCFirm = 10;
 inline constexpr auto bToBFirm = 100;
