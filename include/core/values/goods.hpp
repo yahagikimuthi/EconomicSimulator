@@ -7,14 +7,14 @@ namespace abm {
 class Price final : public value_object::ValueObjectMixin<Price> {
   public:
     [[nodiscard]] constexpr explicit Price(const double value) noexcept
-        : ValueObjectMixin<Price>::ValueObjectMixin(value) {}
+        : ValueObjectMixin<Price>(value) {}
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
 class GoodsQuantity final : public value_object::ValueObjectMixin<GoodsQuantity> {
   public:
     [[nodiscard]] explicit constexpr GoodsQuantity(const double value) noexcept
-        : ValueObjectMixin<GoodsQuantity>::ValueObjectMixin(value) {}
+        : ValueObjectMixin<GoodsQuantity>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(Price lhs, GoodsQuantity rhs) noexcept -> Money {

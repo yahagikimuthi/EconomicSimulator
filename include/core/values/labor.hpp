@@ -7,7 +7,7 @@ namespace abm {
 class [[nodiscard]] Wage final : public value_object::ValueObjectMixin<Wage> {
   public:
     [[nodiscard]] explicit constexpr Wage(const double value) noexcept
-        : ValueObjectMixin<Wage>::ValueObjectMixin(value) {}
+        : ValueObjectMixin<Wage>(value) {}
     [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
@@ -16,11 +16,11 @@ constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
 class [[nodiscard]] HeadCount final : public value_object::ValueObjectMixin<HeadCount> {
   public:
     [[nodiscard]] explicit constexpr HeadCount(const double value) noexcept
-        : ValueObjectMixin<HeadCount>::ValueObjectMixin(value) {}
+        : ValueObjectMixin<HeadCount>(value) {}
     [[nodiscard]] explicit constexpr HeadCount(const int value) noexcept
-        : ValueObjectMixin<HeadCount>::ValueObjectMixin(static_cast<double>(value)) {}
+        : ValueObjectMixin<HeadCount>(static_cast<double>(value)) {}
     [[nodiscard]] explicit constexpr HeadCount(const std::size_t value) noexcept
-        : ValueObjectMixin<HeadCount>::ValueObjectMixin(static_cast<double>(value)) {}
+        : ValueObjectMixin<HeadCount>(static_cast<double>(value)) {}
 
     constexpr auto operator++() noexcept -> HeadCount& {
         ++value_;

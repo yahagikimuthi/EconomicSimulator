@@ -75,7 +75,7 @@ class Wage;
 class Money final : public value_object::ValueObjectMixin<Money> {
   public:
     [[nodiscard]] explicit constexpr Money(const double value) noexcept
-        : ValueObjectMixin<Money>::ValueObjectMixin(value) {}
+        : ValueObjectMixin<Money>(value) {}
 
     [[nodiscard]] explicit constexpr operator Wage() const noexcept;
 };
