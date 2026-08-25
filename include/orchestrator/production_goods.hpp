@@ -2,6 +2,7 @@
 
 #include "components/common.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "components/production_goods_demander.hpp"
@@ -50,18 +51,19 @@ void trade(ProductionGoodsSupplier& goodsSupplier) noexcept { goodsSupplier.trad
 void afterTrade(ProductionGoodsDemander& goodsDemander) noexcept { goodsDemander.afterTrade(); }
 
 void endStep(
-    FirmFinance& finance, ProductionGoodsSupplier& productionGoodsSupplier, CensusDropBox& dropBox
-) noexcept {
-    productionGoodsSupplier.endStep(
-        [&](const Money sales) -> void { finance.assetPlus(sales); }, dropBox
-    );
-}
-
-void endStep(
     FirmFinance&             finance,
     ProductionGoodsSupplier& productionGoodsSupplier,
-    ProductionGoodsDemander& productionGoodsDemander
+    ProductionGoodsDemander& productionGoodsDemander,
+    Government&              government,
+    CensusDropBox&           dropBox
 ) noexcept {
+    productionGoodsSupplier.endStep(
+        [&](const Money sales) -> void {
+            const auto salesAfterTax = government.collectSalesTax(sales);
+            finance.assetPlus(salesAfterTax);
+        },
+        dropBox
+    );
     productionGoodsDemander.endStep([&](const demander::TradeResult& result) -> void {
         finance.assetPlus(-result.purchased);
         productionGoodsSupplier.addProductionEquip(result.tradeAmount);

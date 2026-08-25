@@ -143,9 +143,12 @@ void Engine::runProductionGoods() noexcept {
 
     forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
         production_goods::endStep(
-            firm.finance, firm.productionGoodsSupplier, firm.productionGoodsDemander
+            firm.finance,
+            firm.productionGoodsSupplier,
+            firm.productionGoodsDemander,
+            government_,
+            dropBox_
         );
-        production_goods::endStep(firm.finance, firm.productionGoodsSupplier, dropBox_);
     });
 
     forEach(bToCFirms_, [](BtoCFirm& firm) -> void {
