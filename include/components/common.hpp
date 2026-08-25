@@ -1,7 +1,8 @@
 #pragma once
 
-#include <pcg_random.hpp>
+#include <utility>
 
+#include "components/others.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
@@ -24,19 +25,17 @@ class FirmFinance final {
     [[nodiscard]] explicit constexpr FirmFinance(RandomGenerator& masterRng) noexcept
         : asset_{masterRng.random(setting::agent_finance::firm)} {}
 
-    void endStep(CensusDropBox& dropBox) noexcept {
+    template <AfterTaxCalculatorFn F>
+    void endStep(F&& afterTaxCalculator, CensusDropBox& dropBox) noexcept {
+        const auto afterTax = std::forward<F>(afterTaxCalculator)(thisPeriodProfit_);
+        asset_ += afterTax;
         dropBox.firmAssets.emplace_back(asset_.value());
-        reset();
+        thisPeriodProfit_ = Money{0.0};
     }
 
-    void assetPlus(const Money plus) noexcept {
-        asset_ += plus;
-        thisPeriodProfit_ += plus;
-    }
+    void assetPlus(const Money plus) noexcept { thisPeriodProfit_ += plus; }
 
-    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
-
-    void reset() noexcept { thisPeriodProfit_ = Money{0.0}; }
+    [[nodiscard]] auto asset() const noexcept -> Money { return asset_ + thisPeriodProfit_; }
 
   private:
     Money asset_;

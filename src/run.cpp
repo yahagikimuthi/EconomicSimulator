@@ -194,15 +194,15 @@ void Engine::runConsumerGoods() noexcept {
 
 void Engine::logging() {
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
-        firm_finance::logging(dropBox_, firm.finance);
+        firm_finance::endAllStep(firm.finance, government_, dropBox_);
     });
 
     forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
-        firm_finance::logging(dropBox_, firm.finance);
+        firm_finance::endAllStep(firm.finance, government_, dropBox_);
     });
 
     forEach(hholds_, [&](HHold& hhold) -> void {
-        hhold_finance::logging(dropBox_, hhold.finance);
+        hhold_finance::endAllStep(hhold.finance, dropBox_);
     });
 
     logger_.save(dropBox_, currentStep_);
