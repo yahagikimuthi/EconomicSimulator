@@ -2,6 +2,7 @@
 
 #include "core/assertion.hpp"
 #include "core/values/common.hpp"
+#include "core/values/mixin.hpp"
 
 namespace abm {
 class Price final : public value_object::BaseValueObject<double>,
