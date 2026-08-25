@@ -4,9 +4,7 @@
 #include "world/common.hpp"
 
 namespace abm::firm_finance {
-void logging(CensusDropBox& dropBox, const FirmFinance& finance) noexcept {
-    finance.endStep(dropBox);
-}
+void logging(CensusDropBox& dropBox, FirmFinance& finance) noexcept { finance.endStep(dropBox); }
 }  // namespace abm::firm_finance
 
 namespace abm::hhold_finance {

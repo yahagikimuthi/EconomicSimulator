@@ -24,8 +24,9 @@ class FirmFinance final {
     [[nodiscard]] explicit constexpr FirmFinance(RandomGenerator& masterRng) noexcept
         : asset_{masterRng.random(setting::agent_finance::firm)} {}
 
-    void endStep(CensusDropBox& dropBox) const noexcept {
+    void endStep(CensusDropBox& dropBox) noexcept {
         dropBox.firmAssets.emplace_back(asset_.value());
+        reset();
     }
 
     void assetPlus(const Money plus) noexcept {
