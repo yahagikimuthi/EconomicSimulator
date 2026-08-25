@@ -55,7 +55,7 @@ class OfferPlanner final {
   public:
     [[nodiscard]] explicit constexpr OfferPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          rateCache_{masterRng.random(setting::offerRate)},
+          rateCache_{OfferRate{masterRng.random(setting::offerRate)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::offerRateAdjustVol)} {}
 
@@ -65,7 +65,7 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
-        const auto out     = employPlan * (1.0 + planOfferRate());
+        const auto out     = employPlan * (OfferRate{1.0} + planOfferRate());
         const auto guarded = min(out, HeadCount{::abm::setting::agent_count::hhold});
         return ceil(guarded);
     }
@@ -76,33 +76,33 @@ class OfferPlanner final {
     }
 
   private:
-    [[nodiscard]] auto planOfferRate() noexcept -> double {
+    [[nodiscard]] auto planOfferRate() noexcept -> OfferRate {
         const auto nextRate = calcOfferRate();
         memory_.clearLog();
         if (not nextRate) return rateCache_.cache();
         rateCache_.next(*nextRate);
 
-        ASSERT(*nextRate > 0.0);
+        ASSERT(*nextRate > OfferRate{0.0});
         return *nextRate;
     }
 
-    [[nodiscard]] auto calcOfferRate() const noexcept -> std::optional<double> {
+    [[nodiscard]] auto calcOfferRate() const noexcept -> std::optional<OfferRate> {
         const auto lastEmployResult = memory_.lastEmployResult();
         const auto lastEmployPlan   = memory_.lastEmployPlan();
         if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto shouldRaise = *lastEmployResult < *lastEmployPlan;
-        const auto next        = rateCache_.cache() + (shouldRaise ? alpha : -alpha);
-        const auto guarded     = std::clamp(
+        const auto next        = rateCache_.cache() + OfferRate{(shouldRaise ? alpha : -alpha)};
+        const auto guarded     = clamp(
             next,
-            std::numeric_limits<double>::epsilon(),
-            static_cast<double>(::abm::setting::agent_count::hhold)
+            OfferRate{std::numeric_limits<double>::epsilon()},
+            OfferRate{::abm::setting::agent_count::hhold}
         );
         return guarded;
     }
 
     OfferPlannerMemory      memory_;
-    Cache<double>           rateCache_;
+    Cache<OfferRate>        rateCache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };

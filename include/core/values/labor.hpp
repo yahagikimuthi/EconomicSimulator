@@ -57,4 +57,24 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
     ASSERT(rhs != HeadCount{0.0});
     return Wage{lhs.value() / rhs.value()};
 }
+
+class OfferRate : public value_object::BaseValueObject<double>,
+                  value_object::CompareMixin<OfferRate>,
+                  value_object::AddMixin<OfferRate>,
+                  value_object::ScholarMixin<OfferRate> {
+    friend class CompareMixin<OfferRate>;
+    friend class AddMixin<OfferRate>;
+    friend class ScholarMixin<OfferRate>;
+
+  public:
+    [[nodiscard]] explicit constexpr OfferRate(const double value) noexcept
+        : BaseValueObject<double>(value) {}
+};
+
+[[nodiscard]] constexpr auto operator*(HeadCount lhs, OfferRate rhs) noexcept -> HeadCount {
+    return HeadCount{lhs.value() * rhs.value()};
+}
+[[nodiscard]] constexpr auto operator*(OfferRate lhs, HeadCount rhs) noexcept -> HeadCount {
+    return rhs * lhs;
+}
 }  // namespace abm
