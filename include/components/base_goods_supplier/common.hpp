@@ -69,8 +69,8 @@ class CentralMemory {
         supplyPlan_ = plan.supply;
     }
 
-    void listenMarkupPlan(const double markup) noexcept {
-        ASSERT(markup > 0.0);
+    void listenMarkupPlan(const MarkupRate markup) noexcept {
+        ASSERT(markup > MarkupRate{0.0});
         markupPlan_ = markup;
     }
 
@@ -78,7 +78,7 @@ class CentralMemory {
 
     void logging(CensusDropBox& dropBox) noexcept {
         if (pricePlan_) dropBox.prices.emplace_back(pricePlan_->value());
-        if (markupPlan_) dropBox.markups.emplace_back(*markupPlan_);
+        if (markupPlan_) dropBox.markups.emplace_back(markupPlan_->value());
         if (supplyPlan_) dropBox.supplies.emplace_back(supplyPlan_->value());
         pricePlan_.reset();
         markupPlan_.reset();
@@ -89,14 +89,14 @@ class CentralMemory {
 
   private:
     std::optional<Price>         pricePlan_{std::nullopt};
-    std::optional<double>        markupPlan_{std::nullopt};
+    std::optional<MarkupRate>    markupPlan_{std::nullopt};
     std::optional<GoodsQuantity> supplyPlan_{std::nullopt};
     Money                        lastSales_{0.0};
 };
 
 template <typename T, typename U = std::monostate>
 concept IMediator =
-    requires(T t, U& u, const TradePlan& plan, double markupPlan, const TradeResult& result) {
+    requires(T t, U& u, const TradePlan& plan, MarkupRate markupPlan, const TradeResult& result) {
         { t.publishTradePlan(plan) } -> std::same_as<void>;
         { t.publishMarkupPlan(markupPlan) } -> std::same_as<void>;
         { t.publishTradeResult(result) } -> std::same_as<void>;

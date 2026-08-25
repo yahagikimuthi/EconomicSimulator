@@ -18,10 +18,11 @@ class PricePlanner final {
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
 
-    [[nodiscard]] auto plan(const GoodsQuantity supply, const double markup, const Money totalCost)
-        const noexcept -> Price {
+    [[nodiscard]] auto plan(
+        const GoodsQuantity supply, const MarkupRate markup, const Money totalCost
+    ) const noexcept -> Price {
         ASSERT(supply >= GoodsQuantity{0.0});
-        ASSERT(markup > 0.0);
+        ASSERT(markup > MarkupRate{0.0});
         ASSERT(totalCost >= Money{0.0});
 
         const auto price = calcPrice(supply, markup, totalCost);
@@ -31,11 +32,11 @@ class PricePlanner final {
 
   private:
     [[nodiscard]] static auto calcPrice(
-        const GoodsQuantity supply, const double markup, const Money totalCost
+        const GoodsQuantity supply, const MarkupRate markup, const Money totalCost
     ) noexcept -> Price {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
-        const auto price = Price{avgCost.value() * (1.0 + markup)};
+        const auto price = Price{avgCost.value() * (MarkupRate{1.0} + markup).value()};
         return price;
     }
 

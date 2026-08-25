@@ -12,7 +12,7 @@ namespace abm::value_object {
 template <typename T>
 concept ComputableObject =
     (std::same_as<T, Money> or std::same_as<T, Price> or std::same_as<T, GoodsQuantity> or
-     std::same_as<T, HeadCount> or std::same_as<T, Wage>) and
+     std::same_as<T, HeadCount> or std::same_as<T, Wage> or std::same_as<T, MarkupRate>) and
     requires(T t) {
         { t.value() } -> std::same_as<double>;
     };

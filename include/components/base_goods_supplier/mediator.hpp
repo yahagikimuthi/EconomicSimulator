@@ -10,6 +10,7 @@
 #include "components/base_goods_supplier/markup_planner.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
+#include "core/values/goods.hpp"
 
 namespace abm::base_goods::supplier {
 
@@ -76,7 +77,7 @@ class Mediator final {
         }
     }
 
-    void publishMarkupPlan(const double markup) noexcept {
+    void publishMarkupPlan(const MarkupRate markup) noexcept {
         for (auto opt : markupPlanListeners_) {
             std::visit(
                 [markup](auto&& listener) noexcept -> void {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <limits>
 #include <optional>
 #include <pcg_random.hpp>
@@ -9,6 +8,7 @@
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
+#include "core/values/integrate.hpp"
 
 namespace abm::base_goods::supplier {
 
@@ -48,7 +48,7 @@ class MarkupPlanner final {
   public:
     [[nodiscard]] explicit constexpr MarkupPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          cache_{masterRng.random(setting::lastMarkup)},
+          cache_{MarkupRate{masterRng.random(setting::lastMarkup)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::markupAdjustVol)} {}
 
@@ -57,7 +57,7 @@ class MarkupPlanner final {
         mediator.subscribeTradeResult(memory_);
     }
 
-    [[nodiscard]] auto plan(const double targetIvRatio) noexcept -> double {
+    [[nodiscard]] auto plan(const double targetIvRatio) noexcept -> MarkupRate {
         ASSERT(0.0 < targetIvRatio and targetIvRatio < 1.0);
 
         const auto next = calcNextMarkup(targetIvRatio);
@@ -75,7 +75,7 @@ class MarkupPlanner final {
   private:
     // isSold = (前期供給 - 前期売上) / 前回供給 < 定数
     [[nodiscard]] auto calcNextMarkup(const double targetInvRatio
-    ) const noexcept -> std::optional<double> {
+    ) const noexcept -> std::optional<MarkupRate> {
         const auto lastSupply      = memory_.lastSupply();
         const auto lastSalesAmount = memory_.lastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
@@ -86,18 +86,18 @@ class MarkupPlanner final {
         return calcNextMarkup(isSold);
     }
 
-    [[nodiscard]] auto calcNextMarkup(const bool isSold) const noexcept -> double {
+    [[nodiscard]] auto calcNextMarkup(const bool isSold) const noexcept -> MarkupRate {
         const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
-        const auto nextMarkup = cache_.cache() + (isSold ? alpha : -alpha);
+        const auto nextMarkup = cache_.cache() + MarkupRate{(isSold ? alpha : -alpha)};
         return guard(nextMarkup);
     }
 
-    [[nodiscard]] static auto guard(const double markup) noexcept -> double {
-        return std::max(markup, std::numeric_limits<double>::epsilon());
+    [[nodiscard]] static auto guard(const MarkupRate markup) noexcept -> MarkupRate {
+        return max(markup, MarkupRate{std::numeric_limits<double>::epsilon()});
     }
 
     MarkupPlannerMemory     memory_;
-    Cache<double>           cache_;
+    Cache<MarkupRate>       cache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };
