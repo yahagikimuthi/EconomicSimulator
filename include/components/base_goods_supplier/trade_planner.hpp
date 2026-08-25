@@ -36,7 +36,7 @@ class PricePlanner final {
     ) noexcept -> Price {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
-        const auto price = Price{avgCost.value() * (MarkupRate{1.0} + markup).value()};
+        const auto price = avgCost * (MarkupRate{1.0} + markup);
         return price;
     }
 
