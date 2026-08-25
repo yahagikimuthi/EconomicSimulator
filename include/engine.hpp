@@ -85,7 +85,7 @@ class Engine final {
     void runLabor() noexcept;
     void runProductionGoods() noexcept;
     void runConsumerGoods() noexcept;
-    void logging();
+    void endAllStep();
     void reset() noexcept;
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {

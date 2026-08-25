@@ -41,7 +41,7 @@ void Engine::run() {
         runLabor();
         runProductionGoods();
         runConsumerGoods();
-        logging();
+        endAllStep();
         reset();
     }
     if (isAnalysis_) {
@@ -192,7 +192,7 @@ void Engine::runConsumerGoods() noexcept {
     });
 }
 
-void Engine::logging() {
+void Engine::endAllStep() {
     forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
         firm_finance::endAllStep(firm.finance, government_, dropBox_);
     });
@@ -213,6 +213,7 @@ void Engine::reset() noexcept {
     laborMarket_.clear();
     productionGoodsMarket_.clear();
     consumerGoodsMarket_.clear();
+    government_.reset();
 }
 
 void Logger::save(const CensusDropBox& dropBox, const Step step) {
