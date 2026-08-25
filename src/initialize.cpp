@@ -79,7 +79,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
         bToCFirms_.emplace_back(BtoCFirm{
             .id            = AgentID{agentId},
             .finance       = createFirmFinance(rng_),
-            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::consumerGoods),
+            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::ConsumerGoods),
             .consumerGoodsSupplier   = createConsumerGoodsSupplier(rng_),
             .productionGoodsDemander = createProductionGoodsDemander(rng_)
         });
@@ -94,7 +94,7 @@ Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
         bToBFirms_.emplace_back(BtoBFirm{
             .id            = AgentID{agentId},
             .finance       = createFirmFinance(rng_),
-            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::productionGoods),
+            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::ProductionGoods),
             .productionGoodsDemander = createProductionGoodsDemander(rng_),
             .productionGoodsSupplier = createProductionGoodsSupplier(rng_)
         });
