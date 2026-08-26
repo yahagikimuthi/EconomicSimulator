@@ -43,6 +43,8 @@ class DepositAccount final {
         return static_cast<Money>(out);
     }
 
+    [[nodiscard]] auto balance() const noexcept -> Deposit { return deposit_; }
+
   private:
     bool    isValid{true};
     Deposit deposit_{0.0};
