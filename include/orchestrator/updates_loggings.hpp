@@ -8,7 +8,12 @@
 namespace abm::firm_finance {
 void endAllStep(FirmFinance& finance, Government& government, CensusDropBox& dropBox) noexcept {
     finance.endStep(
-        [&](const Money profit) -> Money { return government.collectCorporateTax(profit); }, dropBox
+        [&, count = 0](const Money profit) mutable -> Money {
+            ASSERT(count == 0);
+            ++count;
+            return government.collectCorporateTax(profit);
+        },
+        dropBox
     );
 }
 }  // namespace abm::firm_finance
