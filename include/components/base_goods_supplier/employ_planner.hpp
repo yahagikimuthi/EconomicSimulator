@@ -72,7 +72,7 @@ class EmployPlanner final {
         const auto isEmploying = employee != HeadCount{0.0};
         const auto avgPower =
             isEmploying ? lastSupply->value() / employee.value() : firmProductPower;
-        const auto out     = avgPower != 0.0 ? targetProduction.value() / avgPower : 1.0;
+        const auto out     = (avgPower != 0.0) ? targetProduction.value() / avgPower : 1.0;
         const auto guarded = std::min(out, static_cast<double>(::abm::setting::agent_count::hhold));
         return ceil(HeadCount{guarded});
     }

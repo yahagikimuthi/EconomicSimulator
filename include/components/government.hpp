@@ -74,7 +74,7 @@ class Government final {
         if (wage > Wage{0.0}) return Money{0.0};
         if (finance_.asset() <= Money{0.0}) return Money{0.0};
         ++nextUnemploymentHHoldCnt_;
-        const auto cnt     = lastUnemploymentHHoldCnt_ != 0 ? lastUnemploymentHHoldCnt_ : 1;
+        const auto cnt     = (lastUnemploymentHHoldCnt_ != 0) ? lastUnemploymentHHoldCnt_ : 1;
         const auto provide = finance_.asset() / cnt;
         finance_.assetPlus(-provide);
         return provide;
