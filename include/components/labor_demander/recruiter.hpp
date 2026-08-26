@@ -5,7 +5,6 @@
 #include <functional>
 #include <optional>
 #include <ranges>
-#include <utility>
 #include <vector>
 
 #include "components/labor_demander/common.hpp"
@@ -118,15 +117,12 @@ class Recruiter final {
         ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entryBox.size()}});
     }
 
-    template <AddRosterFn F>
-    void registerMember(F&& addRoster) noexcept {
+    void registerMember(AddRosterFn auto&& addRoster) noexcept {
         if (not isPosting()) return;
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
         for (auto& acceptApplicant : acceptApplicants) {
-            acceptApplicant.setRoster(
-                std::forward<F>(addRoster)(acceptApplicant.hholdID, myRequest_->wage)
-            );
+            acceptApplicant.setRoster(addRoster(acceptApplicant.hholdID, myRequest_->wage));
             ++employCnt;
         }
         ledger_.readEmployResult({.employ = employCnt});

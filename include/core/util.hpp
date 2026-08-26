@@ -70,7 +70,7 @@ class RandomGenerator final {
         const auto target     = rand(0.0, total);
         auto       currentCnt = 0.0;
         for (auto& elem : std::forward<Container>(container)) {
-            currentCnt += std::invoke(std::forward<Proj>(proj), elem);
+            currentCnt += std::invoke(proj, elem);
             if (currentCnt >= target) return elem;
         }
         ASSERT(false);

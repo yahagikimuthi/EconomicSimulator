@@ -47,14 +47,11 @@ class JobHunter final {
         if (acceptedEntry_) return;
         std::ranges::view auto alignedRequests{
             pickAndSortJobs(market, sampleCnt, entryCnt) |
-            std::views::filter([&](const Request& req) -> bool {
-                return std::forward<F1>(isAligned)(req);
-            }) |
+            std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
             std::views::take(entryCnt)
         };
         if (alignedRequests.empty()) return;
-        for (auto&& request : alignedRequests)
-            myEntries_.add(std::forward<F2>(makeEntrySheet)(request));
+        for (auto&& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
     }
 
     void accept() noexcept {
