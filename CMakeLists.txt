@@ -55,6 +55,7 @@ target_compile_options(project_warnings INTERFACE
     -fcontracts
     -D_GLIBCXX_ASSERTIONS
     -march=native
+    -flto
 )
 target_link_options(project_warnings INTERFACE
     -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
