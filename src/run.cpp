@@ -38,8 +38,8 @@ template <typename T, typename F>
     requires std::invocable<F, T&> and requires(std::vector<T>& agents, F&& f) {
         std::for_each(std::execution::par, agents.begin(), agents.end(), std::forward<F>(f));
     }
-void forEach(std::vector<T>& agents, F f) {
-    std::for_each(agents.begin(), agents.end(), f);
+void forEach(std::vector<T>& agents, F&& f) {
+    std::for_each(agents.begin(), agents.end(), std::forward<F>(f));
 }
 }  // namespace
 
