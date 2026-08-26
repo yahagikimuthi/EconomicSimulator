@@ -4,9 +4,6 @@
 #include <cmath>
 #include <concepts>
 
-#include "core/values/common.hpp"
-#include "core/values/goods.hpp"
-#include "core/values/labor.hpp"
 #include "core/values/mixin.hpp"
 
 namespace abm::value_object {

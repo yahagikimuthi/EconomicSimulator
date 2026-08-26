@@ -9,7 +9,6 @@ class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
                                  value_object::CompareMixin<Wage>,
                                  value_object::AddMixin<Wage>,
                                  value_object::ScholarMixin<Wage> {
-    friend class CompareMixin<Wage>;
     friend class AddMixin<Wage>;
     friend class ScholarMixin<Wage>;
 
@@ -25,7 +24,6 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
                                       value_object::CompareMixin<HeadCount>,
                                       value_object::AddMixin<HeadCount>,
                                       value_object::ScholarMixin<HeadCount> {
-    friend class CompareMixin<HeadCount>;
     friend class AddMixin<HeadCount>;
     friend class ScholarMixin<HeadCount>;
 
@@ -62,7 +60,6 @@ class OfferRate : public value_object::BaseValueObject<double>,
                   value_object::CompareMixin<OfferRate>,
                   value_object::AddMixin<OfferRate>,
                   value_object::ScholarMixin<OfferRate> {
-    friend class CompareMixin<OfferRate>;
     friend class AddMixin<OfferRate>;
     friend class ScholarMixin<OfferRate>;
 

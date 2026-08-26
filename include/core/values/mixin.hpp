@@ -21,10 +21,10 @@ class CompareMixin {
     friend Derived;
 
     [[nodiscard]] friend constexpr auto operator<=>(Derived lhs, Derived rhs) noexcept -> auto {
-        return lhs.value_ <=> rhs.value_;
+        return lhs.value() <=> rhs.value();
     }
     [[nodiscard]] friend constexpr auto operator==(Derived lhs, Derived rhs) noexcept -> bool {
-        return lhs.value_ == rhs.value_;
+        return lhs.value() == rhs.value();
     }
 
   private:

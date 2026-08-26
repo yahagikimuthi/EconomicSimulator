@@ -9,7 +9,6 @@ class Price final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Price>,
                     value_object::AddMixin<Price>,
                     value_object::ScholarMixin<Price> {
-    friend class CompareMixin<Price>;
     friend class AddMixin<Price>;
     friend class ScholarMixin<Price>;
 
@@ -23,7 +22,6 @@ class GoodsQuantity final : public value_object::BaseValueObject<double>,
                             value_object::CompareMixin<GoodsQuantity>,
                             value_object::AddMixin<GoodsQuantity>,
                             value_object::ScholarMixin<GoodsQuantity> {
-    friend class CompareMixin<GoodsQuantity>;
     friend class AddMixin<GoodsQuantity>;
     friend class ScholarMixin<GoodsQuantity>;
 
@@ -48,7 +46,6 @@ class MarkupRate final : public value_object::BaseValueObject<double>,
                          value_object::CompareMixin<MarkupRate>,
                          value_object::AddMixin<MarkupRate>,
                          value_object::ScholarMixin<MarkupRate> {
-    friend class CompareMixin<MarkupRate>;
     friend class AddMixin<MarkupRate>;
     friend class ScholarMixin<MarkupRate>;
 
