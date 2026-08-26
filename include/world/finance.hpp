@@ -96,6 +96,8 @@ class DepositMarket {
         packPartRequest(id, sampleCnt, out, rng);
     }
 
+    void clear() noexcept { requests_.clear(); }
+
   private:
     void packAllRequest(const AgentID id, std::vector<RefWrap<Request>>& out) noexcept {
         for (auto& req : requests_) {
