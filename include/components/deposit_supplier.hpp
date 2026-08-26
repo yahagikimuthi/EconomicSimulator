@@ -5,7 +5,7 @@
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
-#include "world/finance.hpp"
+#include "world/deposit.hpp"
 
 namespace abm::deposit::supplier {
 class AccountManager final {

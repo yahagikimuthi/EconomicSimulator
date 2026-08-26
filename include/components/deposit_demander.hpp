@@ -8,7 +8,7 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/others.hpp"
-#include "world/finance.hpp"
+#include "world/deposit.hpp"
 
 namespace abm::deposit::demander {
 class DepositDemander final {
