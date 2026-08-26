@@ -1,9 +1,8 @@
 #pragma once
 
-#include <array>
 #include <optional>
+#include <tuple>
 #include <type_traits>
-#include <variant>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
@@ -12,11 +11,36 @@
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "core/values/goods.hpp"
 
-namespace abm::base_goods::supplier {
+namespace abm::base_goods::supplier::mediator {
+template <typename... Ts>
+class Listener {
+    static_assert(sizeof...(Ts) >= 1UZ);
 
-class Mediator final {
-    template <typename... Ts>
-    using Listener           = std::variant<std::optional<Ts&>...>;
+  public:
+    [[nodiscard]] Listener() noexcept = default;
+
+    template <typename T>
+        requires std::disjunction_v<std::is_same<T, Ts>...>
+    void add(T& t) noexcept {
+        std::get<std::optional<T&>>(listeners_) = t;
+    }
+
+    template <typename F>
+        requires std::conjunction_v<std::is_invocable<F, Ts>...>
+    void publish(F methodCaller) noexcept {
+        auto notice = [&](auto&& opt) -> void {
+            if (opt) {
+                methodCaller(*opt);
+            }
+        };
+        std::apply([&](auto&&... opts) -> void { ((notice(opts)), ...); }, listeners_);
+    }
+
+  private:
+    std::tuple<std::optional<Ts&>...> listeners_;
+};
+
+class Mediator {
     using TradePlanListener  = Listener<EmployPlannerMemory, MarkupPlannerMemory, CentralMemory>;
     using MarkupPlanListener = Listener<CentralMemory>;
     using TradeResultListener =
@@ -27,83 +51,44 @@ class Mediator final {
 
     template <typename T>
     void subscribeTradePlan(T& t) noexcept {
-        auto& arr = tradePlanListeners_;
-        if constexpr (std::is_same_v<T, EmployPlannerMemory>) {
-            arr[0] = t;
-        } else if constexpr (std::is_same_v<T, MarkupPlannerMemory>) {
-            arr[1] = t;
-        } else if constexpr (std::is_same_v<T, CentralMemory>) {
-            arr[2] = t;
-        } else {
-            static_assert(false);
-        }
+        tradePlanListeners_.add(t);
     }
 
     template <typename T>
     void subscribeMarkupPlan(T& t) noexcept {
-        auto& arr = markupPlanListeners_;
-        if constexpr (std::is_same_v<T, CentralMemory>) {
-            arr[0] = t;
-        } else {
-            static_assert(false);
-        }
+        markupPlanListeners_.add(t);
     }
 
     template <typename T>
     void subscribeTradeResult(T& t) noexcept {
-        auto& arr = tradeResultListeners_;
-        if constexpr (std::is_same_v<T, DemandForecastManagerMemory>) {
-            arr[0] = t;
-        } else if constexpr (std::is_same_v<T, MarkupPlannerMemory>) {
-            arr[1] = t;
-        } else if constexpr (std::is_same_v<T, ProducingSystem>) {
-            arr[2] = t;
-        } else if constexpr (std::is_same_v<T, CentralMemory>) {
-            arr[3] = t;
-        } else {
-            static_assert(false);
-        }
+        tradeResultListeners_.add(t);
     }
 
     void publishTradePlan(const TradePlan& plan) noexcept {
-        for (auto opt : tradePlanListeners_) {
-            std::visit(
-                [&](auto&& listener) noexcept -> void {
-                    if (not listener) return;
-                    listener->listenTradePlan(plan);
-                },
-                opt
-            );
-        }
+        tradePlanListeners_.publish([&](auto&& listener) -> void {
+            listener.listenTradePlan(plan);
+        });
     }
 
-    void publishMarkupPlan(const MarkupRate markup) noexcept {
-        for (auto opt : markupPlanListeners_) {
-            std::visit(
-                [markup](auto&& listener) noexcept -> void {
-                    if (not listener) return;
-                    listener->listenMarkupPlan(markup);
-                },
-                opt
-            );
-        }
+    void publishMarkupPlan(const MarkupRate markupPlan) noexcept {
+        markupPlanListeners_.publish([markupPlan](auto&& listener) -> void {
+            listener.listenMarkupPlan(markupPlan);
+        });
     }
 
     void publishTradeResult(const TradeResult& result) noexcept {
-        for (auto opt : tradeResultListeners_) {
-            std::visit(
-                [&](auto&& listener) noexcept -> void {
-                    if (not listener) return;
-                    listener->listenTradeResult(result);
-                },
-                opt
-            );
-        }
+        tradeResultListeners_.publish([&](auto&& listener) -> void {
+            listener.listenTradeResult(result);
+        });
     }
 
   private:
-    std::array<TradePlanListener, 3>   tradePlanListeners_;
-    std::array<MarkupPlanListener, 1>  markupPlanListeners_;
-    std::array<TradeResultListener, 4> tradeResultListeners_;
+    TradePlanListener   tradePlanListeners_;
+    MarkupPlanListener  markupPlanListeners_;
+    TradeResultListener tradeResultListeners_;
 };
-}  // namespace abm::base_goods::supplier
+}  // namespace abm::base_goods::supplier::mediator
+
+namespace abm::base_goods::supplier {
+using Mediator = mediator::Mediator;
+}

@@ -96,12 +96,9 @@ class CentralMemory {
 
 template <typename T, typename U = std::monostate>
 concept IMediator =
-    requires(T t, U& u, const TradePlan& plan, MarkupRate markupPlan, const TradeResult& result) {
+    requires(T t, U u, const TradePlan& plan, MarkupRate markupPlan, const TradeResult& result) {
         { t.publishTradePlan(plan) } -> std::same_as<void>;
         { t.publishMarkupPlan(markupPlan) } -> std::same_as<void>;
         { t.publishTradeResult(result) } -> std::same_as<void>;
-        { t.subscribeTradePlan(u) } -> std::same_as<void>;
-        { t.subscribeMarkupPlan(u) } -> std::same_as<void>;
-        { t.subscribeTradeResult(u) } -> std::same_as<void>;
     };
 }  // namespace abm::base_goods::supplier
