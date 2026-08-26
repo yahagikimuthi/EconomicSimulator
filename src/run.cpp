@@ -5,6 +5,7 @@
 #include <execution>
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -24,9 +25,13 @@ namespace {
 template <typename T>
     requires requires(T t) { t.finance.asset().value(); }
 [[nodiscard]] auto calcSumAsset(const std::vector<T>& agents) noexcept -> double {
-    return std::ranges::fold_left(agents, 0.0, [](const double acc, const T& agent) -> double {
-        return acc + agent.finance.asset().value();
-    });
+    return std::ranges::fold_left(
+        agents | std::views::transform([](const T& agent) noexcept -> double {
+            return agent.finance.asset().value();
+        }),
+        0.0,
+        std::plus{}
+    );
 }
 
 template <typename T, typename F>
@@ -52,67 +57,71 @@ void Engine::run() noexcept {
 }
 
 void Engine::runLabor() noexcept {
-    forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [&](BtoCFirm& firm) noexcept -> void {
         labor::adjustWorkforce(
             firm.id, firm.consumerGoodsSupplier, firm.laborDemander, laborMarket_
         );
     });
 
-    forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [&](BtoBFirm& firm) noexcept -> void {
         labor::adjustWorkforce(
             firm.id, firm.productionGoodsSupplier, firm.laborDemander, laborMarket_
         );
     });
 
-    forEach(hholds_, [&](HHold& hhold) -> void {
+    forEach(hholds_, [&](HHold& hhold) noexcept -> void {
         labor::jobEntry(hhold.id, hhold.laborSupplier, laborMarket_);
     });
 
-    forEach(bToCFirms_, [](BtoCFirm& firm) -> void { labor::offer(firm.laborDemander); });
-    forEach(bToBFirms_, [](BtoBFirm& firm) -> void { labor::offer(firm.laborDemander); });
+    forEach(bToCFirms_, [](BtoCFirm& firm) noexcept -> void { labor::offer(firm.laborDemander); });
+    forEach(bToBFirms_, [](BtoBFirm& firm) noexcept -> void { labor::offer(firm.laborDemander); });
 
-    forEach(hholds_, [](HHold& hhold) -> void { labor::acceptOffer(hhold.laborSupplier); });
+    forEach(hholds_, [](HHold& hhold) noexcept -> void {
+        labor::acceptOffer(hhold.laborSupplier);
+    });
 
-    forEach(bToCFirms_, [](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [](BtoCFirm& firm) noexcept -> void {
         labor::registerMember(firm.consumerGoodsSupplier, firm.laborDemander);
     });
-    forEach(bToBFirms_, [](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [](BtoBFirm& firm) noexcept -> void {
         labor::registerMember(firm.productionGoodsSupplier, firm.laborDemander);
     });
 
-    forEach(hholds_, [](HHold& hhold) -> void { labor::recordRosterEntry(hhold.laborSupplier); });
+    forEach(hholds_, [](HHold& hhold) noexcept -> void {
+        labor::recordRosterEntry(hhold.laborSupplier);
+    });
 
-    forEach(bToCFirms_, [](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [](BtoCFirm& firm) noexcept -> void {
         labor::acceptResignation(firm.laborDemander);
     });
-    forEach(bToBFirms_, [](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [](BtoBFirm& firm) noexcept -> void {
         labor::acceptResignation(firm.laborDemander);
     });
 
-    forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [&](BtoCFirm& firm) noexcept -> void {
         labor::endStep(firm.finance, firm.laborDemander, dropBox_);
     });
-    forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [&](BtoBFirm& firm) noexcept -> void {
         labor::endStep(firm.finance, firm.laborDemander, dropBox_);
     });
 
-    forEach(hholds_, [&](HHold& hhold) -> void {
+    forEach(hholds_, [&](HHold& hhold) noexcept -> void {
         labor::endStep(hhold.finance, hhold.laborSupplier, government_, dropBox_);
     });
 }
 
 void Engine::runProductionGoods() noexcept {
-    forEach(hholds_, [](HHold& hhold) -> void {
+    forEach(hholds_, [](HHold& hhold) noexcept -> void {
         production_goods::product(hhold.laborSupplier, EMarket::ProductionGoods);
     });
 
-    forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [&](BtoBFirm& firm) noexcept -> void {
         production_goods::postGoods(
             firm.id, firm.productionGoodsSupplier, firm.laborDemander, productionGoodsMarket_
         );
     });
 
-    forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [&](BtoCFirm& firm) noexcept -> void {
         production_goods::purchase(
             firm.id,
             firm.finance,
@@ -122,7 +131,7 @@ void Engine::runProductionGoods() noexcept {
         );
     });
 
-    forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [&](BtoBFirm& firm) noexcept -> void {
         production_goods::purchase(
             firm.id,
             firm.finance,
@@ -132,18 +141,18 @@ void Engine::runProductionGoods() noexcept {
         );
     });
 
-    forEach(bToBFirms_, [](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [](BtoBFirm& firm) noexcept -> void {
         production_goods::trade(firm.productionGoodsSupplier);
     });
 
-    forEach(bToCFirms_, [](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [](BtoCFirm& firm) noexcept -> void {
         production_goods::afterTrade(firm.productionGoodsDemander);
     });
-    forEach(bToBFirms_, [](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [](BtoBFirm& firm) noexcept -> void {
         production_goods::afterTrade(firm.productionGoodsDemander);
     });
 
-    forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [&](BtoBFirm& firm) noexcept -> void {
         production_goods::endStep(
             firm.finance,
             firm.productionGoodsSupplier,
@@ -153,7 +162,7 @@ void Engine::runProductionGoods() noexcept {
         );
     });
 
-    forEach(bToCFirms_, [](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [](BtoCFirm& firm) noexcept -> void {
         production_goods::endStep(
             firm.finance, firm.consumerGoodsSupplier, firm.productionGoodsDemander
         );
@@ -161,49 +170,49 @@ void Engine::runProductionGoods() noexcept {
 }
 
 void Engine::runConsumerGoods() noexcept {
-    forEach(hholds_, [](HHold& hhold) -> void {
+    forEach(hholds_, [](HHold& hhold) noexcept -> void {
         consumer_goods::product(hhold.laborSupplier, EMarket::ConsumerGoods);
     });
 
-    forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [&](BtoCFirm& firm) noexcept -> void {
         consumer_goods::postGoods(
             firm.consumerGoodsSupplier, firm.laborDemander, consumerGoodsMarket_
         );
     });
 
-    forEach(hholds_, [&](HHold& hhold) -> void {
+    forEach(hholds_, [&](HHold& hhold) noexcept -> void {
         consumer_goods::purchase(
             hhold.finance, hhold.consumerGoodsDemander, consumerGoodsMarket_, currentStep_
         );
     });
 
-    forEach(bToCFirms_, [](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [](BtoCFirm& firm) noexcept -> void {
         consumer_goods::trade(firm.consumerGoodsSupplier);
     });
 
-    forEach(hholds_, [](HHold& hhold) -> void {
+    forEach(hholds_, [](HHold& hhold) noexcept -> void {
         consumer_goods::afterTrade(hhold.consumerGoodsDemander);
     });
 
-    forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [&](BtoCFirm& firm) noexcept -> void {
         consumer_goods::endStep(firm.finance, firm.consumerGoodsSupplier, government_, dropBox_);
     });
 
-    forEach(hholds_, [](HHold& hhold) -> void {
+    forEach(hholds_, [](HHold& hhold) noexcept -> void {
         consumer_goods::endStep(hhold.finance, hhold.consumerGoodsDemander);
     });
 }
 
 void Engine::endAllStep() noexcept {
-    forEach(bToCFirms_, [&](BtoCFirm& firm) -> void {
+    forEach(bToCFirms_, [&](BtoCFirm& firm) noexcept -> void {
         firm_finance::endAllStep(firm.finance, government_, dropBox_);
     });
 
-    forEach(bToBFirms_, [&](BtoBFirm& firm) -> void {
+    forEach(bToBFirms_, [&](BtoBFirm& firm) noexcept -> void {
         firm_finance::endAllStep(firm.finance, government_, dropBox_);
     });
 
-    forEach(hholds_, [&](HHold& hhold) -> void {
+    forEach(hholds_, [&](HHold& hhold) noexcept -> void {
         hhold_finance::endAllStep(hhold.finance, hhold.laborSupplier, government_, dropBox_);
     });
 
@@ -224,7 +233,9 @@ void Logger::save(const CensusDropBox& dropBox, const Step step) noexcept {
     auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
     auto create{
-        [&group](std::string_view dataName, const tbb::concurrent_vector<double>& data) -> void {
+        [&group](
+            std::string_view dataName, const tbb::concurrent_vector<double>& data
+        ) noexcept -> void {
             std::vector<double> vec(data.begin(), data.end());
             group.createDataSet(static_cast<std::string>(dataName), vec);
         }

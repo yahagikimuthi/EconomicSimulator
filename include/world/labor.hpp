@@ -156,7 +156,7 @@ class LaborMarket final {
         std::vector<RefWrap<Request>>& out, const int n, RandomGenerator& rng
     ) noexcept {
         rng.sample(
-            requestBox_ | std::views::transform([](Request& req) -> RefWrap<Request> {
+            requestBox_ | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
                 return std::ref(req);
             }),
             std::back_inserter(out),

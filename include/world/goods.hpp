@@ -95,7 +95,7 @@ class ConsumerGoodsEntry final {
     }
     [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
         const auto demand = GoodsQuantity{std::ranges::fold_left(
-            requestBox_ | std::ranges::views::transform([](const Request& req) -> double {
+            requestBox_ | std::ranges::views::transform([](const Request& req) noexcept -> double {
                 return req.requiresAmount.value();
             }),
             0.0,
@@ -190,7 +190,7 @@ class ProductionGoodsEntry final {
 
     [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
         const auto demand = GoodsQuantity{std::ranges::fold_left(
-            requestBox_ | std::ranges::views::transform([](const Request& req) -> double {
+            requestBox_ | std::ranges::views::transform([](const Request& req) noexcept -> double {
                 return req.amount.value();
             }),
             0.0,

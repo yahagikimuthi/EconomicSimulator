@@ -21,9 +21,10 @@ class MyEntries final {
     void clear() noexcept { entries_.clear(); }
 
     [[nodiscard]] auto takeOfferedEntry() noexcept -> std::ranges::view auto {
-        return entries_ |
-               std::views::transform([](RefWrap<Entry> ref) -> Entry& { return ref.get(); }) |
-               std::views::filter([](Entry& e) -> bool { return e.isOffer(); });
+        return entries_ | std::views::transform([](RefWrap<Entry> ref) noexcept -> Entry& {
+                   return ref.get();
+               }) |
+               std::views::filter([](Entry& e) noexcept -> bool { return e.isOffer(); });
     }
 
   private:

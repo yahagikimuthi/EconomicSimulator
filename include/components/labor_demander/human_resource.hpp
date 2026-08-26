@@ -89,9 +89,10 @@ class HumanResource final {
     [[nodiscard]] auto sumWage() const noexcept -> Wage {
         const auto& roster = companyBoard_.roster;
 
-        auto wages =
-            roster | std::views::filter(&RosterEntry::isOccupied) |
-            std::views::transform([](const RosterEntry& e) -> double { return e.wage.value(); });
+        auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
+                     std::views::transform([](const RosterEntry& e) noexcept -> double {
+                         return e.wage.value();
+                     });
         const auto sumWage = std::ranges::fold_left(wages, 0.0, std::plus{});
         ASSERT(sumWage >= 0.0);
         return Wage{sumWage};

@@ -48,6 +48,7 @@ target_compile_options(project_warnings INTERFACE
     -Wpedantic
     -Wunreachable-code
     -Wimplicit-fallthrough
+    -Wnoexcept
     -D_GLIBCXX_DEBUG
     -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
     -fno-omit-frame-pointer
