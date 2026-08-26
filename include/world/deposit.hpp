@@ -13,7 +13,7 @@
 #include "core/values/common.hpp"
 #include "core/values/others.hpp"
 
-namespace abm {
+namespace abm::deposit {
 class DepositAccount final {
   public:
     [[nodiscard]] explicit constexpr DepositAccount(const AgentID id) noexcept : depositorId{id} {}
@@ -130,4 +130,8 @@ class DepositMarket final {
 
     tbb::concurrent_vector<Request> requests_;
 };
-}  // namespace abm
+}  // namespace abm::deposit
+
+namespace abm {
+using DepositMarket = deposit::DepositMarket;
+}

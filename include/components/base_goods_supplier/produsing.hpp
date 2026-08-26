@@ -9,7 +9,7 @@
 #include "core/values/integrate.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 
 namespace abm::base_goods::supplier {
 // TODO 生産関数を要検討

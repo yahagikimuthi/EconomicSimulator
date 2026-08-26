@@ -50,7 +50,9 @@ class ProductionGoodsSupplier final {
         return producingSystem_.calcDesiredProductionGoods(requiresSupply);
     }
 
-    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
+    [[nodiscard]] auto workspace() noexcept -> base_goods::Workspace& {
+        return producingSystem_.workspace();
+    }
 
     void trade() noexcept { tradingSystem_.trade(); }
 

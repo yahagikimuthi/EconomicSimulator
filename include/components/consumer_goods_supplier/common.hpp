@@ -1,7 +1,7 @@
 #pragma once
 
 #include "components/base_goods_supplier/common.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 template <typename T>

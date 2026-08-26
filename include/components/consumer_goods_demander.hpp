@@ -9,7 +9,7 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 
 namespace abm::consumer_goods::demander {
 using Request = ConsumerGoodsRequest;

@@ -20,8 +20,9 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "world/common.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 #include "world/labor.hpp"
+#include "world/production_goods.hpp"
 
 namespace abm {
 struct BtoCFirm final {  // NOLINT

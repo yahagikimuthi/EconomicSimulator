@@ -12,7 +12,7 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::human_resource {
@@ -43,8 +43,9 @@ class HumanResource final {
     [[nodiscard]] explicit constexpr HumanResource(CompanyBoard&& companyBoard) noexcept
         : companyBoard_{std::move(companyBoard)} {}
 
-    [[nodiscard]] auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
-        -> RosterEntry& {
+    [[nodiscard]] auto addRoster(
+        const AgentID id, const Wage wage, base_goods::Workspace& workspace
+    ) noexcept -> RosterEntry& {
         ASSERT(wage > Wage{0.0});
 
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);

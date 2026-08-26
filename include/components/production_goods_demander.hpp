@@ -10,7 +10,7 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/integrate.hpp"
-#include "world/goods.hpp"
+#include "world/production_goods.hpp"
 
 namespace abm::production_goods::demander {
 

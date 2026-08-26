@@ -8,7 +8,7 @@
 #include "components/production_goods_demander.hpp"
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "world/common.hpp"
-#include "world/goods.hpp"
+#include "world/production_goods.hpp"
 
 namespace abm::production_goods {
 void product(LaborSupplier& laborSupplier, const EMarket phase) noexcept {

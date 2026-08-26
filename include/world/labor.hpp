@@ -14,9 +14,12 @@
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
 
-namespace abm {
-class RosterEntry;
+namespace abm::base_goods {
 class Workspace;
+}
+
+namespace abm::labor {
+class RosterEntry;
 struct CompanyBoard final {
     const AgentID                                firmId;
     const EMarket                                firmType;
@@ -28,14 +31,15 @@ struct CompanyBoard final {
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
     }
-    constexpr auto addRoster(const AgentID id, const Wage wage, Workspace& workspace) noexcept
-        -> RosterEntry&;
+    constexpr auto addRoster(
+        const AgentID id, const Wage wage, base_goods::Workspace& workspace
+    ) noexcept -> RosterEntry&;
 };
 
 class RosterEntry final {
   public:
     [[nodiscard]] constexpr RosterEntry(
-        const AgentID i, const Wage w, CompanyBoard& board, Workspace& space
+        const AgentID i, const Wage w, CompanyBoard& board, base_goods::Workspace& space
     ) noexcept
         : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
         ASSERT(w > Wage{0.0});
@@ -53,13 +57,13 @@ class RosterEntry final {
     const Wage    wage;
 
   private:
-    CompanyBoard& companyBoard_;
-    Workspace&    workspace_;
-    bool          isOccupied_{true};
+    CompanyBoard&          companyBoard_;
+    base_goods::Workspace& workspace_;
+    bool                   isOccupied_{true};
 };
 
 constexpr auto CompanyBoard::addRoster(
-    const AgentID id, const Wage wage, Workspace& workspace
+    const AgentID id, const Wage wage, base_goods::Workspace& workspace
 ) noexcept -> RosterEntry& {
     ASSERT(wage > Wage{0.0});
     return roster.emplace_back(id, wage, *this, workspace);
@@ -168,4 +172,8 @@ class LaborMarket final {
 
     tbb::concurrent_vector<LaborRequest> requestBox_;
 };
-}  // namespace abm
+}  // namespace abm::labor
+
+namespace abm {
+using LaborMarket = labor::LaborMarket;
+}

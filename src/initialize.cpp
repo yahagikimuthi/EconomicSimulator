@@ -32,7 +32,7 @@ namespace {
 [[nodiscard]] auto createLaborDemander(
     RandomGenerator& masterRng, const AgentID id, const EMarket firmType
 ) noexcept -> LaborDemander {
-    CompanyBoard board{id, firmType};
+    labor::CompanyBoard board{id, firmType};
     return LaborDemander{masterRng, std::move(board)};
 }
 

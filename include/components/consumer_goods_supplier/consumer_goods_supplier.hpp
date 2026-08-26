@@ -12,7 +12,7 @@
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 class ConsumerGoodsSupplier final {
@@ -50,7 +50,9 @@ class ConsumerGoodsSupplier final {
         reset(dropBox);
     }
 
-    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
+    [[nodiscard]] auto workspace() noexcept -> base_goods::Workspace& {
+        return producingSystem_.workspace();
+    }
 
     void addProductionEquip(const GoodsQuantity productionGoods) noexcept {
         ASSERT(productionGoods >= GoodsQuantity{0.0});

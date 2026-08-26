@@ -12,7 +12,7 @@
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
 #include "world/common.hpp"
-#include "world/goods.hpp"
+#include "world/consumer_goods.hpp"
 
 namespace abm::labor::demander {
 class RecruitSystem final {
@@ -87,7 +87,7 @@ class LaborDemander final {
 
     void offer() noexcept { recruitSystem_.offer(); }
 
-    void registerMember(Workspace& workspace) noexcept {
+    void registerMember(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.registerMember(
             [&] [[nodiscard]] (const AgentID id, const Wage wage) -> RosterEntry& {
                 return humanResource_.addRoster(id, wage, workspace);
