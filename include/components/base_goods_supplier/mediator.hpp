@@ -22,6 +22,7 @@ class Listener {
     template <typename T>
         requires std::disjunction_v<std::is_same<T, Ts>...>
     void add(T& t) noexcept {
+        ASSERT(not std::get<std::optional<T&>>(listeners_));
         std::get<std::optional<T&>>(listeners_) = t;
     }
 
