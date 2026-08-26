@@ -10,6 +10,7 @@
 #include "core/util.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
+#include "world/base_goods.hpp"
 #include "world/common.hpp"
 
 namespace abm::production_goods::supplier {
@@ -17,6 +18,7 @@ class ProductionGoodsSupplier final {
     using ProducingSystem = base_goods::supplier::ProducingSystem;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
+    using Workspace       = base_goods::Workspace;
 
   public:
     [[nodiscard]] explicit constexpr ProductionGoodsSupplier(RandomGenerator& masterRng) noexcept
@@ -50,9 +52,7 @@ class ProductionGoodsSupplier final {
         return producingSystem_.calcDesiredProductionGoods(requiresSupply);
     }
 
-    [[nodiscard]] auto workspace() noexcept -> base_goods::Workspace& {
-        return producingSystem_.workspace();
-    }
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     void trade() noexcept { tradingSystem_.trade(); }
 

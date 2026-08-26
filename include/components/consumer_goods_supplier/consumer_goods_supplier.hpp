@@ -11,14 +11,15 @@
 #include "core/values/common.hpp"
 #include "core/values/goods.hpp"
 #include "core/values/labor.hpp"
+#include "world/base_goods.hpp"
 #include "world/common.hpp"
-#include "world/consumer_goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 class ConsumerGoodsSupplier final {
     using ProducingSystem = base_goods::supplier::ProducingSystem;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
+    using Workspace       = base_goods::Workspace;
 
   public:
     [[nodiscard]] explicit ConsumerGoodsSupplier(RandomGenerator& masterRng) noexcept
@@ -50,9 +51,7 @@ class ConsumerGoodsSupplier final {
         reset(dropBox);
     }
 
-    [[nodiscard]] auto workspace() noexcept -> base_goods::Workspace& {
-        return producingSystem_.workspace();
-    }
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     void addProductionEquip(const GoodsQuantity productionGoods) noexcept {
         ASSERT(productionGoods >= GoodsQuantity{0.0});

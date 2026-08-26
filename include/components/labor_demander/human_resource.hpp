@@ -12,7 +12,7 @@
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"
-#include "world/consumer_goods.hpp"
+#include "world/base_goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::human_resource {
