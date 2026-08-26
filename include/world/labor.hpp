@@ -39,6 +39,7 @@ class RosterEntry final {
     ) noexcept
         : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
         ASSERT(w > Wage{0.0});
+        ASSERT(i != companyBoard_.firmId);
     }
     void addInput(const double productPower) noexcept;
     void resign() noexcept { companyBoard_.resign(*this); }
@@ -107,6 +108,7 @@ class LaborRequest final {
     }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
         ASSERT(productPower > 0.0);
+        ASSERT(id != firmID);
         return *entryBox_.emplace_back(id, productPower, *this);
     }
 
