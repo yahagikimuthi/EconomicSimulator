@@ -27,4 +27,38 @@ class TaxRate final : public value_object::BaseValueObject<double>,
 [[nodiscard]] constexpr auto operator*(TaxRate lhs, Money rhs) noexcept -> Money {
     return rhs * lhs;
 }
+
+class Deposit final : public value_object::BaseValueObject<double>,
+                      value_object::CompareMixin<Deposit>,
+                      value_object::AddMixin<Deposit>,
+                      value_object::ScholarMixin<Deposit> {
+    friend class CompareMixin<Deposit>;
+    friend class AddMixin<Deposit>;
+    friend class ScholarMixin<Deposit>;
+
+  public:
+    [[nodiscard]] explicit constexpr Deposit(const double value) noexcept
+        : BaseValueObject<double>(value) {}
+};
+
+class InterestRate final : public value_object::BaseValueObject<double>,
+                           value_object::CompareMixin<InterestRate>,
+                           value_object::AddMixin<InterestRate>,
+                           value_object::ScholarMixin<InterestRate> {
+    friend class CompareMixin<InterestRate>;
+    friend class AddMixin<InterestRate>;
+    friend class ScholarMixin<InterestRate>;
+
+  public:
+    [[nodiscard]] explicit constexpr InterestRate(const double value) noexcept
+        : BaseValueObject<double>(value) {}
+};
+
+[[nodiscard]] constexpr auto operator*(Deposit lhs, InterestRate rhs) noexcept -> Deposit {
+    return Deposit{lhs.value() * rhs.value()};
+}
+[[nodiscard]] constexpr auto operator*(InterestRate lhs, Deposit rhs) noexcept -> Deposit {
+    return rhs * lhs;
+}
+
 }  // namespace abm
