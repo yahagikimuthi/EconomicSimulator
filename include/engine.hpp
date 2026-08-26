@@ -80,7 +80,7 @@ class Engine final {
     using TBBVec = tbb::concurrent_vector<T>;
 
   public:
-    [[nodiscard]] explicit Engine(const int totalStep, const bool isAnalysis) noexcept;
+    [[nodiscard]] explicit Engine(const unsigned int totalStep, const bool isAnalysis) noexcept;
 
     void run() noexcept;
 

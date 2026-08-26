@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/assertion.hpp"
 #include "core/values/mixin.hpp"
 
 namespace abm {
@@ -27,16 +28,20 @@ class AgentID final : public value_object::BaseValueObject<int>,
         : BaseValueObject<int>(value) {}
 };
 
-class Step final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Step> {
+class Step final : public value_object::BaseValueObject<unsigned int>,
+                   value_object::CompareMixin<Step> {
   public:
-    [[nodiscard]] explicit constexpr Step(const int value) noexcept : BaseValueObject<int>(value) {}
+    [[nodiscard]] explicit constexpr Step(const unsigned int value) noexcept
+        : BaseValueObject<unsigned int>(value) {}
 
     constexpr auto operator++() -> Step& {
         ++value_;
         return *this;
     }
     [[nodiscard]] constexpr auto operator%(const int other) const noexcept -> Step {
-        return Step{value_ % other};
+        ASSERT(other != 0);
+        auto ret = static_cast<int>(value_) % other;
+        return Step{static_cast<unsigned int>(ret)};
     }
 };
 }  // namespace abm

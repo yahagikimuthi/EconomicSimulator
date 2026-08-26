@@ -61,7 +61,7 @@ namespace {
 }
 }  // namespace
 
-Engine::Engine(const int totalStep, const bool isAnalysis) noexcept
+Engine::Engine(const unsigned int totalStep, const bool isAnalysis) noexcept
     : totalStep_{totalStep},
       seed_{generateSeed()},
       rng_{pcg32{seed_.state, seed_.stream}},

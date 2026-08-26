@@ -103,10 +103,10 @@ class ConsumerGoodsDemander final {
         return step % frequency != myPhase_;
     }
 
-    Trader            trader_;
-    const double      mpc_;
-    const Step        myPhase_;
-    static inline int instanceCnt_{};
+    Trader                     trader_;
+    const double               mpc_;
+    const Step                 myPhase_;
+    static inline unsigned int instanceCnt_{};
 };
 }  // namespace abm::consumer_goods::demander
 
