@@ -41,6 +41,8 @@ class Deposit final : public value_object::BaseValueObject<double>,
         : BaseValueObject<double>(value) {}
 };
 
+[[nodiscard]] constexpr Money::operator Deposit() const noexcept { return Deposit{value_}; }
+
 class InterestRate final : public value_object::BaseValueObject<double>,
                            value_object::CompareMixin<InterestRate>,
                            value_object::AddMixin<InterestRate>,

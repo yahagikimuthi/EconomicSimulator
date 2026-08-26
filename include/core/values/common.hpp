@@ -4,6 +4,7 @@
 
 namespace abm {
 class Wage;
+class Deposit;
 class Money final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Money>,
                     value_object::AddMixin<Money>,
@@ -17,6 +18,7 @@ class Money final : public value_object::BaseValueObject<double>,
         : BaseValueObject<double>(value) {}
 
     [[nodiscard]] explicit constexpr operator Wage() const noexcept;
+    [[nodiscard]] explicit constexpr operator Deposit() const noexcept;
 };
 
 class AgentID final : public value_object::BaseValueObject<int>,
