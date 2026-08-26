@@ -45,6 +45,9 @@ void forEach(std::vector<T>& agents, F&& f) {
 
 void Engine::run() noexcept {
     for (currentStep_ = Step{0}; currentStep_ < totalStep_; ++currentStep_) {
+        if (currentStep_ == Step{500}) {
+            ignore();
+        }
         runLabor();
         runProductionGoods();
         runConsumerGoods();
@@ -232,13 +235,9 @@ void Logger::save(const CensusDropBox& dropBox, const Step step) noexcept {
     auto groupPath = std::string{"/step_" + std::to_string(step.value())};
     auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
-    auto create{
-        [&group](
-            std::string_view dataName, const tbb::concurrent_vector<double>& data
-        ) noexcept -> void {
-            std::vector<double> vec(data.begin(), data.end());
-            group.createDataSet(static_cast<std::string>(dataName), vec);
-        }
+    auto create =
+        [&group](std::string_view dataName, const std::vector<double>& data) noexcept -> void {
+        group.createDataSet(static_cast<std::string>(dataName), data);
     };
 
     create(name::firmAssets, dropBox.firmAssets);

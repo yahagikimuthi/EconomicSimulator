@@ -1,25 +1,28 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
+#include <vector>
 
 #include "core/setting.hpp"
 
 namespace abm {
 enum class EMarket : char { Labor, ConsumerGoods, ProductionGoods };
 
+// 並列化する場合、tbb::concurrent_vectorにしなければならない
+// しかし、HighFiveと互換性がないため、連続メモリコンテナで要素の追加を安全に行いたい
+// 事前に容量を確保し、スレッドごとにインデックスを割り当てる方式を検討
 struct CensusDropBox final {
-    tbb::concurrent_vector<double> firmAssets;
-    tbb::concurrent_vector<double> postedEmployments;
-    tbb::concurrent_vector<double> postedWages;
-    tbb::concurrent_vector<double> employments;
-    tbb::concurrent_vector<double> sumWages;
-    tbb::concurrent_vector<double> prices;
-    tbb::concurrent_vector<double> supplies;
-    tbb::concurrent_vector<double> markups;
-    tbb::concurrent_vector<double> inventories;
+    std::vector<double> firmAssets;
+    std::vector<double> postedEmployments;
+    std::vector<double> postedWages;
+    std::vector<double> employments;
+    std::vector<double> sumWages;
+    std::vector<double> prices;
+    std::vector<double> supplies;
+    std::vector<double> markups;
+    std::vector<double> inventories;
 
-    tbb::concurrent_vector<double> hholdAssets;
-    tbb::concurrent_vector<double> wages;
+    std::vector<double> hholdAssets;
+    std::vector<double> wages;
 
     [[nodiscard]] constexpr CensusDropBox() noexcept {
         const auto firmCnt  = setting::agent_count::bToCFirm + setting::agent_count::bToBFirm;
