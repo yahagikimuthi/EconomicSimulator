@@ -39,6 +39,8 @@ class Deposit final : public value_object::BaseValueObject<double>,
   public:
     [[nodiscard]] explicit constexpr Deposit(const double value) noexcept
         : BaseValueObject<double>(value) {}
+
+    [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
 [[nodiscard]] constexpr Money::operator Deposit() const noexcept { return Deposit{value_}; }
