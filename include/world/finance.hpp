@@ -1,19 +1,21 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <functional>
 #include <iterator>
 #include <optional>
 #include <ranges>
 #include <vector>
 
+#include "core/assertion.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/others.hpp"
 
 namespace abm {
-class SavingAccount {
+class DepositAccount {
   public:
-    [[nodiscard]] explicit constexpr SavingAccount(const AgentID id) noexcept : depositorId{id} {}
+    [[nodiscard]] explicit constexpr DepositAccount(const AgentID id) noexcept : depositorId{id} {}
 
     const AgentID depositorId;
 
@@ -38,9 +40,9 @@ class DepositEntry {
     [[nodiscard]] explicit constexpr DepositEntry(const AgentID id, const DepositRequest& req)
         : entryAgentId{id}, request{req} {}
 
-    void account(SavingAccount& account) noexcept { account_ = account; }
+    void account(DepositAccount& account) noexcept { account_ = account; }
 
-    [[nodiscard]] auto account() noexcept -> SavingAccount& {
+    [[nodiscard]] auto account() noexcept -> DepositAccount& {
         ASSERT(account_);
         return *account_;
     }
@@ -49,7 +51,7 @@ class DepositEntry {
     const DepositRequest& request;
 
   private:
-    std::optional<SavingAccount&> account_{std::nullopt};
+    std::optional<DepositAccount&> account_{std::nullopt};
 };
 
 class DepositRequest {
@@ -61,14 +63,18 @@ class DepositRequest {
 
     [[nodiscard]] auto entry(const AgentID entryAgentId) noexcept -> Entry& {
         ASSERT(entryAgentId != bankId);
-        return *entries.emplace_back(entryAgentId, *this);
+        return *entries_.emplace_back(entryAgentId, *this);
+    }
+    void packEntry(std::vector<RefWrap<Entry>>& out) noexcept {
+        ASSERT(out.empty());
+        for (auto& entry : entries_) out.emplace_back(std::ref(entry));
     }
 
     const AgentID      bankId;
     const InterestRate interestRate;
 
   private:
-    tbb::concurrent_vector<Entry> entries;
+    tbb::concurrent_vector<Entry> entries_;
 };
 
 class DepositMarket {
