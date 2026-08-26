@@ -15,7 +15,7 @@ class FlatTaxStrategy {
     }
 
   protected:
-    [[nodiscard]] explicit constexpr FlatTaxStrategy(const double rate) noexcept : rate_{rate} {}
+    [[nodiscard]] explicit constexpr FlatTaxStrategy(const TaxRate rate) noexcept : rate_{rate} {}
 
   private:
     TaxRate rate_;
@@ -23,28 +23,28 @@ class FlatTaxStrategy {
 
 class IncomeTaxStrategy : public FlatTaxStrategy {
   public:
-    [[nodiscard]] explicit constexpr IncomeTaxStrategy(const double rate) noexcept
+    [[nodiscard]] explicit constexpr IncomeTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
 class SalesTaxStrategy : public FlatTaxStrategy {
   public:
-    [[nodiscard]] explicit constexpr SalesTaxStrategy(const double rate) noexcept
+    [[nodiscard]] explicit constexpr SalesTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
 class CorporateTaxStrategy final : public FlatTaxStrategy {
   public:
-    [[nodiscard]] explicit constexpr CorporateTaxStrategy(const double rate) noexcept
+    [[nodiscard]] explicit constexpr CorporateTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
 class Government final {
   public:
     [[nodiscard]] explicit constexpr Government() noexcept
-        : incomeTaxStrategy_{setting::incomeTaxRate},
-          salesTaxStrategy_{setting::salesTaxRate},
-          corporateTaxStrategy_{setting::corporateTaxRate} {}
+        : incomeTaxStrategy_{TaxRate{setting::incomeTaxRate}},
+          salesTaxStrategy_{TaxRate{setting::salesTaxRate}},
+          corporateTaxStrategy_{TaxRate{setting::corporateTaxRate}} {}
 
     [[nodiscard]] auto collectIncomeTax(const Money income) noexcept -> Money {
         if (income <= Money{0.0}) return income;
