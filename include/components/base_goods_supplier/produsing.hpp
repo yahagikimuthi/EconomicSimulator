@@ -16,7 +16,9 @@ class Producer final {
   public:
     [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower_{masterRng.random(setting::productPower)},
-          producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)} {}
+          producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)},
+          producerGoodsDepreciationRate_{masterRng.random(setting::producerGoodsDepreciationRate)} {
+    }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.totalInput();
@@ -25,6 +27,7 @@ class Producer final {
         workspace_.resetInput();
         const auto productionEquipInput = productionGoods_ * producerGoodsEfficiency_;
         ASSERT(productionGoods_ >= GoodsQuantity{0.0});
+        productionGoods_ *= (1.0 - producerGoodsDepreciationRate_);
 
         const auto input = baseProductPower_ * min(workerInput, productionEquipInput);
         return input;
@@ -51,6 +54,7 @@ class Producer final {
     Workspace     workspace_;
     const double  baseProductPower_;
     const double  producerGoodsEfficiency_;
+    const double  producerGoodsDepreciationRate_;
     GoodsQuantity productionGoods_{0.0};
 };
 

@@ -74,6 +74,8 @@ inline constexpr RandomParameter targetInvRatio =
 inline constexpr RandomParameter productPower = UniformParameter<double>{.min = 0.01, .limit = 2.0};
 inline constexpr RandomParameter producerGoodsEfficiency =
     UniformParameter<double>{.min = 1.0, .limit = 10.0};
+inline constexpr RandomParameter producerGoodsDepreciationRate =
+    UniformParameter<double>{.min = 0.1, .limit = 0.2};
 inline constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
 
@@ -95,8 +97,8 @@ inline constexpr auto corporateTaxRate = 0.1;
 
 namespace abm::setting::agent_count {
 inline constexpr auto bToCFirm = 10;
-inline constexpr auto bToBFirm = 100;
-inline constexpr auto hhold    = 10000;
+inline constexpr auto bToBFirm = 10;
+inline constexpr auto hhold    = 100;
 }  // namespace abm::setting::agent_count
 
 namespace abm::setting::agent_finance {
