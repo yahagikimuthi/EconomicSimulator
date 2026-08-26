@@ -1,3 +1,3 @@
 import abm;
 
-auto main() -> int { abm::run(1000); }
+auto main() -> int { abm::run(100U); }
