@@ -54,6 +54,7 @@ target_compile_options(project_warnings INTERFACE
     -fno-omit-frame-pointer
     -fcontracts
     -D_GLIBCXX_ASSERTIONS
+    -march=native
 )
 target_link_options(project_warnings INTERFACE
     -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
