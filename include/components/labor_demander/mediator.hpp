@@ -11,7 +11,7 @@
 
 namespace abm::labor::demander {
 template <typename... Ts>
-class Listener {
+class Listener final {
     static_assert(sizeof...(Ts) >= 1UZ);
 
   public:

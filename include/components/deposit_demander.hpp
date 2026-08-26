@@ -11,7 +11,7 @@
 #include "world/finance.hpp"
 
 namespace abm::deposit::demander {
-class DepositDemander {
+class DepositDemander final {
     using Market  = DepositMarket;
     using Request = DepositRequest;
     using Entry   = DepositEntry;

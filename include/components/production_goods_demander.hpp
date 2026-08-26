@@ -24,7 +24,7 @@ struct TradeResult final {
     const GoodsQuantity tradeAmount;
 };
 
-class Ledger {
+class Ledger final {
   public:
     [[nodiscard]] constexpr Ledger() noexcept = default;
 

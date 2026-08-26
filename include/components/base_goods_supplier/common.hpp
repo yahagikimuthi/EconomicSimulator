@@ -58,7 +58,7 @@ class Cache final {
     std::optional<T> next_{std::nullopt};
 };
 
-class CentralMemory {
+class CentralMemory final {
   public:
     [[nodiscard]] constexpr CentralMemory() noexcept = default;
 

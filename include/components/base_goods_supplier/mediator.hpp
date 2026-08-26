@@ -13,7 +13,7 @@
 
 namespace abm::base_goods::supplier::mediator {
 template <typename... Ts>
-class Listener {
+class Listener final {
     static_assert(sizeof...(Ts) >= 1UZ);
 
   public:
@@ -41,7 +41,7 @@ class Listener {
     std::tuple<std::optional<Ts&>...> listeners_;
 };
 
-class Mediator {
+class Mediator final {
     using TradePlanListener  = Listener<EmployPlannerMemory, MarkupPlannerMemory, CentralMemory>;
     using MarkupPlanListener = Listener<CentralMemory>;
     using TradeResultListener =

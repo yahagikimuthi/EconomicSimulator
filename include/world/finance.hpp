@@ -14,7 +14,7 @@
 #include "core/values/others.hpp"
 
 namespace abm {
-class DepositAccount {
+class DepositAccount final {
   public:
     [[nodiscard]] explicit constexpr DepositAccount(const AgentID id) noexcept : depositorId{id} {}
 
@@ -36,7 +36,7 @@ class DepositAccount {
 };
 
 class DepositRequest;
-class DepositEntry {
+class DepositEntry final {
   public:
     [[nodiscard]] explicit constexpr DepositEntry(const AgentID id, const DepositRequest& req)
         : entryAgentId{id}, request{req} {}
@@ -55,7 +55,7 @@ class DepositEntry {
     std::optional<DepositAccount&> account_{std::nullopt};
 };
 
-class DepositRequest {
+class DepositRequest final {
     using Entry = DepositEntry;
 
   public:
@@ -78,7 +78,7 @@ class DepositRequest {
     tbb::concurrent_vector<Entry> entries_;
 };
 
-class DepositMarket {
+class DepositMarket final {
     using Request = DepositRequest;
 
   public:

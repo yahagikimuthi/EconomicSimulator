@@ -7,7 +7,6 @@
 #include "core/values/others.hpp"
 
 namespace abm::government {
-
 class FlatTaxStrategy {
   public:
     [[nodiscard]] auto calculate(const Money amount) const noexcept -> Money {
@@ -21,13 +20,13 @@ class FlatTaxStrategy {
     TaxRate rate_;
 };
 
-class IncomeTaxStrategy : public FlatTaxStrategy {
+class IncomeTaxStrategy final : public FlatTaxStrategy {
   public:
     [[nodiscard]] explicit constexpr IncomeTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
-class SalesTaxStrategy : public FlatTaxStrategy {
+class SalesTaxStrategy final : public FlatTaxStrategy {
   public:
     [[nodiscard]] explicit constexpr SalesTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}

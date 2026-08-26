@@ -8,7 +8,7 @@
 #include "world/finance.hpp"
 
 namespace abm::deposit::supplier {
-class AccountManager {
+class AccountManager final {
   public:
     [[nodiscard]] constexpr AccountManager() noexcept = default;
 
@@ -16,7 +16,7 @@ class AccountManager {
     std::optional<DepositAccount&> account_{std::nullopt};
 };
 
-class DepositSupplier {
+class DepositSupplier final {
     using Entry   = DepositEntry;
     using Request = DepositRequest;
     using Market  = DepositMarket;
