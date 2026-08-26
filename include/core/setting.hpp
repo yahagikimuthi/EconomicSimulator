@@ -89,6 +89,10 @@ namespace abm::production_goods::demander::setting {
 inline constexpr auto goodsSampleCnt = 2;
 }  // namespace abm::production_goods::demander::setting
 
+namespace abm::deposit::supplier::setting {
+inline constexpr auto maxSampleCnt = 2;
+}
+
 namespace abm::government::setting {
 inline constexpr auto incomeTaxRate    = 0.1;
 inline constexpr auto salesTaxRate     = 0.1;
