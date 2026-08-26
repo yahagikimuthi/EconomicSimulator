@@ -1,5 +1,6 @@
 #pragma once
 
+#include <concepts>
 #include <cstdint>
 #include <limits>
 #include <string_view>
@@ -11,6 +12,7 @@ using namespace std::string_view_literals;
 
 namespace abm {
 template <typename T>
+    requires std::same_as<T, double> or std::same_as<T, int>
 struct UniformParameter final {
     const T min;
     const T limit;
