@@ -20,7 +20,6 @@ template <typename Derived>
 class CompareMixin {
     friend Derived;
 
-  public:
     [[nodiscard]] friend constexpr auto operator<=>(Derived lhs, Derived rhs) noexcept -> auto {
         return lhs.value_ <=> rhs.value_;
     }
@@ -36,7 +35,6 @@ template <typename Derived>
 class AddMixin {
     friend Derived;
 
-  public:
     friend constexpr auto operator+=(Derived& lhs, Derived rhs) noexcept -> Derived& {
         lhs.value_ += rhs.value_;
         return lhs;
@@ -64,7 +62,6 @@ template <typename Derived>
 class ScholarMixin {
     friend Derived;
 
-  public:
     [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> double {
         ASSERT(rhs.value_ != 0.0);
         return lhs.value_ / rhs.value_;
