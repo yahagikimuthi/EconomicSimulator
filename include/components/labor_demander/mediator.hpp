@@ -1,9 +1,8 @@
 #pragma once
 
-#include <array>
-#include <concepts>
 #include <optional>
-#include <variant>
+#include <tuple>
+#include <type_traits>
 
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/empoy_planner.hpp"
@@ -11,10 +10,35 @@
 #include "core/values/labor.hpp"
 
 namespace abm::labor::demander {
-class Mediator final {
-    template <typename... Ts>
-    using Listener = std::variant<std::optional<Ts&>...>;
+template <typename... Ts>
+class Listener {
+    static_assert(sizeof...(Ts) >= 1UZ);
 
+  public:
+    [[nodiscard]] Listener() noexcept = default;
+
+    template <typename T>
+        requires std::disjunction_v<std::is_same<T, Ts>...>
+    void add(T& t) noexcept {
+        std::get<std::optional<T&>>(listeners_) = t;
+    }
+
+    template <typename F>
+        requires std::conjunction_v<std::is_invocable<F, Ts>...>
+    void notice(F methodCaller) noexcept {
+        auto call = [&](auto&& opt) -> void {
+            if (opt) {
+                methodCaller(*opt);
+            }
+        };
+        std::apply([&](auto&&... opts) noexcept -> void { ((call(opts)), ...); }, listeners_);
+    }
+
+  private:
+    std::tuple<std::optional<Ts&>...> listeners_;
+};
+
+class Mediator final {
     using EmployPlanListener =
         Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory, CentralMemory>;
     using RecruitPlanListener   = Listener<CentralMemory>;
@@ -25,79 +49,40 @@ class Mediator final {
 
     template <typename T>
     void subscribeEmployPlan(T& t) noexcept {
-        auto& arr = employPlanListeners_;
-        if constexpr (std::is_same_v<T, planner::WagePlannerMemory>) {
-            arr[0] = t;
-        } else if constexpr (std::is_same_v<T, planner::OfferPlannerMemory>) {
-            arr[1] = t;
-        } else if constexpr (std::is_same_v<T, CentralMemory>) {
-            arr[2] = t;
-        } else {
-            static_assert(false);
-        }
+        employPlanListeners_.add(t);
     }
 
     template <typename T>
     void subscribeRecruitPlan(T& t) noexcept {
-        auto& arr = recruitPlanListeners_;
-        if constexpr (std::same_as<T, CentralMemory>) {
-            arr[0] = t;
-        } else {
-            static_assert(false);
-        }
+        recruitPlanListeners_.add(t);
     }
 
     template <typename T>
     void subscribeRecruitResult(T& t) noexcept {
-        auto& arr = recruitResultListeners_;
-        if constexpr (std::is_same_v<T, planner::WagePlannerMemory>) {
-            arr[0] = t;
-        } else if constexpr (std::is_same_v<T, planner::OfferPlannerMemory>) {
-            arr[1] = t;
-        } else {
-            static_assert(false);
-        }
+        recruitResultListeners_.add(t);
     }
 
     void publishEmployPlan(const HeadCount employPlan) noexcept {
-        for (auto opt : employPlanListeners_) {
-            std::visit(
-                [employPlan](auto&& listener) -> void {
-                    if (not listener) return;
-                    listener->listenEmployPlan(employPlan);
-                },
-                opt
-            );
-        }
+        employPlanListeners_.notice([employPlan](auto&& listener) noexcept -> void {
+            listener.listenEmployPlan(employPlan);
+        });
     }
 
     void publishRecruitPlan(const RecruitPlan& plan) noexcept {
-        for (auto opt : recruitPlanListeners_) {
-            std::visit(
-                [&](auto&& listener) -> void {
-                    if (not listener) return;
-                    listener->listenRecruitPlan(plan);
-                },
-                opt
-            );
-        }
+        recruitPlanListeners_.notice([&](auto&& listener) noexcept -> void {
+            listener.listenRecruitPlan(plan);
+        });
     }
 
     void publishRecruitResult(const RecruitResult& result) noexcept {
-        for (auto opt : recruitResultListeners_) {
-            std::visit(
-                [&](auto&& listener) -> void {
-                    if (not listener) return;
-                    listener->listenRecruitResult(result);
-                },
-                opt
-            );
-        }
+        recruitResultListeners_.notice([&](auto&& listener) noexcept -> void {
+            listener.listenRecruitResult(result);
+        });
     }
 
   private:
-    std::array<EmployPlanListener, 3>    employPlanListeners_;
-    std::array<RecruitPlanListener, 1>   recruitPlanListeners_;
-    std::array<RecruitResultListener, 2> recruitResultListeners_;
+    EmployPlanListener    employPlanListeners_;
+    RecruitPlanListener   recruitPlanListeners_;
+    RecruitResultListener recruitResultListeners_;
 };
 }  // namespace abm::labor::demander
