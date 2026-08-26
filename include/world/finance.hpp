@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstddef>
 #include <functional>
 #include <iterator>
 #include <optional>
@@ -88,18 +89,19 @@ class DepositMarket {
         return *requests_.emplace_back(bankId, interestRate);
     }
 
-    void packRequest(
-        const AgentID                  id,
-        const int                      sampleCnt,
-        std::vector<RefWrap<Request>>& out,
-        RandomGenerator&               rng
-    ) noexcept {
-        ASSERT(out.empty());
-        if (sampleCnt >= static_cast<int>(requests_.size())) {
-            packAllRequest(id, out);
-            return;
+    [[nodiscard]] auto pickRequest(
+        const AgentID id, RandomGenerator& rng, const int maxSampleCnt
+    ) noexcept -> std::optional<Request&> {
+        if (requests_.empty()) return std::nullopt;
+        if (requests_.size() == 1UZ and requests_[0].bankId == id) return std::nullopt;
+
+        for (const auto _ : std::views::iota(0, maxSampleCnt)) {
+            const auto maxIdx = static_cast<int>(requests_.size() - 1UZ);
+            const auto idx    = rng.randInt(0, maxIdx);
+            auto&      sample = requests_[static_cast<std::size_t>(idx)];
+            if (sample.bankId != id) return sample;
         }
-        packPartRequest(id, sampleCnt, out, rng);
+        return std::nullopt;
     }
 
     void clear() noexcept { requests_.clear(); }
