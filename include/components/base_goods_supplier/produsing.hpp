@@ -12,6 +12,7 @@
 #include "world/goods.hpp"
 
 namespace abm::base_goods::supplier {
+// TODO 生産関数を要検討
 class Producer final {
   public:
     [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
