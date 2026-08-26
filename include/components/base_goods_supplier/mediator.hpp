@@ -27,13 +27,13 @@ class Listener {
 
     template <typename F>
         requires std::conjunction_v<std::is_invocable<F, Ts>...>
-    void publish(F methodCaller) noexcept {
-        auto notice = [&](auto&& opt) -> void {
+    void notice(F methodCaller) noexcept {
+        auto caller = [&](auto&& opt) -> void {
             if (opt) {
                 methodCaller(*opt);
             }
         };
-        std::apply([&](auto&&... opts) -> void { ((notice(opts)), ...); }, listeners_);
+        std::apply([&](auto&&... opts) noexcept -> void { ((caller(opts)), ...); }, listeners_);
     }
 
   private:
@@ -65,19 +65,19 @@ class Mediator {
     }
 
     void publishTradePlan(const TradePlan& plan) noexcept {
-        tradePlanListeners_.publish([&](auto&& listener) -> void {
+        tradePlanListeners_.notice([&](auto&& listener) -> void {
             listener.listenTradePlan(plan);
         });
     }
 
     void publishMarkupPlan(const MarkupRate markupPlan) noexcept {
-        markupPlanListeners_.publish([markupPlan](auto&& listener) -> void {
+        markupPlanListeners_.notice([markupPlan](auto&& listener) -> void {
             listener.listenMarkupPlan(markupPlan);
         });
     }
 
     void publishTradeResult(const TradeResult& result) noexcept {
-        tradeResultListeners_.publish([&](auto&& listener) -> void {
+        tradeResultListeners_.notice([&](auto&& listener) -> void {
             listener.listenTradeResult(result);
         });
     }
