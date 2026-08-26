@@ -29,7 +29,6 @@ class RecruitPlanner final {
         const auto plan   = RecruitPlan{.wage = wage, .offer = offer};
 
         mediator.publishEmployPlan(employ);
-        mediator.publishRecruitPlan(plan);
         return plan;
     }
 

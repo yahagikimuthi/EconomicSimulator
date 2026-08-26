@@ -31,6 +31,7 @@ class RecruitSystem final {
     ) noexcept {
         ASSERT(desiredEmploy > HeadCount{0.0});
         const auto plan = planner_.plan(desiredEmploy, salesPerWorker, mediator);
+        mediator.publishRecruitPlan(plan);
         recruiter_.post(id, plan, laborMarket);
     }
 
