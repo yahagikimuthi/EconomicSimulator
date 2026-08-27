@@ -26,7 +26,7 @@ class BaseFinance {
 class FirmFinance final {
   public:
     [[nodiscard]] explicit constexpr FirmFinance(RandomGenerator& masterRng) noexcept
-        : asset_{masterRng.random(setting::agent_finance::firm)} {}
+        : asset_{masterRng.random(setting::firmInitialAsset)} {}
 
     template <AfterTaxCalculatorFn F>
     void endStep(F&& afterTaxCalculator, CensusDropBox& dropBox) noexcept {
@@ -45,19 +45,33 @@ class FirmFinance final {
     Money thisPeriodProfit_{0.0};
 };
 
-class HHoldFinance final : public BaseFinance {
+class HHoldFinance final {
   public:
     [[nodiscard]] explicit constexpr HHoldFinance(RandomGenerator& masterRng) noexcept
-        : BaseFinance::BaseFinance(Money{masterRng.random(setting::agent_finance::hhold)}) {}
+        : asset_{masterRng.random(setting::hholdInitialAsset)} {}
+
     void endStep(CensusDropBox& dropBox) const noexcept {
         dropBox.hholdAssets.emplace_back(asset_.value());
     }
+
+    void assetPlus(const Money plus) noexcept { asset_ += plus; }
+
+    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
+
+  private:
+    Money asset_;
 };
 
-class GovernmentFinance final : public BaseFinance {
+class GovernmentFinance final {
   public:
-    [[nodiscard]] explicit constexpr GovernmentFinance() noexcept
-        : BaseFinance::BaseFinance(Money{0.0}) {}
+    [[nodiscard]] explicit constexpr GovernmentFinance() noexcept : asset_{0.0} {}
+
+    void assetPlus(const Money plus) noexcept { asset_ += plus; }
+
+    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
+
+  private:
+    Money asset_;
 };
 }  // namespace abm::finance
 
