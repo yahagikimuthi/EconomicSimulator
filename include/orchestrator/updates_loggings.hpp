@@ -1,6 +1,6 @@
 #pragma once
 
-#include "components/common.hpp"
+#include "components/finance/finance.hpp"
 #include "components/government.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "world/common.hpp"

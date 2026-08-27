@@ -59,6 +59,7 @@ class DepositDemander final {
     std::optional<Request&>    myRequest_;
     InterestRate               interestRate_;
     std::deque<DepositAccount> depositAccounts_;
+    std::error_code            x;
 };
 }  // namespace abm::deposit::demander
 

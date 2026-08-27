@@ -1,8 +1,8 @@
 #pragma once
 
-#include "components/common.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/finance/finance.hpp"
 #include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"

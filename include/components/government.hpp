@@ -1,6 +1,6 @@
 #pragma once
 
-#include "components/common.hpp"
+#include "components/finance/finance.hpp"
 #include "core/setting.hpp"
 #include "core/values/common.hpp"
 #include "core/values/labor.hpp"

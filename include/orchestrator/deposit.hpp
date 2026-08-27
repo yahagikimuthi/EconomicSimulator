@@ -1,8 +1,8 @@
 #pragma once
 
-#include "components/common.hpp"
-#include "components/deposit_demander.hpp"
-#include "components/deposit_supplier.hpp"
+#include "components/finance/deposit_demander.hpp"
+#include "components/finance/deposit_supplier.hpp"
+#include "components/finance/finance.hpp"
 #include "core/values/common.hpp"
 #include "world/deposit.hpp"
 
@@ -19,8 +19,12 @@ void entry(const AgentID id, DepositSupplier& depositSupplier, DepositMarket& ma
 
 void accountOpening(DepositDemander& depositDemander) noexcept { depositDemander.accountOpening(); }
 
+void registerAccount(DepositSupplier& depositSupplier) noexcept {
+    depositSupplier.registerAccount();
+}
+
 void endStep(FirmFinance& finance, DepositDemander& depositDemander) noexcept {
-    depositDemander.endStep([&](const Money sub) noexcept -> void { finance.assetPlus(-sub); });
+    depositDemander.endStep([&](const Money minus) noexcept -> void { finance.assetPlus(-minus); });
 }
 
 void endStep(DepositSupplier& depositSupplier) noexcept { depositSupplier.endStep(); }
