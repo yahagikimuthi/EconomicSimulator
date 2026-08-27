@@ -9,7 +9,7 @@
 #include "core/values/common.hpp"
 #include "world/common.hpp"
 
-namespace abm {
+namespace abm::finance {
 class BaseFinance {
   public:
     void assetPlus(const Money plus) noexcept { asset_ += plus; }
@@ -59,4 +59,10 @@ class GovernmentFinance final : public BaseFinance {
     [[nodiscard]] explicit constexpr GovernmentFinance() noexcept
         : BaseFinance::BaseFinance(Money{0.0}) {}
 };
+}  // namespace abm::finance
+
+namespace abm {
+using FirmFinance       = finance::FirmFinance;
+using HHoldFinance      = finance::HHoldFinance;
+using GovernmentFinance = finance::GovernmentFinance;
 }  // namespace abm

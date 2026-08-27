@@ -6,13 +6,9 @@
 #include "core/values/others.hpp"
 #include "world/deposit.hpp"
 
-namespace abm::deposit::supplier {
+namespace abm::finance::deposit::supplier {
 
 class DepositSupplier final {
-    using Entry   = DepositEntry;
-    using Request = DepositRequest;
-    using Market  = DepositMarket;
-
   public:
     [[nodiscard]] constexpr DepositSupplier() noexcept = default;
 
@@ -27,8 +23,8 @@ class DepositSupplier final {
 
     std::optional<DepositAccount&> account_{std::nullopt};
 };
-}  // namespace abm::deposit::supplier
+}  // namespace abm::finance::deposit::supplier
 
-namespace abm {
-using DepositSupplier = deposit::supplier::DepositSupplier;
+namespace abm::finance {
+using DepositSupplier = finance::deposit::supplier::DepositSupplier;
 }
