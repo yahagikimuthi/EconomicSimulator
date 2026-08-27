@@ -29,7 +29,10 @@ class DepositSupplier final {
         return account_->withdraw(withdraw);
     }
 
-    void setAccount(DepositAccount& account) noexcept { account_ = account; }
+    void setAccount(DepositAccount& account) noexcept {
+        ASSERT(not haveAccount());
+        account_ = account;
+    }
 
   private:
     [[nodiscard]] auto haveAccount() const noexcept -> bool { return account_.has_value(); }
