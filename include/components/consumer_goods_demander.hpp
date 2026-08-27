@@ -4,7 +4,7 @@
 #include <pcg_random.hpp>
 #include <utility>
 
-#include "components/others.hpp"
+#include "components/common.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"

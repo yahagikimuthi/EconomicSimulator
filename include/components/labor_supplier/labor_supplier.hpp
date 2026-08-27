@@ -4,9 +4,9 @@
 #include <pcg_random.hpp>
 #include <utility>
 
+#include "components/common.hpp"
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
-#include "components/others.hpp"
 #include "core/assertion.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"

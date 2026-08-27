@@ -1,7 +1,7 @@
 #pragma once
 
 #include "components/base_goods_supplier/trade_planner.hpp"
-#include "components/others.hpp"
+#include "components/common.hpp"
 #include "components/production_goods_supplier/common.hpp"
 #include "components/production_goods_supplier/trader.hpp"
 #include "core/util.hpp"

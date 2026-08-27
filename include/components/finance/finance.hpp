@@ -2,7 +2,8 @@
 
 #include <utility>
 
-#include "components/others.hpp"
+#include "components/common.hpp"
+#include "components/finance/deposit_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
@@ -17,7 +18,9 @@ class BaseFinance {
 
   protected:
     [[nodiscard]] explicit constexpr BaseFinance(const Money asset) noexcept : asset_{asset} {}
-    Money asset_;
+
+    DepositSupplier depositSupplier_;
+    Money           asset_;
 };
 
 class FirmFinance final {
