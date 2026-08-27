@@ -28,7 +28,7 @@ class DepositAccount final {
         ASSERT(sub >= Money{0.0});
         const auto out = Deposit{std::min(sub.value(), deposit_.value())};
         deposit_ -= out;
-        return static_cast<Money>(out);
+        return out;
     }
 
     [[nodiscard]] auto balance() const noexcept -> Deposit { return deposit_; }
