@@ -112,7 +112,7 @@ inline constexpr RandomParameter firmInitialAsset =
     UniformParameter<double>{.min = 100.0, .limit = 1000.0};
 inline constexpr RandomParameter hholdInitialAsset =
     UniformParameter<double>{.min = 10.0, .limit = 100.0};
-inline constexpr RandomParameter depositRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
+inline constexpr RandomParameter cashRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
 
 namespace abm::setting::save_name {
