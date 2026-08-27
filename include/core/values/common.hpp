@@ -34,7 +34,7 @@ class Step final : public value_object::BaseValueObject<unsigned int>,
     [[nodiscard]] explicit constexpr Step(const unsigned int value) noexcept
         : BaseValueObject<unsigned int>(value) {}
 
-    constexpr auto operator++() -> Step& {
+    constexpr auto operator++() noexcept -> Step& {
         ++value_;
         return *this;
     }

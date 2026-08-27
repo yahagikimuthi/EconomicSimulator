@@ -51,7 +51,7 @@ struct HHold final {  // NOLINT
 class Logger final {
   public:
     [[nodiscard]] explicit Logger() noexcept
-        : file_{[]() -> HighFive::File {
+        : file_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
               const auto path     = fs::path{filepath};

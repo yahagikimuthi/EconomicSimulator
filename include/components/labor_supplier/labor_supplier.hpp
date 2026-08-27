@@ -38,8 +38,10 @@ class LaborSupplier final {
         employment_.updateStatus();
         if (not shouldSearch()) return;
         jobHunter_.entry(
-            [&] [[nodiscard]] (const Request& req) -> bool { return isAligned(req); },
-            [&] [[nodiscard]] (Request & req) -> Entry& { return makeEntrySheet(id, req); },
+            [&] [[nodiscard]] (const Request& req) noexcept -> bool { return isAligned(req); },
+            [&] [[nodiscard]] (Request & req) noexcept -> Entry& {
+                return makeEntrySheet(id, req);
+            },
             market
         );
     }

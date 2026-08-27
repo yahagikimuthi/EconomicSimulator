@@ -42,7 +42,7 @@ void endStep(
     CensusDropBox&         dropBox
 ) noexcept {
     goodsSupplier.endStep(
-        [&](const Money sales) -> void {
+        [&](const Money sales) noexcept -> void {
             const auto salesAfterTax = government.collectSalesTax(sales);
             finance.assetPlus(salesAfterTax);
         },
@@ -51,6 +51,8 @@ void endStep(
 }
 
 void endStep(HHoldFinance& finance, ConsumerGoodsDemander& goodsDemander) noexcept {
-    goodsDemander.endStep([&](const Money purchase) -> void { finance.assetPlus(-purchase); });
+    goodsDemander.endStep([&](const Money purchase) noexcept -> void {
+        finance.assetPlus(-purchase);
+    });
 }
 }  // namespace abm::consumer_goods

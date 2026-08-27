@@ -169,7 +169,9 @@ class Recruiter final {
             entryBox,
             entryBox.begin() + static_cast<int>(k),
             std::ranges::greater{},
-            [](const RefWrap<Entry> entryRef) -> double { return entryRef.get().productPower; }
+            [](const RefWrap<Entry> entryRef) noexcept -> double {
+                return entryRef.get().productPower;
+            }
         );
         return entryBox;
     }

@@ -43,7 +43,7 @@ class ProductionGoodsEntry final {
         const AgentID i, const Price p, const GoodsQuantity s
     ) noexcept
         : id{i}, price{p}, supply{s} {}
-    [[nodiscard]] auto request(const GoodsQuantity amount) -> Request& {
+    [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
         return *requestBox_.emplace_back(amount, *this);
     }
 
@@ -93,7 +93,7 @@ class ProductionGoodsMarket final {
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
         -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
-        auto toDouble = [] [[nodiscard]] (const Entry& entry) -> double {
+        auto toDouble = [] [[nodiscard]] (const Entry& entry) noexcept -> double {
             return entry.supply.value();
         };
         std::optional<Entry&> betterEntry{std::nullopt};

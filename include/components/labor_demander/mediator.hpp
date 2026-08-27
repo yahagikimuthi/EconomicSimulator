@@ -27,7 +27,7 @@ class Listener final {
     template <typename F>
         requires std::conjunction_v<std::is_invocable<F, Ts>...>
     void notice(F methodCaller) noexcept {
-        auto call = [&](auto&& opt) -> void {
+        auto call = [&](auto&& opt) noexcept -> void {
             if (opt) {
                 methodCaller(*opt);
             }

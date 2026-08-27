@@ -53,7 +53,7 @@ void acceptResignation(LaborDemander& laborDemander) noexcept { laborDemander.ac
 
 void endStep(FirmFinance& finance, LaborDemander& laborDemander, CensusDropBox& dropBox) noexcept {
     laborDemander.endStep(
-        [&](const Money totalCost) -> void { finance.assetPlus(-totalCost); }, dropBox
+        [&](const Money totalCost) noexcept -> void { finance.assetPlus(-totalCost); }, dropBox
     );
 }
 
@@ -64,7 +64,7 @@ void endStep(
     CensusDropBox& dropBox
 ) noexcept {
     laborSupplier.endStep(
-        [&](const Money wage) -> void {
+        [&](const Money wage) noexcept -> void {
             const auto incomeAfterTax = government.collectIncomeTax(wage);
             finance.assetPlus(incomeAfterTax);
         },

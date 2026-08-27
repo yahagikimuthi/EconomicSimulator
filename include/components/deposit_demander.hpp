@@ -5,6 +5,7 @@
 #include <span>
 #include <vector>
 
+#include "components/others.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
 #include "core/values/others.hpp"
@@ -27,12 +28,20 @@ class DepositDemander final {
         if (not isPosting()) return;
         auto entries = packEntry();
         for (Entry& entry : entries) {
-            auto& account = savingAccounts_.emplace_back(entry.entryAgentId);
+            auto& account = depositAccounts_.emplace_back(entry.entryAgentId);
             entry.account(account);
         }
     }
 
-    void endStep() noexcept { reset(); }
+    template <AssetMinusFn F>
+    void endStep(F&& assetMinus) noexcept {
+        for (auto& account : depositAccounts_) {
+            account.applyInterest(interestRate_);
+            const auto minus = account.balance() * interestRate_;
+            assetMinus(static_cast<Money>(minus));
+        }
+        reset();
+    }
 
   private:
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myRequest_.has_value(); }
@@ -47,9 +56,9 @@ class DepositDemander final {
 
     void reset() noexcept { myRequest_.reset(); }
 
-    std::optional<DepositRequest&> myRequest_;
-    InterestRate                   interestRate_;
-    std::deque<DepositAccount>     savingAccounts_;
+    std::optional<Request&>    myRequest_;
+    InterestRate               interestRate_;
+    std::deque<DepositAccount> depositAccounts_;
 };
 }  // namespace abm::deposit::demander
 

@@ -1,3 +1,3 @@
 import abm;
 
-auto main() -> int { abm::run(100U); }
+auto main() noexcept -> int { abm::run(100U); }

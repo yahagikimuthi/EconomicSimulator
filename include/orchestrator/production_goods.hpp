@@ -58,13 +58,13 @@ void endStep(
     CensusDropBox&           dropBox
 ) noexcept {
     productionGoodsSupplier.endStep(
-        [&](const Money sales) -> void {
+        [&](const Money sales) noexcept -> void {
             const auto salesAfterTax = government.collectSalesTax(sales);
             finance.assetPlus(salesAfterTax);
         },
         dropBox
     );
-    productionGoodsDemander.endStep([&](const demander::TradeResult& result) -> void {
+    productionGoodsDemander.endStep([&](const demander::TradeResult& result) noexcept -> void {
         finance.assetPlus(-result.purchased);
         productionGoodsSupplier.addProductionEquip(result.tradeAmount);
     });
@@ -75,7 +75,7 @@ void endStep(
     ConsumerGoodsSupplier&   consumerGoodsSupplier,
     ProductionGoodsDemander& productionGoodsDemander
 ) noexcept {
-    productionGoodsDemander.endStep([&](const demander::TradeResult& result) -> void {
+    productionGoodsDemander.endStep([&](const demander::TradeResult& result) noexcept -> void {
         finance.assetPlus(-result.purchased);
         consumerGoodsSupplier.addProductionEquip(result.tradeAmount);
     });

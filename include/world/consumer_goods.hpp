@@ -92,7 +92,7 @@ class ConsumerGoodsMarket final {
 
     auto pickEntry(const int sampleCnt, RandomGenerator& rng) noexcept -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
-        auto toDouble = [] [[nodiscard]] (const Entry& entry) -> double {
+        auto toDouble = [] [[nodiscard]] (const Entry& entry) noexcept -> double {
             return entry.supply.value();
         };
         auto betterEntry =

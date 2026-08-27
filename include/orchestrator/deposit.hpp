@@ -1,5 +1,6 @@
 #pragma once
 
+#include "components/common.hpp"
 #include "components/deposit_demander.hpp"
 #include "components/deposit_supplier.hpp"
 #include "core/values/common.hpp"
@@ -18,7 +19,9 @@ void entry(const AgentID id, DepositSupplier& depositSupplier, DepositMarket& ma
 
 void accountOpening(DepositDemander& depositDemander) noexcept { depositDemander.accountOpening(); }
 
-void endStep(DepositDemander& depositDemander) noexcept { depositDemander.endStep(); }
+void endStep(FirmFinance& finance, DepositDemander& depositDemander) noexcept {
+    depositDemander.endStep([&](const Money sub) noexcept -> void { finance.assetPlus(-sub); });
+}
 
 void endStep(DepositSupplier& depositSupplier) noexcept { depositSupplier.endStep(); }
 }  // namespace abm::deposit

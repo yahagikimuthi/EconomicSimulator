@@ -5,6 +5,7 @@
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
+#include "core/values/others.hpp"
 #include "world/deposit.hpp"
 
 namespace abm::deposit::supplier {
@@ -12,7 +13,14 @@ class AccountManager final {
   public:
     [[nodiscard]] constexpr AccountManager() noexcept = default;
 
+    [[nodiscard]] auto balance() const noexcept -> Deposit {
+        return account_.transform(&DepositAccount::balance).value_or(Deposit{0.0});
+    }
+
+    void setAccount(DepositAccount& account) noexcept { account_ = account; }
+
   private:
+    [[nodiscard]] auto haveAccount() const noexcept -> bool { return account_.has_value(); }
     std::optional<DepositAccount&> account_{std::nullopt};
 };
 
@@ -32,7 +40,10 @@ class DepositSupplier final {
         myEntry_ = picked->entry(id);
     }
 
-    void registerAccount() noexcept;
+    void registerAccount() noexcept {
+        if (not isPosting()) return;
+        accountManager_.setAccount(myEntry_->account());
+    }
 
     void endStep() noexcept { reset(); }
 

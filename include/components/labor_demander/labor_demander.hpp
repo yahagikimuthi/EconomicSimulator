@@ -89,7 +89,7 @@ class LaborDemander final {
 
     void registerMember(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.registerMember(
-            [&] [[nodiscard]] (const AgentID id, const Wage wage) -> RosterEntry& {
+            [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
                 return humanResource_.addRoster(id, wage, workspace);
             }
         );

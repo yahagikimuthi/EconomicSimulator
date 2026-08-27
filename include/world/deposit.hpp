@@ -21,11 +21,6 @@ class DepositAccount final {
 
     const AgentID depositorId;
 
-    void disable() noexcept {
-        isValid  = false;
-        deposit_ = Deposit{0.0};
-    }
-
     void applyInterest(const InterestRate rate) noexcept {
         ASSERT(InterestRate{0.0} < rate and rate < InterestRate{1.0});
         deposit_ += deposit_ * (InterestRate{1.0} + rate);
@@ -46,7 +41,6 @@ class DepositAccount final {
     [[nodiscard]] auto balance() const noexcept -> Deposit { return deposit_; }
 
   private:
-    bool    isValid{true};
     Deposit deposit_{0.0};
 };
 
@@ -136,8 +130,9 @@ class DepositMarket final {
         RandomGenerator&               rng
     ) noexcept {
         rng.sample(
-            requests_ |
-                std::views::filter([id](const Request& req) -> bool { return req.bankId != id; }),
+            requests_ | std::views::filter([id](const Request& req) noexcept -> bool {
+                return req.bankId != id;
+            }),
             std::back_inserter(out),
             sampleCnt
         );

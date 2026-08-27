@@ -38,16 +38,18 @@ class JobHunter final {
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(
-        F1&&         isAligned,
-        F2&&         makeEntrySheet,
-        LaborMarket& market,
-        const int    sampleCnt = setting::jobSampleCnt,
-        const int    entryCnt  = setting::jobEntryCnt
+        F1&&      isAligned,
+        F2&&      makeEntrySheet,
+        Market&   market,
+        const int sampleCnt = setting::jobSampleCnt,
+        const int entryCnt  = setting::jobEntryCnt
     ) noexcept {
         if (acceptedEntry_) return;
         std::ranges::view auto alignedRequests{
             pickAndSortJobs(market, sampleCnt, entryCnt) |
-            std::views::filter([&](const Request& req) -> bool { return isAligned(req); }) |
+            std::views::filter([&](const Request& req) noexcept -> bool {
+                return isAligned(req);
+            }) |
             std::views::take(entryCnt)
         };
         if (alignedRequests.empty()) return;
@@ -89,7 +91,7 @@ class JobHunter final {
             sortRequests,
             sortRequests.begin() + static_cast<int>(k),
             std::ranges::greater{},
-            [](const RefWrap<Request> requestRef) -> double {
+            [](const RefWrap<Request> requestRef) noexcept -> double {
                 return requestRef.get().wage.value();
             }
         );
