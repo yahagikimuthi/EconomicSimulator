@@ -8,6 +8,7 @@
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "core/values/common.hpp"
+#include "core/values/integrate.hpp"
 #include "world/common.hpp"
 
 namespace abm::finance {
@@ -28,21 +29,55 @@ class BankRegistry {
     std::vector<Bank> banks_;
 };
 
-class BaseFinance {
+class Finance {
   public:
-    void assetPlus(const Money plus) noexcept { cash_ += plus; }
+    [[nodiscard]] explicit constexpr Finance(const Money asset, RandomGenerator& masterRng) noexcept
+        : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    [[nodiscard]] auto asset() const noexcept -> Money { return cash_; }
+    void assetPlus(const Money add) noexcept {
+        ASSERT(add >= Money{0.0});
 
-  protected:
-    [[nodiscard]] explicit constexpr BaseFinance(
-        const Money asset, RandomGenerator& masterRng
-    ) noexcept
-        : cash_{asset}, depositRatio_{masterRng.random(setting::depositRatio)} {}
+        // 現金比率が目標以上で、預金に成功した場合早期リターン
+        if (currentCashRatio() > cashRatio_ and depositSupplier_.tryDeposit(add)) return;
+        cash_ += add;
+    }
 
+    [[nodiscard]] auto claimBudget(const Money claim) noexcept -> Money {
+        ASSERT(claim >= Money{0.0});
+        ASSERT(asset() >= Money{0.0});
+
+        if (currentCashRatio() <= cashRatio_) {
+            const auto out = min(cash_, claim);
+            cash_ -= out;
+            return out;
+        }
+
+        const auto withdraw = depositSupplier_.tryWithdraw(claim);
+        ASSERT(withdraw <= claim);
+
+        const auto rest = claim - withdraw;
+        ASSERT(cash_ >= Money{0.0});
+        const auto cashOut = min(cash_, rest);
+        cash_ -= cashOut;
+
+        return withdraw + cashOut;
+    }
+
+    [[nodiscard]] auto asset() const noexcept -> Money {
+        return cash_ + depositSupplier_.balance();
+    }
+
+    [[nodiscard]] auto currentCashRatio() const noexcept -> double {
+        ASSERT(cash_ >= Money{0.0});
+        ASSERT(asset() >= Money{0.0});
+        if (asset() == Money{0.0}) return 0.0;
+        return cash_ / asset();
+    }
+
+  private:
     DepositSupplier depositSupplier_;
     Money           cash_;
-    const double    depositRatio_;
+    const double    cashRatio_;
 };
 
 class FirmFinance final {
