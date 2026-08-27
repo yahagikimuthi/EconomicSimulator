@@ -107,10 +107,12 @@ inline constexpr auto bToBFirm = 5;
 inline constexpr auto hhold    = 300;
 }  // namespace abm::setting::agent_count
 
-namespace abm::setting::agent_finance {
-inline constexpr RandomParameter firm  = UniformParameter<double>{.min = 100.0, .limit = 1000.0};
-inline constexpr RandomParameter hhold = UniformParameter<double>{.min = 10.0, .limit = 100.0};
-}  // namespace abm::setting::agent_finance
+namespace abm::finance::setting {
+inline constexpr RandomParameter firmInitialAsset =
+    UniformParameter<double>{.min = 100.0, .limit = 1000.0};
+inline constexpr RandomParameter hholdInitialAsset =
+    UniformParameter<double>{.min = 10.0, .limit = 100.0};
+}  // namespace abm::finance::setting
 
 namespace abm::setting::save_name {
 inline constexpr auto firmAssets        = "firmAssets"sv;
