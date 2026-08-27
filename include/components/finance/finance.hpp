@@ -3,6 +3,7 @@
 #include <utility>
 
 #include "components/common.hpp"
+#include "components/finance/deposit_demander.hpp"
 #include "components/finance/deposit_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
@@ -10,17 +11,38 @@
 #include "world/common.hpp"
 
 namespace abm::finance {
+
+class Bank {
+  public:
+    [[nodiscard]] explicit constexpr Bank() noexcept;
+
+  private:
+    DepositDemander depositDemander_;
+};
+
+class BankRegistry {
+  public:
+    [[nodiscard]] explicit constexpr BankRegistry() noexcept;
+
+  private:
+    std::vector<Bank> banks_;
+};
+
 class BaseFinance {
   public:
-    void assetPlus(const Money plus) noexcept { asset_ += plus; }
+    void assetPlus(const Money plus) noexcept { cash_ += plus; }
 
-    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
+    [[nodiscard]] auto asset() const noexcept -> Money { return cash_; }
 
   protected:
-    [[nodiscard]] explicit constexpr BaseFinance(const Money asset) noexcept : asset_{asset} {}
+    [[nodiscard]] explicit constexpr BaseFinance(
+        const Money asset, RandomGenerator& masterRng
+    ) noexcept
+        : cash_{asset}, depositRatio_{masterRng.random(setting::depositRatio)} {}
 
     DepositSupplier depositSupplier_;
-    Money           asset_;
+    Money           cash_;
+    const double    depositRatio_;
 };
 
 class FirmFinance final {
