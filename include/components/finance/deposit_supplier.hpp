@@ -16,6 +16,19 @@ class DepositSupplier final {
         return account_.transform(&DepositAccount::balance).value_or(Deposit{0.0});
     }
 
+    [[nodiscard]] auto tryDeposit(const Money deposit) noexcept -> bool {
+        ASSERT(deposit >= Money{0.0});
+        if (not haveAccount()) return false;
+        account_->deposit(deposit);
+        return true;
+    }
+
+    [[nodiscard]] auto tryWithdraw(const Money withdraw) noexcept -> Money {
+        ASSERT(withdraw >= Money{0.0});
+        if (not haveAccount()) return Money{0.0};
+        return account_->withdraw(withdraw);
+    }
+
     void setAccount(DepositAccount& account) noexcept { account_ = account; }
 
   private:
