@@ -1,9 +1,6 @@
 #pragma once
 
 #include <deque>
-#include <optional>
-#include <span>
-#include <vector>
 
 #include "components/common.hpp"
 #include "core/util.hpp"
