@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <concepts>
 #include <cstdint>
 #include <functional>
@@ -12,14 +13,20 @@
 #include <utility>
 #include <variant>
 
-#include "core/assertion.hpp"
 #include "core/setting.hpp"
+#include "core/util.hpp"
 
 namespace abm {
 template <typename... Ts>
 struct Overloaded final : Ts... {
     using Ts::operator()...;
 };
+
+#ifdef __clang__
+#define ASSERT(...) assert(__VA_ARGS__)
+#else
+#define ASSERT(...) contract_assert(__VA_ARGS__)
+#endif
 
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;

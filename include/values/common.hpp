@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/assertion.hpp"
+#include "core/util.hpp"
 #include "values/mixin.hpp"
 
 namespace abm {

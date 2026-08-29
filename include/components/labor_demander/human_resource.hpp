@@ -8,7 +8,6 @@
 #include <utility>
 #include <vector>
 
-#include "core/assertion.hpp"
 #include "core/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"

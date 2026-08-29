@@ -2,7 +2,7 @@
 
 #include <atomic>
 
-#include "core/assertion.hpp"
+#include "core/util.hpp"
 #include "values/goods.hpp"
 
 namespace abm::base_goods {

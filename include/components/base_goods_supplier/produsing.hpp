@@ -2,7 +2,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
-#include "core/assertion.hpp"
+#include "core/util.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
 #include "values/goods.hpp"

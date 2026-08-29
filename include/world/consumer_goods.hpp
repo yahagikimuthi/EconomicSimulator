@@ -8,7 +8,6 @@
 #include <ranges>
 #include <vector>
 
-#include "core/assertion.hpp"
 #include "core/util.hpp"
 #include "values/goods.hpp"
 
