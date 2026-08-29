@@ -8,7 +8,7 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
 #include "components/consumer_goods_supplier/common.hpp"
-#include "core/util.hpp"
+#include "others/util.hpp"
 #include "values/goods.hpp"
 #include "world/consumer_goods.hpp"
 

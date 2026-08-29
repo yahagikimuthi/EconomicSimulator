@@ -5,8 +5,8 @@
 #include <pcg_random.hpp>
 #include <utility>
 
-#include "core/setting.hpp"
-#include "core/util.hpp"
+#include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "values/integrate.hpp"

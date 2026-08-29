@@ -5,8 +5,8 @@
 #include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
-#include "core/setting.hpp"
-#include "core/util.hpp"
+#include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/goods.hpp"
 #include "values/integrate.hpp"
 

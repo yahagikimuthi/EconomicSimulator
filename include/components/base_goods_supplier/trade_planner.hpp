@@ -5,8 +5,8 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
-#include "core/setting.hpp"
-#include "core/util.hpp"
+#include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "values/integrate.hpp"

@@ -7,8 +7,8 @@
 #include "components/common.hpp"
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
-#include "core/setting.hpp"
-#include "core/util.hpp"
+#include "others/setting.hpp"
+#include "others/util.hpp"
 #include "world/common.hpp"
 #include "world/labor.hpp"
 

@@ -12,11 +12,11 @@
 #include <vector>
 
 #include "analysis/analysis.hpp"
-#include "core/setting.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
 #include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
+#include "others/setting.hpp"
 #include "values/common.hpp"
 #include "world/common.hpp"
 

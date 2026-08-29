@@ -2,7 +2,7 @@
 
 #include <compare>
 
-#include "core/util.hpp"
+#include "others/util.hpp"
 
 namespace abm::value_object {
 template <typename T>

@@ -7,7 +7,7 @@
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/common.hpp"
 #include "components/consumer_goods_supplier/trading_system.hpp"
-#include "core/util.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "values/labor.hpp"

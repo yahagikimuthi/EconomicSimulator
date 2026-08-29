@@ -1,7 +1,7 @@
 #pragma once
 
 #include "components/finance/finance.hpp"
-#include "core/setting.hpp"
+#include "others/setting.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
 #include "values/others.hpp"

@@ -7,7 +7,7 @@
 #include <ranges>
 #include <vector>
 
-#include "core/util.hpp"
+#include "others/util.hpp"
 #include "values/goods.hpp"
 
 namespace abm::production_goods {

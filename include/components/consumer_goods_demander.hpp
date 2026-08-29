@@ -5,8 +5,8 @@
 #include <utility>
 
 #include "components/common.hpp"
-#include "core/setting.hpp"
-#include "core/util.hpp"
+#include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "world/consumer_goods.hpp"

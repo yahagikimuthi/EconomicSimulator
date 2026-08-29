@@ -6,8 +6,8 @@
 #include <pcg_random.hpp>
 
 #include "components/labor_demander/common.hpp"
-#include "core/setting.hpp"
-#include "core/util.hpp"
+#include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/integrate.hpp"
 #include "values/labor.hpp"
 

@@ -3,7 +3,7 @@
 #include <deque>
 
 #include "components/common.hpp"
-#include "core/util.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/others.hpp"
 #include "world/deposit.hpp"

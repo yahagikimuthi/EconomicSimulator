@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "components/labor_demander/common.hpp"
-#include "core/util.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
 
