@@ -18,7 +18,7 @@
 #include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "core/values/common.hpp"
+#include "values/common.hpp"
 #include "world/common.hpp"
 #include "world/consumer_goods.hpp"
 #include "world/labor.hpp"

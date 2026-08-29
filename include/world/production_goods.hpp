@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "core/util.hpp"
-#include "core/values/goods.hpp"
+#include "values/goods.hpp"
 
 namespace abm::production_goods {
 class ProductionGoodsEntry;

@@ -2,9 +2,9 @@
 
 #include "components/finance/finance.hpp"
 #include "core/setting.hpp"
-#include "core/values/common.hpp"
-#include "core/values/labor.hpp"
-#include "core/values/others.hpp"
+#include "values/common.hpp"
+#include "values/labor.hpp"
+#include "values/others.hpp"
 
 namespace abm::government {
 class FlatTaxStrategy {

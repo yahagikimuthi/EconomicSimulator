@@ -9,8 +9,8 @@
 #include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
-#include "core/values/common.hpp"
-#include "core/values/labor.hpp"
+#include "values/common.hpp"
+#include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
 

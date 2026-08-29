@@ -9,7 +9,7 @@
 #include "components/base_goods_supplier/ledger.hpp"
 #include "components/production_goods_supplier/common.hpp"
 #include "core/util.hpp"
-#include "core/values/goods.hpp"
+#include "values/goods.hpp"
 
 namespace abm::production_goods::supplier {
 class Trader final {

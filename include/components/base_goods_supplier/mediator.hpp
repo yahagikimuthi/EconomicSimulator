@@ -9,7 +9,7 @@
 #include "components/base_goods_supplier/markup_planner.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
-#include "core/values/goods.hpp"
+#include "values/goods.hpp"
 
 namespace abm::base_goods::supplier::mediator {
 template <typename... Ts>

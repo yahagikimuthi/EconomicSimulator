@@ -7,8 +7,8 @@
 #include "components/finance/deposit_supplier.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "core/values/common.hpp"
-#include "core/values/integrate.hpp"
+#include "values/common.hpp"
+#include "values/integrate.hpp"
 #include "world/common.hpp"
 
 namespace abm::finance {

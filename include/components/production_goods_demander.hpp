@@ -7,9 +7,9 @@
 
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "core/values/common.hpp"
-#include "core/values/goods.hpp"
-#include "core/values/integrate.hpp"
+#include "values/common.hpp"
+#include "values/goods.hpp"
+#include "values/integrate.hpp"
 #include "world/production_goods.hpp"
 
 namespace abm::production_goods::demander {

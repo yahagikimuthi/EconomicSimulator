@@ -7,7 +7,7 @@
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/empoy_planner.hpp"
 #include "components/labor_demander/wage_planner.hpp"
-#include "core/values/labor.hpp"
+#include "values/labor.hpp"
 
 namespace abm::labor::demander {
 template <typename... Ts>

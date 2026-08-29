@@ -7,8 +7,8 @@
 #include "components/common.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "core/values/common.hpp"
-#include "core/values/goods.hpp"
+#include "values/common.hpp"
+#include "values/goods.hpp"
 #include "world/consumer_goods.hpp"
 
 namespace abm::consumer_goods::demander {

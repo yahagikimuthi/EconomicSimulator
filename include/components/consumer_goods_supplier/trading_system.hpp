@@ -5,7 +5,7 @@
 #include "components/consumer_goods_supplier/common.hpp"
 #include "components/consumer_goods_supplier/trader.hpp"
 #include "core/util.hpp"
-#include "core/values/goods.hpp"
+#include "values/goods.hpp"
 
 namespace abm::consumer_goods::supplier {
 class TradingSystem final {

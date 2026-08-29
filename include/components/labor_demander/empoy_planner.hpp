@@ -7,8 +7,8 @@
 #include "components/labor_demander/common.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "core/values/integrate.hpp"
-#include "core/values/labor.hpp"
+#include "values/integrate.hpp"
+#include "values/labor.hpp"
 
 namespace abm::labor::demander::planner {
 

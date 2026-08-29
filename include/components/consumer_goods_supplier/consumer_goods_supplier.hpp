@@ -8,9 +8,9 @@
 #include "components/common.hpp"
 #include "components/consumer_goods_supplier/trading_system.hpp"
 #include "core/util.hpp"
-#include "core/values/common.hpp"
-#include "core/values/goods.hpp"
-#include "core/values/labor.hpp"
+#include "values/common.hpp"
+#include "values/goods.hpp"
+#include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
 

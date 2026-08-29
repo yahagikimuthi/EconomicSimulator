@@ -6,7 +6,7 @@
 #include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
-#include "core/values/common.hpp"
+#include "values/common.hpp"
 #include "world/common.hpp"
 
 namespace abm::consumer_goods {

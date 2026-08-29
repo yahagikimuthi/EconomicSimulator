@@ -13,11 +13,11 @@
 
 #include "analysis/analysis.hpp"
 #include "core/setting.hpp"
-#include "core/values/common.hpp"
 #include "orchestrator/consumer_goods.hpp"
 #include "orchestrator/labor.hpp"
 #include "orchestrator/production_goods.hpp"
 #include "orchestrator/updates_loggings.hpp"
+#include "values/common.hpp"
 #include "world/common.hpp"
 
 namespace abm {

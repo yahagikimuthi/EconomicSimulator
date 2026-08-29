@@ -10,8 +10,8 @@
 
 #include "core/assertion.hpp"
 #include "core/util.hpp"
-#include "core/values/common.hpp"
-#include "core/values/labor.hpp"
+#include "values/common.hpp"
+#include "values/labor.hpp"
 #include "world/common.hpp"
 
 namespace abm::base_goods {

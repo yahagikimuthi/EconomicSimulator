@@ -6,9 +6,9 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "core/setting.hpp"
 #include "core/util.hpp"
-#include "core/values/goods.hpp"
-#include "core/values/integrate.hpp"
-#include "core/values/labor.hpp"
+#include "values/goods.hpp"
+#include "values/integrate.hpp"
+#include "values/labor.hpp"
 
 namespace abm::base_goods::supplier {
 // 前回の取引計画中、供給量が必要

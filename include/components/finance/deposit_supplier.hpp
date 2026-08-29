@@ -2,8 +2,8 @@
 
 #include <optional>
 
-#include "core/values/common.hpp"
-#include "core/values/others.hpp"
+#include "values/common.hpp"
+#include "values/others.hpp"
 #include "world/deposit.hpp"
 
 namespace abm::finance::deposit::supplier {

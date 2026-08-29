@@ -1,9 +1,9 @@
 #pragma once
 
 #include "components/base_goods_supplier/common.hpp"
-#include "core/values/common.hpp"
-#include "core/values/goods.hpp"
-#include "core/values/integrate.hpp"
+#include "values/common.hpp"
+#include "values/goods.hpp"
+#include "values/integrate.hpp"
 
 namespace abm::base_goods::supplier {
 struct ATradeResult final {

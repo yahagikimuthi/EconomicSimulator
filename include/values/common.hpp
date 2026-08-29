@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/assertion.hpp"
-#include "core/values/mixin.hpp"
+#include "values/mixin.hpp"
 
 namespace abm {
 class Wage;

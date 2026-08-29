@@ -4,7 +4,7 @@
 #include <cmath>
 #include <concepts>
 
-#include "core/values/mixin.hpp"
+#include "values/mixin.hpp"
 
 namespace abm::value_object {
 template <typename T>

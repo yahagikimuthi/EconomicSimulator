@@ -3,7 +3,7 @@
 #include <atomic>
 
 #include "core/assertion.hpp"
-#include "core/values/goods.hpp"
+#include "values/goods.hpp"
 
 namespace abm::base_goods {
 class Workspace final {
