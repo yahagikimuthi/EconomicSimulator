@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "components/capital_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
@@ -15,8 +16,8 @@ class ConsumerFirm final {
     void beginingYear() noexcept {
         const auto salesForecast =
             consumerGoodsSupplier_.planAndExpectSales(laborDemander_.sumWage());
-        const auto laborDemanderRequest   = laborDemanderAnnualRequestBudget(salesForecast);
-        const auto capitalDemanderRequest = capitalDemanderAnnualRequestBudget();
+        const auto laborDemanderRequest   = laborDemanderAnnualRequestBudget();
+        const auto capitalDemanderRequest = capitalDemanderRequestBudget();
         const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
         if (total.isZeroOrLess()) {
             laborDemander_.reviseAnnualPlan(laborDemanderRequest);
@@ -28,13 +29,29 @@ class ConsumerFirm final {
         distributeAnnualBudget(budget, laborDemanderRequest, capitalDemanderRequest);
     }
 
-  private:
-    [[nodiscard]] auto laborDemanderAnnualRequestBudget(const Money salesForecast
-    ) noexcept -> Money {
-        const auto adjust = consumerGoodsSupplier_.calcDesiredEmploy(laborDemander_.employeeCnt());
-        return laborDemander_.planAnnualAndRequestBudget(adjust, salesForecast);
+    void beginintMonth() noexcept {
+        const auto salesForecast =
+            consumerGoodsSupplier_.planAndExpectSales(laborDemander_.sumWage());
+        const auto sumWage                = laborDemander_.sumWage();
+        const auto capitalDemanderRequest = capitalDemanderRequestBudget();
+        const auto total                  = sumWage + capitalDemanderRequest - salesForecast;
+        if (total.isZeroOrLess()) {
+            capitalDemander_.revisePlan(capitalDemanderRequest);
+            return;
+        }
+        const auto budget = finance_.claimBudget(total) + salesForecast;
+        ASSERT(budget <= total);
+        capitalDemander_.revisePlan(std::max(budget - sumWage, Money{0.0}));
     }
-    [[nodiscard]] auto capitalDemanderAnnualRequestBudget() noexcept -> Money {
+
+  private:
+    [[nodiscard]] auto laborDemanderAnnualRequestBudget() noexcept -> Money {
+        const auto adjust = consumerGoodsSupplier_.calcDesiredEmploy(laborDemander_.employeeCnt());
+        return laborDemander_.planAnnualAndRequestBudget(
+            adjust, consumerGoodsSupplier_.salesForecast()
+        );
+    }
+    [[nodiscard]] auto capitalDemanderRequestBudget() noexcept -> Money {
         const auto desired = consumerGoodsSupplier_.requiresCapital();
         return capitalDemander_.planAndRequestBudget(desired);
     }
