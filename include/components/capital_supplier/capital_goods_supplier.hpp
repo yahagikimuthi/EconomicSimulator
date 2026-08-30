@@ -5,7 +5,7 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
-#include "components/capital_goods_supplier/trading_system.hpp"
+#include "components/capital_supplier/trading_system.hpp"
 #include "components/common.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
@@ -13,15 +13,15 @@
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
 
-namespace abm::capital_goods::supplier {
-class CapitalGoodsSupplier final {
+namespace abm::capital::supplier {
+class CapitalSupplier final {
     using ProducingSystem = base_goods::supplier::ProducingSystem;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
     using Workspace       = base_goods::Workspace;
 
   public:
-    [[nodiscard]] explicit constexpr CapitalGoodsSupplier(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr CapitalSupplier(RandomGenerator& masterRng) noexcept
         : producingSystem_{masterRng}, tradingSystem_{masterRng} {}
 
     void setMediator() noexcept {
@@ -47,17 +47,17 @@ class CapitalGoodsSupplier final {
         return producingSystem_.calcDesiredEmploy(targetSupply, employee);
     }
 
-    [[nodiscard]] auto requiresCapitalGoods() noexcept -> GoodsQuantity {
+    [[nodiscard]] auto requiresCapital() noexcept -> GoodsQuantity {
         const auto requiresSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredCapitalGoods(requiresSupply);
+        return producingSystem_.calcDesiredCapital(requiresSupply);
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     void trade() noexcept { tradingSystem_.trade(); }
 
-    void addCapitalEquip(const GoodsQuantity capitalGoods) noexcept {
-        producingSystem_.addProducingEquip(capitalGoods);
+    void addCapitalEquip(const GoodsQuantity capital) noexcept {
+        producingSystem_.addProducingEquip(capital);
     }
 
     template <AssetPlusFn F>
@@ -80,8 +80,8 @@ class CapitalGoodsSupplier final {
     Mediator        mediator_;
     CentralMemory   memory_;
 };
-}  // namespace abm::capital_goods::supplier
+}  // namespace abm::capital::supplier
 
 namespace abm {
-using CapitalGoodsSupplier = capital_goods::supplier::CapitalGoodsSupplier;
+using CapitalSupplier = capital::supplier::CapitalSupplier;
 }

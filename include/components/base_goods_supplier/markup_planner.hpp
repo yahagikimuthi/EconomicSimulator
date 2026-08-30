@@ -8,7 +8,7 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
-#include "values/integrate.hpp"
+#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 

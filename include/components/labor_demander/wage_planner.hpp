@@ -8,8 +8,8 @@
 #include "components/labor_demander/common.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "values/integrate.hpp"
 #include "values/labor.hpp"
+#include "values/math.hpp"
 
 namespace abm::labor::demander::planner {
 // 前回雇用計画が必要

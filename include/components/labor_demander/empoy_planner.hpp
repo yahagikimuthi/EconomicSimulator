@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <optional>
@@ -7,8 +8,8 @@
 #include "components/labor_demander/common.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "values/integrate.hpp"
 #include "values/labor.hpp"
+#include "values/math.hpp"
 
 namespace abm::labor::demander::planner {
 
@@ -65,7 +66,7 @@ class OfferPlanner final {
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
         const auto out     = employPlan * (OfferRate{1.0} + planOfferRate());
-        const auto guarded = min(out, HeadCount{::abm::setting::agent_count::hhold});
+        const auto guarded = std::min(out, HeadCount{::abm::setting::agent_count::hhold});
         return ceil(guarded);
     }
 
@@ -92,7 +93,7 @@ class OfferPlanner final {
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto shouldRaise = *lastEmployResult < *lastEmployPlan;
         const auto next        = rateCache_.cache() + OfferRate{(shouldRaise ? alpha : -alpha)};
-        const auto guarded     = clamp(
+        const auto guarded     = std::clamp(
             next,
             OfferRate{std::numeric_limits<double>::epsilon()},
             OfferRate{::abm::setting::agent_count::hhold}

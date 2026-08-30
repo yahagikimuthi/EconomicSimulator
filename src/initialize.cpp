@@ -7,8 +7,8 @@
 #include <pcg_random.hpp>
 #include <utility>
 
-#include "components/capital_goods_demander.hpp"
-#include "components/capital_goods_supplier/capital_goods_supplier.hpp"
+#include "components/capital_demander.hpp"
+#include "components/capital_supplier/capital_supplier.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
@@ -50,14 +50,12 @@ namespace {
     return ConsumerGoodsSupplier{masterRng};
 }
 
-[[nodiscard]] auto createCapitalGoodsDemander(RandomGenerator& masterRng
-) noexcept -> CapitalGoodsDemander {
-    return CapitalGoodsDemander{masterRng};
+[[nodiscard]] auto createCapitalDemander(RandomGenerator& masterRng) noexcept -> CapitalDemander {
+    return CapitalDemander{masterRng};
 }
 
-[[nodiscard]] auto createCapitalGoodsSupplier(RandomGenerator& masterRng
-) noexcept -> CapitalGoodsSupplier {
-    return CapitalGoodsSupplier{masterRng};
+[[nodiscard]] auto createCapitalSupplier(RandomGenerator& masterRng) noexcept -> CapitalSupplier {
+    return CapitalSupplier{masterRng};
 }
 }  // namespace
 
@@ -81,7 +79,7 @@ Engine::Engine(const unsigned int totalStep, const bool isAnalysis) noexcept
             .finance       = createFirmFinance(rng_),
             .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::ConsumerGoods),
             .consumerGoodsSupplier = createConsumerGoodsSupplier(rng_),
-            .capitalGoodsDemander  = createCapitalGoodsDemander(rng_)
+            .capitalDemander       = createCapitalDemander(rng_)
         });
     }
     for (BtoCFirm& firm : bToCFirms_) {
@@ -92,16 +90,16 @@ Engine::Engine(const unsigned int totalStep, const bool isAnalysis) noexcept
     bToBFirms_.reserve(cnt::bToBFirm);
     for (; agentId < cnt::bToCFirm + cnt::bToBFirm; ++agentId) {
         bToBFirms_.emplace_back(BtoBFirm{
-            .id            = AgentID{agentId},
-            .finance       = createFirmFinance(rng_),
-            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::CapitalGoods),
-            .capitalGoodsDemander = createCapitalGoodsDemander(rng_),
-            .capitalGoodsSupplier = createCapitalGoodsSupplier(rng_)
+            .id              = AgentID{agentId},
+            .finance         = createFirmFinance(rng_),
+            .laborDemander   = createLaborDemander(rng_, AgentID{agentId}, EMarket::Capital),
+            .capitalDemander = createCapitalDemander(rng_),
+            .capitalSupplier = createCapitalSupplier(rng_)
         });
     }
     for (BtoBFirm& firm : bToBFirms_) {
         firm.laborDemander.setMediator();
-        firm.capitalGoodsSupplier.setMediator();
+        firm.capitalSupplier.setMediator();
     }
 
     hholds_.reserve(cnt::hhold);

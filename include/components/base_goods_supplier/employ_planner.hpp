@@ -7,8 +7,8 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
-#include "values/integrate.hpp"
 #include "values/labor.hpp"
+#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 // 前回の取引計画中、供給量が必要

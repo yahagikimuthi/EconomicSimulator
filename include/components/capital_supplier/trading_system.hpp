@@ -1,13 +1,13 @@
 #pragma once
 
 #include "components/base_goods_supplier/trade_planner.hpp"
-#include "components/capital_goods_supplier/common.hpp"
-#include "components/capital_goods_supplier/trader.hpp"
+#include "components/capital_supplier/common.hpp"
+#include "components/capital_supplier/trader.hpp"
 #include "components/common.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 
-namespace abm::capital_goods::supplier {
+namespace abm::capital::supplier {
 class TradingSystem final {
     using TradePlanner = base_goods::supplier::TradePlanner;
 
@@ -51,4 +51,4 @@ class TradingSystem final {
     TradePlanner planner_;
     Trader       trader_;
 };
-}  // namespace abm::capital_goods::supplier
+}  // namespace abm::capital::supplier

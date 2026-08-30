@@ -44,10 +44,48 @@ class HumanResource final {
         : companyBoard_{std::move(companyBoard)} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Money {
-        layOffsPlan_.emplace(layOffsCnt);
-        const auto wageSum = sumWage();
-        const auto avgWage = wageSum.value() / employeeCnt().value();
-        return static_cast<Money>(wageSum.value() - (avgWage * layOffsCnt.value()));
+        const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
+        layOffsPlan_           = layOffsPlan;
+        const auto wageSum     = sumWage();
+        const auto avgWage     = wageSum.value() / employeeCnt().value();
+        requestedBudget_       = (employeeCnt() - layOffsPlan) * Wage{avgWage};
+        return *requestedBudget_;
+    }
+
+    void revisePlan(const Money budget) noexcept {
+        ASSERT(requestedBudget_);
+        ASSERT(budget <= requestedBudget_);
+        if (budget == requestedBudget_) return;
+        const auto cutSumWage = sumWage().value() - budget.value();
+        if (cutSumWage <= 0.0) return;
+        const auto avgWage = sumWage() / employeeCnt().value();
+        const auto layOffs = cutSumWage / avgWage.value();
+        layOffsPlan_.emplace(layOffs);
+    }
+
+    [[nodiscard]] auto requestedBudget() const noexcept -> Money {
+        ASSERT(requestedBudget_);
+        return *requestedBudget_;
+    }
+
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
+        ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
+        const auto rosterSize = companyBoard_.roster.size() - emptyRosterPool_.size();
+        const auto out        = HeadCount{rosterSize};
+        ASSERT(out >= HeadCount{0.0});
+        return out;
+    }
+
+    [[nodiscard]] auto sumWage() const noexcept -> Wage {
+        const auto& roster = companyBoard_.roster;
+
+        auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
+                     std::views::transform([](const RosterEntry& e) noexcept -> double {
+                         return e.wage.value();
+                     });
+        const auto sumWage = std::ranges::fold_left(wages, 0.0, std::plus{});
+        ASSERT(sumWage >= 0.0);
+        return Wage{sumWage};
     }
 
     [[nodiscard]] auto addRoster(
@@ -73,15 +111,6 @@ class HumanResource final {
         resignationBox.clear();
     }
 
-    void revisePlan(const Money budget) noexcept {
-        if (budget >= *claimedBudget_) return;
-        const auto cutSumWage = sumWage().value() - budget.value();
-        if (cutSumWage <= 0.0) return;
-        const auto avgWage = sumWage() / employeeCnt().value();
-        const auto layOffs = cutSumWage / avgWage.value();
-        layOffsPlan_.emplace(layOffs);
-    }
-
     void layOffs() noexcept {
         const auto layOffsCnt = layOffsPlan_;
         ASSERT(layOffsCnt >= HeadCount{0.0});
@@ -96,36 +125,11 @@ class HumanResource final {
         }
     }
 
-    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
-        ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
-        const auto rosterSize = companyBoard_.roster.size() - emptyRosterPool_.size();
-        const auto out        = HeadCount{rosterSize};
-        ASSERT(out >= HeadCount{0.0});
-        return out;
-    }
-
-    [[nodiscard]] auto sumWage() const noexcept -> Wage {
-        const auto& roster = companyBoard_.roster;
-
-        auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
-                     std::views::transform([](const RosterEntry& e) noexcept -> double {
-                         return e.wage.value();
-                     });
-        const auto sumWage = std::ranges::fold_left(wages, 0.0, std::plus{});
-        ASSERT(sumWage >= 0.0);
-        return Wage{sumWage};
-    }
-
-    [[nodiscard]] auto claimedBudget() const noexcept -> Money {
-        ASSERT(claimedBudget_);
-        return *claimedBudget_;
-    }
-
   private:
-    CompanyBoard                   companyBoard_;
-    EmptyRosterPool                emptyRosterPool_;
-    std::optional<const HeadCount> layOffsPlan_;
-    std::optional<Money>           claimedBudget_;
+    CompanyBoard             companyBoard_;
+    EmptyRosterPool          emptyRosterPool_;
+    std::optional<HeadCount> layOffsPlan_;
+    std::optional<Money>     requestedBudget_;
 };
 }  // namespace abm::labor::demander::human_resource
 

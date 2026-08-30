@@ -5,8 +5,8 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
-#include "values/integrate.hpp"
 #include "values/labor.hpp"
+#include "values/math.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
 
@@ -25,25 +25,25 @@ class Producer final {
         ASSERT(workerInput >= GoodsQuantity{0.0});
 
         workspace_.resetInput();
-        const auto capitalEquipInput = capitalGoods_ * producerGoodsEfficiency_;
-        ASSERT(capitalGoods_ >= GoodsQuantity{0.0});
-        capitalGoods_ *= (1.0 - producerGoodsDepreciationRate_);
+        const auto capitalEquipInput = capital_ * producerGoodsEfficiency_;
+        ASSERT(capital_ >= GoodsQuantity{0.0});
+        capital_ *= (1.0 - producerGoodsDepreciationRate_);
 
         const auto input = baseProductPower_ * min(workerInput, capitalEquipInput);
         return input;
     }
 
-    void addProducingEquip(const GoodsQuantity capitalGoods) noexcept {
-        ASSERT(capitalGoods >= GoodsQuantity{0.0});
-        capitalGoods_ += capitalGoods;
+    void addProducingEquip(const GoodsQuantity capital) noexcept {
+        ASSERT(capital >= GoodsQuantity{0.0});
+        capital_ += capital;
     }
 
     [[nodiscard]] auto baseProductPower() const noexcept -> double { return baseProductPower_; }
 
-    [[nodiscard]] auto calcDesiredCapitalGoods(const GoodsQuantity requiresSupply
+    [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
         return max(
-            (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - capitalGoods_,
+            (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - capital_,
             GoodsQuantity{0.0}
         );
     }
@@ -55,7 +55,7 @@ class Producer final {
     const double  baseProductPower_;
     const double  producerGoodsEfficiency_;
     const double  producerGoodsDepreciationRate_;
-    GoodsQuantity capitalGoods_{0.0};
+    GoodsQuantity capital_{0.0};
 };
 
 class ProducingSystem final {
@@ -77,13 +77,13 @@ class ProducingSystem final {
         );
     }
 
-    [[nodiscard]] auto calcDesiredCapitalGoods(const GoodsQuantity requiresSupply
+    [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return producer_.calcDesiredCapitalGoods(requiresSupply);
+        return producer_.calcDesiredCapital(requiresSupply);
     }
 
-    void addProducingEquip(const GoodsQuantity capitalGoods) noexcept {
-        producer_.addProducingEquip(capitalGoods);
+    void addProducingEquip(const GoodsQuantity capital) noexcept {
+        producer_.addProducingEquip(capital);
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }

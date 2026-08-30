@@ -3,7 +3,7 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "values/integrate.hpp"
+#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 struct ATradeResult final {

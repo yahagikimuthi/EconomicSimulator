@@ -8,8 +8,8 @@
 #include <random>
 #include <vector>
 
-#include "components/capital_goods_demander.hpp"
-#include "components/capital_goods_supplier/capital_goods_supplier.hpp"
+#include "components/capital_demander.hpp"
+#include "components/capital_supplier/capital_supplier.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
@@ -20,7 +20,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
-#include "world/capital_goods.hpp"
+#include "world/capital.hpp"
 #include "world/common.hpp"
 #include "world/consumer_goods.hpp"
 #include "world/labor.hpp"
@@ -31,15 +31,15 @@ struct BtoCFirm final {  // NOLINT
     FirmFinance           finance;
     LaborDemander         laborDemander;
     ConsumerGoodsSupplier consumerGoodsSupplier;
-    CapitalGoodsDemander  capitalGoodsDemander;
+    CapitalDemander       capitalDemander;
 };
 
 struct BtoBFirm final {  // NOLINT
-    const AgentID        id;
-    FirmFinance          finance;
-    LaborDemander        laborDemander;
-    CapitalGoodsDemander capitalGoodsDemander;
-    CapitalGoodsSupplier capitalGoodsSupplier;
+    const AgentID   id;
+    FirmFinance     finance;
+    LaborDemander   laborDemander;
+    CapitalDemander capitalDemander;
+    CapitalSupplier capitalSupplier;
 };
 
 struct HHold final {  // NOLINT
@@ -87,7 +87,7 @@ class Engine final {
 
   private:
     void runLabor() noexcept;
-    void runCapitalGoods() noexcept;
+    void runCapital() noexcept;
     void runConsumerGoods() noexcept;
     void endAllStep() noexcept;
     void reset() noexcept;
@@ -117,7 +117,7 @@ class Engine final {
     RandomGenerator rng_;
 
     LaborMarket         laborMarket_;
-    CapitalGoodsMarket  capitalGoodsMarket_;
+    CapitalMarket       capitalMarket_;
     ConsumerGoodsMarket consumerGoodsMarket_;
 
     bool isAnalysis_;

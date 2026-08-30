@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <concepts>
 #include <limits>
 #include <optional>
@@ -10,10 +11,9 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "values/integrate.hpp"
-#include "world/capital_goods.hpp"
+#include "world/capital.hpp"
 
-namespace abm::capital_goods::demander {
+namespace abm::capital::demander {
 struct Log final {
     const Money         purchase{std::numeric_limits<double>::epsilon()};
     const GoodsQuantity tradeAmount{std::numeric_limits<double>::infinity()};
@@ -62,18 +62,19 @@ concept ReadResultFn = requires(F f, const TradeResult& result) {
     { f(result) } -> std::same_as<void>;
 };
 
-class CapitalGoodsDemander final {
-    using Request = CapitalGoodsRequest;
-    using Market  = CapitalGoodsMarket;
+class CapitalDemander final {
+    using Request = CapitalRequest;
+    using Market  = CapitalMarket;
 
   public:
-    [[nodiscard]] explicit constexpr CapitalGoodsDemander(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr CapitalDemander(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     [[nodiscard]] auto planAndRequestBudget(const GoodsQuantity desiredAmount) noexcept -> Money {
         const auto avgPrice = log_.purchase / log_.tradeAmount;
         purchaseAmountPlan_ = desiredAmount;
-        return avgPrice * desiredAmount;
+        budget_             = avgPrice * desiredAmount;
+        return *budget_;
     }
 
     void revisePlan(const Money budget) noexcept { budget_ = budget; }
@@ -85,7 +86,7 @@ class CapitalGoodsDemander final {
     ) noexcept {
         const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
-        const auto purchaseAmount = min(*purchaseAmountPlan_, *budget_ / pickedEntry->price);
+        const auto purchaseAmount = std::min(*purchaseAmountPlan_, *budget_ / pickedEntry->price);
         myRequest_                = pickedEntry->request(purchaseAmount);
     }
 
@@ -119,8 +120,8 @@ class CapitalGoodsDemander final {
     std::optional<Money>          budget_{std::nullopt};
     std::optional<const Request&> myRequest_{std::nullopt};
 };
-}  // namespace abm::capital_goods::demander
+}  // namespace abm::capital::demander
 
 namespace abm {
-using CapitalGoodsDemander = capital_goods::demander::CapitalGoodsDemander;
+using CapitalDemander = capital::demander::CapitalDemander;
 }

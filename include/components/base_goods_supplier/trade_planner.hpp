@@ -9,7 +9,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "values/integrate.hpp"
+#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 class PricePlanner final {

@@ -8,7 +8,7 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/integrate.hpp"
+#include "values/math.hpp"
 #include "world/common.hpp"
 
 namespace abm::finance {

@@ -39,12 +39,11 @@ class ConsumerGoodsSupplier final {
         return producingSystem_.calcDesiredEmploy(requiresSupply, employee);
     }
 
-    [[nodiscard]] auto planAndRequestBudget(const Money totalCost) noexcept -> Money {
+    [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Money {
         const auto supply = producingSystem_.produce();
         tradingSystem_.plan(supply, totalCost, mediator_);
         return -salesForecast();
     }
-    void revisePlan(const Money _) noexcept {}
 
     void beginingMonth(const Money totalCost) noexcept {
         const auto supply = producingSystem_.produce();
@@ -62,16 +61,16 @@ class ConsumerGoodsSupplier final {
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
-    void addCapitalEquip(const GoodsQuantity capitalGoods) noexcept {
-        ASSERT(capitalGoods >= GoodsQuantity{0.0});
-        producingSystem_.addProducingEquip(capitalGoods);
+    void addCapitalEquip(const GoodsQuantity capital) noexcept {
+        ASSERT(capital >= GoodsQuantity{0.0});
+        producingSystem_.addProducingEquip(capital);
     }
 
     [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 
-    [[nodiscard]] auto requiresCapitalGoods() noexcept -> GoodsQuantity {
+    [[nodiscard]] auto requiresCapital() noexcept -> GoodsQuantity {
         const auto requiresSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredCapitalGoods(requiresSupply);
+        return producingSystem_.calcDesiredCapital(requiresSupply);
     }
 
   private:

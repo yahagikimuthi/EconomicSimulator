@@ -10,13 +10,11 @@
 #include "others/util.hpp"
 #include "values/goods.hpp"
 
-namespace abm::capital_goods {
-class CapitalGoodsEntry;
-class CapitalGoodsRequest final {
+namespace abm::capital {
+class CapitalEntry;
+class CapitalRequest final {
   public:
-    [[nodiscard]] constexpr CapitalGoodsRequest(
-        const GoodsQuantity a, const CapitalGoodsEntry& e
-    ) noexcept
+    [[nodiscard]] constexpr CapitalRequest(const GoodsQuantity a, const CapitalEntry& e) noexcept
         : amount{a}, entry{e} {
         ASSERT(a.isZeroOrMore());
     }
@@ -28,18 +26,18 @@ class CapitalGoodsRequest final {
         tradeAmount_ = tradeAmount;
     }
 
-    const GoodsQuantity      amount;
-    const CapitalGoodsEntry& entry;
+    const GoodsQuantity amount;
+    const CapitalEntry& entry;
 
   private:
     GoodsQuantity tradeAmount_{0.0};
 };
 
-class CapitalGoodsEntry final {
-    using Request = CapitalGoodsRequest;
+class CapitalEntry final {
+    using Request = CapitalRequest;
 
   public:
-    [[nodiscard]] constexpr CapitalGoodsEntry(
+    [[nodiscard]] constexpr CapitalEntry(
         const AgentID i, const Price p, const GoodsQuantity s
     ) noexcept
         : id{i}, price{p}, supply{s} {}
@@ -76,11 +74,11 @@ class CapitalGoodsEntry final {
     tbb::concurrent_vector<Request> requestBox_;
 };
 
-class CapitalGoodsMarket final {
-    using Entry = CapitalGoodsEntry;
+class CapitalMarket final {
+    using Entry = CapitalEntry;
 
   public:
-    [[nodiscard]] CapitalGoodsMarket() noexcept = default;
+    [[nodiscard]] CapitalMarket() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
@@ -113,8 +111,8 @@ class CapitalGoodsMarket final {
     tbb::concurrent_vector<Entry> entryBox_;
     std::atomic<double>           totalSupply_;
 };
-}  // namespace abm::capital_goods
+}  // namespace abm::capital
 
 namespace abm {
-using CapitalGoodsMarket = capital_goods::CapitalGoodsMarket;
+using CapitalMarket = capital::CapitalMarket;
 }

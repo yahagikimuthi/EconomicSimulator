@@ -5,7 +5,7 @@
 #include "others/setting.hpp"
 
 namespace abm {
-enum class EMarket : char { Labor, ConsumerGoods, CapitalGoods };
+enum class EMarket : char { Labor, ConsumerGoods, Capital };
 
 // 並列化する場合、tbb::concurrent_vectorにしなければならない
 // しかし、HighFiveと互換性がないため、連続メモリコンテナで要素の追加を安全に行いたい
