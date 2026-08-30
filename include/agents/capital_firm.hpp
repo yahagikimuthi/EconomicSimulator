@@ -26,7 +26,7 @@ class CapitalFirm final {
         ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
     }
 
-    void beginintMonth() noexcept {
+    void beginingMonth() noexcept {
         const auto salesForecast = capitalSupplier_.planAndExpectSales(laborDemander_.sumWage());
         const auto sumWage       = laborDemander_.sumWage();
         const auto capitalDemanderRequest = capitalDemanderRequestBudget();
