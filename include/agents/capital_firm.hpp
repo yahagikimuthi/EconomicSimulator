@@ -8,64 +8,90 @@
 #include "values/common.hpp"
 
 namespace abm {
-class CapitalFirm final {
-  public:
-    [[nodiscard]] explicit CapitalFirm(RandomGenerator& masterRng) noexcept;
-
-    void beginingYear() noexcept {
-        const auto salesForecast = capitalSupplier_.planAndExpectSales(laborDemander_.sumWage());
-        const auto laborDemanderRequest   = laborDemanderAnnualRequestBudget();
-        const auto capitalDemanderRequest = capitalDemanderRequestBudget();
-        const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
-        if (total.isZeroOrLess()) {
-            laborDemander_.reviseAnnualPlan(laborDemanderRequest);
-            capitalDemander_.revisePlan(capitalDemanderRequest);
-            return;
-        }
-        const auto budget = finance_.claimBudget(total) + salesForecast;
-        ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
-    }
-
-    void beginingMonth() noexcept {
-        const auto salesForecast = capitalSupplier_.planAndExpectSales(laborDemander_.sumWage());
-        const auto sumWage       = laborDemander_.sumWage();
-        const auto capitalDemanderRequest = capitalDemanderRequestBudget();
-        const auto total                  = sumWage + capitalDemanderRequest - salesForecast;
-        if (total.isZeroOrLess()) {
-            capitalDemander_.revisePlan(capitalDemanderRequest);
-            return;
-        }
-        const auto budget = finance_.claimBudget(total) + salesForecast;
-        ASSERT(budget <= total);
-        capitalDemander_.revisePlan(std::max(budget - sumWage, Money{0.0}));
-    }
-
-  private:
-    [[nodiscard]] auto laborDemanderAnnualRequestBudget() noexcept -> Money {
-        const auto adjust = capitalSupplier_.calcDesiredEmploy(laborDemander_.employeeCnt());
-        return laborDemander_.planAnnualAndRequestBudget(adjust, capitalSupplier_.salesForecast());
-    }
-    [[nodiscard]] auto capitalDemanderRequestBudget() noexcept -> Money {
-        const auto desired = capitalSupplier_.requiresCapital();
-        return capitalDemander_.planAndRequestBudget(desired);
-    }
-    void distributeAnnualBudget(
-        const Money budget, const Money laborDemanderRequest, const Money capitalDemanderRequest
-    ) noexcept {
-        ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
-        if (budget < laborDemanderRequest) {
-            laborDemander_.reviseAnnualPlan(budget);
-            capitalDemander_.revisePlan(Money{0.0});
-            return;
-        }
-        laborDemander_.reviseAnnualPlan(laborDemanderRequest);
-        capitalDemander_.revisePlan(budget - laborDemanderRequest);
-    }
-
-    finance::Finance finance_;
-    LaborDemander    laborDemander_;
-    CapitalDemander  capitalDemander_;
-    CapitalSupplier  capitalSupplier_;
-    const AgentID    id_;
+struct CapitalFirm final {
+    finance::Finance finance;
+    LaborDemander    laborDemander;
+    CapitalDemander  capitalDemander;
+    CapitalSupplier  capitalSupplier;
+    const AgentID    id;
 };
 }  // namespace abm
+
+namespace abm::capital_firm::detail {
+[[nodiscard]] auto laborDemanderAnnualRequestBudget(
+    LaborDemander& laborDemander, CapitalSupplier& capitalSupplier
+) noexcept -> Money {
+    const auto adjust = capitalSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
+    return laborDemander.planAnnualAndRequestBudget(adjust, capitalSupplier.salesForecast());
+}
+
+[[nodiscard]] auto capitalDemanderRequestBudget(
+    CapitalDemander& capitalDemander, CapitalSupplier& capitalSupplier
+) noexcept -> Money {
+    const auto desired = capitalSupplier.requiresCapital();
+    return capitalDemander.planAndRequestBudget(desired);
+}
+
+void distributeAnnualBudget(
+    LaborDemander&   laborDemander,
+    CapitalDemander& capitalDemander,
+    const Money      budget,
+    const Money      laborDemanderRequest,
+    const Money      capitalDemanderRequest
+) noexcept {
+    ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
+    if (budget < laborDemanderRequest) {
+        laborDemander.reviseAnnualPlan(budget);
+        capitalDemander.revisePlan(Money{0.0});
+        return;
+    }
+    laborDemander.reviseAnnualPlan(laborDemanderRequest);
+    capitalDemander.revisePlan(laborDemanderRequest - budget);
+}
+}  // namespace abm::capital_firm::detail
+
+namespace abm::capital_firm {
+void beginingYear(
+    finance::Finance& finance,
+    LaborDemander&    laborDemander,
+    CapitalDemander&  capitalDemander,
+    CapitalSupplier&  capitalSupplier
+) noexcept {
+    const auto salesForecast = capitalSupplier.planAndExpectSales(laborDemander.sumWage());
+    const auto laborDemanderRequest =
+        detail::laborDemanderAnnualRequestBudget(laborDemander, capitalSupplier);
+    const auto capitalDemanderRequest =
+        detail::capitalDemanderRequestBudget(capitalDemander, capitalSupplier);
+    const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
+    if (total.isZeroOrLess()) {
+        laborDemander.reviseAnnualPlan(laborDemanderRequest);
+        capitalDemander.revisePlan(capitalDemanderRequest);
+        return;
+    }
+    const auto budget = finance.claimBudget(total) + salesForecast;
+    ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
+    detail::distributeAnnualBudget(
+        laborDemander, capitalDemander, budget, laborDemanderRequest, capitalDemanderRequest
+    );
+}
+
+void beginingMonth(
+    finance::Finance& finance,
+    LaborDemander&    laborDemander,
+    CapitalDemander&  capitalDemander,
+    CapitalSupplier&  capitalSupplier
+) noexcept {
+    const auto salesForecast = capitalSupplier.planAndExpectSales(laborDemander.sumWage());
+    const auto sumWage       = laborDemander.sumWage();
+    const auto capitalDemanderRequest =
+        detail::capitalDemanderRequestBudget(capitalDemander, capitalSupplier);
+    const auto total = sumWage + capitalDemanderRequest - salesForecast;
+    if (total.isZeroOrLess()) {
+        capitalDemander.revisePlan(capitalDemanderRequest);
+        return;
+    }
+    const auto budget = finance.claimBudget(total) + salesForecast;
+    ASSERT(budget <= total);
+    capitalDemander.revisePlan(std::max(budget - sumWage, Money{0.0}));
+}
+}  // namespace abm::capital_firm

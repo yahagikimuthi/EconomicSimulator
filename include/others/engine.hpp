@@ -41,7 +41,9 @@ class Engine final {
             );
         }
         for (auto& firm : capitalFirms_) {
-            firm.beginingYear();
+            capital_firm::beginingYear(
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
+            );
         }
         runLabor();
         runCapital();
@@ -55,7 +57,9 @@ class Engine final {
             );
         }
         for (auto& firm : capitalFirms_) {
-            firm.beginingMonth();
+            capital_firm::beginingMonth(
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
+            );
         }
         runCapital();
         runConsumerGoods();
