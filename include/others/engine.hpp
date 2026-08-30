@@ -46,8 +46,21 @@ class Engine final {
         runConsumerGoods();
     }
 
-    void runMonthlyPhase() noexcept {}
-    void runDailyPhase() noexcept {}
+    void runMonthlyPhase() noexcept {
+        for (auto& firm : consumerFirms_) {
+            firm.beginintMonth();
+        }
+        for (auto& firm : capitalFirms_) {
+            firm.beginingMonth();
+        }
+        runCapital();
+        runConsumerGoods();
+    }
+
+    void runDailyPhase() noexcept {
+        runCapital();
+        runConsumerGoods();
+    }
 
     void runLabor() noexcept {}
     void runCapital() noexcept {}
