@@ -21,7 +21,7 @@ struct Overloaded final : Ts... {
 };
 
 #ifdef __clang__
-#define ASSERT(...) assert(__VA_ARGS__)
+#define ASSERT(...) assert(__VA_ARGS__)  // NOLINT
 #else
 #define ASSERT(...) contract_assert(__VA_ARGS__)
 #endif
@@ -29,9 +29,12 @@ struct Overloaded final : Ts... {
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
-constexpr void ignore(auto&& _) noexcept {}
+constexpr void ignore(auto&&... _) noexcept {}
 
-constexpr void ignore() noexcept {}
+struct PCG32Seed final {
+    const std::uint64_t state;
+    const std::uint64_t stream;
+};
 
 class RandomGenerator final {
   public:

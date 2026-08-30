@@ -12,9 +12,9 @@
 #include "world/common.hpp"
 
 namespace abm {
-class Logger2 final {
+class Logger final {
   public:
-    [[nodiscard]] explicit Logger2() noexcept
+    [[nodiscard]] explicit Logger() noexcept
         : file_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);

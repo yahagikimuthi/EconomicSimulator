@@ -1,10 +1,6 @@
 #pragma once
 
-#include <tbb/concurrent_vector.h>
 #include <cstdint>
-#include <filesystem>
-#include <highfive/H5DataSet.hpp>
-#include <highfive/H5File.hpp>
 #include <random>
 #include <vector>
 
@@ -49,37 +45,12 @@ struct HHold final {  // NOLINT
     ConsumerGoodsDemander consumerGoodsDemander;
 };
 
-class Logger final {
-  public:
-    [[nodiscard]] explicit Logger() noexcept
-        : file_{[]() noexcept -> HighFive::File {
-              namespace fs        = std::filesystem;
-              const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
-              const auto path     = fs::path{filepath};
-              if (path.has_parent_path()) fs::create_directories(path.parent_path());
-              return HighFive::File{
-                  filepath,
-                  HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
-              };
-          }()} {}
-
-    [[nodiscard]] auto isValid() const noexcept -> bool { return file_.isValid(); }
-
-    void save(const CensusDropBox& dropBox, Step step) noexcept;
-
-  private:
-    HighFive::File file_;
-};
-
 struct PCG32Seed final {
     const std::uint64_t state;
     const std::uint64_t stream;
 };
 
 class Engine final {
-    template <typename T>
-    using TBBVec = tbb::concurrent_vector<T>;
-
   public:
     [[nodiscard]] explicit Engine(const unsigned int totalStep, const bool isAnalysis) noexcept;
 
