@@ -36,7 +36,9 @@ class Engine final {
   private:
     void runYearlyPhase() noexcept {
         for (auto& firm : consumerFirms_) {
-            firm.beginingYear();
+            consumer_firm::beginingMonth(
+                firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
+            );
         }
         for (auto& firm : capitalFirms_) {
             firm.beginingYear();
@@ -48,7 +50,9 @@ class Engine final {
 
     void runMonthlyPhase() noexcept {
         for (auto& firm : consumerFirms_) {
-            firm.beginintMonth();
+            consumer_firm::beginingMonth(
+                firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
+            );
         }
         for (auto& firm : capitalFirms_) {
             firm.beginingMonth();
