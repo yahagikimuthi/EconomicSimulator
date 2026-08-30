@@ -32,8 +32,9 @@ class Employment final {
         return rosterEntry_.transform(&RosterEntry::wage).value_or(Wage{0.0});
     }
 
-    void work(const EMarket phase) noexcept {
-        if (shouldWork(phase)) rosterEntry_->addInput(productPower_);
+    void work() noexcept {
+        if (not isEmployed()) return;
+        rosterEntry_->addInput(productPower_);
     }
 
     [[nodiscard]] auto productPower() const noexcept -> double { return productPower_; }

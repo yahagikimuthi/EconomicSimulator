@@ -59,7 +59,7 @@ class LaborSupplier final {
         reset(dropBox);
     }
 
-    void product(const EMarket phase) noexcept { employment_.work(phase); }
+    void product() noexcept { employment_.work(); }
 
     [[nodiscard]] auto wage() const noexcept -> Money {
         const auto out = employment_.wage();
