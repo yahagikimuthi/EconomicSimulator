@@ -21,6 +21,13 @@ class TradingSystem final {
         return planner_.requiresSupply();
     }
 
+    void plan(
+        const GoodsQuantity supply, const Money totalCost, IMediator auto& mediator
+    ) noexcept {
+        ASSERT(supply.isZeroOrMore());
+        const auto plan = planner_.planTrading(supply, totalCost, mediator);
+    }
+
     void post(
         const AgentID       id,
         const GoodsQuantity supply,

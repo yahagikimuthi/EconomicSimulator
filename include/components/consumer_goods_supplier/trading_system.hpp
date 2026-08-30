@@ -23,7 +23,7 @@ class TradingSystem final {
         const GoodsQuantity supply, const Money totalCost, IMediator auto& mediator
     ) noexcept {
         const auto plan = planner_.planTrading(supply, totalCost, mediator);
-        plan_.emplace(plan);
+        plan_           = plan;
         mediator.publishTradePlan(plan);
     }
 
@@ -56,8 +56,8 @@ class TradingSystem final {
     }
 
   private:
-    TradePlanner                   planner_;
-    Trader                         trader_;
-    std::optional<const TradePlan> plan_{std::nullopt};
+    TradePlanner             planner_;
+    Trader                   trader_;
+    std::optional<TradePlan> plan_{std::nullopt};
 };
 }  // namespace abm::consumer_goods::supplier

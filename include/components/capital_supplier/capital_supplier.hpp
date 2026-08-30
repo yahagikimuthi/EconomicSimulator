@@ -33,6 +33,13 @@ class CapitalSupplier final {
         mediator_.subscribeTradeResult(producingSystem_);
     }
 
+    [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Money {
+        ASSERT(totalCost.isZeroOrMore());
+        const auto supply = producingSystem_.produce();
+        tradingSystem_.plan(supply, totalCost, mediator_);
+        return salesForecast();
+    }
+
     void post(const AgentID id, const Money totalCost, Market& market) noexcept {
         ASSERT(totalCost >= Money{0.0});
 

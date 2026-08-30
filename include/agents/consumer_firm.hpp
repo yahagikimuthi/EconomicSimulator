@@ -8,37 +8,38 @@
 #include "values/common.hpp"
 
 namespace abm {
-class ConsumerFirm {
+class ConsumerFirm final {
   public:
     [[nodiscard]] ConsumerFirm(RandomGenerator& rng) noexcept;
 
     void beginingYear() noexcept {
         const auto salesForecast =
             consumerGoodsSupplier_.planAndExpectSales(laborDemander_.sumWage());
-        const auto laborDemanderRequest   = calcLaborDemanderRequestBudget(salesForecast);
-        const auto capitalDemanderRequest = calcCapitalDemanderRequestBudget();
+        const auto laborDemanderRequest   = laborDemanderAnnualRequestBudget(salesForecast);
+        const auto capitalDemanderRequest = capitalDemanderAnnualRequestBudget();
         const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
         if (total.isZeroOrLess()) {
             laborDemander_.reviseAnnualPlan(laborDemanderRequest);
             capitalDemander_.revisePlan(capitalDemanderRequest);
             return;
         }
-        const auto budget = finance_.claimBudget(total);
+        const auto budget = finance_.claimBudget(total) + salesForecast;
         ASSERT(budget <= total);
-        distributeBudget(budget, laborDemanderRequest, capitalDemanderRequest);
+        distributeAnnualBudget(budget, laborDemanderRequest, capitalDemanderRequest);
     }
 
   private:
-    [[nodiscard]] auto calcLaborDemanderRequestBudget(const Money salesForecast) noexcept -> Money {
+    [[nodiscard]] auto laborDemanderAnnualRequestBudget(const Money salesForecast
+    ) noexcept -> Money {
         const auto adjust = consumerGoodsSupplier_.calcDesiredEmploy(laborDemander_.employeeCnt());
         return laborDemander_.planAnnualAndRequestBudget(adjust, salesForecast);
     }
-    [[nodiscard]] auto calcCapitalDemanderRequestBudget() noexcept -> Money {
+    [[nodiscard]] auto capitalDemanderAnnualRequestBudget() noexcept -> Money {
         const auto desired = consumerGoodsSupplier_.requiresCapital();
         return capitalDemander_.planAndRequestBudget(desired);
     }
 
-    void distributeBudget(
+    void distributeAnnualBudget(
         const Money budget, const Money laborDemanderRequest, const Money capitalDemanderRequest
     ) noexcept {
         ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
