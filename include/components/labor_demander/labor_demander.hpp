@@ -48,7 +48,7 @@ class RecruitSystem final {
         recruiter_.registerMember(std::forward<F>(addRoster));
     }
 
-    void endStep(IMediator auto& mediator) noexcept {
+    void endingRecruiting(IMediator auto& mediator) noexcept {
         const auto result = recruiter_.publishResult();
         if (not result) return;
         mediator.publishRecruitResult(*result);
@@ -133,6 +133,15 @@ class LaborDemander final {
 
     void acceptResignation() noexcept { humanResource_.acceptResignation(); }
 
+    template <AssetMinusFn F>
+    void endStep(F&& assetMinus, CensusDropBox& dropBox) noexcept {
+        recruitSystem_.endingRecruiting(mediator_);
+        const auto totalCost = sumWage();
+        std::forward<F>(assetMinus)(totalCost);
+        dropBox.sumWages.emplace_back(totalCost.value());
+        reset(dropBox);
+    }
+
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         const auto out = humanResource_.employeeCnt();
         ASSERT(out >= HeadCount{0.0});
@@ -143,15 +152,6 @@ class LaborDemander final {
         const auto out = humanResource_.sumWage();
         ASSERT(out >= Wage{0.0});
         return static_cast<Money>(out);
-    }
-
-    template <AssetMinusFn F>
-    void endStep(F&& assetMinus, CensusDropBox& dropBox) noexcept {
-        recruitSystem_.endStep(mediator_);
-        const auto totalCost = sumWage();
-        std::forward<F>(assetMinus)(totalCost);
-        dropBox.sumWages.emplace_back(totalCost.value());
-        reset(dropBox);
     }
 
   private:
