@@ -8,7 +8,8 @@ namespace abm {
 class TaxRate final : public value_object::BaseValueObject<double>,
                       value_object::CompareMixin<TaxRate>,
                       value_object::AddMixin<TaxRate>,
-                      value_object::ScholarMixin<TaxRate> {
+                      value_object::ScholarMixin<TaxRate>,
+                      public value_object::SignMixin<TaxRate> {
     friend class CompareMixin<TaxRate>;
     friend class AddMixin<TaxRate>;
     friend class ScholarMixin<TaxRate>;
@@ -31,7 +32,8 @@ class TaxRate final : public value_object::BaseValueObject<double>,
 class Deposit final : public value_object::BaseValueObject<double>,
                       value_object::CompareMixin<Deposit>,
                       value_object::AddMixin<Deposit>,
-                      value_object::ScholarMixin<Deposit> {
+                      value_object::ScholarMixin<Deposit>,
+                      public value_object::SignMixin<Deposit> {
     friend class CompareMixin<Deposit>;
     friend class AddMixin<Deposit>;
     friend class ScholarMixin<Deposit>;
@@ -48,7 +50,8 @@ class Deposit final : public value_object::BaseValueObject<double>,
 class InterestRate final : public value_object::BaseValueObject<double>,
                            value_object::CompareMixin<InterestRate>,
                            value_object::AddMixin<InterestRate>,
-                           value_object::ScholarMixin<InterestRate> {
+                           value_object::ScholarMixin<InterestRate>,
+                           public value_object::SignMixin<InterestRate> {
     friend class CompareMixin<InterestRate>;
     friend class AddMixin<InterestRate>;
     friend class ScholarMixin<InterestRate>;

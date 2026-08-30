@@ -18,13 +18,13 @@ class CapitalGoodsRequest final {
         const GoodsQuantity a, const CapitalGoodsEntry& e
     ) noexcept
         : amount{a}, entry{e} {
-        ASSERT(a >= GoodsQuantity{0.0});
+        ASSERT(a.isZeroOrMore());
     }
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
 
     void trade(const GoodsQuantity tradeAmount) noexcept {
-        ASSERT(tradeAmount_ == GoodsQuantity{0.0});
-        ASSERT(tradeAmount >= GoodsQuantity{0.0});
+        ASSERT(tradeAmount_.isZero());
+        ASSERT(tradeAmount.isZeroOrMore());
         tradeAmount_ = tradeAmount;
     }
 
@@ -48,14 +48,12 @@ class CapitalGoodsEntry final {
     }
 
     [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
-        const auto demand = GoodsQuantity{std::ranges::fold_left(
-            requestBox_ | std::ranges::views::transform([](const Request& req) noexcept -> double {
-                return req.amount.value();
-            }),
-            0.0,
+        const auto demand = std::ranges::fold_left(
+            requestBox_ | std::ranges::views::transform(&Request::amount),
+            GoodsQuantity{0.0},
             std::plus<>{}
-        )};
-        ASSERT(demand >= GoodsQuantity{0.0});
+        );
+        ASSERT(demand.isZeroOrMore());
         return demand;
     }
 
@@ -96,7 +94,7 @@ class CapitalGoodsMarket final {
         auto toDouble = [] [[nodiscard]] (const Entry& entry) noexcept -> double {
             return entry.supply.value();
         };
-        std::optional<Entry&> betterEntry{std::nullopt};
+        auto betterEntry = std::optional<Entry&>{std::nullopt};
         for (const auto _ : std::views::iota(0, sampleCnt)) {
             auto& sample = rng.discreteDistribution(entryBox_, totalSupply_.load(), toDouble);
             if (sample.id == id) continue;

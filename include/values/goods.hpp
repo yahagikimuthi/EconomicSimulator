@@ -8,7 +8,8 @@ namespace abm {
 class Price final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Price>,
                     value_object::AddMixin<Price>,
-                    value_object::ScholarMixin<Price> {
+                    value_object::ScholarMixin<Price>,
+                    value_object::SignMixin<Price> {
     friend class AddMixin<Price>;
     friend class ScholarMixin<Price>;
 
@@ -21,7 +22,8 @@ class Price final : public value_object::BaseValueObject<double>,
 class GoodsQuantity final : public value_object::BaseValueObject<double>,
                             value_object::CompareMixin<GoodsQuantity>,
                             value_object::AddMixin<GoodsQuantity>,
-                            value_object::ScholarMixin<GoodsQuantity> {
+                            value_object::ScholarMixin<GoodsQuantity>,
+                            public value_object::SignMixin<GoodsQuantity> {
     friend class AddMixin<GoodsQuantity>;
     friend class ScholarMixin<GoodsQuantity>;
 
@@ -48,7 +50,8 @@ class GoodsQuantity final : public value_object::BaseValueObject<double>,
 class MarkupRate final : public value_object::BaseValueObject<double>,
                          value_object::CompareMixin<MarkupRate>,
                          value_object::AddMixin<MarkupRate>,
-                         value_object::ScholarMixin<MarkupRate> {
+                         value_object::ScholarMixin<MarkupRate>,
+                         value_object::SignMixin<MarkupRate> {
     friend class AddMixin<MarkupRate>;
     friend class ScholarMixin<MarkupRate>;
 

@@ -63,7 +63,8 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
 class OfferRate : public value_object::BaseValueObject<double>,
                   value_object::CompareMixin<OfferRate>,
                   value_object::AddMixin<OfferRate>,
-                  value_object::ScholarMixin<OfferRate> {
+                  value_object::ScholarMixin<OfferRate>,
+                  public value_object::SignMixin<OfferRate> {
     friend class AddMixin<OfferRate>;
     friend class ScholarMixin<OfferRate>;
 
