@@ -22,6 +22,15 @@ class Date final {
     [[nodiscard]] auto isBeginingMonth() const noexcept -> bool { return day_ == 1U; }
     [[nodiscard]] auto isBeginingYear() const noexcept -> bool { return year_ == 1U; }
 
+    [[nodiscard]] auto toFlatTime() const noexcept -> unsigned int {
+        const auto yearIdx   = year_ - 1U;
+        const auto monthIdx  = month_ - 1U;
+        const auto dayIdx    = day_ - 1U;
+        const auto flatMonth = (yearIdx * 12U) + monthIdx;
+        const auto flatDay   = (flatMonth * 30U) + dayIdx;
+        return flatDay;
+    }
+
     auto operator++() noexcept -> Date& {
         if (day_ < 30U) {
             ++day_;
