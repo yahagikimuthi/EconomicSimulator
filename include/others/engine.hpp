@@ -21,9 +21,38 @@ class Engine final {
   public:
     [[nodiscard]] explicit Engine(const Date endingDay) noexcept;
 
-    void run() noexcept;
+    void run() noexcept {
+        for (; today_ < endingDay_; ++today_) {
+            if (today_.isBeginingYear()) {
+                runYearlyPhase();
+            } else if (today_.isBeginingMonth()) {
+                runMonthlyPhase();
+            } else {
+                runDailyPhase();
+            }
+        }
+    }
 
   private:
+    void runYearlyPhase() noexcept {
+        for (auto& firm : consumerFirms_) {
+            firm.beginingYear();
+        }
+        for (auto& firm : capitalFirms_) {
+            firm.beginingYear();
+        }
+        runLabor();
+        runCapital();
+        runConsumerGoods();
+    }
+
+    void runMonthlyPhase() noexcept {}
+    void runDailyPhase() noexcept {}
+
+    void runLabor() noexcept {}
+    void runCapital() noexcept {}
+    void runConsumerGoods() noexcept {}
+
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
             return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};
