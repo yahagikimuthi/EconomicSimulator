@@ -23,7 +23,8 @@ constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
 class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<double>,
                                       value_object::CompareMixin<HeadCount>,
                                       value_object::AddMixin<HeadCount>,
-                                      value_object::ScholarMixin<HeadCount> {
+                                      value_object::ScholarMixin<HeadCount>,
+                                      public value_object::SignMixin<HeadCount> {
     friend class AddMixin<HeadCount>;
     friend class ScholarMixin<HeadCount>;
 
@@ -46,6 +47,9 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
 };
 [[nodiscard]] constexpr auto operator*(Wage lhs, HeadCount rhs) noexcept -> Money {
     return Money{lhs.value() * rhs.value()};
+}
+[[nodiscard]] constexpr auto operator*(HeadCount lhs, Wage rhs) noexcept -> Money {
+    return rhs * lhs;
 }
 [[nodiscard]] constexpr auto operator/(Money lhs, Wage rhs) noexcept -> HeadCount {
     ASSERT(rhs != Wage{0.0});

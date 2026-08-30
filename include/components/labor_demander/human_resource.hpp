@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <utility>
 #include <vector>
@@ -42,6 +43,13 @@ class HumanResource final {
     [[nodiscard]] explicit constexpr HumanResource(CompanyBoard&& companyBoard) noexcept
         : companyBoard_{std::move(companyBoard)} {}
 
+    [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Money {
+        layOffsPlan_.emplace(layOffsCnt);
+        const auto wageSum = sumWage();
+        const auto avgWage = wageSum.value() / employeeCnt().value();
+        return static_cast<Money>(wageSum.value() - (avgWage * layOffsCnt.value()));
+    }
+
     [[nodiscard]] auto addRoster(
         const AgentID id, const Wage wage, base_goods::Workspace& workspace
     ) noexcept -> RosterEntry& {
@@ -65,7 +73,17 @@ class HumanResource final {
         resignationBox.clear();
     }
 
-    void layOffs(const HeadCount layOffsCnt) noexcept {
+    void revisePlan(const Money budget) noexcept {
+        if (budget >= *claimedBudget_) return;
+        const auto cutSumWage = sumWage().value() - budget.value();
+        if (cutSumWage <= 0.0) return;
+        const auto avgWage = sumWage() / employeeCnt().value();
+        const auto layOffs = cutSumWage / avgWage.value();
+        layOffsPlan_.emplace(layOffs);
+    }
+
+    void layOffs() noexcept {
+        const auto layOffsCnt = layOffsPlan_;
         ASSERT(layOffsCnt >= HeadCount{0.0});
 
         auto currentLayOffs = HeadCount{0.0};
@@ -98,9 +116,16 @@ class HumanResource final {
         return Wage{sumWage};
     }
 
+    [[nodiscard]] auto claimedBudget() const noexcept -> Money {
+        ASSERT(claimedBudget_);
+        return *claimedBudget_;
+    }
+
   private:
-    CompanyBoard    companyBoard_;
-    EmptyRosterPool emptyRosterPool_;
+    CompanyBoard                   companyBoard_;
+    EmptyRosterPool                emptyRosterPool_;
+    std::optional<const HeadCount> layOffsPlan_;
+    std::optional<Money>           claimedBudget_;
 };
 }  // namespace abm::labor::demander::human_resource
 

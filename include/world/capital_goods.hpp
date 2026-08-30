@@ -10,12 +10,12 @@
 #include "others/util.hpp"
 #include "values/goods.hpp"
 
-namespace abm::production_goods {
-class ProductionGoodsEntry;
-class ProductionGoodsRequest final {
+namespace abm::capital_goods {
+class CapitalGoodsEntry;
+class CapitalGoodsRequest final {
   public:
-    [[nodiscard]] constexpr ProductionGoodsRequest(
-        const GoodsQuantity a, const ProductionGoodsEntry& e
+    [[nodiscard]] constexpr CapitalGoodsRequest(
+        const GoodsQuantity a, const CapitalGoodsEntry& e
     ) noexcept
         : amount{a}, entry{e} {
         ASSERT(a >= GoodsQuantity{0.0});
@@ -28,18 +28,18 @@ class ProductionGoodsRequest final {
         tradeAmount_ = tradeAmount;
     }
 
-    const GoodsQuantity         amount;
-    const ProductionGoodsEntry& entry;
+    const GoodsQuantity      amount;
+    const CapitalGoodsEntry& entry;
 
   private:
     GoodsQuantity tradeAmount_{0.0};
 };
 
-class ProductionGoodsEntry final {
-    using Request = ProductionGoodsRequest;
+class CapitalGoodsEntry final {
+    using Request = CapitalGoodsRequest;
 
   public:
-    [[nodiscard]] constexpr ProductionGoodsEntry(
+    [[nodiscard]] constexpr CapitalGoodsEntry(
         const AgentID i, const Price p, const GoodsQuantity s
     ) noexcept
         : id{i}, price{p}, supply{s} {}
@@ -78,11 +78,11 @@ class ProductionGoodsEntry final {
     tbb::concurrent_vector<Request> requestBox_;
 };
 
-class ProductionGoodsMarket final {
-    using Entry = ProductionGoodsEntry;
+class CapitalGoodsMarket final {
+    using Entry = CapitalGoodsEntry;
 
   public:
-    [[nodiscard]] ProductionGoodsMarket() noexcept = default;
+    [[nodiscard]] CapitalGoodsMarket() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
@@ -115,8 +115,8 @@ class ProductionGoodsMarket final {
     tbb::concurrent_vector<Entry> entryBox_;
     std::atomic<double>           totalSupply_;
 };
-}  // namespace abm::production_goods
+}  // namespace abm::capital_goods
 
 namespace abm {
-using ProductionGoodsMarket = production_goods::ProductionGoodsMarket;
+using CapitalGoodsMarket = capital_goods::CapitalGoodsMarket;
 }

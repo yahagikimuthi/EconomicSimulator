@@ -11,7 +11,7 @@
 #include <string_view>
 #include <vector>
 
-#include "core/setting.hpp"
+#include "others/setting.hpp"
 
 namespace abm::analysis {
 class InputDataManager final {

@@ -5,7 +5,7 @@
 
 #include "analysis/analyzer.hpp"
 #include "analysis/context_task.hpp"
-#include "core/setting.hpp"
+#include "others/setting.hpp"
 
 namespace abm::analysis {
 [[nodiscard]] constexpr auto calcMean(

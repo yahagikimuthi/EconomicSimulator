@@ -1,11 +1,11 @@
 #pragma once
 
+#include "components/capital_goods_supplier/capital_goods_supplier.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
 #include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
-#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "values/labor.hpp"
 #include "world/common.hpp"
 #include "world/labor.hpp"
@@ -22,10 +22,10 @@ void adjustWorkforce(
 }
 
 void adjustWorkforce(
-    const AgentID&           id,
-    ProductionGoodsSupplier& goodsSupplier,
-    LaborDemander&           laborDemander,
-    LaborMarket&             laborMarket
+    const AgentID&        id,
+    CapitalGoodsSupplier& goodsSupplier,
+    LaborDemander&        laborDemander,
+    LaborMarket&          laborMarket
 ) noexcept {
     const auto desiredEmploy = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
     laborDemander.adjustWorkforce(id, desiredEmploy, goodsSupplier.salesForecast(), laborMarket);
@@ -43,7 +43,7 @@ void registerMember(ConsumerGoodsSupplier& goodsSupplier, LaborDemander& laborDe
     laborDemander.registerMember(goodsSupplier.workspace());
 }
 
-void registerMember(ProductionGoodsSupplier& goodsSupplier, LaborDemander& laborDemander) noexcept {
+void registerMember(CapitalGoodsSupplier& goodsSupplier, LaborDemander& laborDemander) noexcept {
     laborDemander.registerMember(goodsSupplier.workspace());
 }
 

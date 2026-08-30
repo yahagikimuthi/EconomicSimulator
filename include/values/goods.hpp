@@ -33,6 +33,9 @@ class GoodsQuantity final : public value_object::BaseValueObject<double>,
 [[nodiscard]] constexpr auto operator*(Price lhs, GoodsQuantity rhs) noexcept -> Money {
     return Money{lhs.value() * rhs.value()};
 }
+[[nodiscard]] constexpr auto operator*(GoodsQuantity lhs, Price rhs) noexcept -> Money {
+    return rhs * lhs;
+}
 [[nodiscard]] constexpr auto operator/(Money lhs, Price rhs) noexcept -> GoodsQuantity {
     ASSERT(rhs != Price{0.0});
     return GoodsQuantity{lhs.value() / rhs.value()};

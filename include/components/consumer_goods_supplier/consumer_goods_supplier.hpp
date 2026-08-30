@@ -39,10 +39,19 @@ class ConsumerGoodsSupplier final {
         return producingSystem_.calcDesiredEmploy(requiresSupply, employee);
     }
 
-    void post(const Money totalCost, Market& market) noexcept {
+    [[nodiscard]] auto planAndRequestBudget(const Money totalCost) noexcept -> Money {
         const auto supply = producingSystem_.produce();
-        tradingSystem_.post(supply, totalCost, market, mediator_);
+        tradingSystem_.plan(supply, totalCost, mediator_);
+        return -salesForecast();
     }
+    void revisePlan(const Money _) noexcept {}
+
+    void beginingMonth(const Money totalCost) noexcept {
+        const auto supply = producingSystem_.produce();
+        tradingSystem_.plan(supply, totalCost, mediator_);
+    }
+
+    void post(Market& market) noexcept { tradingSystem_.post(market); }
     void trade() noexcept { tradingSystem_.trade(); }
 
     template <AssetPlusFn F>
@@ -53,16 +62,16 @@ class ConsumerGoodsSupplier final {
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
-    void addProductionEquip(const GoodsQuantity productionGoods) noexcept {
-        ASSERT(productionGoods >= GoodsQuantity{0.0});
-        producingSystem_.addProducingEquip(productionGoods);
+    void addCapitalEquip(const GoodsQuantity capitalGoods) noexcept {
+        ASSERT(capitalGoods >= GoodsQuantity{0.0});
+        producingSystem_.addProducingEquip(capitalGoods);
     }
 
     [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 
-    [[nodiscard]] auto requiresProductionGoods() noexcept -> GoodsQuantity {
+    [[nodiscard]] auto requiresCapitalGoods() noexcept -> GoodsQuantity {
         const auto requiresSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredProductionGoods(requiresSupply);
+        return producingSystem_.calcDesiredCapitalGoods(requiresSupply);
     }
 
   private:

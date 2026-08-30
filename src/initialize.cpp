@@ -7,13 +7,13 @@
 #include <pcg_random.hpp>
 #include <utility>
 
+#include "components/capital_goods_demander.hpp"
+#include "components/capital_goods_supplier/capital_goods_supplier.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
-#include "components/production_goods_demander.hpp"
-#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -50,19 +50,19 @@ namespace {
     return ConsumerGoodsSupplier{masterRng};
 }
 
-[[nodiscard]] auto createProductionGoodsDemander(RandomGenerator& masterRng
-) noexcept -> ProductionGoodsDemander {
-    return ProductionGoodsDemander{masterRng};
+[[nodiscard]] auto createCapitalGoodsDemander(RandomGenerator& masterRng
+) noexcept -> CapitalGoodsDemander {
+    return CapitalGoodsDemander{masterRng};
 }
 
-[[nodiscard]] auto createProductionGoodsSupplier(RandomGenerator& masterRng
-) noexcept -> ProductionGoodsSupplier {
-    return ProductionGoodsSupplier{masterRng};
+[[nodiscard]] auto createCapitalGoodsSupplier(RandomGenerator& masterRng
+) noexcept -> CapitalGoodsSupplier {
+    return CapitalGoodsSupplier{masterRng};
 }
 }  // namespace
 
 Engine::Engine(const unsigned int totalStep, const bool isAnalysis) noexcept
-    : totalStep_{totalStep},
+    : endDate_{totalStep},
       seed_{generateSeed()},
       rng_{pcg32{seed_.state, seed_.stream}},
       isAnalysis_{isAnalysis} {
@@ -80,8 +80,8 @@ Engine::Engine(const unsigned int totalStep, const bool isAnalysis) noexcept
             .id            = AgentID{agentId},
             .finance       = createFirmFinance(rng_),
             .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::ConsumerGoods),
-            .consumerGoodsSupplier   = createConsumerGoodsSupplier(rng_),
-            .productionGoodsDemander = createProductionGoodsDemander(rng_)
+            .consumerGoodsSupplier = createConsumerGoodsSupplier(rng_),
+            .capitalGoodsDemander  = createCapitalGoodsDemander(rng_)
         });
     }
     for (BtoCFirm& firm : bToCFirms_) {
@@ -94,14 +94,14 @@ Engine::Engine(const unsigned int totalStep, const bool isAnalysis) noexcept
         bToBFirms_.emplace_back(BtoBFirm{
             .id            = AgentID{agentId},
             .finance       = createFirmFinance(rng_),
-            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::ProductionGoods),
-            .productionGoodsDemander = createProductionGoodsDemander(rng_),
-            .productionGoodsSupplier = createProductionGoodsSupplier(rng_)
+            .laborDemander = createLaborDemander(rng_, AgentID{agentId}, EMarket::CapitalGoods),
+            .capitalGoodsDemander = createCapitalGoodsDemander(rng_),
+            .capitalGoodsSupplier = createCapitalGoodsSupplier(rng_)
         });
     }
     for (BtoBFirm& firm : bToBFirms_) {
         firm.laborDemander.setMediator();
-        firm.productionGoodsSupplier.setMediator();
+        firm.capitalGoodsSupplier.setMediator();
     }
 
     hholds_.reserve(cnt::hhold);

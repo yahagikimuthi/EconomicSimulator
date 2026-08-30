@@ -9,7 +9,8 @@ class Deposit;
 class Money final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Money>,
                     value_object::AddMixin<Money>,
-                    value_object::ScholarMixin<Money> {
+                    value_object::ScholarMixin<Money>,
+                    public value_object::SignMixin<Money> {
     friend class AddMixin<Money>;
     friend class ScholarMixin<Money>;
 

@@ -22,18 +22,24 @@ class RecruitSystem final {
 
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
 
-    void post(
-        const AgentID   id,
-        const HeadCount desiredEmploy,
-        const Money     salesPerWorker,
-        Market&         laborMarket,
-        IMediator auto& mediator
-    ) noexcept {
-        ASSERT(desiredEmploy > HeadCount{0.0});
-        const auto plan = planner_.plan(desiredEmploy, salesPerWorker, mediator);
+    [[nodiscard]] auto planAndRequestBudget(
+        const HeadCount desiredEmploy, const Money salesPerWorker, IMediator auto& mediator
+    ) noexcept -> Money {
+        ASSERT(desiredEmploy.isZeroOrMore());
+        const auto plan = planner_.plan(desiredEmploy, salesPerWorker);
         mediator.publishRecruitPlan(plan);
-        recruiter_.post(id, plan, laborMarket);
+        plan_.emplace(plan);
+        claimedBudget_ = plan.employ * plan.wage;
+        return *claimedBudget_;
     }
+
+    void revisePlan(const Money budget) noexcept {
+        const auto cut     = *claimedBudget_ - budget;
+        const auto cutWage = cut / plan_->employ;
+        plan_.emplace(plan_->wage - cutWage, plan_->employ, plan_->offer);
+    }
+
+    void post(const AgentID id, Market& market) noexcept { recruiter_.post(id, *plan_, market); }
 
     void offer() noexcept { recruiter_.offer(); }
 
@@ -53,9 +59,16 @@ class RecruitSystem final {
         recruiter_.reset();
     }
 
+    [[nodiscard]] auto claimedBudget() const noexcept -> Money {
+        ASSERT(claimedBudget_);
+        return *claimedBudget_;
+    }
+
   private:
-    RecruitPlanner planner_;
-    Recruiter      recruiter_;
+    RecruitPlanner             planner_;
+    Recruiter                  recruiter_;
+    std::optional<RecruitPlan> plan_;
+    std::optional<Money>       claimedBudget_;
 };
 
 class LaborDemander final {
@@ -71,18 +84,41 @@ class LaborDemander final {
         mediator_.subscribeEmployPlan(memory_);
     }
 
-    void adjustWorkforce(
-        const AgentID id, const HeadCount adjustment, const Money salesForecast, Market& laborMarket
-    ) noexcept {
-        if (adjustment > HeadCount{0.0}) {
-            const auto employee       = humanResource_.employeeCnt();
-            const auto isEmploying    = employee != HeadCount{0.0};
-            const auto salesPerWorker = isEmploying ? salesForecast.value() / employee.value()
-                                                    : std::numeric_limits<double>::infinity();
-            recruitSystem_.post(id, adjustment, Money{salesPerWorker}, laborMarket, mediator_);
-        } else if (adjustment < HeadCount{0.0}) {
-            humanResource_.layOffs(-adjustment);
+    [[nodiscard]] auto planAndRequestBudget(
+        const HeadCount adjustment, const Money salesForecast
+    ) noexcept -> Money {
+        const auto employee       = employeeCnt();
+        const auto isEmploying    = not employee.isZero();
+        const auto salesPerWorker = isEmploying ? salesForecast.value() / employee.value()
+                                                : std::numeric_limits<double>::infinity();
+        if (adjustment.isPositive()) {
+            const auto recruitSystemBudget =
+                recruitSystem_.planAndRequestBudget(adjustment, Money{salesPerWorker}, mediator_);
+            const auto hrBudget = humanResource_.planAndRequestBudget(HeadCount{0.0});
+            return recruitSystemBudget + hrBudget;
         }
+        const auto recruitSystemBudget =
+            recruitSystem_.planAndRequestBudget(HeadCount{0.0}, Money{salesPerWorker}, mediator_);
+        const auto hrBudget = humanResource_.planAndRequestBudget(-adjustment);
+        return recruitSystemBudget + hrBudget;
+    }
+
+    void revisePlan(const Money budget) noexcept {
+        const auto recruitSystemClaimed = recruitSystem_.claimedBudget();
+        const auto hrClaimed            = humanResource_.claimedBudget();
+        ASSERT(budget <= recruitSystemClaimed + hrClaimed);
+        if (budget < hrClaimed) {
+            recruitSystem_.revisePlan(Money{0.0});
+            humanResource_.revisePlan(budget);
+            return;
+        }
+        recruitSystem_.revisePlan(budget - hrClaimed);
+        humanResource_.revisePlan(hrClaimed);
+    }
+
+    void adjustWorkforce(const AgentID id, Market& market) noexcept {
+        recruitSystem_.post(id, market);
+        humanResource_.layOffs();
     }
 
     void offer() noexcept { recruitSystem_.offer(); }

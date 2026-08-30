@@ -87,9 +87,9 @@ inline constexpr auto            goodsSampleCnt       = 2;
 inline constexpr RandomParameter mpc = UniformParameter<double>{.min = 0.5, .limit = 0.8};
 }  // namespace abm::consumer_goods::demander::setting
 
-namespace abm::production_goods::demander::setting {
+namespace abm::capital_goods::demander::setting {
 inline constexpr auto goodsSampleCnt = 2;
-}  // namespace abm::production_goods::demander::setting
+}  // namespace abm::capital_goods::demander::setting
 
 namespace abm::deposit::supplier::setting {
 inline constexpr auto maxSampleCnt = 2;

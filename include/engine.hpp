@@ -8,37 +8,38 @@
 #include <random>
 #include <vector>
 
+#include "components/capital_goods_demander.hpp"
+#include "components/capital_goods_supplier/capital_goods_supplier.hpp"
 #include "components/consumer_goods_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
 #include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
-#include "components/production_goods_demander.hpp"
-#include "components/production_goods_supplier/production_goods_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
+#include "world/capital_goods.hpp"
 #include "world/common.hpp"
 #include "world/consumer_goods.hpp"
 #include "world/labor.hpp"
-#include "world/production_goods.hpp"
 
 namespace abm {
 struct BtoCFirm final {  // NOLINT
-    const AgentID           id;
-    FirmFinance             finance;
-    LaborDemander           laborDemander;
-    ConsumerGoodsSupplier   consumerGoodsSupplier;
-    ProductionGoodsDemander productionGoodsDemander;
+    const AgentID         id;
+    FirmFinance           finance;
+    LaborDemander         laborDemander;
+    ConsumerGoodsSupplier consumerGoodsSupplier;
+    CapitalGoodsDemander  capitalGoodsDemander;
 };
 
 struct BtoBFirm final {  // NOLINT
-    const AgentID           id;
-    FirmFinance             finance;
-    LaborDemander           laborDemander;
-    ProductionGoodsDemander productionGoodsDemander;
-    ProductionGoodsSupplier productionGoodsSupplier;
+    const AgentID        id;
+    FirmFinance          finance;
+    LaborDemander        laborDemander;
+    CapitalGoodsDemander capitalGoodsDemander;
+    CapitalGoodsSupplier capitalGoodsSupplier;
 };
 
 struct HHold final {  // NOLINT
@@ -86,7 +87,7 @@ class Engine final {
 
   private:
     void runLabor() noexcept;
-    void runProductionGoods() noexcept;
+    void runCapitalGoods() noexcept;
     void runConsumerGoods() noexcept;
     void endAllStep() noexcept;
     void reset() noexcept;
@@ -109,15 +110,15 @@ class Engine final {
 
     CensusDropBox dropBox_;
 
-    const Step totalStep_;
-    Step       currentStep_{0};
+    const Date endDate_;
+    Date       today_{1U, 1U, 1U};
 
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    LaborMarket           laborMarket_;
-    ProductionGoodsMarket productionGoodsMarket_;
-    ConsumerGoodsMarket   consumerGoodsMarket_;
+    LaborMarket         laborMarket_;
+    CapitalGoodsMarket  capitalGoodsMarket_;
+    ConsumerGoodsMarket consumerGoodsMarket_;
 
     bool isAnalysis_;
 };

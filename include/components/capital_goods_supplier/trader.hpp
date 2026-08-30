@@ -7,11 +7,11 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
-#include "components/production_goods_supplier/common.hpp"
+#include "components/capital_goods_supplier/common.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 
-namespace abm::production_goods::supplier {
+namespace abm::capital_goods::supplier {
 class Trader final {
     using TradePlan    = base_goods::supplier::TradePlan;
     using Ledger       = base_goods::supplier::Ledger;
@@ -83,4 +83,4 @@ class Trader final {
     mutable RandomGenerator rng_;
     bool                    isActive_{false};
 };
-}  // namespace abm::production_goods::supplier
+}  // namespace abm::capital_goods::supplier

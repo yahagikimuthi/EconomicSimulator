@@ -94,4 +94,26 @@ class ScholarMixin {
   private:
     [[nodiscard]] explicit constexpr ScholarMixin() noexcept = default;
 };
+
+template <typename Derived>
+struct SignMixin {
+    friend Derived;
+
+  public:
+    [[nodiscard]] constexpr auto isPositive() const noexcept -> bool { return This() > Derived{0}; }
+    [[nodiscard]] constexpr auto isZeroOrMore() const noexcept -> bool {
+        return This() >= Derived{0};
+    }
+    [[nodiscard]] constexpr auto isZero() const noexcept -> bool { return This() == Derived{0}; }
+    [[nodiscard]] constexpr auto isZeroOrLess() const noexcept -> bool {
+        return This() <= Derived{0};
+    }
+    [[nodiscard]] constexpr auto isNegative() const noexcept -> bool { return This() < Derived{0}; }
+
+  private:
+    [[nodiscard]] constexpr auto This() const noexcept -> const Derived& {
+        return static_cast<const Derived&>(*this);
+    }
+    [[nodiscard]] SignMixin() noexcept = default;
+};
 }  // namespace abm::value_object

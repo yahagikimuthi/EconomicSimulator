@@ -25,25 +25,25 @@ class Producer final {
         ASSERT(workerInput >= GoodsQuantity{0.0});
 
         workspace_.resetInput();
-        const auto productionEquipInput = productionGoods_ * producerGoodsEfficiency_;
-        ASSERT(productionGoods_ >= GoodsQuantity{0.0});
-        productionGoods_ *= (1.0 - producerGoodsDepreciationRate_);
+        const auto capitalEquipInput = capitalGoods_ * producerGoodsEfficiency_;
+        ASSERT(capitalGoods_ >= GoodsQuantity{0.0});
+        capitalGoods_ *= (1.0 - producerGoodsDepreciationRate_);
 
-        const auto input = baseProductPower_ * min(workerInput, productionEquipInput);
+        const auto input = baseProductPower_ * min(workerInput, capitalEquipInput);
         return input;
     }
 
-    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
-        ASSERT(productionGoods >= GoodsQuantity{0.0});
-        productionGoods_ += productionGoods;
+    void addProducingEquip(const GoodsQuantity capitalGoods) noexcept {
+        ASSERT(capitalGoods >= GoodsQuantity{0.0});
+        capitalGoods_ += capitalGoods;
     }
 
     [[nodiscard]] auto baseProductPower() const noexcept -> double { return baseProductPower_; }
 
-    [[nodiscard]] auto calcDesiredProductionGoods(const GoodsQuantity requiresSupply
+    [[nodiscard]] auto calcDesiredCapitalGoods(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
         return max(
-            (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - productionGoods_,
+            (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - capitalGoods_,
             GoodsQuantity{0.0}
         );
     }
@@ -55,7 +55,7 @@ class Producer final {
     const double  baseProductPower_;
     const double  producerGoodsEfficiency_;
     const double  producerGoodsDepreciationRate_;
-    GoodsQuantity productionGoods_{0.0};
+    GoodsQuantity capitalGoods_{0.0};
 };
 
 class ProducingSystem final {
@@ -77,13 +77,13 @@ class ProducingSystem final {
         );
     }
 
-    [[nodiscard]] auto calcDesiredProductionGoods(const GoodsQuantity requiresSupply
+    [[nodiscard]] auto calcDesiredCapitalGoods(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return producer_.calcDesiredProductionGoods(requiresSupply);
+        return producer_.calcDesiredCapitalGoods(requiresSupply);
     }
 
-    void addProducingEquip(const GoodsQuantity productionGoods) noexcept {
-        producer_.addProducingEquip(productionGoods);
+    void addProducingEquip(const GoodsQuantity capitalGoods) noexcept {
+        producer_.addProducingEquip(capitalGoods);
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }

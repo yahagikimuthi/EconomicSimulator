@@ -1,6 +1,7 @@
 #pragma once
 
 #include <concepts>
+#include <limits>
 #include <optional>
 #include <pcg_random.hpp>
 #include <utility>
@@ -10,9 +11,13 @@
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "values/integrate.hpp"
-#include "world/production_goods.hpp"
+#include "world/capital_goods.hpp"
 
-namespace abm::production_goods::demander {
+namespace abm::capital_goods::demander {
+struct Log final {
+    const Money         purchase{std::numeric_limits<double>::epsilon()};
+    const GoodsQuantity tradeAmount{std::numeric_limits<double>::infinity()};
+};
 
 struct ATradeResult final {
     const Price         price;
@@ -57,26 +62,30 @@ concept ReadResultFn = requires(F f, const TradeResult& result) {
     { f(result) } -> std::same_as<void>;
 };
 
-class ProductionGoodsDemander final {
-    using Request = ProductionGoodsRequest;
-    using Market  = ProductionGoodsMarket;
+class CapitalGoodsDemander final {
+    using Request = CapitalGoodsRequest;
+    using Market  = CapitalGoodsMarket;
 
   public:
-    [[nodiscard]] explicit constexpr ProductionGoodsDemander(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit constexpr CapitalGoodsDemander(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
+    [[nodiscard]] auto planAndRequestBudget(const GoodsQuantity desiredAmount) noexcept -> Money {
+        const auto avgPrice = log_.purchase / log_.tradeAmount;
+        purchaseAmountPlan_ = desiredAmount;
+        return avgPrice * desiredAmount;
+    }
+
+    void revisePlan(const Money budget) noexcept { budget_ = budget; }
+
+    void plan(const GoodsQuantity desiredAmount) noexcept { purchaseAmountPlan_ = desiredAmount; }
+
     void request(
-        const AgentID       id,
-        const Money         asset,
-        const GoodsQuantity desiredPurchaseAmount,
-        Market&             market,
-        const int           sampleCnt = setting::goodsSampleCnt
+        const AgentID id, Market& market, const int sampleCnt = setting::goodsSampleCnt
     ) noexcept {
-        if (desiredPurchaseAmount <= GoodsQuantity{0.0}) return;
-        if (asset <= Money{0.0}) return;
         const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
-        const auto purchaseAmount = min(desiredPurchaseAmount, asset / pickedEntry->price);
+        const auto purchaseAmount = min(*purchaseAmountPlan_, *budget_ / pickedEntry->price);
         myRequest_                = pickedEntry->request(purchaseAmount);
     }
 
@@ -105,10 +114,13 @@ class ProductionGoodsDemander final {
 
     Ledger                        ledger_;
     RandomGenerator               rng_;
+    Log                           log_;
+    std::optional<GoodsQuantity>  purchaseAmountPlan_{std::nullopt};
+    std::optional<Money>          budget_{std::nullopt};
     std::optional<const Request&> myRequest_{std::nullopt};
 };
-}  // namespace abm::production_goods::demander
+}  // namespace abm::capital_goods::demander
 
 namespace abm {
-using ProductionGoodsDemander = production_goods::demander::ProductionGoodsDemander;
+using CapitalGoodsDemander = capital_goods::demander::CapitalGoodsDemander;
 }

@@ -38,14 +38,12 @@ class EmployPlanner final {
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(memory_); }
 
     [[nodiscard]] auto plan(
-        const double        firmProductPower,
-        const HeadCount     employee,
-        const GoodsQuantity targetProduction
+        const double firmProductPower, const HeadCount employee, const GoodsQuantity targetCapital
     ) noexcept -> HeadCount {
         ASSERT(firmProductPower >= 0.0);
         ASSERT(employee >= HeadCount{0.0});
 
-        const auto out = calc(firmProductPower, employee, targetProduction);
+        const auto out = calc(firmProductPower, employee, targetCapital);
         memory_.clearLog();
         if (not out) return cache_.cache();
         cache_.next(*out);
@@ -59,9 +57,7 @@ class EmployPlanner final {
 
   private:
     [[nodiscard]] auto calc(
-        const double        firmProductPower,
-        const HeadCount     employee,
-        const GoodsQuantity targetProduction
+        const double firmProductPower, const HeadCount employee, const GoodsQuantity targetCapital
     ) noexcept -> std::optional<HeadCount> {
         ASSERT(firmProductPower >= 0.0);
         ASSERT(employee >= HeadCount{0.0});
@@ -72,7 +68,7 @@ class EmployPlanner final {
         const auto isEmploying = employee != HeadCount{0.0};
         const auto avgPower =
             isEmploying ? lastSupply->value() / employee.value() : firmProductPower;
-        const auto out     = (avgPower != 0.0) ? targetProduction.value() / avgPower : 1.0;
+        const auto out     = (avgPower != 0.0) ? targetCapital.value() / avgPower : 1.0;
         const auto guarded = std::min(out, static_cast<double>(::abm::setting::agent_count::hhold));
         return ceil(HeadCount{guarded});
     }
