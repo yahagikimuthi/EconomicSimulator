@@ -11,7 +11,6 @@
 #include <random>
 #include <ranges>
 #include <utility>
-#include <variant>
 
 #include "others/setting.hpp"
 
@@ -102,24 +101,21 @@ class RandomGenerator final {
     }
 
     [[nodiscard]] constexpr auto random(const RandomParameter& param) noexcept -> double {
-        return std::visit(
-            Overloaded{
-                [&](const UniformParameter<int>& uniformParam) noexcept -> double {
-                    return randInt(
-                        static_cast<int>(uniformParam.min), static_cast<int>(uniformParam.limit)
-                    );
-                },
-                [&](const UniformParameter<double>& uniformParam) noexcept -> double {
-                    return rand(uniformParam.min, uniformParam.limit);
-                },
-                [&](const NormalParameter& normalParam) noexcept -> double {
-                    return randNormal(
-                        normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
-                    );
-                }
+        return param.visit(Overloaded{
+            [&](const UniformParameter<int>& uniformParam) noexcept -> double {
+                return randInt(
+                    static_cast<int>(uniformParam.min), static_cast<int>(uniformParam.limit)
+                );
             },
-            param
-        );
+            [&](const UniformParameter<double>& uniformParam) noexcept -> double {
+                return rand(uniformParam.min, uniformParam.limit);
+            },
+            [&](const NormalParameter& normalParam) noexcept -> double {
+                return randNormal(
+                    normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
+                );
+            }
+        });
     }
 
   private:
