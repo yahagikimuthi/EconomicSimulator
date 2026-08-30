@@ -13,17 +13,31 @@ class CapitalFirm final {
     [[nodiscard]] explicit CapitalFirm(RandomGenerator& masterRng) noexcept;
 
     void beginingYear() noexcept {
-        const auto sales = capitalSupplier_.planAndExpectSales(laborDemander_.sumWage());
+        const auto salesForecast = capitalSupplier_.planAndExpectSales(laborDemander_.sumWage());
         const auto laborDemanderRequest   = laborDemanderAnnualRequestBudget();
         const auto capitalDemanderRequest = capitalDemanderRequestBudget();
-        const auto total                  = laborDemanderRequest + capitalDemanderRequest - sales;
+        const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
         if (total.isZeroOrLess()) {
             laborDemander_.reviseAnnualPlan(laborDemanderRequest);
             capitalDemander_.revisePlan(capitalDemanderRequest);
             return;
         }
-        const auto budget = finance_.claimBudget(total) + sales;
+        const auto budget = finance_.claimBudget(total) + salesForecast;
         ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
+    }
+
+    void beginintMonth() noexcept {
+        const auto salesForecast = capitalSupplier_.planAndExpectSales(laborDemander_.sumWage());
+        const auto sumWage       = laborDemander_.sumWage();
+        const auto capitalDemanderRequest = capitalDemanderRequestBudget();
+        const auto total                  = sumWage + capitalDemanderRequest - salesForecast;
+        if (total.isZeroOrLess()) {
+            capitalDemander_.revisePlan(capitalDemanderRequest);
+            return;
+        }
+        const auto budget = finance_.claimBudget(total) + salesForecast;
+        ASSERT(budget <= total);
+        capitalDemander_.revisePlan(std::max(budget - sumWage, Money{0.0}));
     }
 
   private:
