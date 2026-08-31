@@ -133,27 +133,36 @@ class Market final {
     }
 
     template <std::size_t N>
-    void pickRequest(std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng) noexcept {
+    void pickRequest(
+        const AgentID                             requestorId,
+        std::inplace_vector<RefWrap<Request>, N>& out,
+        RandomGenerator&                          rng
+    ) noexcept {
         ASSERT(out.empty());
         if (out.max_size() >= requests_.size()) {
-            packAllRequest(out);
+            packAllRequest(requestorId, out);
         }
-        packPartRequest(out, rng);
+        packPartRequest(requestorId, out, rng);
     }
 
     void clear() noexcept { requests_.clear(); }
 
   private:
-    void packAllRequest(std::inplace_vector<RefWrap<Request>, 1UZ>& out) {
-        for (auto& req : requests_) out.unchecked_emplace_back(std::ref(req));
+    void packAllRequest(const AgentID id, std::inplace_vector<RefWrap<Request>, 1UZ>& out) {
+        for (auto& req : requests_) {
+            if (req.firmID == id) continue;
+            out.unchecked_emplace_back(std::ref(req));
+        }
     }
 
     template <std::size_t N>
     void packPartRequest(
-        std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng
+        const AgentID id, std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng
     ) noexcept {
         rng.sample(
-            requests_ | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
+            requests_ | std::views::filter([id](const Request& req) noexcept -> bool {
+                return req.firmID == id;
+            }) | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
                 return std::ref(req);
             }),
             std::back_inserter(out),
