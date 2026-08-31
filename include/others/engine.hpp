@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pcg_random.hpp>
 #include <vector>
 
 #include "others/agents.hpp"
@@ -19,7 +20,8 @@ class Engine final {
     using TBBVec = tbb::concurrent_vector<T>;
 
   public:
-    [[nodiscard]] explicit Engine(const Date endingDay) noexcept;
+    [[nodiscard]] explicit Engine(const Date endingDay) noexcept
+        : seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}}, endingDay_{endingDay} {}
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
