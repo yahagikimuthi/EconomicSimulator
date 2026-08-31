@@ -10,10 +10,10 @@
 #include "values/labor.hpp"
 
 namespace abm::labor::demander {
-template <typename... Ts>
-class Listener final {
-    static_assert(sizeof...(Ts) >= 1UZ);
 
+template <typename... Ts>
+    requires(sizeof...(Ts) > 0UZ)
+class Listener final {
   public:
     Listener() noexcept = default;
 
@@ -26,13 +26,12 @@ class Listener final {
 
     template <typename F>
         requires std::conjunction_v<std::is_invocable<F, Ts>...>
-    void notice(F methodCaller) noexcept {
-        auto call = [&](auto&& opt) noexcept -> void {
+    void notice(F&& methodCaller) noexcept {
+        template for (auto& opt : listeners_) {
             if (opt) {
                 methodCaller(*opt);
             }
-        };
-        std::apply([&](auto&&... opts) noexcept -> void { ((call(opts)), ...); }, listeners_);
+        }
     }
 
   private:
