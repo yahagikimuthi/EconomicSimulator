@@ -23,7 +23,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(pcg_cpp)
 
 # --- ソースファイルの取得 ---
-file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS "src/app_main.cpp")
+file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS "src/main.cpp")
 
 # モジュールインターフェースファイル (.cppm) を include/ から再帰取得
 file(GLOB_RECURSE MODULE_SOURCES CONFIGURE_DEPENDS "include/*.cppm")
