@@ -14,18 +14,18 @@ namespace abm {
 class HHold final {
   public:
     explicit HHold(const AgentID Id, RandomGenerator& masterRng) noexcept
-        : finance{masterRng}, laborSupplier{masterRng}, consumerGoodsDemander{masterRng}, id{Id} {}
+        : finance{Id, masterRng}, laborSupplier{masterRng}, goodsDemander{masterRng}, id{Id} {}
 
     HHoldFinance          finance;
     LaborSupplier         laborSupplier;
-    ConsumerGoodsDemander consumerGoodsDemander;
+    ConsumerGoodsDemander goodsDemander;
     const AgentID         id;
 };
 
 class Firm final {
   public:
     explicit Firm(const AgentID Id, RandomGenerator& masterRng) noexcept
-        : finance{masterRng},
+        : finance{Id, masterRng},
           laborDemander{masterRng, {Id}},
           capitalDemander{masterRng},
           goodsSupplier{masterRng},
