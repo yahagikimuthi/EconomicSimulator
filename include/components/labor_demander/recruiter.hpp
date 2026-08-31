@@ -46,13 +46,13 @@ class Ledger final {
 
     void addApplicantsCnt(const HeadCount applicant) noexcept {
         ASSERT(applicant.isZeroOrMore());
-        ASSERT(applicants_.isZeroOrMore());
+        ASSERT(applicants_.isZero());
         applicants_ += applicant;
     }
 
     void addEmployCnt(const HeadCount employ) noexcept {
         ASSERT(employ.isZeroOrMore());
-        ASSERT(employ_.isZeroOrMore());
+        ASSERT(employ_.isZero());
         employ_ += employ;
     }
 
