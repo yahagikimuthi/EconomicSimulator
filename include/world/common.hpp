@@ -25,8 +25,9 @@ struct CensusDropBox final {
     std::vector<double> wages;
 
     CensusDropBox() noexcept {
-        const auto firmCnt  = setting::agent_count::bToCFirm + setting::agent_count::bToBFirm;
-        const auto hholdCnt = setting::agent_count::hhold;
+        namespace cnt       = setting::agent_count;
+        const auto firmCnt  = cnt::capitalFirm + cnt::consumerFirm;
+        const auto hholdCnt = cnt::hhold;
 
         firmAssets.reserve(firmCnt);
         postedEmployments.reserve(firmCnt);
