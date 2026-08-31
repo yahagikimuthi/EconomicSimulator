@@ -29,7 +29,7 @@ struct Overloaded final : Ts... {
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
-constexpr void ignore(auto&&... _) noexcept {}
+constexpr void nothing(auto&&... _) noexcept {}
 
 struct PCG32Seed final {
     const std::uint64_t state;
