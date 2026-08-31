@@ -7,9 +7,9 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
-#include "components/capital_supplier/common.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
+#include "world/capital.hpp"
 
 namespace abm::capital::supplier {
 class Trader final {
