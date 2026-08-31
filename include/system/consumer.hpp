@@ -1,14 +1,18 @@
 #pragma once
 
-#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/base_goods_supplier/base_goods_supplier.hpp"
+#include "components/finance/finance.hpp"
 #include "values/common.hpp"
+#include "world/base_goods.hpp"
 
 namespace abm::consumer::supplier {
 inline void supplyGoods(
-    const AgentID id, BaseGoodsSupplier& supplier, ConsumerGoodsMarket& market
+    const AgentID id, BaseGoodsSupplier& supplier, base_goods::Market& market
 ) noexcept {
     supplier.post(id, market);
 }
 
-inline void tradeGoods(BaseGoodsSupplier& supplier) noexcept { supplier.trade(); }
+inline void tradeGoods(FirmFinance& finance, BaseGoodsSupplier& supplier) noexcept {
+    supplier.trade(finance);
+}
 }  // namespace abm::consumer::supplier
