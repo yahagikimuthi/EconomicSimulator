@@ -28,13 +28,12 @@ class Listener final {
 
     template <typename F>
         requires std::conjunction_v<std::is_invocable<F, Ts>...>
-    void notice(F methodCaller) noexcept {
-        auto caller = [&](auto&& opt) noexcept -> void {
+    void notice(F&& methodCaller) noexcept {
+        template for (auto& opt : listeners_) {
             if (opt) {
                 methodCaller(*opt);
             }
-        };
-        std::apply([&](auto&&... opts) noexcept -> void { ((caller(opts)), ...); }, listeners_);
+        }
     }
 
   private:
