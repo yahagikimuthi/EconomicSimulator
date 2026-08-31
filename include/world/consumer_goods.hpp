@@ -9,26 +9,27 @@
 #include <vector>
 
 #include "others/util.hpp"
+#include "values/common.hpp"
 #include "values/goods.hpp"
 
 namespace abm::consumer_goods {
 class ConsumerGoodsEntry;
 class ConsumerGoodsRequest final {
   public:
-    ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
-        : requiresAmount{a}, entry{e} {
-        ASSERT(a > GoodsQuantity{0.0});
+    ConsumerGoodsRequest(const Money pay, const ConsumerGoodsEntry& e) noexcept
+        : payment{pay}, entry{e} {
+        ASSERT(pay.isPositive());
     }
     [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
 
     void trade(const GoodsQuantity tradeAmount) noexcept {
-        ASSERT(tradeAmount >= GoodsQuantity{0.0});
-        ASSERT(tradeAmount_ == GoodsQuantity{0.0});
+        ASSERT(tradeAmount.isZeroOrMore());
+        ASSERT(tradeAmount_.isZeroOrMore());
         tradeAmount_ = tradeAmount;
     }
 
-    const GoodsQuantity       requiresAmount;
+    const Money               payment;
     const ConsumerGoodsEntry& entry;
 
   private:
@@ -43,9 +44,9 @@ class ConsumerGoodsEntry final {
         ASSERT(p > Price{0.0});
         ASSERT(s > GoodsQuantity{0.0});
     }
-    [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
-        ASSERT(amount > GoodsQuantity{0.0});
-        return *requestBox_.emplace_back(amount, *this);
+    [[nodiscard]] auto request(const Money payment) noexcept -> Request& {
+        ASSERT(payment.isPositive());
+        return *requestBox_.emplace_back(payment, *this);
     }
     void requestBox(std::vector<RefWrap<Request>>& out) noexcept {
         ASSERT(out.empty());
