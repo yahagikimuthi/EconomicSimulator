@@ -51,7 +51,7 @@ class MarkupRate final : public value_object::BaseValueObject<double>,
                          value_object::CompareMixin<MarkupRate>,
                          value_object::AddMixin<MarkupRate>,
                          value_object::ScholarMixin<MarkupRate>,
-                         value_object::SignMixin<MarkupRate> {
+                         public value_object::SignMixin<MarkupRate> {
     friend struct AddMixin<MarkupRate>;
     friend struct ScholarMixin<MarkupRate>;
 
