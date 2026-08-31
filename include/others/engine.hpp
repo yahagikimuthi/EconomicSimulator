@@ -6,8 +6,7 @@
 #include "others/logger.hpp"
 #include "others/util.hpp"
 #include "system/begining.hpp"
-#include "system/capital_firm.hpp"
-#include "system/consumer_firm.hpp"
+#include "system/capital.hpp"
 #include "system/labor.hpp"
 #include "values/date.hpp"
 #include "world/capital.hpp"
@@ -118,26 +117,27 @@ class Engine final {
     }
 
     void runCapital() noexcept {
+        using namespace capital;
         for (auto& firm : capitalFirms_) {
-            capital_firm::supplyCapital(firm.id, firm.capitalSupplier, capitalMarket_);
+            supplier::supplyCapital(firm.id, firm.capitalSupplier, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
-            capital_firm::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
+            demander::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
         }
         for (auto& firm : consumerFirms_) {
-            consumer_firm::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
+            demander::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
-            capital_firm::tradeCapital(firm.capitalSupplier);
+            supplier::tradeCapital(firm.capitalSupplier);
         }
 
         for (auto& firm : capitalFirms_) {
-            capital_firm::afterCapitalTrade(firm.capitalDemander);
+            supplier::afterCapitalTrade(firm.capitalDemander);
         }
         for (auto& firm : consumerFirms_) {
-            consumer_firm::afterCapitalTrade(firm.capitalDemander);
+            supplier::afterCapitalTrade(firm.capitalDemander);
         }
     }
 

@@ -3,5 +3,5 @@
 #include "components/labor_supplier/labor_supplier.hpp"
 
 namespace abm::hhold {
-void work(LaborSupplier& laborSupplier) noexcept { laborSupplier.product(); }
+inline void work(LaborSupplier& laborSupplier) noexcept { laborSupplier.product(); }
 }  // namespace abm::hhold
