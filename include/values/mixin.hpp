@@ -123,6 +123,6 @@ struct SignMixin {
     }
 
   protected:
-    [[nodiscard]] SignMixin() noexcept = default;
+    explicit constexpr SignMixin() noexcept = default;
 };
 }  // namespace abm::value_object
