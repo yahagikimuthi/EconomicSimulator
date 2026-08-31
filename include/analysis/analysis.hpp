@@ -18,7 +18,7 @@ namespace abm::analysis {
 }
 
 void analysisData() {
-    namespace name = setting::save_name;
+    namespace name = save_name;
     auto analyzer  = Analyzer{};
 
     analyzer.requireData(name::firmAssets);

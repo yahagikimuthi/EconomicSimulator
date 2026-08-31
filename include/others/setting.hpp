@@ -1,22 +1,19 @@
 #pragma once
 
-#include <concepts>
 #include <cstdint>
 #include <limits>
 #include <string_view>
 #include <variant>
 
-namespace abm::setting {
-using namespace std::string_view_literals;
-}
-
 namespace abm {
+using namespace std::string_view_literals;
+
 template <typename T>
-    requires std::same_as<T, double> or std::same_as<T, int>
 struct UniformParameter final {
     const T min;
     const T limit;
 };
+
 struct NormalParameter final {
     const double mean{0.0};
     const double dev{1.0};
@@ -115,7 +112,7 @@ inline constexpr RandomParameter hholdInitialAsset =
 inline constexpr RandomParameter cashRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
 
-namespace abm::setting::save_name {
+namespace abm::save_name {
 inline constexpr auto firmAssets        = "firmAssets"sv;
 inline constexpr auto postedEmployments = "postedEmployments"sv;
 inline constexpr auto postedWages       = "postedWages"sv;
@@ -127,4 +124,4 @@ inline constexpr auto markups           = "markups"sv;
 inline constexpr auto inventories       = "inventories"sv;
 inline constexpr auto householdAssets   = "householdAssets"sv;
 inline constexpr auto wages             = "wages"sv;
-}  // namespace abm::setting::save_name
+}  // namespace abm::save_name
