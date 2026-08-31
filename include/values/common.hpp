@@ -22,6 +22,11 @@ class Money final : public value_object::BaseValueObject<double>,
 class AgentID final : public value_object::BaseValueObject<int>,
                       public value_object::CompareMixin<AgentID> {
   public:
+    auto operator++() noexcept -> AgentID& {
+        ++value_;
+        return *this;
+    }
+
     explicit constexpr AgentID(const int value) noexcept : BaseValueObject<int>(value) {}
 };
 
