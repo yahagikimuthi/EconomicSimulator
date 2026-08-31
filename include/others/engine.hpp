@@ -5,9 +5,10 @@
 #include "others/agents.hpp"
 #include "others/logger.hpp"
 #include "others/util.hpp"
+#include "system/begining.hpp"
 #include "system/capital_firm.hpp"
 #include "system/consumer_firm.hpp"
-#include "system/hhold.hpp"
+#include "system/labor.hpp"
 #include "values/date.hpp"
 #include "world/capital.hpp"
 #include "world/common.hpp"
@@ -37,12 +38,12 @@ class Engine final {
   private:
     void runYearlyPhase() noexcept {
         for (auto& firm : consumerFirms_) {
-            consumer_firm::beginingMonth(
+            begining::beginingMonth(
                 firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
             );
         }
         for (auto& firm : capitalFirms_) {
-            capital_firm::beginingYear(
+            begining::beginingYear(
                 firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
             );
         }
@@ -53,12 +54,12 @@ class Engine final {
 
     void runMonthlyPhase() noexcept {
         for (auto& firm : consumerFirms_) {
-            consumer_firm::beginingMonth(
+            begining::beginingMonth(
                 firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
             );
         }
         for (auto& firm : capitalFirms_) {
-            capital_firm::beginingMonth(
+            begining::beginingMonth(
                 firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
             );
         }
@@ -72,46 +73,47 @@ class Engine final {
     }
 
     void runLabor() noexcept {
+        using namespace labor;
         for (auto& firm : consumerFirms_) {
-            consumer_firm::layOffs(firm.laborDemander);
-            consumer_firm::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
+            demander::layOffs(firm.laborDemander);
+            demander::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
         }
         for (auto& firm : capitalFirms_) {
-            capital_firm::layOffs(firm.laborDemander);
-            capital_firm::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
+            demander::layOffs(firm.laborDemander);
+            demander::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
         }
 
         for (auto& hhold : hholds_) {
-            hhold::laborEntry(hhold.id, hhold.laborSupplier, laborMarket_);
+            supplier::laborEntry(hhold.id, hhold.laborSupplier, laborMarket_);
         }
 
         for (auto& firm : consumerFirms_) {
-            consumer_firm::offer(firm.laborDemander);
+            demander::offer(firm.laborDemander);
         }
         for (auto& firm : capitalFirms_) {
-            capital_firm::offer(firm.laborDemander);
+            demander::offer(firm.laborDemander);
         }
 
         for (auto& hhold : hholds_) {
-            hhold::acceptOffer(hhold.laborSupplier);
+            supplier::acceptOffer(hhold.laborSupplier);
         }
 
         for (auto& firm : consumerFirms_) {
-            consumer_firm::registerMember(firm.laborDemander, firm.consumerGoodsSupplier);
+            demander::registerMember(firm.laborDemander, firm.consumerGoodsSupplier);
         }
         for (auto& firm : capitalFirms_) {
-            capital_firm::registerMember(firm.laborDemander, firm.capitalSupplier);
+            demander::registerMember(firm.laborDemander, firm.capitalSupplier);
         }
 
         for (auto& hhold : hholds_) {
-            hhold::recordRosterEntry(hhold.laborSupplier);
+            supplier::recordRosterEntry(hhold.laborSupplier);
         }
 
         for (auto& firm : consumerFirms_) {
-            consumer_firm::acceptResignation(firm.laborDemander);
+            demander::acceptResignation(firm.laborDemander);
         }
         for (auto& firm : capitalFirms_) {
-            capital_firm::acceptResignation(firm.laborDemander);
+            demander::acceptResignation(firm.laborDemander);
         }
     }
 
