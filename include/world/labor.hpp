@@ -1,12 +1,13 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cstddef>
 #include <deque>
 #include <functional>
+#include <inplace_vector>
 #include <iterator>
 #include <optional>
 #include <ranges>
-#include <vector>
 
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -123,34 +124,32 @@ class Market final {
         return *requestBox_.emplace_back(id, wage);
     }
 
-    void pickRequest(
-        std::vector<RefWrap<Request>>& out, const int n, RandomGenerator& rng
-    ) noexcept {
+    template <std::size_t N>
+    void pickRequest(std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng) noexcept {
         ASSERT(out.empty());
-        if (n >= static_cast<int>(requestBox_.size())) {
+        if (out.max_size() > requestBox_.size()) {
             packAllRequest(out);
-            return;
         }
-        packPartRequest(out, n, rng);
+        packPartRequest(out, rng);
     }
 
     void clear() noexcept { requestBox_.clear(); }
 
   private:
-    void packAllRequest(std::vector<RefWrap<Request>>& out) noexcept {
-        for (Request& request : requestBox_) {
-            out.emplace_back(std::ref(request));
-        }
+    void packAllRequest(std::inplace_vector<RefWrap<Request>, 1UZ>& out) {
+        for (auto& req : requestBox_) out.unchecked_emplace_back(std::ref(req));
     }
+
+    template <std::size_t N>
     void packPartRequest(
-        std::vector<RefWrap<Request>>& out, const int n, RandomGenerator& rng
+        std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng
     ) noexcept {
         rng.sample(
             requestBox_ | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
                 return std::ref(req);
             }),
             std::back_inserter(out),
-            n
+            out.max_size()
         );
     }
 
