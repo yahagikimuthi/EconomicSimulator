@@ -49,7 +49,7 @@ class Workspace final {
 class Entry;
 class Request final {
   public:
-    Request(const Money pay, const Entry& e) noexcept : payment_{pay}, entry_{e} {
+    Request(const Money pay, const Entry& e) noexcept : payment_{pay}, remainPaid_{pay}, entry_{e} {
         ASSERT(pay.isZeroOrMore());
     }
     // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
@@ -69,9 +69,11 @@ class Request final {
         ASSERT(payment_.isZeroOrMore());
         return payment_;
     }
+    [[nodiscard]] auto remainPaid() const noexcept -> Money { return remainPaid_; }
 
   private:
-    Money         payment_;
+    const Money   payment_;
+    Money         remainPaid_;
     GoodsQuantity tradeAmount_{0.0};
     const Entry&  entry_;
 };
@@ -99,7 +101,7 @@ class Entry final {
     ASSERT(tradeAmount.isZeroOrMore());
     tradeAmount_         = tradeAmount;
     const auto actualPay = tradeAmount * entry_.price;
-    payment_ -= actualPay;
+    remainPaid_ -= actualPay;
     ASSERT(payment_.isZeroOrMore());
     return actualPay;
 }

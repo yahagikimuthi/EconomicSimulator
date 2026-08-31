@@ -98,7 +98,7 @@ class CapitalDemander final {
 
     void afterTrade(FirmFinance& finance) noexcept {
         if (not myRequest_) return;
-        const auto remain = myRequest_->payment();
+        const auto remain = myRequest_->remainPaid();
         finance.assetPlus(remain, FirmFinance::AccountItem::CapitalGoodsCost);
     }
 
