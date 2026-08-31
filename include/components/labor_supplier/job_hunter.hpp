@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <inplace_vector>
 #include <optional>
 #include <pcg_random.hpp>
 #include <ranges>
@@ -16,18 +17,18 @@ namespace abm::labor::supplier {
 class MyEntries final {
   public:
     MyEntries() noexcept = default;
-    void add(Entry& entry) noexcept { entries_.emplace_back(std::ref(entry)); }
-    void clear() noexcept { entries_.clear(); }
-
-    [[nodiscard]] auto takeOfferedEntry() noexcept -> std::ranges::view auto {
+    [[nodiscard]] auto takeOfferedEntry() noexcept -> auto {
         return entries_ | std::views::transform([](RefWrap<Entry> ref) noexcept -> Entry& {
                    return ref.get();
                }) |
                std::views::filter([](Entry& e) noexcept -> bool { return e.isOffer(); });
     }
 
+    void add(Entry& entry) noexcept { entries_.unchecked_emplace_back(std::ref(entry)); }
+    void clear() noexcept { entries_.clear(); }
+
   private:
-    std::vector<RefWrap<Entry>> entries_;
+    std::inplace_vector<RefWrap<Entry>, setting::jobEntryCnt> entries_;
 };
 
 template <typename F>
@@ -46,22 +47,22 @@ class JobHunter final {
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void entry(
+        const AgentID           id,
         IsAlignedFn auto&&      isAligned,
         MakeEntrySheetFn auto&& makeEntrySheet,
         Market&                 market,
-        const int               sampleCnt = setting::jobSampleCnt,
-        const int               entryCnt  = setting::jobEntryCnt
+        const int               entryCnt = setting::jobEntryCnt
     ) noexcept {
         if (acceptedEntry_) return;
         std::ranges::view auto alignedRequests{
-            pickAndSortJobs(market, sampleCnt, entryCnt) |
+            pickAndSortJobs(id, market, entryCnt) |
             std::views::filter([&](const Request& req) noexcept -> bool {
                 return isAligned(req);
             }) |
             std::views::take(entryCnt)
         };
         if (alignedRequests.empty()) return;
-        for (auto&& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
+        for (auto& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
     }
 
     void accept() noexcept {
@@ -83,11 +84,12 @@ class JobHunter final {
     }
 
     [[nodiscard]] auto pickAndSortJobs(
-        Market& market, const int sampleCnt, const int entryCnt
+        const AgentID id, Market& market, const int entryCnt
     ) noexcept -> std::span<RefWrap<Request>> {
-        static thread_local auto sampleRequest = std::vector<RefWrap<Request>>{};
+        static thread_local auto sampleRequest =
+            std::inplace_vector<RefWrap<Request>, setting::jobSampleCnt>{};
         sampleRequest.clear();
-        market.pickRequest(sampleRequest, sampleCnt, rng_);
+        market.pickRequest(id, sampleRequest, rng_);
         sortSample(sampleRequest, entryCnt);
         return sampleRequest;
     }
@@ -99,9 +101,7 @@ class JobHunter final {
             sortRequests,
             sortRequests.begin() + static_cast<int>(k),
             std::ranges::greater{},
-            [](const RefWrap<Request> requestRef) noexcept -> double {
-                return requestRef.get().wage.value();
-            }
+            [](const RefWrap<Request> requestRef) noexcept -> Wage { return requestRef.get().wage; }
         );
     }
 
