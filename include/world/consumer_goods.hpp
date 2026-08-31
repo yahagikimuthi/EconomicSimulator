@@ -2,8 +2,6 @@
 
 #include <tbb/concurrent_vector.h>
 #include <atomic>
-#include <functional>
-#include <pcg_random.hpp>
 #include <ranges>
 
 #include "others/util.hpp"
@@ -46,9 +44,10 @@ class ConsumerGoodsEntry final {
     using Request = ConsumerGoodsRequest;
 
   public:
-    ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept : price{p}, supply{s} {
-        ASSERT(p.isPositive());
-        ASSERT(s.isPositive());
+    ConsumerGoodsEntry(const AgentID Id, const Price Price, const GoodsQuantity Supply) noexcept
+        : id{Id}, price{Price}, supply{Supply} {
+        ASSERT(Price.isPositive());
+        ASSERT(Supply.isPositive());
     }
 
     [[nodiscard]] auto request(const Money payment) noexcept -> Request& {
@@ -58,6 +57,7 @@ class ConsumerGoodsEntry final {
 
     [[nodiscard]] auto requests() noexcept -> auto { return std::ranges::subrange{requests_}; }
 
+    const AgentID       id;
     const Price         price;
     const GoodsQuantity supply;
 
@@ -70,26 +70,30 @@ class ConsumerGoodsMarket final {
 
   public:
     ConsumerGoodsMarket() noexcept = default;
-    [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
+    [[nodiscard]] auto entry(
+        const AgentID id, const Price price, const GoodsQuantity supply
+    ) noexcept -> Entry& {
         ASSERT(price > Price{0.0});
         ASSERT(supply > GoodsQuantity{0.0});
         totalSupply_.fetch_add(supply.value());
-        return *entries_.emplace_back(price, supply);
+        return *entries_.emplace_back(id, price, supply);
     }
 
-    auto pickEntry(const int sampleCnt, RandomGenerator& rng) noexcept -> std::optional<Entry&> {
+    auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
+        -> std::optional<Entry&> {
         if (entries_.empty()) return std::nullopt;
-        auto toDouble = [](const Entry& entry) noexcept -> double { return entry.supply.value(); };
-        auto betterEntry =
-            std::ref(rng.discreteDistribution(entries_, totalSupply_.load(), toDouble));
-        if (sampleCnt <= 1) return betterEntry.get();
+        if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
 
-        for (const auto _ : std::views::iota(0, sampleCnt - 1)) {
-            auto& sample = rng.discreteDistribution(entries_, totalSupply_.load(), toDouble);
-            if (sample.price >= betterEntry.get().price) continue;
-            betterEntry = std::ref(sample);
+        auto currentBetter = std::optional<Entry&>{std::nullopt};
+        for (const auto _ : std::views::iota(0, sampleCnt)) {
+            auto& picked = rng.discreteDistribution(
+                entries_, totalSupply_.load(), [](Entry& e) -> double { return e.supply.value(); }
+            );
+            if (picked.id == id) continue;
+            if (not currentBetter) currentBetter = picked;
+            if (picked.price < currentBetter->price) currentBetter = picked;
         }
-        return betterEntry.get();
+        return currentBetter;
     }
 
     void clear() noexcept { entries_.clear(), totalSupply_.store(0.0); }
