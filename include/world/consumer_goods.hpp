@@ -53,13 +53,14 @@ class ConsumerGoodsEntry final {
         for (Request& req : requestBox_) out.emplace_back(std::ref(req));
     }
     [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
-        const auto demand = GoodsQuantity{std::ranges::fold_left(
-            requestBox_ | std::ranges::views::transform([](const Request& req) noexcept -> double {
-                return req.requiresAmount.value();
-            }),
-            0.0,
-            std::plus<>{}
-        )};
+        const auto demand = std::ranges::fold_left(
+            requestBox_ |
+                std::views::transform([this](const Request& req) noexcept -> GoodsQuantity {
+                    return req.payment / price;
+                }),
+            GoodsQuantity{0.0},
+            std::plus{}
+        );
         ASSERT(demand >= GoodsQuantity{0.0});
         return demand;
     }
@@ -68,7 +69,7 @@ class ConsumerGoodsEntry final {
     const GoodsQuantity supply;
 
     void performFullTrade() noexcept {
-        for (Request& req : requestBox_) req.trade(req.requiresAmount);
+        for (Request& req : requestBox_) req.trade(req.payment / price);
     }
 
   private:
