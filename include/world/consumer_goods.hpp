@@ -15,11 +15,19 @@
 namespace abm::consumer_goods {
 class ConsumerGoodsEntry;
 class ConsumerGoodsRequest final {
+    using Request = ConsumerGoodsRequest;
+    using Entry   = ConsumerGoodsEntry;
+
   public:
-    ConsumerGoodsRequest(const Money pay, const ConsumerGoodsEntry& e) noexcept
-        : payment{pay}, entry{e} {
+    ConsumerGoodsRequest(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
         ASSERT(pay.isPositive());
     }
+    ConsumerGoodsRequest(const Request&)               = delete;
+    auto operator=(const Request&) -> Request&         = delete;
+    ConsumerGoodsRequest(Request&&)                    = delete;
+    auto operator=(ConsumerGoodsRequest&&) -> Request& = delete;
+    ~ConsumerGoodsRequest() noexcept                   = default;
+
     [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
 
@@ -29,8 +37,8 @@ class ConsumerGoodsRequest final {
         tradeAmount_ = tradeAmount;
     }
 
-    const Money               payment;
-    const ConsumerGoodsEntry& entry;
+    const Money  payment;
+    const Entry& entry;
 
   private:
     GoodsQuantity tradeAmount_{0.0};
@@ -41,8 +49,8 @@ class ConsumerGoodsEntry final {
 
   public:
     ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept : price{p}, supply{s} {
-        ASSERT(p > Price{0.0});
-        ASSERT(s > GoodsQuantity{0.0});
+        ASSERT(p.isPositive());
+        ASSERT(s.isPositive());
     }
 
     [[nodiscard]] auto request(const Money payment) noexcept -> Request& {
