@@ -10,16 +10,6 @@
 #include "values/common.hpp"
 #include "world/capital.hpp"
 
-namespace abm {
-struct CapitalFirm final {
-    finance::Finance finance;
-    LaborDemander    laborDemander;
-    CapitalDemander  capitalDemander;
-    CapitalSupplier  capitalSupplier;
-    const AgentID    id;
-};
-}  // namespace abm
-
 namespace abm::capital_firm::detail {
 [[nodiscard]] auto laborDemanderAnnualRequestBudget(
     LaborDemander& laborDemander, CapitalSupplier& capitalSupplier

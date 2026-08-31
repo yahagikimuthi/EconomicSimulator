@@ -2,11 +2,12 @@
 
 #include <vector>
 
-#include "agents/capital_firm.hpp"
-#include "agents/consumer_firm.hpp"
-#include "agents/hhold.hpp"
+#include "others/agents.hpp"
 #include "others/logger.hpp"
 #include "others/util.hpp"
+#include "system/capital_firm.hpp"
+#include "system/consumer_firm.hpp"
+#include "system/hhold.hpp"
 #include "values/date.hpp"
 #include "world/capital.hpp"
 #include "world/common.hpp"

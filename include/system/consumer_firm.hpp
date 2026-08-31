@@ -11,16 +11,6 @@
 #include "world/capital.hpp"
 #include "world/labor.hpp"
 
-namespace abm {
-struct ConsumerFirm final {
-    finance::Finance      finance;
-    LaborDemander         laborDemander;
-    CapitalDemander       capitalDemander;
-    ConsumerGoodsSupplier consumerGoodsSupplier;
-    const AgentID         id;
-};
-}  // namespace abm
-
 namespace abm::consumer_firm::detail {
 [[nodiscard]] auto laborDemanderAnnualRequestBudget(
     LaborDemander& laborDemander, ConsumerGoodsSupplier& consumerGoodsSupplier
