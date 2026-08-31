@@ -13,9 +13,8 @@
 
 namespace abm::base_goods::supplier::mediator {
 template <typename... Ts>
+    requires(sizeof...(Ts) > 0UZ)
 class Listener final {
-    static_assert(sizeof...(Ts) >= 1UZ);
-
   public:
     Listener() noexcept = default;
 
