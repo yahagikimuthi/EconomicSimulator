@@ -1,25 +1,38 @@
 #pragma once
 
-#include <algorithm>
-#include <functional>
 #include <optional>
-#include <pcg_random.hpp>
+#include <ranges>
 #include <span>
+#include <type_traits>
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
 #include "components/finance/finance.hpp"
 #include "others/util.hpp"
+#include "values/common.hpp"
 #include "values/goods.hpp"
 #include "world/capital.hpp"
+#include "world/common.hpp"
+#include "world/consumer_goods.hpp"
 
-namespace abm::capital::supplier {
+namespace abm::base_goods::supplier {
+
+template <EMarket SupplyGoodsType>
+    requires(SupplyGoodsType == EMarket::ConsumerGoods) or (SupplyGoodsType == EMarket::Capital)
 class Trader final {
-    using TradePlan    = base_goods::supplier::TradePlan;
-    using Ledger       = base_goods::supplier::Ledger;
-    using ATradeResult = base_goods::supplier::ATradeResult;
-    using TradeResult  = base_goods::supplier::TradeResult;
+    using Market = std::conditional_t<
+        SupplyGoodsType == EMarket::ConsumerGoods,
+        ConsumerGoodsMarket,
+        CapitalMarket>;
+    using Request = std::conditional_t<
+        SupplyGoodsType == EMarket::ConsumerGoods,
+        consumer_goods::Request,
+        capital::Request>;
+    using Entry = std::conditional_t<
+        SupplyGoodsType == EMarket::ConsumerGoods,
+        consumer_goods::Entry,
+        capital::Entry>;
 
   public:
     explicit Trader(RandomGenerator& masterRng) noexcept
@@ -108,4 +121,4 @@ class Trader final {
     mutable RandomGenerator rng_;
     bool                    isActive_{false};
 };
-}  // namespace abm::capital::supplier
+}  // namespace abm::base_goods::supplier

@@ -1,19 +1,24 @@
 #pragma once
 
-#include <optional>
-
+#include <type_traits>
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
-#include "components/capital_supplier/common.hpp"
-#include "components/capital_supplier/trader.hpp"
+#include "components/base_goods_supplier/trader.hpp"
 #include "components/common.hpp"
-#include "others/util.hpp"
+#include "components/finance/finance.hpp"
 #include "values/goods.hpp"
+#include "world/capital.hpp"
+#include "world/common.hpp"
+#include "world/consumer_goods.hpp"
 
-namespace abm::capital::supplier {
+namespace abm::base_goods::supplier {
+template <EMarket SupplyGoodsType>
+    requires(SupplyGoodsType == EMarket::ConsumerGoods) or (SupplyGoodsType == EMarket::Capital)
 class TradingSystem final {
-    using TradePlanner = base_goods::supplier::TradePlanner;
-    using TradePlan    = base_goods::supplier::TradePlan;
+    using Market = std::conditional_t<
+        SupplyGoodsType == EMarket::ConsumerGoods,
+        ConsumerGoodsMarket,
+        CapitalMarket>;
 
   public:
     explicit TradingSystem(RandomGenerator& masterRng) noexcept
@@ -38,7 +43,7 @@ class TradingSystem final {
         trader_.post(id, *plan_, market);
     }
 
-    void trade() noexcept { trader_.trade(); }
+    void trade(FirmFinance& finance) noexcept { trader_.trade(finance); }
 
     void endStep(AssetPlusFn auto&& assetPlus, IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
@@ -55,6 +60,6 @@ class TradingSystem final {
   private:
     std::optional<TradePlan> plan_;
     TradePlanner             planner_;
-    Trader                   trader_;
+    Trader<SupplyGoodsType>  trader_;
 };
-}  // namespace abm::capital::supplier
+}  // namespace abm::base_goods::supplier

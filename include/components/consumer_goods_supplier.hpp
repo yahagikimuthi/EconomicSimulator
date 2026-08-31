@@ -5,23 +5,26 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/mediator.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
-#include "components/capital_supplier/trading_system.hpp"
+#include "components/base_goods_supplier/trading_system.hpp"
 #include "components/common.hpp"
+#include "components/finance/finance.hpp"
 #include "others/util.hpp"
+#include "values/common.hpp"
 #include "values/goods.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
 
-namespace abm::capital::supplier {
-class CapitalSupplier final {
+namespace abm::consumer_goods::supplier {
+class ConsumerGoodsSupplier final {
+    using TradingSystem   = base_goods::supplier::TradingSystem<EMarket::ConsumerGoods>;
     using ProducingSystem = base_goods::supplier::ProducingSystem;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
     using Workspace       = base_goods::Workspace;
 
   public:
-    explicit CapitalSupplier(RandomGenerator& masterRng) noexcept
+    explicit ConsumerGoodsSupplier(RandomGenerator& masterRng) noexcept
         : producingSystem_{masterRng}, tradingSystem_{masterRng} {}
 
     void setMediator() noexcept {
@@ -33,34 +36,24 @@ class CapitalSupplier final {
         mediator_.subscribeTradeResult(producingSystem_);
     }
 
+    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
+        const auto requiresSupply = tradingSystem_.requiresSupply();
+        return producingSystem_.calcDesiredEmploy(requiresSupply, employee);
+    }
+
     [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Money {
-        ASSERT(totalCost.isZeroOrMore());
         const auto supply = producingSystem_.produce();
         tradingSystem_.plan(supply, totalCost, mediator_);
-        return salesForecast();
+        return -salesForecast();
+    }
+
+    void beginingMonth(const Money totalCost) noexcept {
+        const auto supply = producingSystem_.produce();
+        tradingSystem_.plan(supply, totalCost, mediator_);
     }
 
     void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }
-
-    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
-        ASSERT(employee.isZeroOrMore());
-
-        const auto targetSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredEmploy(targetSupply, employee);
-    }
-
-    [[nodiscard]] auto requiresCapital() noexcept -> GoodsQuantity {
-        const auto requiresSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredCapital(requiresSupply);
-    }
-
-    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
-
-    void trade() noexcept { tradingSystem_.trade(); }
-
-    void addCapitalEquip(const GoodsQuantity capital) noexcept {
-        producingSystem_.addProducingEquip(capital);
-    }
+    void trade(FirmFinance& finance) noexcept { tradingSystem_.trade(finance); }
 
     template <AssetPlusFn F>
     void endStep(F&& assetPlus, CensusDropBox& dropBox) noexcept {
@@ -68,13 +61,25 @@ class CapitalSupplier final {
         reset(dropBox);
     }
 
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
+
+    void addCapitalEquip(const GoodsQuantity capital) noexcept {
+        ASSERT(capital.isZeroOrMore());
+        producingSystem_.addProducingEquip(capital);
+    }
+
     [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
+
+    [[nodiscard]] auto requiresCapital() noexcept -> GoodsQuantity {
+        const auto requiresSupply = tradingSystem_.requiresSupply();
+        return producingSystem_.calcDesiredCapital(requiresSupply);
+    }
 
   private:
     void reset(CensusDropBox& dropBox) noexcept {
-        memory_.logging(dropBox);
-        producingSystem_.reset(dropBox);
         tradingSystem_.reset();
+        producingSystem_.reset(dropBox);
+        memory_.logging(dropBox);
     }
 
     ProducingSystem producingSystem_;
@@ -82,8 +87,8 @@ class CapitalSupplier final {
     Mediator        mediator_;
     CentralMemory   memory_;
 };
-}  // namespace abm::capital::supplier
+}  // namespace abm::consumer_goods::supplier
 
 namespace abm {
-using CapitalSupplier = capital::supplier::CapitalSupplier;
+using ConsumerGoodsSupplier = consumer_goods::supplier::ConsumerGoodsSupplier;
 }

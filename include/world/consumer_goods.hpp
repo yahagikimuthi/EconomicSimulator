@@ -12,8 +12,8 @@ namespace abm::consumer_goods {
 class Entry;
 class Request final {
   public:
-    Request(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
-        ASSERT(pay.isPositive());
+    Request(const Money pay, const Entry& e) noexcept : payment_{pay}, entry_{e} {
+        ASSERT(pay.isZeroOrMore());
     }
     Request(const Request&)                             = delete;
     auto operator=(const Request&) noexcept -> Request& = delete;
@@ -21,32 +21,25 @@ class Request final {
     auto operator=(Request&&) noexcept -> Request&      = delete;
     ~Request() noexcept                                 = default;
 
-    [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
-
-    void trade(const GoodsQuantity tradeAmount) noexcept {
-        ASSERT(tradeAmount.isZeroOrMore());
-        ASSERT(tradeAmount_.isZeroOrMore());
-        tradeAmount_ = tradeAmount;
+    [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
+    [[nodiscard]] auto price() const noexcept -> Price;
+    [[nodiscard]] auto payment() const noexcept -> Money {
+        ASSERT(payment_.isZeroOrMore());
+        return payment_;
     }
 
-    const Money  payment;
-    const Entry& entry;
-
   private:
+    Money         payment_;
     GoodsQuantity tradeAmount_{0.0};
+    const Entry&  entry_;
 };
 
 class Entry final {
   public:
-    Entry(const AgentID Id, const Price Price, const GoodsQuantity Supply) noexcept
-        : id{Id}, price{Price}, supply{Supply} {
-        ASSERT(Price.isPositive());
-        ASSERT(Supply.isPositive());
-    }
-
+    Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
+        : id{i}, price{p}, supply{s} {}
     [[nodiscard]] auto request(const Money payment) noexcept -> Request& {
-        ASSERT(payment.isPositive());
         return *requests_.emplace_back(payment, *this);
     }
 
@@ -59,6 +52,17 @@ class Entry final {
   private:
     tbb::concurrent_vector<Request> requests_;
 };
+
+[[nodiscard]] auto Request::trade(const GoodsQuantity tradeAmount) noexcept -> Money {
+    ASSERT(tradeAmount_.isZero());
+    ASSERT(tradeAmount.isZeroOrMore());
+    tradeAmount_         = tradeAmount;
+    const auto actualPay = tradeAmount * entry_.price;
+    payment_ -= actualPay;
+    ASSERT(payment_.isZeroOrMore());
+    return actualPay;
+}
+[[nodiscard]] auto Request::price() const noexcept -> Price { return entry_.price; }
 
 class Market final {
   public:
