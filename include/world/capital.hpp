@@ -15,6 +15,12 @@ class Request final {
     Request(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
         ASSERT(pay.isZeroOrMore());
     }
+    Request(const Request&)                             = delete;
+    auto operator=(const Request&) noexcept -> Request& = delete;
+    Request(Request&&)                                  = delete;
+    auto operator=(Request&&) noexcept -> Request&      = delete;
+    ~Request() noexcept                                 = default;
+
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
 
     void trade(const GoodsQuantity tradeAmount) noexcept {
