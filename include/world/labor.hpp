@@ -120,24 +120,24 @@ class Market final {
     Market() noexcept = default;
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
-        ASSERT(wage > Wage{0.0});
-        return *requestBox_.emplace_back(id, wage);
+        ASSERT(wage.isPositive());
+        return *requests_.emplace_back(id, wage);
     }
 
     template <std::size_t N>
     void pickRequest(std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng) noexcept {
         ASSERT(out.empty());
-        if (out.max_size() > requestBox_.size()) {
+        if (out.max_size() >= requests_.size()) {
             packAllRequest(out);
         }
         packPartRequest(out, rng);
     }
 
-    void clear() noexcept { requestBox_.clear(); }
+    void clear() noexcept { requests_.clear(); }
 
   private:
     void packAllRequest(std::inplace_vector<RefWrap<Request>, 1UZ>& out) {
-        for (auto& req : requestBox_) out.unchecked_emplace_back(std::ref(req));
+        for (auto& req : requests_) out.unchecked_emplace_back(std::ref(req));
     }
 
     template <std::size_t N>
@@ -145,7 +145,7 @@ class Market final {
         std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng
     ) noexcept {
         rng.sample(
-            requestBox_ | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
+            requests_ | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
                 return std::ref(req);
             }),
             std::back_inserter(out),
@@ -153,7 +153,7 @@ class Market final {
         );
     }
 
-    tbb::concurrent_vector<Request> requestBox_;
+    tbb::concurrent_vector<Request> requests_;
 };
 }  // namespace abm::labor
 
