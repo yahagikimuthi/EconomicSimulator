@@ -25,7 +25,7 @@ class FirmFinance final {
         : cash_{Money{masterRng.random(setting::firmInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    [[nodiscard]] auto withdraw(const Money sub, const AccountItem item) noexcept -> Money {
+    [[nodiscard]] auto tryWithdraw(const Money sub, const AccountItem item) noexcept -> Money {
         ASSERT(sub.isZeroOrMore());
         ASSERT(item != AccountItem::Sales);
         if (currentCashRatio() > cashRatio_) {
