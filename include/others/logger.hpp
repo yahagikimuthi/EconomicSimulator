@@ -14,7 +14,7 @@
 namespace abm {
 class Logger final {
   public:
-    explicit Logger() noexcept
+    explicit Logger()
         : file_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
@@ -24,7 +24,9 @@ class Logger final {
                   filepath,
                   HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
               };
-          }()} {}
+          }()} {
+        if (not isValid()) throw std::invalid_argument("cannot open file");
+    }
 
     [[nodiscard]] auto isValid() const noexcept -> bool { return file_.isValid(); }
 
