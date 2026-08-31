@@ -41,11 +41,14 @@ class Trader final {
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void request(
-        const Money budget, Market& market, const int sampleCnt = setting::goodsSampleCnt
+        const AgentID id,
+        const Money   budget,
+        Market&       market,
+        const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
-        auto pickedEntry = market.pickEntry(sampleCnt, rng_);
+        auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not myRequest_) return;
-        myRequest_ = pickedEntry->request(budget / pickedEntry->price);
+        myRequest_ = pickedEntry->request(budget);
     }
 
     void afterTrade() noexcept {
@@ -76,16 +79,17 @@ class ConsumerGoodsDemander final {
           myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}
 
     void request(
-        const Money asset,
-        const Step  step,
-        Market&     market,
-        const int   frequency = setting::maxPurchaseFrequency,
-        const int   sampleCnt = setting::goodsSampleCnt
+        const AgentID id,
+        const Money   asset,
+        const Step    step,
+        Market&       market,
+        const int     frequency = setting::maxPurchaseFrequency,
+        const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         if (shouldPass(step, frequency)) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
-        trader_.request(budget, market, sampleCnt);
+        trader_.request(id, budget, market, sampleCnt);
     }
 
     void afterTrade() noexcept { trader_.afterTrade(); }
