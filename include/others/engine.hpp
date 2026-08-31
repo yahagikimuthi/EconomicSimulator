@@ -5,6 +5,7 @@
 
 #include "others/agents.hpp"
 #include "others/logger.hpp"
+#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "system/begining.hpp"
 #include "system/capital.hpp"
@@ -21,7 +22,32 @@ class Engine final {
 
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
-        : seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}}, endingDay_{endingDay} {}
+        : seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}}, endingDay_{endingDay} {
+        namespace cnt = setting::agent_count;
+        auto id       = 0;
+        capitalFirms_.reserve(cnt::capitalFirm);
+        for (; id < cnt::capitalFirm; ++id) {
+            capitalFirms_.emplace_back(AgentID{id}, rng_);
+        }
+        for (auto& firm : capitalFirms_) {
+            firm.laborDemander.setMediator();
+            firm.goodsSupplier.setMediator();
+        }
+
+        consumerFirms_.reserve(cnt::consumerFirm + 5);
+        for (; id < cnt::capitalFirm + cnt::consumerFirm; ++id) {
+            consumerFirms_.emplace_back(AgentID{id}, rng_);
+        }
+        for (auto& firm : consumerFirms_) {
+            firm.laborDemander.setMediator();
+            firm.goodsSupplier.setMediator();
+        }
+
+        hholds_.reserve(cnt::hhold + 10);
+        for (; id < cnt::capitalFirm + cnt::consumerFirm + cnt::hhold; ++id) {
+            hholds_.emplace_back(AgentID{id}, rng_);
+        }
+    }
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
