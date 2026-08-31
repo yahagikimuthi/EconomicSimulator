@@ -26,21 +26,4 @@ class TaxRate final : public value_object::BaseValueObject<double>,
 [[nodiscard]] constexpr auto operator*(TaxRate lhs, Money rhs) noexcept -> Money {
     return rhs * lhs;
 }
-
-class Deposit final : public value_object::BaseValueObject<double>,
-                      value_object::CompareMixin<Deposit>,
-                      value_object::AddMixin<Deposit>,
-                      value_object::ScholarMixin<Deposit>,
-                      public value_object::SignMixin<Deposit> {
-    friend struct AddMixin<Deposit>;
-    friend struct ScholarMixin<Deposit>;
-
-  public:
-    explicit constexpr Deposit(const double value) noexcept : BaseValueObject<double>(value) {}
-
-    [[nodiscard]] constexpr operator Money() const noexcept { return Money{value_}; }
-};
-
-[[nodiscard]] constexpr Money::operator Deposit() const noexcept { return Deposit{value_}; }
-
 }  // namespace abm

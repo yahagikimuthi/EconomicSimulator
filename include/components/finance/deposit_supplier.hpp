@@ -3,7 +3,6 @@
 #include <optional>
 
 #include "values/common.hpp"
-#include "values/others.hpp"
 #include "world/deposit.hpp"
 
 namespace abm::finance::deposit::supplier {
@@ -12,8 +11,8 @@ class DepositSupplier final {
   public:
     DepositSupplier() noexcept = default;
 
-    [[nodiscard]] auto balance() const noexcept -> Deposit {
-        return account_.transform(&DepositAccount::balance).value_or(Deposit{0.0});
+    [[nodiscard]] auto balance() const noexcept -> Money {
+        return account_.transform(&DepositAccount::balance).value_or(Money{0.0});
     }
 
     [[nodiscard]] auto tryDeposit(const Money deposit) noexcept -> bool {

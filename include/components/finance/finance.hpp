@@ -61,12 +61,12 @@ class FirmFinance final {
         if (currentCashRatio() > cashRatio_) {
             const auto cashOut     = std::min(cash_, claim);
             const auto rest        = claim - cashOut;
-            const auto withdraw    = std::min(static_cast<Money>(depositSupplier_.balance()), rest);
+            const auto withdraw    = std::min(depositSupplier_.balance(), rest);
             const auto moreCashOut = rest - withdraw;
             return cashOut + withdraw + moreCashOut;
         }
 
-        const auto withdraw = std::min(static_cast<Money>(depositSupplier_.balance()), claim);
+        const auto withdraw = std::min(depositSupplier_.balance(), claim);
         ASSERT(withdraw <= claim);
         const auto cashOut = claim - withdraw;
         return withdraw + cashOut;
