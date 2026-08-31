@@ -2,10 +2,10 @@
 
 #include <utility>
 
-#include "components/base_supplier/common.hpp"
-#include "components/base_supplier/mediator.hpp"
-#include "components/base_supplier/produsing.hpp"
-#include "components/base_supplier/trading_system.hpp"
+#include "components/base_goods_supplier/common.hpp"
+#include "components/base_goods_supplier/mediator.hpp"
+#include "components/base_goods_supplier/produsing.hpp"
+#include "components/base_goods_supplier/trading_system.hpp"
 #include "components/common.hpp"
 #include "components/finance/finance.hpp"
 #include "others/util.hpp"

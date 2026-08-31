@@ -4,8 +4,8 @@
 #include <limits>
 #include <pcg_random.hpp>
 
-#include "components/base_supplier/common.hpp"
-#include "components/base_supplier/markup_planner.hpp"
+#include "components/base_goods_supplier/common.hpp"
+#include "components/base_goods_supplier/markup_planner.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"

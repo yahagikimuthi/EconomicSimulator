@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "components/base_supplier/common.hpp"
+#include "components/base_goods_supplier/common.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 

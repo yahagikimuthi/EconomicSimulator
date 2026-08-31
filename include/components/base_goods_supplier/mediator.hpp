@@ -4,11 +4,11 @@
 #include <tuple>
 #include <type_traits>
 
-#include "components/base_supplier/common.hpp"
-#include "components/base_supplier/employ_planner.hpp"
-#include "components/base_supplier/markup_planner.hpp"
-#include "components/base_supplier/produsing.hpp"
-#include "components/base_supplier/trade_planner.hpp"
+#include "components/base_goods_supplier/common.hpp"
+#include "components/base_goods_supplier/employ_planner.hpp"
+#include "components/base_goods_supplier/markup_planner.hpp"
+#include "components/base_goods_supplier/produsing.hpp"
+#include "components/base_goods_supplier/trade_planner.hpp"
 #include "values/goods.hpp"
 
 namespace abm::base_goods::supplier::mediator {
