@@ -68,6 +68,10 @@ class Entry final {
         : entrantId{Id}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
+    // Request::entries() -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
+    // entrantが持つ参照が無効化してしまう。
+    // std::sortはstd::swapを内部で行い、そのコンセプトはコピー及びムーブ構築が可能であること。
+    // よって、各種コンストラクタ及び演算子を明示的削除する。
     Entry(const Entry&)                             = delete;
     auto operator=(const Entry&) noexcept -> Entry& = delete;
     Entry(Entry&&)                                  = delete;
