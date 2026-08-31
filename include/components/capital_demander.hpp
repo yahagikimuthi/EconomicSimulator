@@ -86,8 +86,8 @@ class CapitalDemander final {
     ) noexcept {
         const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
-        const auto purchaseAmount = std::min(*purchaseAmountPlan_, *budget_ / pickedEntry->price);
-        myRequest_                = pickedEntry->request(purchaseAmount);
+        const auto payment = std::min(*purchaseAmountPlan_ * pickedEntry->price, *budget_);
+        myRequest_         = pickedEntry->request(payment);
     }
 
     void afterTrade() noexcept {
