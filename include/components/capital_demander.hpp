@@ -103,11 +103,6 @@ class CapitalDemander final {
     }
 
   private:
-    void reset() noexcept {
-        ledger_.reset();
-        myRequest_.reset();
-    }
-
     Ledger                        ledger_;
     RandomGenerator               rng_;
     Log                           log_;
