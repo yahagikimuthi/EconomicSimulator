@@ -50,7 +50,7 @@ class ConsumerGoodsSupplier final {
         tradingSystem_.plan(supply, totalCost, mediator_);
     }
 
-    void post(Market& market) noexcept { tradingSystem_.post(market); }
+    void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }
     void trade() noexcept { tradingSystem_.trade(); }
 
     template <AssetPlusFn F>

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <optional>
+
+#include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "components/capital_supplier/common.hpp"
 #include "components/capital_supplier/trader.hpp"
@@ -10,6 +13,7 @@
 namespace abm::capital::supplier {
 class TradingSystem final {
     using TradePlanner = base_goods::supplier::TradePlanner;
+    using TradePlan    = base_goods::supplier::TradePlan;
 
   public:
     [[nodiscard]] explicit constexpr TradingSystem(RandomGenerator& masterRng) noexcept
@@ -26,18 +30,12 @@ class TradingSystem final {
     ) noexcept {
         ASSERT(supply.isZeroOrMore());
         const auto plan = planner_.planTrading(supply, totalCost, mediator);
+        plan_           = plan;
     }
 
-    void post(
-        const AgentID       id,
-        const GoodsQuantity supply,
-        const Money         totalCost,
-        Market&             market,
-        IMediator auto&     mediator
-    ) noexcept {
-        ASSERT(supply >= GoodsQuantity{0.0});
-        const auto plan = planner_.planTrading(supply, totalCost, mediator);
-        trader_.post(id, plan, market);
+    void post(const AgentID id, Market& market) noexcept {
+        ASSERT(plan_);
+        trader_.post(id, *plan_, market);
     }
 
     void trade() noexcept { trader_.trade(); }
@@ -55,7 +53,8 @@ class TradingSystem final {
     }
 
   private:
-    TradePlanner planner_;
-    Trader       trader_;
+    std::optional<TradePlan> plan_;
+    TradePlanner             planner_;
+    Trader                   trader_;
 };
 }  // namespace abm::capital::supplier

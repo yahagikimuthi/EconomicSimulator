@@ -7,6 +7,7 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "world/capital.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
@@ -111,4 +112,18 @@ void registerMember(LaborDemander& laborDemander, ConsumerGoodsSupplier& goodsSu
 }
 
 void acceptResignation(LaborDemander& laborDemander) noexcept { laborDemander.acceptResignation(); }
+
+void supplyGoods(
+    const AgentID id, ConsumerGoodsSupplier& supplier, ConsumerGoodsMarket& market
+) noexcept {
+    supplier.post(id, market);
+}
+
+void tradeGoods(ConsumerGoodsSupplier& supplier) noexcept { supplier.trade(); }
+
+void purchaseCapital(const AgentID id, CapitalDemander& demander, CapitalMarket& market) noexcept {
+    demander.request(id, market);
+}
+
+void afterCapitalTrade(CapitalDemander& demander) noexcept { demander.afterTrade(); }
 }  // namespace abm::consumer_firm

@@ -35,7 +35,7 @@ class TradingSystem final {
         trader_.post(plan, market);
     }
 
-    void post(Market& market) noexcept { trader_.post(*plan_, market); }
+    void post(const AgentID _, Market& market) noexcept { trader_.post(*plan_, market); }
 
     [[nodiscard]] auto requiresSupply() noexcept -> GoodsQuantity {
         return planner_.requiresSupply();

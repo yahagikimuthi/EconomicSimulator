@@ -40,12 +40,7 @@ class CapitalSupplier final {
         return salesForecast();
     }
 
-    void post(const AgentID id, const Money totalCost, Market& market) noexcept {
-        ASSERT(totalCost >= Money{0.0});
-
-        const auto supply = producingSystem_.produce();
-        tradingSystem_.post(id, supply, totalCost, market, mediator_);
-    }
+    void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
         ASSERT(employee >= HeadCount{0.0});

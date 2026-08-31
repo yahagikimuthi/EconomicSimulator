@@ -114,7 +114,30 @@ class Engine final {
         }
     }
 
-    void runCapital() noexcept {}
+    void runCapital() noexcept {
+        for (auto& firm : capitalFirms_) {
+            capital_firm::supplyCapital(firm.id, firm.capitalSupplier, capitalMarket_);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            capital_firm::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
+        }
+        for (auto& firm : consumerFirms_) {
+            consumer_firm::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            capital_firm::tradeCapital(firm.capitalSupplier);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            capital_firm::afterCapitalTrade(firm.capitalDemander);
+        }
+        for (auto& firm : consumerFirms_) {
+            consumer_firm::afterCapitalTrade(firm.capitalDemander);
+        }
+    }
+
     void runConsumerGoods() noexcept {}
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
