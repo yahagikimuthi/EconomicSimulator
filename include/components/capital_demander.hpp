@@ -5,7 +5,6 @@
 #include <limits>
 #include <optional>
 #include <pcg_random.hpp>
-#include <utility>
 
 #include "components/finance/firm_finance.hpp"
 #include "others/setting.hpp"
@@ -97,21 +96,10 @@ class CapitalDemander final {
         myRequest_ = pickedEntry->request(withdraw);
     }
 
-    void afterTrade() noexcept {
+    void afterTrade(FirmFinance& finance) noexcept {
         if (not myRequest_) return;
-        ledger_.readTradeResult(
-            {.price = myRequest_->price(), .tradeAmount = myRequest_->tradeAmount()}
-        );
-    }
-
-    template <ReadResultFn F>
-    void endStep(F&& readResult) noexcept {
-        const auto result = ledger_.publishTradeResult();
-        ASSERT(result.purchased >= Money{0.0});
-        ASSERT(result.tradeAmount.isZeroOrMore());
-
-        std::forward<F>(readResult)(result);
-        reset();
+        const auto remain = myRequest_->payment();
+        finance.assetPlus(remain, FirmFinance::AccountItem::CapitalGoodsCost);
     }
 
   private:
