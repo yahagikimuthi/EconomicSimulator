@@ -106,9 +106,7 @@ class RandomGenerator final {
     [[nodiscard]] constexpr auto random(const RandomParameter& param) noexcept -> double {
         return param.visit(Overloaded{
             [&](const UniformParameter<int>& uniformParam) noexcept -> double {
-                return randInt(
-                    static_cast<int>(uniformParam.min), static_cast<int>(uniformParam.limit)
-                );
+                return randInt(uniformParam.min, uniformParam.limit);
             },
             [&](const UniformParameter<double>& uniformParam) noexcept -> double {
                 return rand(uniformParam.min, uniformParam.limit);
