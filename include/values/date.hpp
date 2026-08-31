@@ -26,17 +26,17 @@ class Date final {
         const auto yearIdx   = year_ - 1U;
         const auto monthIdx  = month_ - 1U;
         const auto dayIdx    = day_ - 1U;
-        const auto flatMonth = (yearIdx * 12U) + monthIdx;
-        const auto flatDay   = (flatMonth * 30U) + dayIdx;
+        const auto flatMonth = (yearIdx * maxMonth_) + monthIdx;
+        const auto flatDay   = (flatMonth * maxDay_) + dayIdx;
         return flatDay;
     }
 
     auto operator++() noexcept -> Date& {
-        if (day_ < 30U) {
+        if (day_ < maxDay_) {
             ++day_;
             return *this;
         }
-        if (month_ < 12U) {
+        if (month_ < maxMonth_) {
             day_ = 1U;
             ++month_;
             return *this;
@@ -51,5 +51,8 @@ class Date final {
     unsigned int year_;
     unsigned int month_;
     unsigned int day_;
+
+    static constexpr unsigned int maxMonth_ = 12;
+    static constexpr unsigned int maxDay_   = 20U;
 };
 }  // namespace abm
