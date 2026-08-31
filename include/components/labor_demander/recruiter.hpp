@@ -34,14 +34,6 @@ class Ledger final {
   public:
     Ledger() = default;
 
-    struct OfferResult final {
-        const HeadCount applicants;
-    };
-
-    struct EmployResult final {
-        const HeadCount employ;
-    };
-
     void makeNewPage(const HeadCount offerPlan) noexcept {
         ASSERT(offerPlan.isZeroOrMore());
         offerPlan_ = offerPlan;
@@ -52,14 +44,16 @@ class Ledger final {
         return offerPlan_;
     }
 
-    void readOfferResult(const OfferResult& result) noexcept {
-        ASSERT(result.applicants.isZeroOrMore());
-        applicants_ += result.applicants;
+    void addApplicantsCnt(const HeadCount applicant) noexcept {
+        ASSERT(applicant.isZeroOrMore());
+        ASSERT(applicants_.isZeroOrMore());
+        applicants_ += applicant;
     }
 
-    void readEmployResult(const EmployResult add) noexcept {
-        ASSERT(add.employ.isZeroOrMore());
-        employ_ += add.employ;
+    void addEmployCnt(const HeadCount employ) noexcept {
+        ASSERT(employ.isZeroOrMore());
+        ASSERT(employ_.isZeroOrMore());
+        employ_ += employ;
     }
 
     [[nodiscard]] auto publishResult() const -> RecruitResult {
@@ -85,7 +79,6 @@ class Recruiter final {
     Recruiter() noexcept = default;
 
     void post(const AgentID id, const RecruitPlan& plan, Market& laborMarket) noexcept {
-        isActive_ = true;
         ASSERT(plan.wage.isZeroOrMore());
         if (not shouldPost(plan)) return;
         ledger_.makeNewPage(plan.offer);
@@ -111,11 +104,10 @@ class Recruiter final {
             acceptApplicant.setRoster(addRoster(acceptApplicant.entrantId, myRequest_->wage));
             ++employCnt;
         }
-        ledger_.readEmployResult({.employ = employCnt});
+        ledger_.addEmployCnt(employCnt);
     }
 
     [[nodiscard]] auto publishResult() const noexcept -> std::optional<RecruitResult> {
-        if (not isActive_) return std::nullopt;
         return ledger_.publishResult();
     }
 
@@ -123,7 +115,6 @@ class Recruiter final {
         myRequest_.reset();
         ledger_.reset();
         offerApplicants_.clear();
-        isActive_ = false;
     }
 
   private:
@@ -133,7 +124,7 @@ class Recruiter final {
         auto entries = myRequest_->entries();
         for (auto& entry : entries) entry.offer();
         const auto applicant = HeadCount{entries.size()};
-        ledger_.readOfferResult({.applicants = applicant});
+        ledger_.addApplicantsCnt(applicant);
     }
 
     void offerPart() noexcept {
@@ -148,8 +139,7 @@ class Recruiter final {
             offerApplicants_.add(entry);
             ++offerCnt;
         }
-
-        ledger_.readOfferResult({.applicants = HeadCount{entries.size()}});
+        ledger_.addApplicantsCnt(HeadCount{entries.size()});
     }
 
     [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {
@@ -162,7 +152,7 @@ class Recruiter final {
     }
 
     [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) noexcept -> bool {
-        return plan.offer.isPositive();
+        return plan.offer.isPositive() and plan.employ.isPositive() and plan.wage.isPositive();
     }
 
     [[nodiscard]] static auto sortApplicants(
@@ -189,7 +179,6 @@ class Recruiter final {
     std::optional<Request&> myRequest_{std::nullopt};
     Ledger                  ledger_;
     OfferApplicants         offerApplicants_;
-    bool                    isActive_{false};
 };
 }  // namespace abm::labor::demander::recruiter
 
