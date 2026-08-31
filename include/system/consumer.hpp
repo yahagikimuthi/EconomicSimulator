@@ -1,7 +1,7 @@
 #pragma once
 
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
-#include "components/finance/finance.hpp"
+#include "components/finance/firm_finance.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
 

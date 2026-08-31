@@ -3,7 +3,8 @@
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
 #include "components/consumer_goods_demander.hpp"
-#include "components/finance/finance.hpp"
+#include "components/finance/firm_finance.hpp"
+#include "components/finance/others_finance.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "others/util.hpp"
@@ -15,7 +16,7 @@ class HHold final {
     explicit HHold(const AgentID Id, RandomGenerator& masterRng) noexcept
         : finance{masterRng}, laborSupplier{masterRng}, consumerGoodsDemander{masterRng}, id{Id} {}
 
-    FirmFinance           finance;
+    HHoldFinance          finance;
     LaborSupplier         laborSupplier;
     ConsumerGoodsDemander consumerGoodsDemander;
     const AgentID         id;

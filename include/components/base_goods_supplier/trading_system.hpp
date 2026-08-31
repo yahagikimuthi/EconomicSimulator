@@ -4,7 +4,7 @@
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "components/base_goods_supplier/trader.hpp"
 #include "components/common.hpp"
-#include "components/finance/finance.hpp"
+#include "components/finance/firm_finance.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
 
