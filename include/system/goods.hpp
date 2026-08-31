@@ -25,4 +25,8 @@ inline void purchase(
 ) noexcept {
     demander.request(id, finance, market);
 }
+
+inline void afterTrade(HHoldFinance& finance, GoodsDemander& demander) noexcept {
+    demander.afterTrade(finance);
+}
 }  // namespace abm::goods::demander
