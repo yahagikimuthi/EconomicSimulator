@@ -81,11 +81,11 @@ inline constexpr RandomParameter producerGoodsDepreciationRate =
 inline constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
 
-namespace abm::consumer_goods::demander::setting {
+namespace abm::goods::demander::setting {
 inline constexpr auto            maxPurchaseFrequency = 1;
 inline constexpr auto            goodsSampleCnt       = 2;
 inline constexpr RandomParameter mpc = UniformParameter<double>{.min = 0.5, .limit = 0.8};
-}  // namespace abm::consumer_goods::demander::setting
+}  // namespace abm::goods::demander::setting
 
 namespace abm::capital::demander::setting {
 inline constexpr auto goodsSampleCnt = 2;

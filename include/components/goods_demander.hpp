@@ -11,7 +11,7 @@
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
 
-namespace abm::consumer_goods::demander {
+namespace abm::goods::demander {
 using Request = base_goods::Request;
 using Entry   = base_goods::Entry;
 using Market  = base_goods::Market;
@@ -71,9 +71,9 @@ class Trader final {
     std::optional<const Request&> myRequest_{std::nullopt};
 };
 
-class ConsumerGoodsDemander final {
+class GoodsDemander final {
   public:
-    explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
+    explicit GoodsDemander(RandomGenerator& masterRng) noexcept
         : trader_{masterRng}, mpc_{masterRng.random(setting::mpc)} {}
 
     [[nodiscard]] auto planAndRequestBudget(const Money asset) noexcept -> Money {
@@ -112,8 +112,8 @@ class ConsumerGoodsDemander final {
     const double         mpc_;
     std::optional<Money> budget_;
 };
-}  // namespace abm::consumer_goods::demander
+}  // namespace abm::goods::demander
 
 namespace abm {
-using ConsumerGoodsDemander = consumer_goods::demander::ConsumerGoodsDemander;
+using GoodsDemander = goods::demander::GoodsDemander;
 }

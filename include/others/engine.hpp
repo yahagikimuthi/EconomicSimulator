@@ -75,7 +75,7 @@ class Engine final {
         }
         runLabor();
         runCapital();
-        runConsumerGoods();
+        runGoods();
     }
 
     void runMonthlyPhase() noexcept {
@@ -93,7 +93,7 @@ class Engine final {
             );
         }
         runCapital();
-        runConsumerGoods();
+        runGoods();
     }
 
     void runDailyPhase() noexcept {
@@ -101,7 +101,7 @@ class Engine final {
             labor::supplier::work(hhold.laborSupplier);
         }
         runCapital();
-        runConsumerGoods();
+        runGoods();
     }
 
     void runLabor() noexcept {
@@ -174,7 +174,7 @@ class Engine final {
         }
     }
 
-    void runConsumerGoods() noexcept {}
+    void runGoods() noexcept {}
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
@@ -196,7 +196,7 @@ class Engine final {
     std::vector<Firm>  capitalFirms_;
 
     LaborMarket        laborMarket_;
-    base_goods::Market consumerGoodsMarket_;
+    base_goods::Market goodsMarket_;
     base_goods::Market capitalMarket_;
     CensusDropBox      dropBox_;
 

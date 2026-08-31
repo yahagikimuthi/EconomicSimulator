@@ -5,7 +5,10 @@
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
 #include "components/finance/firm_finance.hpp"
+#include "components/finance/others_finance.hpp"
+#include "components/goods_demander.hpp"
 #include "components/labor_demander/labor_demander.hpp"
+#include "components/labor_supplier/labor_supplier.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 
@@ -136,5 +139,11 @@ inline void beginingMonth(
     const auto budget = finance.claimBudget(total) + salesForecast;
     ASSERT(budget <= total);
     capitalDemander.revisePlan(std::max(budget - sumWage, Money{0.0}));
+}
+
+inline void beginingMonth(
+    HHoldFinance& finance, LaborSupplier& laborSupplier, GoodsDemander& goodsDemander
+) noexcept {
+    const auto goodsDemanderRequest =
 }
 }  // namespace abm::begining
