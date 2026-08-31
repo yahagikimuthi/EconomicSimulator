@@ -43,7 +43,7 @@ class RosterEntry final {
     // entrantが持つ参照が無効化してしまう。
     // std::sortはstd::swapを内部で行い、そのコンセプトはコピー及びムーブ構築が可能であること。
     // よって、各種コンストラクタ及び演算子を明示的削除する。
-    RosterEntry(const RosterEntry&)                             = delete;
+    RosterEntry(const RosterEntry&) noexcept                    = default;
     auto operator=(const RosterEntry&) noexcept -> RosterEntry& = delete;
     RosterEntry(RosterEntry&&)                                  = delete;
     auto operator=(RosterEntry&&) noexcept -> RosterEntry&      = delete;
