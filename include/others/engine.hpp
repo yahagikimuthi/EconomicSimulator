@@ -20,7 +20,7 @@ class Engine final {
     using TBBVec = tbb::concurrent_vector<T>;
 
   public:
-    [[nodiscard]] explicit Engine(const Date endingDay) noexcept
+    [[nodiscard]] explicit Engine(const Date endingDay)
         : seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}}, endingDay_{endingDay} {}
 
     void run() noexcept {
