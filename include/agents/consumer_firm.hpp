@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+
 #include "components/capital_demander.hpp"
 #include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
