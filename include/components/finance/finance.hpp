@@ -13,7 +13,7 @@
 
 namespace abm::finance {
 
-class Bank {
+class Bank final {
   public:
     explicit Bank() noexcept;
 
@@ -21,7 +21,7 @@ class Bank {
     DepositDemander depositDemander_;
 };
 
-class BankRegistry {
+class BankRegistry final {
   public:
     explicit BankRegistry() noexcept;
 
