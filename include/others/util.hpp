@@ -91,11 +91,11 @@ class RandomGenerator final {
         std::ranges::shuffle(std::forward<Container>(c), rng_);
     }
 
-    template <std::ranges::input_range Range, std::weakly_incrementable Out>
-        requires requires(Range& range, Out outIt, int n, pcg32 rng) {
+    template <std::ranges::input_range Range, std::weakly_incrementable Out, std::integral N>
+        requires requires(Range& range, Out outIt, N n, pcg32 rng) {
             std::ranges::sample(range, outIt, n, rng);
         }
-    void sample(Range&& r, Out out, const int n) noexcept {
+    void sample(Range&& r, Out out, const N n) noexcept {
         std::ranges::sample(std::forward<Range>(r), out, n, rng_);
     }
 
