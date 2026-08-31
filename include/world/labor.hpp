@@ -39,7 +39,7 @@ class RosterEntry final {
     RosterEntry(
         const AgentID i, const Wage w, CompanyBoard& board, base_goods::Workspace& space
     ) noexcept
-        : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
+        : employeeId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
         ASSERT(w > Wage{0.0});
         ASSERT(i != companyBoard_.firmId);
     }
@@ -51,7 +51,7 @@ class RosterEntry final {
     [[nodiscard]] auto firmType() const noexcept -> EMarket { return companyBoard_.firmType; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
 
-    const AgentID hholdId;
+    const AgentID employeeId;
     const Wage    wage;
 
   private:
@@ -71,10 +71,10 @@ class Request;
 class Entry final {
   public:
     Entry(const AgentID i, const double power, const Request& req) noexcept
-        : hholdID{i}, productPower{power}, request{req} {
+        : requestorId{i}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
-    const AgentID hholdID;
+    const AgentID requestorId;
     const double  productPower;
 
     void offer() noexcept { isOffer_ = true; }
@@ -102,19 +102,16 @@ class Request final {
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
         ASSERT(productPower > 0.0);
         ASSERT(id != firmID);
-        return *entryBox_.emplace_back(id, productPower, *this);
+        return *entries_.emplace_back(id, productPower, *this);
     }
 
-    void packEntry(std::vector<RefWrap<Entry>>& out) noexcept {
-        ASSERT(out.empty());
-        for (Entry& e : entryBox_) out.emplace_back(std::ref(e));
-    }
+    [[nodiscard]] auto entries() noexcept -> auto { return std::ranges::subrange{entries_}; }
 
     const AgentID firmID;
     const Wage    wage;
 
   private:
-    tbb::concurrent_vector<Entry> entryBox_;
+    tbb::concurrent_vector<Entry> entries_;
 };
 
 class Market final {
