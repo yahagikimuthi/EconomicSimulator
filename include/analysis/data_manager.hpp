@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdlib>
 #include <filesystem>
 #include <highfive/H5DataType.hpp>
 #include <highfive/H5File.hpp>
@@ -18,22 +17,13 @@ class InputDataManager final {
   public:
     [[nodiscard]] InputDataManager()
         : inFile_{[]() noexcept -> HighFive::File {
+              namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
-
-              if (const auto path = std::filesystem::path{filepath}; path.has_parent_path())
-                  std::filesystem::create_directories(path.parent_path());
+              const auto path     = fs::path{filepath};
+              path.has_parent_path();
+              if (path.has_parent_path()) fs::create_directories(path.parent_path());
               return HighFive::File{filepath, HighFive::File::ReadOnly};
-          }()} {
-        if (not inFile_.isValid()) {
-            std::cerr << "Failed to load the file\n"
-                      << "Path: "
-                      << std::filesystem::absolute(
-                             static_cast<std::string>(setting::simulationResultOutputPath)
-                         )
-                      << '\n';
-            std::abort();
-        }
-    }
+          }()} {}
 
     [[nodiscard]] auto getStepKeys() const -> std::vector<std::string> {
         auto stepKeys = inFile_.listObjectNames();
@@ -78,25 +68,17 @@ class OutputDataManager final {
   public:
     [[nodiscard]] OutputDataManager()
         : outFile_{[]() noexcept -> HighFive::File {
+              namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::metricDataOutputPath);
-              if (const auto path = std::filesystem::path{filepath}; path.has_parent_path()) {
-                  std::filesystem::create_directories(path.parent_path());
+              const auto path     = fs::path{filepath};
+              if (path.has_parent_path()) {
+                  fs::create_directories(path.parent_path());
               }
               return HighFive::File{
                   filepath,
                   HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate
               };
-          }()} {
-        if (not outFile_.isValid()) {
-            std::cerr << "Failed to create the file\n"
-                      << "Path: "
-                      << std::filesystem::absolute(
-                             static_cast<std::string>(setting::metricDataOutputPath)
-                         )
-                      << '\n';
-            std::abort();
-        }
-    }
+          }()} {}
 
     void write(const std::string&& dataSetName, const std::vector<double>&& container) {
         outFile_.createDataSet<double>(dataSetName, HighFive::DataSpace::From(container))
