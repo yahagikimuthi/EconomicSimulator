@@ -11,7 +11,7 @@
 namespace abm::goods::demander {
 using Request = base_goods::Request;
 using Entry   = base_goods::Entry;
-using Market  = base_goods::Market;
+using Market  = BaseGoodsMarket;
 
 class Trader final {
   public:

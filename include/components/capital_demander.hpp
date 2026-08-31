@@ -15,7 +15,7 @@
 #include "world/base_goods.hpp"
 
 namespace abm::capital::demander {
-using Market  = base_goods::Market;
+using Market  = BaseGoodsMarket;
 using Request = base_goods::Request;
 
 struct Log final {

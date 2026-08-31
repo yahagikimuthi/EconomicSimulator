@@ -144,3 +144,7 @@ class Market final {
     std::atomic<double>           totalSupply_;
 };
 }  // namespace abm::base_goods
+
+namespace abm {
+using BaseGoodsMarket = base_goods::Market;
+}

@@ -8,7 +8,7 @@
 
 namespace abm::capital::supplier {
 inline void supplyCapital(
-    const AgentID id, BaseGoodsSupplier& supplier, base_goods::Market& market
+    const AgentID id, BaseGoodsSupplier& supplier, BaseGoodsMarket& market
 ) noexcept {
     supplier.post(id, market);
 }

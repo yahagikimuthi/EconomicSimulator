@@ -7,7 +7,7 @@
 
 namespace abm::consumer::supplier {
 inline void supplyGoods(
-    const AgentID id, BaseGoodsSupplier& supplier, base_goods::Market& market
+    const AgentID id, BaseGoodsSupplier& supplier, BaseGoodsMarket& market
 ) noexcept {
     supplier.post(id, market);
 }
