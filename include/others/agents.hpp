@@ -15,7 +15,7 @@ class HHold final {
   public:
     explicit HHold(RandomGenerator& masterRng) noexcept;
 
-    finance::Finance      finance;
+    FirmFinance           finance;
     LaborSupplier         laborSupplier;
     ConsumerGoodsDemander consumerGoodsDemander;
     const AgentID         id;
@@ -25,7 +25,7 @@ class ConsumerFirm final {
   public:
     explicit ConsumerFirm(RandomGenerator& masterRng) noexcept;
 
-    finance::Finance      finance;
+    FirmFinance           finance;
     LaborDemander         laborDemander;
     CapitalDemander       capitalDemander;
     ConsumerGoodsSupplier consumerGoodsSupplier;
@@ -36,10 +36,10 @@ class CapitalFirm final {
   public:
     explicit CapitalFirm(RandomGenerator& masterRng) noexcept;
 
-    finance::Finance finance;
-    LaborDemander    laborDemander;
-    CapitalDemander  capitalDemander;
-    CapitalSupplier  capitalSupplier;
-    const AgentID    id;
+    FirmFinance     finance;
+    LaborDemander   laborDemander;
+    CapitalDemander capitalDemander;
+    CapitalSupplier capitalSupplier;
+    const AgentID   id;
 };
 }  // namespace abm

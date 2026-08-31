@@ -6,7 +6,6 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "world/common.hpp"
 
 namespace abm::finance {
 enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
@@ -24,9 +23,9 @@ struct BS {};
 
 enum class Color : char { Red, Blue, Yellow };
 
-class Finance {
+class FirmFinance {
   public:
-    explicit Finance(const Money asset, RandomGenerator& masterRng) noexcept
+    explicit FirmFinance(const Money asset, RandomGenerator& masterRng) noexcept
         : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     [[nodiscard]] auto withdraw(const Money sub, const AccountItem item) noexcept -> Money {
@@ -114,19 +113,64 @@ class Finance {
 
 class HHoldFinance final {
   public:
-    explicit HHoldFinance(RandomGenerator& masterRng) noexcept
-        : asset_{masterRng.random(setting::hholdInitialAsset)} {}
+    explicit HHoldFinance(const Money asset, RandomGenerator& masterRng) noexcept
+        : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    void endStep(CensusDropBox& dropBox) const noexcept {
-        dropBox.hholdAssets.emplace_back(asset_.value());
+    [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
+        ASSERT(sub.isZeroOrMore());
+        if (currentCashRatio() > cashRatio_) {
+            const auto withdraw = depositSupplier_.tryWithdraw(sub);
+            ASSERT(withdraw <= sub);
+            const auto cashOut = sub - withdraw;
+            cash_ -= cashOut;
+            return withdraw + cashOut;
+        }
+        const auto cashOut = std::min(cash_, sub);
+        cash_ -= cashOut;
+        const auto rest        = sub - cashOut;
+        const auto withdraw    = depositSupplier_.tryWithdraw(rest);
+        const auto moreCashOut = rest - withdraw;
+        cash_ -= moreCashOut;
+        return cashOut + withdraw + moreCashOut;
     }
 
-    void assetPlus(const Money plus) noexcept { asset_ += plus; }
+    void assetPlus(const Money add) noexcept {
+        ASSERT(add.isZeroOrMore());
+        // 現金比率が目標以上で、預金に成功した場合早期リターン
+        if (currentCashRatio() > cashRatio_ and depositSupplier_.tryDeposit(add)) return;
+        cash_ += add;
+    }
 
-    [[nodiscard]] auto asset() const noexcept -> Money { return asset_; }
+    [[nodiscard]] auto claimBudget(const Money claim) const noexcept -> Money {
+        ASSERT(claim.isZeroOrMore());
+
+        if (currentCashRatio() > cashRatio_) {
+            const auto cashOut     = std::min(cash_, claim);
+            const auto rest        = claim - cashOut;
+            const auto withdraw    = std::min(static_cast<Money>(depositSupplier_.balance()), rest);
+            const auto moreCashOut = rest - withdraw;
+            return cashOut + withdraw + moreCashOut;
+        }
+
+        const auto withdraw = std::min(static_cast<Money>(depositSupplier_.balance()), claim);
+        ASSERT(withdraw <= claim);
+        const auto cashOut = claim - withdraw;
+        return withdraw + cashOut;
+    }
+
+    [[nodiscard]] auto asset() const noexcept -> Money {
+        return cash_ + depositSupplier_.balance();
+    }
+
+    [[nodiscard]] auto currentCashRatio() const noexcept -> double {
+        if (asset().isZero()) return 0.0;
+        return cash_ / asset();
+    }
 
   private:
-    Money asset_;
+    DepositSupplier depositSupplier_;
+    Money           cash_;
+    const double    cashRatio_;
 };
 
 class GovernmentFinance final {
@@ -144,5 +188,6 @@ class GovernmentFinance final {
 
 namespace abm {
 using HHoldFinance      = finance::HHoldFinance;
+using FirmFinance       = finance::FirmFinance;
 using GovernmentFinance = finance::GovernmentFinance;
 }  // namespace abm

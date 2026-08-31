@@ -58,10 +58,10 @@ inline void distributeAnnualBudget(
 
 namespace abm::begining {
 inline void beginingYear(
-    finance::Finance& finance,
-    LaborDemander&    laborDemander,
-    CapitalDemander&  capitalDemander,
-    CapitalSupplier&  capitalSupplier
+    FirmFinance&     finance,
+    LaborDemander&   laborDemander,
+    CapitalDemander& capitalDemander,
+    CapitalSupplier& capitalSupplier
 ) noexcept {
     const auto salesForecast = capitalSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto laborDemanderRequest =
@@ -82,10 +82,10 @@ inline void beginingYear(
 }
 
 inline void beginingMonth(
-    finance::Finance& finance,
-    LaborDemander&    laborDemander,
-    CapitalDemander&  capitalDemander,
-    CapitalSupplier&  capitalSupplier
+    FirmFinance&     finance,
+    LaborDemander&   laborDemander,
+    CapitalDemander& capitalDemander,
+    CapitalSupplier& capitalSupplier
 ) noexcept {
     const auto salesForecast = capitalSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto sumWage       = laborDemander.sumWage();
@@ -102,7 +102,7 @@ inline void beginingMonth(
 }
 
 inline void beginingYear(
-    finance::Finance&      finance,
+    FirmFinance&           finance,
     LaborDemander&         laborDemander,
     ConsumerGoodsSupplier& consumerGoodsSupplier,
     CapitalDemander&       capitalDemander
@@ -126,7 +126,7 @@ inline void beginingYear(
 }
 
 inline void beginingMonth(
-    finance::Finance&      finance,
+    FirmFinance&           finance,
     LaborDemander&         laborDemander,
     ConsumerGoodsSupplier& consumerGoodsSupplier,
     CapitalDemander&       capitalDemander
