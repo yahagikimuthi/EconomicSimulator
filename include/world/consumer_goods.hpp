@@ -38,8 +38,6 @@ class Request final {
 };
 
 class Entry final {
-    using Request = Request;
-
   public:
     Entry(const AgentID Id, const Price Price, const GoodsQuantity Supply) noexcept
         : id{Id}, price{Price}, supply{Supply} {
@@ -63,8 +61,6 @@ class Entry final {
 };
 
 class Market final {
-    using Entry = Entry;
-
   public:
     Market() noexcept = default;
     [[nodiscard]] auto entry(
