@@ -40,12 +40,12 @@ class Engine final {
         }
         for (auto& firm : consumerFirms_) {
             begining::beginingMonth(
-                firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
+                firm.finance, firm.laborDemander, firm.goodsSupplier, firm.capitalDemander
             );
         }
         for (auto& firm : capitalFirms_) {
             begining::beginingYear(
-                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
             );
         }
         runLabor();
@@ -59,12 +59,12 @@ class Engine final {
         }
         for (auto& firm : consumerFirms_) {
             begining::beginingMonth(
-                firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
+                firm.finance, firm.laborDemander, firm.goodsSupplier, firm.capitalDemander
             );
         }
         for (auto& firm : capitalFirms_) {
             begining::beginingMonth(
-                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
             );
         }
         runCapital();
@@ -106,10 +106,10 @@ class Engine final {
         }
 
         for (auto& firm : consumerFirms_) {
-            demander::registerMember(firm.laborDemander, firm.consumerGoodsSupplier);
+            demander::registerMember(firm.laborDemander, firm.goodsSupplier);
         }
         for (auto& firm : capitalFirms_) {
-            demander::registerMember(firm.laborDemander, firm.capitalSupplier);
+            demander::registerMember(firm.laborDemander, firm.goodsSupplier);
         }
 
         for (auto& hhold : hholds_) {
@@ -127,7 +127,7 @@ class Engine final {
     void runCapital() noexcept {
         using namespace capital;
         for (auto& firm : capitalFirms_) {
-            supplier::supplyCapital(firm.id, firm.capitalSupplier, capitalMarket_);
+            supplier::supplyCapital(firm.id, firm.goodsSupplier, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -138,7 +138,7 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            supplier::tradeCapital(firm.finance, firm.capitalSupplier);
+            supplier::tradeCapital(firm.finance, firm.goodsSupplier);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -166,9 +166,9 @@ class Engine final {
 
     Logger logger_;
 
-    std::vector<HHold>        hholds_;
-    std::vector<ConsumerFirm> consumerFirms_;
-    std::vector<CapitalFirm>  capitalFirms_;
+    std::vector<HHold> hholds_;
+    std::vector<Firm>  consumerFirms_;
+    std::vector<Firm>  capitalFirms_;
 
     LaborMarket        laborMarket_;
     base_goods::Market consumerGoodsMarket_;

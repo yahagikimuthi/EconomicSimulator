@@ -1,7 +1,6 @@
 #pragma once
 
-#include "components/capital_supplier.hpp"
-#include "components/consumer_goods_supplier.hpp"
+#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "values/common.hpp"
@@ -18,11 +17,8 @@ inline void postLaborRequest(
 
 inline void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer(); }
 
-inline void registerMember(LaborDemander& laborDemander, CapitalSupplier& goodsSupplier) noexcept {
-    laborDemander.registerMember(goodsSupplier.workspace());
-}
 inline void registerMember(
-    LaborDemander& laborDemander, ConsumerGoodsSupplier& goodsSupplier
+    LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier
 ) noexcept {
     laborDemander.registerMember(goodsSupplier.workspace());
 }

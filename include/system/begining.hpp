@@ -2,9 +2,8 @@
 
 #include <algorithm>
 
+#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
-#include "components/capital_supplier.hpp"
-#include "components/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "others/util.hpp"
@@ -12,16 +11,16 @@
 
 namespace abm::begining::detail {
 [[nodiscard]] inline auto laborDemanderAnnualRequestBudget(
-    LaborDemander& laborDemander, CapitalSupplier& capitalSupplier
+    LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier
 ) noexcept -> Money {
-    const auto adjust = capitalSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
-    return laborDemander.planAnnualAndRequestBudget(adjust, capitalSupplier.salesForecast());
+    const auto adjust = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
+    return laborDemander.planAnnualAndRequestBudget(adjust, goodsSupplier.salesForecast());
 }
 
 [[nodiscard]] inline auto capitalDemanderRequestBudget(
-    CapitalDemander& capitalDemander, CapitalSupplier& capitalSupplier
+    CapitalDemander& capitalDemander, BaseGoodsSupplier& goodsSupplier
 ) noexcept -> Money {
-    const auto desired = capitalSupplier.requiresCapital();
+    const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
 }
 
@@ -42,32 +41,26 @@ inline void distributeAnnualBudget(
     capitalDemander.revisePlan(laborDemanderRequest - budget);
 }
 
-[[nodiscard]] auto laborDemanderAnnualRequestBudget(
-    LaborDemander& laborDemander, ConsumerGoodsSupplier& consumerGoodsSupplier
-) noexcept -> Money {
-    const auto adjust = consumerGoodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
-    return laborDemander.planAnnualAndRequestBudget(adjust, consumerGoodsSupplier.salesForecast());
-}
 [[nodiscard]] auto capitalDemanderRequestBudget(
-    ConsumerGoodsSupplier& consumerGoodsSupplier, CapitalDemander& capitalDemander
+    BaseGoodsSupplier& goodsSupplier, CapitalDemander& capitalDemander
 ) noexcept -> Money {
-    const auto desired = consumerGoodsSupplier.requiresCapital();
+    const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
 }
 }  // namespace abm::begining::detail
 
 namespace abm::begining {
 inline void beginingYear(
-    FirmFinance&     finance,
-    LaborDemander&   laborDemander,
-    CapitalDemander& capitalDemander,
-    CapitalSupplier& capitalSupplier
+    FirmFinance&       finance,
+    LaborDemander&     laborDemander,
+    CapitalDemander&   capitalDemander,
+    BaseGoodsSupplier& goodsSupplier
 ) noexcept {
-    const auto salesForecast = capitalSupplier.planAndExpectSales(laborDemander.sumWage());
+    const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto laborDemanderRequest =
-        detail::laborDemanderAnnualRequestBudget(laborDemander, capitalSupplier);
+        detail::laborDemanderAnnualRequestBudget(laborDemander, goodsSupplier);
     const auto capitalDemanderRequest =
-        detail::capitalDemanderRequestBudget(capitalDemander, capitalSupplier);
+        detail::capitalDemanderRequestBudget(capitalDemander, goodsSupplier);
     const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
     if (total.isZeroOrLess()) {
         laborDemander.reviseAnnualPlan(laborDemanderRequest);
@@ -82,15 +75,15 @@ inline void beginingYear(
 }
 
 inline void beginingMonth(
-    FirmFinance&     finance,
-    LaborDemander&   laborDemander,
-    CapitalDemander& capitalDemander,
-    CapitalSupplier& capitalSupplier
+    FirmFinance&       finance,
+    LaborDemander&     laborDemander,
+    CapitalDemander&   capitalDemander,
+    BaseGoodsSupplier& goodsSupplier
 ) noexcept {
-    const auto salesForecast = capitalSupplier.planAndExpectSales(laborDemander.sumWage());
+    const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto sumWage       = laborDemander.sumWage();
     const auto capitalDemanderRequest =
-        detail::capitalDemanderRequestBudget(capitalDemander, capitalSupplier);
+        detail::capitalDemanderRequestBudget(capitalDemander, goodsSupplier);
     const auto total = sumWage + capitalDemanderRequest - salesForecast;
     if (total.isZeroOrLess()) {
         capitalDemander.revisePlan(capitalDemanderRequest);
@@ -102,16 +95,16 @@ inline void beginingMonth(
 }
 
 inline void beginingYear(
-    FirmFinance&           finance,
-    LaborDemander&         laborDemander,
-    ConsumerGoodsSupplier& consumerGoodsSupplier,
-    CapitalDemander&       capitalDemander
+    FirmFinance&       finance,
+    LaborDemander&     laborDemander,
+    BaseGoodsSupplier& goodsSupplier,
+    CapitalDemander&   capitalDemander
 ) noexcept {
-    const auto salesForecast = consumerGoodsSupplier.planAndExpectSales(laborDemander.sumWage());
+    const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto laborDemanderRequest =
-        detail::laborDemanderAnnualRequestBudget(laborDemander, consumerGoodsSupplier);
+        detail::laborDemanderAnnualRequestBudget(laborDemander, goodsSupplier);
     const auto capitalDemanderRequest =
-        detail::capitalDemanderRequestBudget(consumerGoodsSupplier, capitalDemander);
+        detail::capitalDemanderRequestBudget(goodsSupplier, capitalDemander);
     const auto total = laborDemanderRequest + capitalDemanderRequest - salesForecast;
     if (total.isZeroOrLess()) {
         laborDemander.reviseAnnualPlan(laborDemanderRequest);
@@ -126,15 +119,15 @@ inline void beginingYear(
 }
 
 inline void beginingMonth(
-    FirmFinance&           finance,
-    LaborDemander&         laborDemander,
-    ConsumerGoodsSupplier& consumerGoodsSupplier,
-    CapitalDemander&       capitalDemander
+    FirmFinance&       finance,
+    LaborDemander&     laborDemander,
+    BaseGoodsSupplier& goodsSupplier,
+    CapitalDemander&   capitalDemander
 ) noexcept {
-    const auto salesForecast = consumerGoodsSupplier.planAndExpectSales(laborDemander.sumWage());
+    const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto sumWage       = laborDemander.sumWage();
     const auto capitalDemanderRequest =
-        detail::capitalDemanderRequestBudget(consumerGoodsSupplier, capitalDemander);
+        detail::capitalDemanderRequestBudget(goodsSupplier, capitalDemander);
     const auto total = sumWage + capitalDemanderRequest - salesForecast;
     if (total.isZeroOrLess()) {
         capitalDemander.revisePlan(capitalDemanderRequest);

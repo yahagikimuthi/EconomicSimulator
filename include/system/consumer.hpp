@@ -5,10 +5,10 @@
 
 namespace abm::consumer::supplier {
 inline void supplyGoods(
-    const AgentID id, ConsumerGoodsSupplier& supplier, ConsumerGoodsMarket& market
+    const AgentID id, BaseGoodsSupplier& supplier, ConsumerGoodsMarket& market
 ) noexcept {
     supplier.post(id, market);
 }
 
-inline void tradeGoods(ConsumerGoodsSupplier& supplier) noexcept { supplier.trade(); }
+inline void tradeGoods(BaseGoodsSupplier& supplier) noexcept { supplier.trade(); }
 }  // namespace abm::consumer::supplier
