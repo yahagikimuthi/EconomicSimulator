@@ -17,16 +17,17 @@
 namespace abm::labor {
 class RosterEntry;
 struct CompanyBoard final {
-    const AgentID                                firmId;
-    std::deque<RosterEntry>                      roster;
-    tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
-
     CompanyBoard(const AgentID Id) noexcept : firmId{Id} {}
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
     }
-    auto addRoster(const AgentID id, const Wage wage, base_goods::Workspace& workspace) noexcept
-        -> RosterEntry&;
+    [[nodiscard]] auto addRoster(
+        const AgentID id, const Wage wage, base_goods::Workspace& workspace
+    ) noexcept -> RosterEntry&;
+
+    const AgentID                                firmId;
+    std::deque<RosterEntry>                      roster;
+    tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
 };
 
 class RosterEntry final {
