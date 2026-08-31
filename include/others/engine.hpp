@@ -24,6 +24,9 @@ class Engine final {
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
+            for (auto& hhold : hholds_) {
+                labor::supplier::work(hhold.laborSupplier);
+            }
             if (today_.isBeginingYear()) {
                 runYearlyPhase();
             } else if (today_.isBeginingMonth()) {

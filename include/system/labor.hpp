@@ -33,6 +33,8 @@ inline void acceptResignation(LaborDemander& laborDemander) noexcept {
 }  // namespace abm::labor::demander
 
 namespace abm::labor::supplier {
+inline void work(LaborSupplier& laborSupplier) noexcept { laborSupplier.product(); }
+
 inline void laborEntry(
     const AgentID id, LaborSupplier& laborSupplier, LaborMarket& market
 ) noexcept {
