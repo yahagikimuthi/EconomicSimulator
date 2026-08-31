@@ -86,12 +86,15 @@ class CapitalMarket final {
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
         -> std::optional<Entry&> {
         if (entryBox_.empty()) return std::nullopt;
-        auto toDouble = [] [[nodiscard]] (const Entry& entry) noexcept -> double {
-            return entry.supply.value();
-        };
+        if (entryBox_.size() == 1UZ and entryBox_[0].id == id) return std::nullopt;
+
         auto betterEntry = std::optional<Entry&>{std::nullopt};
         for (const auto _ : std::views::iota(0, sampleCnt)) {
-            auto& sample = rng.discreteDistribution(entryBox_, totalSupply_.load(), toDouble);
+            auto& sample = rng.discreteDistribution(
+                entryBox_,
+                totalSupply_.load(),
+                [](const Entry& e) noexcept -> double { return e.supply.value(); }
+            );
             if (sample.id == id) continue;
             if (not betterEntry) {
                 betterEntry = sample;
