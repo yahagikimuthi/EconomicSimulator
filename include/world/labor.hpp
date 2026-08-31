@@ -75,6 +75,12 @@ class Entry final {
         : requestorId{i}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
+    Entry(const Entry&)                             = delete;
+    auto operator=(const Entry&) noexcept -> Entry& = delete;
+    Entry(Entry&&)                                  = delete;
+    auto operator=(Entry&&) noexcept -> Entry&      = delete;
+    ~Entry() noexcept                               = default;
+
     const AgentID requestorId;
     const double  productPower;
 
