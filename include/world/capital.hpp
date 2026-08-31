@@ -2,10 +2,8 @@
 
 #include <tbb/concurrent_vector.h>
 #include <atomic>
-#include <functional>
 #include <optional>
 #include <ranges>
-#include <vector>
 
 #include "others/util.hpp"
 #include "values/goods.hpp"
@@ -14,8 +12,8 @@ namespace abm::capital {
 class Entry;
 class Request final {
   public:
-    Request(const GoodsQuantity a, const Entry& e) noexcept : amount{a}, entry{e} {
-        ASSERT(a.isZeroOrMore());
+    Request(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
+        ASSERT(pay.isZeroOrMore());
     }
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
 
@@ -25,8 +23,8 @@ class Request final {
         tradeAmount_ = tradeAmount;
     }
 
-    const GoodsQuantity amount;
-    const Entry&        entry;
+    const Money  payment;
+    const Entry& entry;
 
   private:
     GoodsQuantity tradeAmount_{0.0};
@@ -36,37 +34,18 @@ class Entry final {
   public:
     Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
         : id{i}, price{p}, supply{s} {}
-    [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
-        return *requestBox_.emplace_back(amount, *this);
+    [[nodiscard]] auto request(const Money payment) noexcept -> Request& {
+        return *requests_.emplace_back(payment, *this);
     }
 
-    [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
-        const auto demand = std::ranges::fold_left(
-            requestBox_ | std::ranges::views::transform(&Request::amount),
-            GoodsQuantity{0.0},
-            std::plus<>{}
-        );
-        ASSERT(demand.isZeroOrMore());
-        return demand;
-    }
-
-    void packRequest(std::vector<RefWrap<Request>>& out) noexcept {
-        ASSERT(out.empty());
-        for (Request& req : requestBox_) {
-            out.emplace_back(std::ref(req));
-        }
-    }
-
-    void performFullTrade() noexcept {
-        for (Request& req : requestBox_) req.trade(req.amount);
-    }
+    [[nodiscard]] auto requests() noexcept -> auto { return std::ranges::subrange{requests_}; }
 
     const AgentID       id;
     const Price         price;
     const GoodsQuantity supply;
 
   private:
-    tbb::concurrent_vector<Request> requestBox_;
+    tbb::concurrent_vector<Request> requests_;
 };
 
 class Market final {
