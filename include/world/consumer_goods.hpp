@@ -9,20 +9,17 @@
 #include "values/goods.hpp"
 
 namespace abm::consumer_goods {
-class ConsumerGoodsEntry;
-class ConsumerGoodsRequest final {
-    using Request = ConsumerGoodsRequest;
-    using Entry   = ConsumerGoodsEntry;
-
+class Entry;
+class Request final {
   public:
-    ConsumerGoodsRequest(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
+    Request(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
         ASSERT(pay.isPositive());
     }
-    ConsumerGoodsRequest(const Request&)                        = delete;
-    auto operator=(const Request&) noexcept -> Request&         = delete;
-    ConsumerGoodsRequest(Request&&)                             = delete;
-    auto operator=(ConsumerGoodsRequest&&) noexcept -> Request& = delete;
-    ~ConsumerGoodsRequest() noexcept                            = default;
+    Request(const Request&)                             = delete;
+    auto operator=(const Request&) noexcept -> Request& = delete;
+    Request(Request&&)                                  = delete;
+    auto operator=(Request&&) noexcept -> Request&      = delete;
+    ~Request() noexcept                                 = default;
 
     [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
@@ -40,11 +37,11 @@ class ConsumerGoodsRequest final {
     GoodsQuantity tradeAmount_{0.0};
 };
 
-class ConsumerGoodsEntry final {
-    using Request = ConsumerGoodsRequest;
+class Entry final {
+    using Request = Request;
 
   public:
-    ConsumerGoodsEntry(const AgentID Id, const Price Price, const GoodsQuantity Supply) noexcept
+    Entry(const AgentID Id, const Price Price, const GoodsQuantity Supply) noexcept
         : id{Id}, price{Price}, supply{Supply} {
         ASSERT(Price.isPositive());
         ASSERT(Supply.isPositive());
@@ -65,11 +62,11 @@ class ConsumerGoodsEntry final {
     tbb::concurrent_vector<Request> requests_;
 };
 
-class ConsumerGoodsMarket final {
-    using Entry = ConsumerGoodsEntry;
+class Market final {
+    using Entry = Entry;
 
   public:
-    ConsumerGoodsMarket() noexcept = default;
+    Market() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
@@ -110,5 +107,5 @@ class ConsumerGoodsMarket final {
 }  // namespace abm::consumer_goods
 
 namespace abm {
-using ConsumerGoodsMarket = consumer_goods::ConsumerGoodsMarket;
+using ConsumerGoodsMarket = consumer_goods::Market;
 }

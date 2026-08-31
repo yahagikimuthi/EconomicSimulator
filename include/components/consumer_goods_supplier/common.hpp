@@ -7,7 +7,7 @@ namespace abm::consumer_goods::supplier {
 template <typename T>
 concept IMediator = base_goods::supplier::IMediator<T>;
 
-using Market  = ConsumerGoodsMarket;
-using Entry   = ConsumerGoodsEntry;
-using Request = ConsumerGoodsRequest;
+using Market  = Market;
+using Entry   = Entry;
+using Request = Request;
 }  // namespace abm::consumer_goods::supplier
