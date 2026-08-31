@@ -96,7 +96,7 @@ class RandomGenerator final {
             std::ranges::sample(range, outIt, n, rng);
         }
     void sample(Range&& r, Out out, const N n) noexcept {
-        std::ranges::sample(std::forward<Range>(r), out, n, rng_);
+        std::ranges::sample(std::forward<Range>(r), out, static_cast<int>(n), rng_);
     }
 
     [[nodiscard]] constexpr auto makeUint64() noexcept -> std::uint64_t {

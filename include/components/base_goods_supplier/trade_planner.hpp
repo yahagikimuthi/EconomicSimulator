@@ -84,7 +84,7 @@ class DemandForecastManager final {
         if (not next) return cache_.cache();
         cache_.next(*next);
 
-        ASSERT(*next.isZeroOrMore());
+        ASSERT(next->isZeroOrMore());
         return *next;
     }
 

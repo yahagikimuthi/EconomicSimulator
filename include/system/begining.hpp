@@ -3,8 +3,8 @@
 #include <algorithm>
 
 #include "components/capital_demander.hpp"
-#include "components/capital_supplier/capital_supplier.hpp"
-#include "components/consumer_goods_supplier/consumer_goods_supplier.hpp"
+#include "components/capital_supplier.hpp"
+#include "components/consumer_goods_supplier.hpp"
 #include "components/finance/finance.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "others/util.hpp"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <limits>
 #include <optional>
 #include <pcg_random.hpp>
@@ -8,7 +9,6 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
-#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 
@@ -79,7 +79,7 @@ class MarkupPlanner final {
         const auto lastSupply      = memory_.lastSupply();
         const auto lastSalesAmount = memory_.lastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
-        ASSERT(*lastSupply.isZeroOrMore());
+        ASSERT(lastSupply->isZeroOrMore());
         const auto inventory  = *lastSupply - *lastSalesAmount;
         const auto isSupplied = *lastSupply != GoodsQuantity{0.0};
         const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio : true;
@@ -93,7 +93,7 @@ class MarkupPlanner final {
     }
 
     [[nodiscard]] static auto guard(const MarkupRate markup) noexcept -> MarkupRate {
-        return max(markup, MarkupRate{std::numeric_limits<double>::epsilon()});
+        return std::max(markup, MarkupRate{std::numeric_limits<double>::epsilon()});
     }
 
     MarkupPlannerMemory     memory_;

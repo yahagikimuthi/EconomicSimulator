@@ -1,7 +1,8 @@
 #pragma once
 
 #include "components/capital_demander.hpp"
-#include "components/capital_supplier/capital_supplier.hpp"
+#include "components/capital_supplier.hpp"
+#include "components/finance/finance.hpp"
 #include "values/common.hpp"
 #include "world/capital.hpp"
 
@@ -10,7 +11,9 @@ inline void supplyCapital(const AgentID id, CapitalSupplier& supplier, Market& m
     supplier.post(id, market);
 }
 
-inline void tradeCapital(CapitalSupplier& supplier) noexcept { supplier.trade(); }
+inline void tradeCapital(FirmFinance& finance, CapitalSupplier& supplier) noexcept {
+    supplier.trade(finance);
+}
 
 inline void afterCapitalTrade(CapitalDemander& demander) noexcept { demander.afterTrade(); }
 

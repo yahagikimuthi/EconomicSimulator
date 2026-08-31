@@ -113,7 +113,7 @@ class HumanResource final {
 
     void layOffs() noexcept {
         const auto layOffsCnt = layOffsPlan_;
-        ASSERT(layOffsCnt.isZeroOrMore());
+        ASSERT(layOffsCnt->isZeroOrMore());
 
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : companyBoard_.roster) {

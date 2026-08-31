@@ -5,7 +5,6 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
-#include "world/common.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
@@ -45,11 +44,6 @@ class Employment final {
     }
 
   private:
-    [[nodiscard]] auto shouldWork(const EMarket phase) const noexcept -> bool {
-        if (not isEmployed()) return false;
-        return rosterEntry_->firmType() == phase;
-    }
-
     void resign() noexcept {
         if (not isEmployed()) return;
         rosterEntry_->resign();

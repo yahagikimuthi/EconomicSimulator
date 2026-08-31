@@ -139,7 +139,7 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            supplier::tradeCapital(firm.capitalSupplier);
+            supplier::tradeCapital(firm.finance, firm.capitalSupplier);
         }
 
         for (auto& firm : capitalFirms_) {

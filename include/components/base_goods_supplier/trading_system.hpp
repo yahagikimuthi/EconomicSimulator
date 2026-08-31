@@ -35,7 +35,7 @@ class TradingSystem final {
     ) noexcept {
         ASSERT(supply.isZeroOrMore());
         const auto plan = planner_.planTrading(supply, totalCost, mediator);
-        plan_           = plan;
+        plan_.emplace(plan);
     }
 
     void post(const AgentID id, Market& market) noexcept {

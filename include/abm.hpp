@@ -1,10 +1,14 @@
 #pragma once
 
-#include "engine.hpp"
+#include "analysis/analysis.hpp"
+#include "others/engine.hpp"
 
 namespace abm {
 inline void run(const unsigned int step, const bool isAnalysis = false) {
-    auto engine = Engine{step, isAnalysis};
+    auto engine = Engine{Date{1U, 1U, step}};
     engine.run();
+    if (isAnalysis) {
+        analysis::analysisData();
+    }
 }
 }  // namespace abm

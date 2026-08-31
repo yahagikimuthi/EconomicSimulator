@@ -68,12 +68,12 @@ class CentralMemory final {
 
     void logging(CensusDropBox& dropBox) noexcept {
         if (employPlan_) {
-            ASSERT(employPlan_.isZeroOrMore());
+            ASSERT(employPlan_->isZeroOrMore());
             dropBox.postedEmployments.emplace_back(employPlan_->value());
             employPlan_.reset();
         }
         if (wagePlan_) {
-            ASSERT(wagePlan_.isZeroOrMore());
+            ASSERT(wagePlan_->isZeroOrMore());
             dropBox.postedWages.emplace_back(wagePlan_->value());
             wagePlan_.reset();
         }

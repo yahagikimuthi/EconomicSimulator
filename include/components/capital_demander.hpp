@@ -63,9 +63,6 @@ concept ReadResultFn = requires(F f, const TradeResult& result) {
 };
 
 class CapitalDemander final {
-    using Request = Request;
-    using Market  = Market;
-
   public:
     explicit CapitalDemander(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}

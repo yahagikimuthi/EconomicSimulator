@@ -98,7 +98,6 @@ class FirmFinance final {
             case AccountItem::Taxes:
                 pl_.taxes -= money;
                 break;
-            default:
         }
     }
 
@@ -117,7 +116,6 @@ class FirmFinance final {
             case AccountItem::Taxes:
                 pl_.taxes += money;
                 break;
-            default:
         }
     }
 

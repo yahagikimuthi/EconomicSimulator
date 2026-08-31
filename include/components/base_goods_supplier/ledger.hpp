@@ -1,9 +1,10 @@
 #pragma once
 
+#include <algorithm>
+
 #include "components/base_goods_supplier/common.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 struct ATradeResult final {
@@ -30,7 +31,7 @@ class Ledger final {
     [[nodiscard]] auto tradableAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
         ASSERT(demand.isZeroOrMore());
 
-        const auto out = min(inventory_, demand);
+        const auto out = std::min(inventory_, demand);
         ASSERT(out.isZeroOrMore());
         return out;
     }

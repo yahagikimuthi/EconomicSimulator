@@ -54,7 +54,7 @@ class Trader final {
     void afterTrade() noexcept {
         if (not myRequest_) return;
         ledger_.readTradeResult(
-            {.price = myRequest_->entry.price, .purchaseAmount = myRequest_->tradeAmount()}
+            {.price = myRequest_->price(), .purchaseAmount = myRequest_->tradeAmount()}
         );
     }
 

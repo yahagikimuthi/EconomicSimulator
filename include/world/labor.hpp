@@ -12,7 +12,6 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
-#include "world/common.hpp"
 
 namespace abm::base_goods {
 class Workspace;
@@ -22,12 +21,10 @@ namespace abm::labor {
 class RosterEntry;
 struct CompanyBoard final {
     const AgentID                                firmId;
-    const EMarket                                firmType;
     std::deque<RosterEntry>                      roster;
     tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
 
-    [[nodiscard]] CompanyBoard(const AgentID Id, const EMarket type) noexcept
-        : firmId{Id}, firmType{type} {}
+    CompanyBoard(const AgentID Id) noexcept : firmId{Id} {}
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
     }
@@ -49,7 +46,6 @@ class RosterEntry final {
     void disable() noexcept { isOccupied_ = false; }
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
-    [[nodiscard]] auto firmType() const noexcept -> EMarket { return companyBoard_.firmType; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
 
     const AgentID employeeId;
@@ -149,7 +145,8 @@ class Market final {
     void clear() noexcept { requests_.clear(); }
 
   private:
-    void packAllRequest(const AgentID id, std::inplace_vector<RefWrap<Request>, 1UZ>& out) {
+    template <std::size_t N>
+    void packAllRequest(const AgentID id, std::inplace_vector<RefWrap<Request>, N>& out) {
         for (auto& req : requests_) {
             if (req.firmID == id) continue;
             out.unchecked_emplace_back(std::ref(req));

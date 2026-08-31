@@ -82,7 +82,7 @@ class OfferPlanner final {
         if (not nextRate) return rateCache_.cache();
         rateCache_.next(*nextRate);
 
-        ASSERT(*nextRate.isPositive());
+        ASSERT(nextRate->isPositive());
         return *nextRate;
     }
 
