@@ -8,22 +8,23 @@
 #include "values/common.hpp"
 
 namespace abm::finance {
-enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
-
-struct PL final {
-    void reset() noexcept { sales = capitalGoodsCost = depreciation = taxes = Money{0.0}; }
-
-    Money sales{0.0};
-    Money capitalGoodsCost{0.0};
-    Money depreciation{0.0};
-    Money taxes{0.0};
-};
 
 class FirmFinance final {
+    struct PL final {
+        void reset() noexcept { sales = capitalGoodsCost = depreciation = taxes = Money{0.0}; }
+
+        Money sales{0.0};
+        Money capitalGoodsCost{0.0};
+        Money depreciation{0.0};
+        Money taxes{0.0};
+    };
+
   public:
     explicit FirmFinance(RandomGenerator& masterRng) noexcept
         : cash_{Money{masterRng.random(setting::firmInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
+
+    enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
 
     [[nodiscard]] auto tryWithdraw(const Money sub, const AccountItem item) noexcept -> Money {
         ASSERT(sub.isZeroOrMore());
