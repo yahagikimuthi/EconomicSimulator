@@ -147,6 +147,7 @@ class Recruiter final {
         static thread_local auto refs = std::vector<RefWrap<Entry>>{};
         refs.clear();
         auto entries = myRequest_->entries();
+        refs.reserve(entries.size());
         for (auto& entry : entries) refs.emplace_back(std::ref(entry));
         return refs;
     }
