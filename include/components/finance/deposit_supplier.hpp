@@ -7,7 +7,7 @@ namespace abm::finance::deposit::supplier {
 
 class DepositSupplier final {
   public:
-    DepositSupplier(const AgentID id) noexcept;
+    explicit DepositSupplier(const AgentID id) noexcept;
 
     [[nodiscard]] auto balance() const noexcept -> Money { return account_.balance(); }
 
