@@ -70,7 +70,50 @@ class Engine final {
         runConsumerGoods();
     }
 
-    void runLabor() noexcept {}
+    void runLabor() noexcept {
+        for (auto& firm : consumerFirms_) {
+            consumer_firm::layOffs(firm.laborDemander);
+            consumer_firm::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
+        }
+        for (auto& firm : capitalFirms_) {
+            capital_firm::layOffs(firm.laborDemander);
+            capital_firm::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
+        }
+
+        for (auto& hhold : hholds_) {
+            hhold::laborEntry(hhold.id, hhold.laborSupplier, laborMarket_);
+        }
+
+        for (auto& firm : consumerFirms_) {
+            consumer_firm::offer(firm.laborDemander);
+        }
+        for (auto& firm : capitalFirms_) {
+            capital_firm::offer(firm.laborDemander);
+        }
+
+        for (auto& hhold : hholds_) {
+            hhold::acceptOffer(hhold.laborSupplier);
+        }
+
+        for (auto& firm : consumerFirms_) {
+            consumer_firm::registerMember(firm.laborDemander, firm.consumerGoodsSupplier);
+        }
+        for (auto& firm : capitalFirms_) {
+            capital_firm::registerMember(firm.laborDemander, firm.capitalSupplier);
+        }
+
+        for (auto& hhold : hholds_) {
+            hhold::recordRosterEntry(hhold.laborSupplier);
+        }
+
+        for (auto& firm : consumerFirms_) {
+            consumer_firm::acceptResignation(firm.laborDemander);
+        }
+        for (auto& firm : capitalFirms_) {
+            capital_firm::acceptResignation(firm.laborDemander);
+        }
+    }
+
     void runCapital() noexcept {}
     void runConsumerGoods() noexcept {}
 

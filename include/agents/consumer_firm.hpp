@@ -7,6 +7,7 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 struct ConsumerFirm final {
@@ -94,4 +95,20 @@ void beginingMonth(
     ASSERT(budget <= total);
     capitalDemander.revisePlan(std::max(budget - sumWage, Money{0.0}));
 }
+
+void layOffs(LaborDemander& laborDemander) noexcept { laborDemander.layOffs(); }
+
+void postLaborRequest(
+    const AgentID id, LaborDemander& laborDemander, LaborMarket& market
+) noexcept {
+    laborDemander.postLaborRequest(id, market);
+}
+
+void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer(); }
+
+void registerMember(LaborDemander& laborDemander, ConsumerGoodsSupplier& goodsSupplier) noexcept {
+    laborDemander.registerMember(goodsSupplier.workspace());
+}
+
+void acceptResignation(LaborDemander& laborDemander) noexcept { laborDemander.acceptResignation(); }
 }  // namespace abm::consumer_firm
