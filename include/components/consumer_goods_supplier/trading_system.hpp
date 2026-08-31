@@ -14,7 +14,7 @@ class TradingSystem final {
     using TradePlan    = base_goods::supplier::TradePlan;
 
   public:
-    [[nodiscard]] explicit constexpr TradingSystem(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit TradingSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng}, trader_{masterRng} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }

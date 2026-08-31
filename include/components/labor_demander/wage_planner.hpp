@@ -16,7 +16,7 @@ namespace abm::labor::demander::planner {
 // 前回雇用結果中、応募者数が必要
 class WagePlannerMemory final {
   public:
-    [[nodiscard]] explicit constexpr WagePlannerMemory(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}},
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenEmployPlan(const HeadCount employPlan) noexcept {
@@ -46,7 +46,7 @@ class WagePlannerMemory final {
 
 class WagePlanner final {
   public:
-    [[nodiscard]] explicit constexpr WagePlanner(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit WagePlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{Wage{masterRng.random(setting::lastWage)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},

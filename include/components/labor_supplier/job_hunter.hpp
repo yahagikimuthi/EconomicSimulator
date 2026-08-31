@@ -33,7 +33,7 @@ class MyEntries final {
 
 class JobHunter final {
   public:
-    [[nodiscard]] explicit constexpr JobHunter(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit JobHunter(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>

@@ -48,7 +48,7 @@ class Mediator final {
         Listener<DemandForecastManagerMemory, MarkupPlannerMemory, ProducingSystem, CentralMemory>;
 
   public:
-    [[nodiscard]] constexpr Mediator() noexcept = default;
+    [[nodiscard]] Mediator() noexcept = default;
 
     template <typename T>
     void subscribeTradePlan(T& t) noexcept {

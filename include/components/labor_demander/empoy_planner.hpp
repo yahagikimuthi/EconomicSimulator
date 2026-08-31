@@ -26,7 +26,7 @@ class EmployPlanner final {
 // 前回雇用結果中、雇用数が必要
 class OfferPlannerMemory final {
   public:
-    [[nodiscard]] explicit constexpr OfferPlannerMemory(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit OfferPlannerMemory(RandomGenerator& masterRng) noexcept
         : employResult_{HeadCount{masterRng.random(setting::lastApplicants)}},
           employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}} {}
     [[nodiscard]] auto lastEmployResult() const noexcept -> std::optional<HeadCount> {
@@ -53,7 +53,7 @@ class OfferPlannerMemory final {
 
 class OfferPlanner final {
   public:
-    [[nodiscard]] explicit constexpr OfferPlanner(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit OfferPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           rateCache_{OfferRate{masterRng.random(setting::offerRate)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},

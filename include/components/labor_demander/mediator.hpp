@@ -46,7 +46,7 @@ class Mediator final {
     using RecruitResultListener = Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
   public:
-    [[nodiscard]] constexpr Mediator() noexcept = default;
+    [[nodiscard]] Mediator() noexcept = default;
 
     template <typename T>
     void subscribeEmployPlan(T& t) noexcept {

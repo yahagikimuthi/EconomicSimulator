@@ -20,7 +20,7 @@ class Trader final {
     using TradeResult  = base_goods::supplier::TradeResult;
 
   public:
-    [[nodiscard]] explicit constexpr Trader(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit Trader(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void post(const TradePlan& plan, Market& market) noexcept {

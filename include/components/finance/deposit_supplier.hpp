@@ -10,7 +10,7 @@ namespace abm::finance::deposit::supplier {
 
 class DepositSupplier final {
   public:
-    [[nodiscard]] constexpr DepositSupplier() noexcept = default;
+    [[nodiscard]] DepositSupplier() noexcept = default;
 
     [[nodiscard]] auto balance() const noexcept -> Deposit {
         return account_.transform(&DepositAccount::balance).value_or(Deposit{0.0});

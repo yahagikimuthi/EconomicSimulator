@@ -10,7 +10,7 @@
 namespace abm::finance::deposit {
 class DepositAccount final {
   public:
-    [[nodiscard]] explicit constexpr DepositAccount(const AgentID id) noexcept : depositorId{id} {}
+    [[nodiscard]] explicit DepositAccount(const AgentID id) noexcept : depositorId{id} {}
 
     const AgentID depositorId;
 

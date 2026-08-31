@@ -11,7 +11,7 @@
 namespace abm::labor::supplier {
 class Employment final {
   public:
-    [[nodiscard]] explicit constexpr Employment(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit Employment(RandomGenerator& masterRng) noexcept
         : productPower_{masterRng.random(setting::productPower)} {}
 
     [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_.has_value(); }

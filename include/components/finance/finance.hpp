@@ -15,7 +15,7 @@ namespace abm::finance {
 
 class Bank {
   public:
-    [[nodiscard]] explicit constexpr Bank() noexcept;
+    [[nodiscard]] explicit Bank() noexcept;
 
   private:
     DepositDemander depositDemander_;
@@ -23,7 +23,7 @@ class Bank {
 
 class BankRegistry {
   public:
-    [[nodiscard]] explicit constexpr BankRegistry() noexcept;
+    [[nodiscard]] explicit BankRegistry() noexcept;
 
   private:
     std::vector<Bank> banks_;
@@ -31,7 +31,7 @@ class BankRegistry {
 
 class Finance {
   public:
-    [[nodiscard]] explicit constexpr Finance(const Money asset, RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit Finance(const Money asset, RandomGenerator& masterRng) noexcept
         : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     void assetPlus(const Money add) noexcept {
@@ -82,7 +82,7 @@ class Finance {
 
 class FirmFinance final {
   public:
-    [[nodiscard]] explicit constexpr FirmFinance(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit FirmFinance(RandomGenerator& masterRng) noexcept
         : asset_{masterRng.random(setting::firmInitialAsset)} {}
 
     template <AfterTaxCalculatorFn F>
@@ -104,7 +104,7 @@ class FirmFinance final {
 
 class HHoldFinance final {
   public:
-    [[nodiscard]] explicit constexpr HHoldFinance(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit HHoldFinance(RandomGenerator& masterRng) noexcept
         : asset_{masterRng.random(setting::hholdInitialAsset)} {}
 
     void endStep(CensusDropBox& dropBox) const noexcept {
@@ -121,7 +121,7 @@ class HHoldFinance final {
 
 class GovernmentFinance final {
   public:
-    [[nodiscard]] explicit constexpr GovernmentFinance() noexcept : asset_{0.0} {}
+    [[nodiscard]] explicit GovernmentFinance() noexcept : asset_{0.0} {}
 
     void assetPlus(const Money plus) noexcept { asset_ += plus; }
 

@@ -8,8 +8,8 @@
 namespace abm::base_goods {
 class Workspace final {
   public:
-    [[nodiscard]] constexpr Workspace() noexcept = default;
-    ~Workspace() noexcept                        = default;
+    [[nodiscard]] Workspace() noexcept = default;
+    ~Workspace() noexcept              = default;
     [[nodiscard]] Workspace(const Workspace& other) noexcept
         : totalInput_{other.totalInput_.load()} {}
     auto operator=(const Workspace& other) noexcept -> Workspace& {

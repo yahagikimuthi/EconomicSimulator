@@ -23,7 +23,7 @@ struct ATradeResult final {
 
 class Ledger final {
   public:
-    [[nodiscard]] constexpr Ledger() noexcept = default;
+    [[nodiscard]] Ledger() noexcept = default;
 
     void reset() noexcept { purchasing_ = Money{0.0}; }
     void readTradeResult(const ATradeResult& result) noexcept {
@@ -37,7 +37,7 @@ class Ledger final {
 
 class Trader final {
   public:
-    [[nodiscard]] explicit constexpr Trader(RandomGenerator& masterRng)
+    [[nodiscard]] explicit Trader(RandomGenerator& masterRng)
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void request(
@@ -70,7 +70,7 @@ class Trader final {
 
 class ConsumerGoodsDemander final {
   public:
-    [[nodiscard]] explicit constexpr ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
         : trader_{masterRng},
           mpc_{masterRng.random(setting::mpc)},
           myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}

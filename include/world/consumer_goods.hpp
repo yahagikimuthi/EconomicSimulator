@@ -15,13 +15,11 @@ namespace abm::consumer_goods {
 class ConsumerGoodsEntry;
 class ConsumerGoodsRequest final {
   public:
-    [[nodiscard]] constexpr ConsumerGoodsRequest(
-        const GoodsQuantity a, const ConsumerGoodsEntry& e
-    ) noexcept
+    [[nodiscard]] ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
         : requiresAmount{a}, entry{e} {
         ASSERT(a > GoodsQuantity{0.0});
     }
-    [[nodiscard]] constexpr auto price() const noexcept -> Price;
+    [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
 
     void trade(const GoodsQuantity tradeAmount) noexcept {
@@ -41,7 +39,7 @@ class ConsumerGoodsEntry final {
     using Request = ConsumerGoodsRequest;
 
   public:
-    [[nodiscard]] constexpr ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
+    [[nodiscard]] ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
         : price{p}, supply{s} {
         ASSERT(p > Price{0.0});
         ASSERT(s > GoodsQuantity{0.0});

@@ -15,7 +15,7 @@
 namespace abm::labor::supplier {
 class LikelihoodChangingJob final {
   public:
-    [[nodiscard]] explicit constexpr LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
           threshold_{masterRng.random(setting::changingJobThreshold)} {}
 
@@ -30,7 +30,7 @@ class LikelihoodChangingJob final {
 namespace abm::labor::supplier {
 class LaborSupplier final {
   public:
-    [[nodiscard]] explicit constexpr LaborSupplier(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit LaborSupplier(RandomGenerator& masterRng) noexcept
         : jobHunter_{masterRng}, employment_{masterRng}, likelihoodChangingJob_{masterRng} {}
 
     void entry(const AgentID id, LaborMarket& market) noexcept {

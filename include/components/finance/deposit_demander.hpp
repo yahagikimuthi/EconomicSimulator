@@ -11,7 +11,7 @@
 namespace abm::finance::deposit::demander {
 class DepositDemander final {
   public:
-    [[nodiscard]] explicit constexpr DepositDemander(RandomGenerator& masterRng) noexcept;
+    [[nodiscard]] explicit DepositDemander(RandomGenerator& masterRng) noexcept;
 
     template <AssetMinusFn F>
     void endStep(F&& assetMinus) noexcept {

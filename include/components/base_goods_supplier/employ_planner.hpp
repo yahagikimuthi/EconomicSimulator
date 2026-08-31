@@ -14,7 +14,7 @@ namespace abm::base_goods::supplier {
 // 前回の取引計画中、供給量が必要
 class EmployPlannerMemory final {
   public:
-    [[nodiscard]] explicit constexpr EmployPlannerMemory(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit EmployPlannerMemory(RandomGenerator& masterRng) noexcept
         : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}} {}
     [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
         return supply_.log();
@@ -32,7 +32,7 @@ class EmployPlannerMemory final {
 
 class EmployPlanner final {
   public:
-    [[nodiscard]] explicit constexpr EmployPlanner(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit EmployPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng}, cache_{HeadCount{masterRng.random(setting::desiredEmploy)}} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradePlan(memory_); }

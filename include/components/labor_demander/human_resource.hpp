@@ -18,9 +18,9 @@
 namespace abm::labor::demander::human_resource {
 class EmptyRosterPool final {
   public:
-    [[nodiscard]] constexpr EmptyRosterPool() noexcept = default;
-    [[nodiscard]] constexpr auto size() const noexcept -> std::size_t { return pool_.size(); }
-    [[nodiscard]] constexpr auto empty() const noexcept -> bool { return size() == 0UZ; }
+    [[nodiscard]] EmptyRosterPool() noexcept = default;
+    [[nodiscard]] auto size() const noexcept -> std::size_t { return pool_.size(); }
+    [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0UZ; }
 
     auto popBackEntry() noexcept -> RosterEntry& {
         ASSERT(not empty());
@@ -40,7 +40,7 @@ class EmptyRosterPool final {
 
 class HumanResource final {
   public:
-    [[nodiscard]] explicit constexpr HumanResource(CompanyBoard&& companyBoard) noexcept
+    [[nodiscard]] explicit HumanResource(CompanyBoard&& companyBoard) noexcept
         : companyBoard_{std::move(companyBoard)} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Money {

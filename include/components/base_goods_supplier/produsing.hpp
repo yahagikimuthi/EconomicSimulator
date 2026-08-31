@@ -14,7 +14,7 @@ namespace abm::base_goods::supplier {
 // TODO 生産関数を要検討
 class Producer final {
   public:
-    [[nodiscard]] explicit constexpr Producer(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower_{masterRng.random(setting::productPower)},
           producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)},
           producerGoodsDepreciationRate_{masterRng.random(setting::producerGoodsDepreciationRate)} {
@@ -60,7 +60,7 @@ class Producer final {
 
 class ProducingSystem final {
   public:
-    [[nodiscard]] explicit constexpr ProducingSystem(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit ProducingSystem(RandomGenerator& masterRng) noexcept
         : employPlanner_{masterRng},
           producer_{masterRng},
           inventory_{masterRng.random(setting::inventory)} {}

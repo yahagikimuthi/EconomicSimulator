@@ -14,7 +14,7 @@
 namespace abm::base_goods::supplier {
 class PricePlanner final {
   public:
-    [[nodiscard]] explicit constexpr PricePlanner(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
 
@@ -51,8 +51,7 @@ class PricePlanner final {
 // 前回の取引結果中、需要量が必要
 class DemandForecastManagerMemory final {
   public:
-    [[nodiscard]] explicit constexpr DemandForecastManagerMemory(RandomGenerator& masterRng
-    ) noexcept
+    [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
         : totalDemand_{GoodsQuantity{masterRng.random(setting::lastDemand)}} {}
 
     [[nodiscard]] auto lastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
@@ -71,7 +70,7 @@ class DemandForecastManagerMemory final {
 
 class DemandForecastManager final {
   public:
-    [[nodiscard]] explicit constexpr DemandForecastManager(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{GoodsQuantity{masterRng.random(setting::demandForecast)}},
           adjustment_{masterRng.random(setting::demandForecastAdjustVol)} {}
@@ -114,7 +113,7 @@ class DemandForecastManager final {
 
 class TradePlanner final {
   public:
-    [[nodiscard]] explicit constexpr TradePlanner(RandomGenerator& masterRng) noexcept
+    [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept
         : markupPlanner_{masterRng},
           pricePlanner_{masterRng},
           demandForecast_{masterRng},

@@ -25,19 +25,18 @@ struct CompanyBoard final {
     std::deque<RosterEntry>                      roster;
     tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
 
-    [[nodiscard]] constexpr CompanyBoard(const AgentID i, const EMarket type) noexcept
+    [[nodiscard]] CompanyBoard(const AgentID i, const EMarket type) noexcept
         : firmId{i}, firmType{type} {}
     void resign(RosterEntry& resignEntry) noexcept {
         resignationBox.emplace_back(std::ref(resignEntry));
     }
-    constexpr auto addRoster(
-        const AgentID id, const Wage wage, base_goods::Workspace& workspace
-    ) noexcept -> RosterEntry&;
+    auto addRoster(const AgentID id, const Wage wage, base_goods::Workspace& workspace) noexcept
+        -> RosterEntry&;
 };
 
 class RosterEntry final {
   public:
-    [[nodiscard]] constexpr RosterEntry(
+    [[nodiscard]] RosterEntry(
         const AgentID i, const Wage w, CompanyBoard& board, base_goods::Workspace& space
     ) noexcept
         : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
@@ -61,7 +60,7 @@ class RosterEntry final {
     bool                   isOccupied_{true};
 };
 
-constexpr auto CompanyBoard::addRoster(
+auto CompanyBoard::addRoster(
     const AgentID id, const Wage wage, base_goods::Workspace& workspace
 ) noexcept -> RosterEntry& {
     ASSERT(wage > Wage{0.0});
@@ -73,9 +72,7 @@ class LaborEntry final {
     using Request = LaborRequest;
 
   public:
-    [[nodiscard]] constexpr LaborEntry(
-        const AgentID i, const double power, const Request& req
-    ) noexcept
+    [[nodiscard]] LaborEntry(const AgentID i, const double power, const Request& req) noexcept
         : hholdID{i}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
@@ -105,8 +102,7 @@ class LaborRequest final {
     using Entry = LaborEntry;
 
   public:
-    [[nodiscard]] constexpr LaborRequest(const AgentID i, const Wage w) noexcept
-        : firmID{i}, wage{w} {
+    [[nodiscard]] LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {
         ASSERT(w > Wage{0.0});
     }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {

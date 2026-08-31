@@ -14,7 +14,7 @@ struct ATradeResult final {
 
 class Ledger final {
   public:
-    [[nodiscard]] constexpr Ledger() noexcept = default;
+    [[nodiscard]] Ledger() noexcept = default;
 
     void makeNewPage(const GoodsQuantity supply) noexcept {
         ASSERT(supply >= GoodsQuantity{0.0});

@@ -14,7 +14,7 @@ namespace abm::capital {
 class CapitalEntry;
 class CapitalRequest final {
   public:
-    [[nodiscard]] constexpr CapitalRequest(const GoodsQuantity a, const CapitalEntry& e) noexcept
+    [[nodiscard]] CapitalRequest(const GoodsQuantity a, const CapitalEntry& e) noexcept
         : amount{a}, entry{e} {
         ASSERT(a.isZeroOrMore());
     }
@@ -37,9 +37,7 @@ class CapitalEntry final {
     using Request = CapitalRequest;
 
   public:
-    [[nodiscard]] constexpr CapitalEntry(
-        const AgentID i, const Price p, const GoodsQuantity s
-    ) noexcept
+    [[nodiscard]] CapitalEntry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
         : id{i}, price{p}, supply{s} {}
     [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
         return *requestBox_.emplace_back(amount, *this);

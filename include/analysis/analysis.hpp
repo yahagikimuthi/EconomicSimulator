@@ -8,7 +8,7 @@
 #include "others/setting.hpp"
 
 namespace abm::analysis {
-[[nodiscard]] constexpr auto calcMean(
+[[nodiscard]] auto calcMean(
     const std::span<const double> container, const double nanToNum = 0.0
 ) noexcept -> double {
     if (container.empty()) return nanToNum;
