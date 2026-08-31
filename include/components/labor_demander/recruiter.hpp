@@ -30,34 +30,30 @@ class OfferApplicants final {
     std::vector<RefWrap<Entry>> applicants_;
 };
 
-struct OfferResult final {
-    const HeadCount offer;
-    const HeadCount applicants;
-};
-
-struct EmployResult final {
-    const HeadCount employ;
-};
-
 class Ledger final {
   public:
     Ledger() = default;
 
+    struct OfferResult final {
+        const HeadCount applicants;
+    };
+
+    struct EmployResult final {
+        const HeadCount employ;
+    };
+
     void makeNewPage(const HeadCount offerPlan) noexcept {
         ASSERT(offerPlan.isZeroOrMore());
-        remainOffer_ = offerPlan;
+        offerPlan_ = offerPlan;
     }
 
-    [[nodiscard]] auto remainOffer() const noexcept -> HeadCount {
-        ASSERT(remainOffer_.isZeroOrMore());
-        return remainOffer_;
+    [[nodiscard]] auto offerPlan() const noexcept -> HeadCount {
+        ASSERT(offerPlan_.isZeroOrMore());
+        return offerPlan_;
     }
 
     void readOfferResult(const OfferResult& result) noexcept {
-        ASSERT(result.offer.isZeroOrMore());
         ASSERT(result.applicants.isZeroOrMore());
-
-        remainOffer_ -= result.offer;
         applicants_ += result.applicants;
     }
 
@@ -71,15 +67,15 @@ class Ledger final {
     }
 
     void reset() noexcept {
-        ASSERT(remainOffer_.isZeroOrMore());
+        ASSERT(offerPlan_.isZeroOrMore());
         ASSERT(applicants_.isZeroOrMore());
         ASSERT(employ_.isZeroOrMore());
 
-        remainOffer_ = applicants_ = employ_ = HeadCount{0.0};
+        offerPlan_ = applicants_ = employ_ = HeadCount{0.0};
     }
 
   private:
-    HeadCount remainOffer_{0.0};
+    HeadCount offerPlan_{0.0};
     HeadCount applicants_{0.0};
     HeadCount employ_{0.0};
 };
@@ -100,7 +96,7 @@ class Recruiter final {
         if (not isPosting()) return;
         auto entries = myRequest_->entries();
         if (entries.empty()) return;
-        if (HeadCount{entries.size()} < ledger_.remainOffer()) {
+        if (HeadCount{entries.size()} < ledger_.offerPlan()) {
             offerAll();
             return;
         }
@@ -137,13 +133,13 @@ class Recruiter final {
         auto entries = myRequest_->entries();
         for (auto& entry : entries) entry.offer();
         const auto applicant = HeadCount{entries.size()};
-        ledger_.readOfferResult({.offer = applicant, .applicants = applicant});
+        ledger_.readOfferResult({.applicants = applicant});
     }
 
     void offerPart() noexcept {
         auto entries         = packEntry();
-        auto offerApplicants = sortApplicants(ledger_.remainOffer(), entries) |
-                               std::views::take(ledger_.remainOffer().value());
+        auto offerApplicants = sortApplicants(ledger_.offerPlan(), entries) |
+                               std::views::take(ledger_.offerPlan().value());
 
         auto offerCnt = HeadCount{0.0};
         for (auto entryRef : offerApplicants) {
@@ -153,7 +149,7 @@ class Recruiter final {
             ++offerCnt;
         }
 
-        ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entries.size()}});
+        ledger_.readOfferResult({.applicants = HeadCount{entries.size()}});
     }
 
     [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {

@@ -8,7 +8,6 @@
 #include <ranges>
 #include <span>
 
-#include "components/labor_supplier/common.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "world/labor.hpp"
@@ -31,18 +30,27 @@ class MyEntries final {
     std::vector<RefWrap<Entry>> entries_;
 };
 
+template <typename F>
+concept IsAlignedFn = requires(F f, const Request& request) {
+    { f(request) } -> std::same_as<bool>;
+};
+
+template <typename F>
+concept MakeEntrySheetFn = requires(F f, Request request) {
+    { f(request) } -> std::same_as<Entry&>;
+};
+
 class JobHunter final {
   public:
     explicit JobHunter(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    template <IsAlignedFn F1, MakeEntrySheetFn F2>
     void entry(
-        F1&&      isAligned,
-        F2&&      makeEntrySheet,
-        Market&   market,
-        const int sampleCnt = setting::jobSampleCnt,
-        const int entryCnt  = setting::jobEntryCnt
+        IsAlignedFn auto&&      isAligned,
+        MakeEntrySheetFn auto&& makeEntrySheet,
+        Market&                 market,
+        const int               sampleCnt = setting::jobSampleCnt,
+        const int               entryCnt  = setting::jobEntryCnt
     ) noexcept {
         if (acceptedEntry_) return;
         std::ranges::view auto alignedRequests{
