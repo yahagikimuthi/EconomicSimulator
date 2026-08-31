@@ -24,9 +24,6 @@ class Engine final {
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
-            for (auto& hhold : hholds_) {
-                labor::supplier::work(hhold.laborSupplier);
-            }
             if (today_.isBeginingYear()) {
                 runYearlyPhase();
             } else if (today_.isBeginingMonth()) {
@@ -39,6 +36,9 @@ class Engine final {
 
   private:
     void runYearlyPhase() noexcept {
+        for (auto& hhold : hholds_) {
+            labor::supplier::work(hhold.laborSupplier);
+        }
         for (auto& firm : consumerFirms_) {
             begining::beginingMonth(
                 firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
@@ -55,6 +55,9 @@ class Engine final {
     }
 
     void runMonthlyPhase() noexcept {
+        for (auto& hhold : hholds_) {
+            labor::supplier::work(hhold.laborSupplier);
+        }
         for (auto& firm : consumerFirms_) {
             begining::beginingMonth(
                 firm.finance, firm.laborDemander, firm.consumerGoodsSupplier, firm.capitalDemander
@@ -70,6 +73,9 @@ class Engine final {
     }
 
     void runDailyPhase() noexcept {
+        for (auto& hhold : hholds_) {
+            labor::supplier::work(hhold.laborSupplier);
+        }
         runCapital();
         runConsumerGoods();
     }
