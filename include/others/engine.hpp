@@ -17,9 +17,6 @@
 
 namespace abm {
 class Engine final {
-    template <typename T>
-    using TBBVec = tbb::concurrent_vector<T>;
-
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
         : seed_{generateSeed()}, rng_{pcg32{seed_.state, seed_.stream}}, endingDay_{endingDay} {
