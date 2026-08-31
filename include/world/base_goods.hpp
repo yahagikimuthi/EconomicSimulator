@@ -123,7 +123,7 @@ class Market final {
         if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
 
         auto betterEntry = std::optional<Entry&>{std::nullopt};
-        for (const auto _ : std::views::iota(0, sampleCnt)) {
+        for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
                 entries_,
                 totalSupply_.load(),
