@@ -183,6 +183,9 @@ class Engine final {
         for (auto& hhold : hholds_) {
             demander::purchase(hhold.id, hhold.finance, hhold.goodsDemander, goodsMarket_);
         }
+        for (auto& firm : consumerFirms_) {
+            supplier::trade(firm.finance, firm.goodsSupplier);
+        }
     }
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
