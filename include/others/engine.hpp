@@ -156,10 +156,10 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            demander::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
+            demander::purchaseCapital(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
         }
         for (auto& firm : consumerFirms_) {
-            demander::purchaseCapital(firm.id, firm.capitalDemander, capitalMarket_);
+            demander::purchaseCapital(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -167,10 +167,10 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            supplier::afterCapitalTrade(firm.capitalDemander);
+            supplier::afterCapitalTrade(firm.finance, firm.capitalDemander);
         }
         for (auto& firm : consumerFirms_) {
-            supplier::afterCapitalTrade(firm.capitalDemander);
+            supplier::afterCapitalTrade(firm.finance, firm.capitalDemander);
         }
     }
 

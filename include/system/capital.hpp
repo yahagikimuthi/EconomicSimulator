@@ -17,12 +17,16 @@ inline void tradeCapital(FirmFinance& finance, BaseGoodsSupplier& supplier) noex
     supplier.trade(finance);
 }
 
-inline void afterCapitalTrade(CapitalDemander& demander) noexcept { demander.afterTrade(); }
+inline void afterCapitalTrade(FirmFinance& finance, CapitalDemander& demander) noexcept {
+    demander.afterTrade(finance);
+}
 
 }  // namespace abm::capital::supplier
 
 namespace abm::capital::demander {
-inline void purchaseCapital(const AgentID id, CapitalDemander& demander, Market& market) noexcept {
-    demander.request(id, market);
+inline void purchaseCapital(
+    const AgentID id, FirmFinance& finance, CapitalDemander& demander, Market& market
+) noexcept {
+    demander.request(id, finance, market);
 }
 }  // namespace abm::capital::demander
