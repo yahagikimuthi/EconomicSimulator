@@ -61,7 +61,7 @@ class Trader final {
         ASSERT(isPosting());
         static thread_local auto requestBox = std::vector<RefWrap<Request>>{};
         requestBox.clear();
-        myEntry_->requestBox(requestBox);
+        myEntry_->packRequest(requestBox);
         return requestBox;
     }
 
