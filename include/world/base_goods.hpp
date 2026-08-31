@@ -35,7 +35,7 @@ class Workspace final {
 
     void addInput(const double workerProductPower) noexcept {
         ASSERT(workerProductPower > 0.0);
-        totalInput_.fetch_add(workerProductPower);
+        totalInput_.fetch_add(workerProductPower);  // TODO 処理系が対応する場合store_addに変更
     }
     [[nodiscard]] auto totalInput() const noexcept -> GoodsQuantity {
         return GoodsQuantity{totalInput_.load()};
@@ -113,7 +113,7 @@ class Market final {
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
-        totalSupply_.fetch_add(supply.value());
+        totalSupply_.fetch_add(supply.value());  // TODO 処理系が対応する場合store_addに変更
         return *entries_.emplace_back(id, price, supply);
     }
 
