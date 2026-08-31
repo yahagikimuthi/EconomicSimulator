@@ -1,12 +1,10 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
-#include <algorithm>
 #include <atomic>
 #include <functional>
 #include <pcg_random.hpp>
 #include <ranges>
-#include <vector>
 
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -58,26 +56,7 @@ class ConsumerGoodsEntry final {
         return *requests_.emplace_back(payment, *this);
     }
 
-    void packRequest(std::vector<RefWrap<Request>>& out) noexcept {
-        ASSERT(out.empty());
-        for (Request& req : requests_) out.emplace_back(std::ref(req));
-    }
-
-    [[nodiscard]] auto totalDemand() const noexcept -> GoodsQuantity {
-        const auto demand = std::ranges::fold_left(
-            requests_ | std::views::transform([this](const Request& req) noexcept -> GoodsQuantity {
-                return req.payment / price;
-            }),
-            GoodsQuantity{0.0},
-            std::plus{}
-        );
-        ASSERT(demand >= GoodsQuantity{0.0});
-        return demand;
-    }
-
-    void performFullTrade() noexcept {
-        for (Request& req : requests_) req.trade(req.payment / price);
-    }
+    [[nodiscard]] auto requests() noexcept -> auto { return std::ranges::subrange{requests_}; }
 
     const Price         price;
     const GoodsQuantity supply;
