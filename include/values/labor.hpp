@@ -8,7 +8,8 @@ namespace abm {
 class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
                                  value_object::CompareMixin<Wage>,
                                  value_object::AddMixin<Wage>,
-                                 value_object::ScholarMixin<Wage> {
+                                 value_object::ScholarMixin<Wage>,
+                                 public value_object::SignMixin<Wage> {
     friend struct AddMixin<Wage>;
     friend struct ScholarMixin<Wage>;
 
