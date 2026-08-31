@@ -6,7 +6,7 @@
 
 namespace abm::value_object {
 template <typename T>
-class BaseValueObject {
+struct BaseValueObject {
   public:
     [[nodiscard]] constexpr auto value() const noexcept -> T { return value_; }
 
@@ -17,7 +17,7 @@ class BaseValueObject {
 };
 
 template <typename Derived>
-class CompareMixin {
+struct CompareMixin {
     friend Derived;
 
     [[nodiscard]] friend constexpr auto operator<=>(Derived lhs, Derived rhs) noexcept -> auto {
@@ -32,7 +32,7 @@ class CompareMixin {
 };
 
 template <typename Derived>
-class AddMixin {
+struct AddMixin {
     friend Derived;
 
     friend constexpr auto operator+=(Derived& lhs, Derived rhs) noexcept -> Derived& {
@@ -59,7 +59,7 @@ class AddMixin {
 };
 
 template <typename Derived>
-class ScholarMixin {
+struct ScholarMixin {
     friend Derived;
 
     [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> double {
