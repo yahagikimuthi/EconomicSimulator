@@ -8,6 +8,7 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
 
@@ -74,19 +75,17 @@ class Trader final {
 class ConsumerGoodsDemander final {
   public:
     explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
-        : trader_{masterRng},
-          mpc_{masterRng.random(setting::mpc)},
-          myPhase_{instanceCnt_++ % setting::maxPurchaseFrequency} {}
+        : trader_{masterRng}, mpc_{masterRng.random(setting::mpc)} {}
 
     void request(
         const AgentID id,
         const Money   asset,
-        const Step    step,
+        const Date    today,
         Market&       market,
         const int     frequency = setting::maxPurchaseFrequency,
         const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
-        if (shouldPass(step, frequency)) return;
+        if (shouldPass(today, frequency)) return;
         const auto budget = asset * mpc_;
         if (budget <= Money{0.0}) return;
         trader_.request(id, budget, market, sampleCnt);
@@ -103,14 +102,14 @@ class ConsumerGoodsDemander final {
     }
 
   private:
-    [[nodiscard]] auto shouldPass(const Step step, const int frequency) const noexcept -> bool {
-        return step % frequency != myPhase_;
+    [[nodiscard]] auto shouldPass(const Date today, const int frequency) const noexcept -> bool {
+        return static_cast<int>(today.toFlatTime()) % frequency != myPhase_;
     }
 
-    Trader                     trader_;
-    const double               mpc_;
-    const Step                 myPhase_;
-    static inline unsigned int instanceCnt_{};
+    Trader            trader_;
+    const double      mpc_;
+    const int         myPhase_{instanceCnt_ % setting::maxPurchaseFrequency};
+    static inline int instanceCnt_{};
 };
 }  // namespace abm::consumer_goods::demander
 
