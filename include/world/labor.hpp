@@ -57,7 +57,7 @@ class RosterEntry final {
     bool                   isOccupied_{true};
 };
 
-auto CompanyBoard::addRoster(
+inline auto CompanyBoard::addRoster(
     const AgentID id, const Wage wage, base_goods::Workspace& workspace
 ) noexcept -> RosterEntry& {
     ASSERT(wage.isPositive());

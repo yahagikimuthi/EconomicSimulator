@@ -90,7 +90,7 @@ class Entry final {
     tbb::concurrent_vector<Request> requests_;
 };
 
-[[nodiscard]] auto Request::trade(const GoodsQuantity tradeAmount) noexcept -> Money {
+[[nodiscard]] inline auto Request::trade(const GoodsQuantity tradeAmount) noexcept -> Money {
     ASSERT(tradeAmount_.isZero());
     ASSERT(tradeAmount.isZeroOrMore());
     tradeAmount_         = tradeAmount;
@@ -99,7 +99,7 @@ class Entry final {
     ASSERT(payment_.isZeroOrMore());
     return actualPay;
 }
-[[nodiscard]] auto Request::price() const noexcept -> Price { return entry_.price; }
+[[nodiscard]] inline auto Request::price() const noexcept -> Price { return entry_.price; }
 
 class Market final {
   public:

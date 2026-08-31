@@ -5,8 +5,8 @@
 #include <span>
 #include <vector>
 
-#include "components/base_goods_supplier/common.hpp"
-#include "components/base_goods_supplier/ledger.hpp"
+#include "components/base_supplier/common.hpp"
+#include "components/base_supplier/ledger.hpp"
 #include "components/finance/finance.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
