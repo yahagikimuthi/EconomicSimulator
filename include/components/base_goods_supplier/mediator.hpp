@@ -17,7 +17,7 @@ class Listener final {
     static_assert(sizeof...(Ts) >= 1UZ);
 
   public:
-    [[nodiscard]] Listener() noexcept = default;
+    Listener() noexcept = default;
 
     template <typename T>
         requires std::disjunction_v<std::is_same<T, Ts>...>
@@ -48,7 +48,7 @@ class Mediator final {
         Listener<DemandForecastManagerMemory, MarkupPlannerMemory, ProducingSystem, CentralMemory>;
 
   public:
-    [[nodiscard]] Mediator() noexcept = default;
+    Mediator() noexcept = default;
 
     template <typename T>
     void subscribeTradePlan(T& t) noexcept {

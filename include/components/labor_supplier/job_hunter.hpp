@@ -16,7 +16,7 @@
 namespace abm::labor::supplier {
 class MyEntries final {
   public:
-    [[nodiscard]] MyEntries() noexcept = default;
+    MyEntries() noexcept = default;
     void add(Entry& entry) noexcept { entries_.emplace_back(std::ref(entry)); }
     void clear() noexcept { entries_.clear(); }
 
@@ -33,7 +33,7 @@ class MyEntries final {
 
 class JobHunter final {
   public:
-    [[nodiscard]] explicit JobHunter(RandomGenerator& masterRng) noexcept
+    explicit JobHunter(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     template <IsAlignedFn F1, MakeEntrySheetFn F2>

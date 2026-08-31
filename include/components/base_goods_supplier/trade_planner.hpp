@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <limits>
 #include <pcg_random.hpp>
 
@@ -9,12 +10,11 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "values/math.hpp"
 
 namespace abm::base_goods::supplier {
 class PricePlanner final {
   public:
-    [[nodiscard]] explicit PricePlanner(RandomGenerator& masterRng) noexcept
+    explicit PricePlanner(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
 
@@ -41,7 +41,7 @@ class PricePlanner final {
     }
 
     [[nodiscard]] static auto guard(const Price price) noexcept -> Price {
-        return max(price, Price{std::numeric_limits<double>::epsilon()});
+        return std::max(price, Price{std::numeric_limits<double>::epsilon()});
     }
 
     mutable RandomGenerator rng_;
@@ -51,7 +51,7 @@ class PricePlanner final {
 // 前回の取引結果中、需要量が必要
 class DemandForecastManagerMemory final {
   public:
-    [[nodiscard]] explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
+    explicit DemandForecastManagerMemory(RandomGenerator& masterRng) noexcept
         : totalDemand_{GoodsQuantity{masterRng.random(setting::lastDemand)}} {}
 
     [[nodiscard]] auto lastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
@@ -70,7 +70,7 @@ class DemandForecastManagerMemory final {
 
 class DemandForecastManager final {
   public:
-    [[nodiscard]] explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
+    explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{GoodsQuantity{masterRng.random(setting::demandForecast)}},
           adjustment_{masterRng.random(setting::demandForecastAdjustVol)} {}
@@ -103,7 +103,7 @@ class DemandForecastManager final {
     }
 
     [[nodiscard]] static auto guard(const GoodsQuantity expect) noexcept -> GoodsQuantity {
-        return max(expect, GoodsQuantity{std::numeric_limits<double>::epsilon()});
+        return std::max(expect, GoodsQuantity{std::numeric_limits<double>::epsilon()});
     }
 
     DemandForecastManagerMemory memory_;
@@ -113,7 +113,7 @@ class DemandForecastManager final {
 
 class TradePlanner final {
   public:
-    [[nodiscard]] explicit TradePlanner(RandomGenerator& masterRng) noexcept
+    explicit TradePlanner(RandomGenerator& masterRng) noexcept
         : markupPlanner_{masterRng},
           pricePlanner_{masterRng},
           demandForecast_{masterRng},

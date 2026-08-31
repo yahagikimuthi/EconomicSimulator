@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <utility>
 
 #include "components/common.hpp"
@@ -8,14 +9,13 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/math.hpp"
 #include "world/common.hpp"
 
 namespace abm::finance {
 
 class Bank {
   public:
-    [[nodiscard]] explicit Bank() noexcept;
+    explicit Bank() noexcept;
 
   private:
     DepositDemander depositDemander_;
@@ -23,7 +23,7 @@ class Bank {
 
 class BankRegistry {
   public:
-    [[nodiscard]] explicit BankRegistry() noexcept;
+    explicit BankRegistry() noexcept;
 
   private:
     std::vector<Bank> banks_;
@@ -31,7 +31,7 @@ class BankRegistry {
 
 class Finance {
   public:
-    [[nodiscard]] explicit Finance(const Money asset, RandomGenerator& masterRng) noexcept
+    explicit Finance(const Money asset, RandomGenerator& masterRng) noexcept
         : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     void assetPlus(const Money add) noexcept {
@@ -47,7 +47,7 @@ class Finance {
         ASSERT(asset() >= Money{0.0});
 
         if (currentCashRatio() <= cashRatio_) {
-            const auto out = min(cash_, claim);
+            const auto out = std::min(cash_, claim);
             cash_ -= out;
             return out;
         }
@@ -57,7 +57,7 @@ class Finance {
 
         const auto rest = claim - withdraw;
         ASSERT(cash_ >= Money{0.0});
-        const auto cashOut = min(cash_, rest);
+        const auto cashOut = std::min(cash_, rest);
         cash_ -= cashOut;
 
         return withdraw + cashOut;
@@ -82,7 +82,7 @@ class Finance {
 
 class FirmFinance final {
   public:
-    [[nodiscard]] explicit FirmFinance(RandomGenerator& masterRng) noexcept
+    explicit FirmFinance(RandomGenerator& masterRng) noexcept
         : asset_{masterRng.random(setting::firmInitialAsset)} {}
 
     template <AfterTaxCalculatorFn F>
@@ -104,7 +104,7 @@ class FirmFinance final {
 
 class HHoldFinance final {
   public:
-    [[nodiscard]] explicit HHoldFinance(RandomGenerator& masterRng) noexcept
+    explicit HHoldFinance(RandomGenerator& masterRng) noexcept
         : asset_{masterRng.random(setting::hholdInitialAsset)} {}
 
     void endStep(CensusDropBox& dropBox) const noexcept {
@@ -121,7 +121,7 @@ class HHoldFinance final {
 
 class GovernmentFinance final {
   public:
-    [[nodiscard]] explicit GovernmentFinance() noexcept : asset_{0.0} {}
+    explicit GovernmentFinance() noexcept : asset_{0.0} {}
 
     void assetPlus(const Money plus) noexcept { asset_ += plus; }
 

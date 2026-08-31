@@ -31,7 +31,7 @@ struct TradeResult final {
 
 class Ledger final {
   public:
-    [[nodiscard]] Ledger() noexcept = default;
+    Ledger() noexcept = default;
 
     void readTradeResult(const ATradeResult& result) noexcept {
         ASSERT(result.price >= Price{0.0});
@@ -67,7 +67,7 @@ class CapitalDemander final {
     using Market  = CapitalMarket;
 
   public:
-    [[nodiscard]] explicit CapitalDemander(RandomGenerator& masterRng) noexcept
+    explicit CapitalDemander(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     [[nodiscard]] auto planAndRequestBudget(const GoodsQuantity desiredAmount) noexcept -> Money {

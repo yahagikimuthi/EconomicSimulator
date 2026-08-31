@@ -15,8 +15,7 @@ class TaxRate final : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<TaxRate>;
 
   public:
-    [[nodiscard]] explicit constexpr TaxRate(const double value) noexcept
-        : BaseValueObject<double>(value) {
+    explicit constexpr TaxRate(const double value) noexcept : BaseValueObject<double>(value) {
         ASSERT(0.0 <= value and value <= 1.0);
     }
 };
@@ -39,8 +38,7 @@ class Deposit final : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<Deposit>;
 
   public:
-    [[nodiscard]] explicit constexpr Deposit(const double value) noexcept
-        : BaseValueObject<double>(value) {}
+    explicit constexpr Deposit(const double value) noexcept : BaseValueObject<double>(value) {}
 
     [[nodiscard]] constexpr operator Money() const noexcept { return Money{value_}; }
 };
@@ -57,8 +55,7 @@ class InterestRate final : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<InterestRate>;
 
   public:
-    [[nodiscard]] explicit constexpr InterestRate(const double value) noexcept
-        : BaseValueObject<double>(value) {}
+    explicit constexpr InterestRate(const double value) noexcept : BaseValueObject<double>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(Deposit lhs, InterestRate rhs) noexcept -> Deposit {

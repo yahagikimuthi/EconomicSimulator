@@ -16,8 +16,7 @@
 namespace abm::labor::demander {
 class RecruitSystem final {
   public:
-    [[nodiscard]] explicit RecruitSystem(RandomGenerator& masterRng) noexcept
-        : planner_{masterRng} {}
+    explicit RecruitSystem(RandomGenerator& masterRng) noexcept : planner_{masterRng} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
 
@@ -78,7 +77,7 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    [[nodiscard]] explicit LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
+    explicit LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
         : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
 
     void setMediator() noexcept {

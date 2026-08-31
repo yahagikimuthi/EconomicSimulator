@@ -14,7 +14,7 @@ class FlatTaxStrategy {
     }
 
   protected:
-    [[nodiscard]] explicit FlatTaxStrategy(const TaxRate rate) noexcept : rate_{rate} {}
+    explicit FlatTaxStrategy(const TaxRate rate) noexcept : rate_{rate} {}
 
   private:
     TaxRate rate_;
@@ -22,25 +22,25 @@ class FlatTaxStrategy {
 
 class IncomeTaxStrategy final : public FlatTaxStrategy {
   public:
-    [[nodiscard]] explicit IncomeTaxStrategy(const TaxRate rate) noexcept
+    explicit IncomeTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
 class SalesTaxStrategy final : public FlatTaxStrategy {
   public:
-    [[nodiscard]] explicit SalesTaxStrategy(const TaxRate rate) noexcept
+    explicit SalesTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
 class CorporateTaxStrategy final : public FlatTaxStrategy {
   public:
-    [[nodiscard]] explicit CorporateTaxStrategy(const TaxRate rate) noexcept
+    explicit CorporateTaxStrategy(const TaxRate rate) noexcept
         : FlatTaxStrategy::FlatTaxStrategy(rate) {}
 };
 
 class Government final {
   public:
-    [[nodiscard]] explicit Government() noexcept
+    explicit Government() noexcept
         : incomeTaxStrategy_{TaxRate{setting::incomeTaxRate}},
           salesTaxStrategy_{TaxRate{setting::salesTaxRate}},
           corporateTaxStrategy_{TaxRate{setting::corporateTaxRate}} {}

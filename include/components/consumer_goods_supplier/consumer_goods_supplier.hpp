@@ -22,7 +22,7 @@ class ConsumerGoodsSupplier final {
     using Workspace       = base_goods::Workspace;
 
   public:
-    [[nodiscard]] explicit ConsumerGoodsSupplier(RandomGenerator& masterRng) noexcept
+    explicit ConsumerGoodsSupplier(RandomGenerator& masterRng) noexcept
         : producingSystem_{masterRng}, tradingSystem_{masterRng} {}
 
     void setMediator() noexcept {

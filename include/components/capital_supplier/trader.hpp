@@ -19,7 +19,7 @@ class Trader final {
     using TradeResult  = base_goods::supplier::TradeResult;
 
   public:
-    [[nodiscard]] explicit Trader(RandomGenerator& masterRng) noexcept
+    explicit Trader(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void post(const AgentID id, const TradePlan& plan, Market& market) noexcept {
@@ -77,7 +77,8 @@ class Trader final {
         }
     }
 
-    [[nodiscard]] auto      isPosting() const noexcept -> bool { return myEntry_.has_value(); }
+    [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
+
     Ledger                  ledger_;
     std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;

@@ -16,7 +16,7 @@ namespace abm::base_goods::supplier {
 // 前回の取引結果中、売上高が必要
 class MarkupPlannerMemory final {
   public:
-    [[nodiscard]] explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept
+    explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept
         : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}},
           salesAmount_{GoodsQuantity{masterRng.random(setting::lastSalesAmount)}} {}
     [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
@@ -46,7 +46,7 @@ class MarkupPlannerMemory final {
 
 class MarkupPlanner final {
   public:
-    [[nodiscard]] explicit MarkupPlanner(RandomGenerator& masterRng) noexcept
+    explicit MarkupPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{MarkupRate{masterRng.random(setting::lastMarkup)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},

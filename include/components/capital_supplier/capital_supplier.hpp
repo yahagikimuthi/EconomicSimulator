@@ -21,7 +21,7 @@ class CapitalSupplier final {
     using Workspace       = base_goods::Workspace;
 
   public:
-    [[nodiscard]] explicit CapitalSupplier(RandomGenerator& masterRng) noexcept
+    explicit CapitalSupplier(RandomGenerator& masterRng) noexcept
         : producingSystem_{masterRng}, tradingSystem_{masterRng} {}
 
     void setMediator() noexcept {

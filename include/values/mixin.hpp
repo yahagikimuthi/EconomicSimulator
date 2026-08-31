@@ -11,7 +11,7 @@ class BaseValueObject {
     [[nodiscard]] constexpr auto value() const noexcept -> T { return value_; }
 
   protected:
-    [[nodiscard]] explicit constexpr BaseValueObject(const T value) noexcept : value_{value} {}
+    explicit constexpr BaseValueObject(const T value) noexcept : value_{value} {}
 
     T value_;
 };
@@ -28,7 +28,7 @@ class CompareMixin {
     }
 
   private:
-    [[nodiscard]] explicit constexpr CompareMixin() noexcept = default;
+    explicit constexpr CompareMixin() noexcept = default;
 };
 
 template <typename Derived>
@@ -55,7 +55,7 @@ class AddMixin {
     }
 
   private:
-    [[nodiscard]] explicit constexpr AddMixin() noexcept = default;
+    explicit constexpr AddMixin() noexcept = default;
 };
 
 template <typename Derived>
@@ -92,7 +92,7 @@ class ScholarMixin {
     }
 
   private:
-    [[nodiscard]] explicit constexpr ScholarMixin() noexcept = default;
+    explicit constexpr ScholarMixin() noexcept = default;
 };
 
 template <typename Derived>

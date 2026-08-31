@@ -13,9 +13,8 @@ class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<Wage>;
 
   public:
-    [[nodiscard]] explicit constexpr Wage(const double value) noexcept
-        : BaseValueObject<double>(value) {}
-    [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
+    explicit constexpr Wage(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
 constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
@@ -29,11 +28,10 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
     friend class ScholarMixin<HeadCount>;
 
   public:
-    [[nodiscard]] explicit constexpr HeadCount(const double value) noexcept
-        : BaseValueObject<double>(value) {}
-    [[nodiscard]] explicit constexpr HeadCount(const int value) noexcept
+    explicit constexpr HeadCount(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr HeadCount(const int value) noexcept
         : BaseValueObject<double>(static_cast<double>(value)) {}
-    [[nodiscard]] explicit constexpr HeadCount(const std::size_t value) noexcept
+    explicit constexpr HeadCount(const std::size_t value) noexcept
         : BaseValueObject<double>(static_cast<double>(value)) {}
 
     constexpr auto operator++() noexcept -> HeadCount& {
@@ -69,8 +67,7 @@ class OfferRate : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<OfferRate>;
 
   public:
-    [[nodiscard]] explicit constexpr OfferRate(const double value) noexcept
-        : BaseValueObject<double>(value) {}
+    explicit constexpr OfferRate(const double value) noexcept : BaseValueObject<double>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(HeadCount lhs, OfferRate rhs) noexcept -> HeadCount {

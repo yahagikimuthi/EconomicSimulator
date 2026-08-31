@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "components/common.hpp"
@@ -14,7 +16,7 @@ class TradingSystem final {
     using TradePlan    = base_goods::supplier::TradePlan;
 
   public:
-    [[nodiscard]] explicit TradingSystem(RandomGenerator& masterRng) noexcept
+    explicit TradingSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng}, trader_{masterRng} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
@@ -35,7 +37,9 @@ class TradingSystem final {
         trader_.post(plan, market);
     }
 
-    void post(const AgentID _, Market& market) noexcept { trader_.post(*plan_, market); }
+    void post([[maybe_unused]] const AgentID _, Market& market) noexcept {
+        trader_.post(*plan_, market);
+    }
 
     [[nodiscard]] auto requiresSupply() noexcept -> GoodsQuantity {
         return planner_.requiresSupply();

@@ -18,7 +18,7 @@
 namespace abm::labor::demander::human_resource {
 class EmptyRosterPool final {
   public:
-    [[nodiscard]] EmptyRosterPool() noexcept = default;
+    EmptyRosterPool() noexcept = default;
     [[nodiscard]] auto size() const noexcept -> std::size_t { return pool_.size(); }
     [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0UZ; }
 
@@ -40,7 +40,7 @@ class EmptyRosterPool final {
 
 class HumanResource final {
   public:
-    [[nodiscard]] explicit HumanResource(CompanyBoard&& companyBoard) noexcept
+    explicit HumanResource(CompanyBoard&& companyBoard) noexcept
         : companyBoard_{std::move(companyBoard)} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Money {

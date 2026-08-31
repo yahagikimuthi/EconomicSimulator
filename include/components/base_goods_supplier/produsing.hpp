@@ -1,12 +1,13 @@
 #pragma once
 
+#include <algorithm>
+
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 #include "values/labor.hpp"
-#include "values/math.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
 
@@ -14,7 +15,7 @@ namespace abm::base_goods::supplier {
 // TODO 生産関数を要検討
 class Producer final {
   public:
-    [[nodiscard]] explicit Producer(RandomGenerator& masterRng) noexcept
+    explicit Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower_{masterRng.random(setting::productPower)},
           producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)},
           producerGoodsDepreciationRate_{masterRng.random(setting::producerGoodsDepreciationRate)} {
@@ -29,7 +30,7 @@ class Producer final {
         ASSERT(capital_ >= GoodsQuantity{0.0});
         capital_ *= (1.0 - producerGoodsDepreciationRate_);
 
-        const auto input = baseProductPower_ * min(workerInput, capitalEquipInput);
+        const auto input = baseProductPower_ * std::min(workerInput, capitalEquipInput);
         return input;
     }
 
@@ -42,7 +43,7 @@ class Producer final {
 
     [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return max(
+        return std::max(
             (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - capital_,
             GoodsQuantity{0.0}
         );
@@ -60,7 +61,7 @@ class Producer final {
 
 class ProducingSystem final {
   public:
-    [[nodiscard]] explicit ProducingSystem(RandomGenerator& masterRng) noexcept
+    explicit ProducingSystem(RandomGenerator& masterRng) noexcept
         : employPlanner_{masterRng},
           producer_{masterRng},
           inventory_{masterRng.random(setting::inventory)} {}

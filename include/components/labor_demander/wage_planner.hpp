@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <optional>
@@ -9,14 +10,13 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/labor.hpp"
-#include "values/math.hpp"
 
 namespace abm::labor::demander::planner {
 // 前回雇用計画が必要
 // 前回雇用結果中、応募者数が必要
 class WagePlannerMemory final {
   public:
-    [[nodiscard]] explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
+    explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}},
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenEmployPlan(const HeadCount employPlan) noexcept {
@@ -46,7 +46,7 @@ class WagePlannerMemory final {
 
 class WagePlanner final {
   public:
-    [[nodiscard]] explicit WagePlanner(RandomGenerator& masterRng) noexcept
+    explicit WagePlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{Wage{masterRng.random(setting::lastWage)}},
           rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
@@ -85,12 +85,12 @@ class WagePlanner final {
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
         const auto plan        = cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
-        const auto guarded     = min(plan, static_cast<Wage>(salesPerWorker));
+        const auto guarded     = std::min(plan, static_cast<Wage>(salesPerWorker));
         return wageGuard(guarded);
     }
 
     [[nodiscard]] static auto wageGuard(const Wage wage) noexcept -> Wage {
-        return max(wage, Wage{std::numeric_limits<double>::epsilon()});
+        return std::max(wage, Wage{std::numeric_limits<double>::epsilon()});
     }
 
     WagePlannerMemory       memory_;

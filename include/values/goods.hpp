@@ -16,7 +16,7 @@ class Price final : public value_object::BaseValueObject<double>,
   public:
     [[nodiscard]] constexpr explicit Price(const double value) noexcept
         : BaseValueObject<double>(value) {}
-    [[nodiscard]] explicit constexpr operator Money() const noexcept { return Money{value_}; }
+    explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
 class GoodsQuantity final : public value_object::BaseValueObject<double>,
@@ -28,7 +28,7 @@ class GoodsQuantity final : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<GoodsQuantity>;
 
   public:
-    [[nodiscard]] explicit constexpr GoodsQuantity(const double value) noexcept
+    explicit constexpr GoodsQuantity(const double value) noexcept
         : BaseValueObject<double>(value) {}
 };
 
@@ -56,8 +56,7 @@ class MarkupRate final : public value_object::BaseValueObject<double>,
     friend class ScholarMixin<MarkupRate>;
 
   public:
-    [[nodiscard]] explicit constexpr MarkupRate(const double value) noexcept
-        : BaseValueObject<double>(value) {}
+    explicit constexpr MarkupRate(const double value) noexcept : BaseValueObject<double>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(Money lhs, MarkupRate rhs) noexcept -> Price {

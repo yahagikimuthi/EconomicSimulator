@@ -15,7 +15,7 @@ namespace abm::consumer_goods {
 class ConsumerGoodsEntry;
 class ConsumerGoodsRequest final {
   public:
-    [[nodiscard]] ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
+    ConsumerGoodsRequest(const GoodsQuantity a, const ConsumerGoodsEntry& e) noexcept
         : requiresAmount{a}, entry{e} {
         ASSERT(a > GoodsQuantity{0.0});
     }
@@ -39,8 +39,7 @@ class ConsumerGoodsEntry final {
     using Request = ConsumerGoodsRequest;
 
   public:
-    [[nodiscard]] ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept
-        : price{p}, supply{s} {
+    ConsumerGoodsEntry(const Price p, const GoodsQuantity s) noexcept : price{p}, supply{s} {
         ASSERT(p > Price{0.0});
         ASSERT(s > GoodsQuantity{0.0});
     }
@@ -79,7 +78,7 @@ class ConsumerGoodsMarket final {
     using Entry = ConsumerGoodsEntry;
 
   public:
-    [[nodiscard]] ConsumerGoodsMarket() noexcept = default;
+    ConsumerGoodsMarket() noexcept = default;
     [[nodiscard]] auto entry(const Price price, const GoodsQuantity supply) noexcept -> Entry& {
         ASSERT(price > Price{0.0});
         ASSERT(supply > GoodsQuantity{0.0});

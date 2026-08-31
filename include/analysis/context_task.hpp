@@ -47,8 +47,7 @@ concept LogicType = requires(Logic logic, const DataContext& ctx) {
 
 class IMetricTask {
   public:
-    [[nodiscard]] explicit IMetricTask(std::string&& outName) noexcept
-        : outName_{std::move(outName)} {}
+    explicit IMetricTask(std::string&& outName) noexcept : outName_{std::move(outName)} {}
 
     virtual ~IMetricTask() noexcept                             = default;
     IMetricTask(const IMetricTask&) noexcept                    = default;

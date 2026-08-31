@@ -14,7 +14,7 @@
 namespace abm {
 class Logger final {
   public:
-    [[nodiscard]] explicit Logger() noexcept
+    explicit Logger() noexcept
         : file_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);

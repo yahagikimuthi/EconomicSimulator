@@ -38,7 +38,7 @@ struct PCG32Seed final {
 
 class RandomGenerator final {
   public:
-    [[nodiscard]] explicit constexpr RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
+    explicit constexpr RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
 
     [[nodiscard]] constexpr auto rand(const double min = 0.0, const double limit = 1.0) noexcept
         -> double {

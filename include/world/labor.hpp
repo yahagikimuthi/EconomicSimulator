@@ -36,7 +36,7 @@ struct CompanyBoard final {
 
 class RosterEntry final {
   public:
-    [[nodiscard]] RosterEntry(
+    RosterEntry(
         const AgentID i, const Wage w, CompanyBoard& board, base_goods::Workspace& space
     ) noexcept
         : hholdId{i}, wage{w}, companyBoard_{board}, workspace_{space} {
@@ -72,7 +72,7 @@ class LaborEntry final {
     using Request = LaborRequest;
 
   public:
-    [[nodiscard]] LaborEntry(const AgentID i, const double power, const Request& req) noexcept
+    LaborEntry(const AgentID i, const double power, const Request& req) noexcept
         : hholdID{i}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
@@ -102,7 +102,7 @@ class LaborRequest final {
     using Entry = LaborEntry;
 
   public:
-    [[nodiscard]] LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {
+    LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {
         ASSERT(w > Wage{0.0});
     }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
@@ -127,7 +127,7 @@ class LaborMarket final {
     using Request = LaborRequest;
 
   public:
-    [[nodiscard]] LaborMarket() noexcept = default;
+    LaborMarket() noexcept = default;
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
         ASSERT(wage > Wage{0.0});

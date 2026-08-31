@@ -33,7 +33,7 @@ struct RecruitResult final {
 template <typename T>
 class Memory final {
   public:
-    [[nodiscard]] explicit Memory(const T log) noexcept : log_{log} {}
+    explicit Memory(const T log) noexcept : log_{log} {}
 
     void reset() noexcept {
         if (not next_) return;
@@ -52,7 +52,7 @@ class Memory final {
 template <typename T>
 class Cache final {
   public:
-    [[nodiscard]] explicit Cache(const T cache) noexcept : cache_{cache} {}
+    explicit Cache(const T cache) noexcept : cache_{cache} {}
     [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
 
     void next(const T next) noexcept { next_ = next; }
@@ -68,7 +68,7 @@ class Cache final {
 
 class CentralMemory final {
   public:
-    [[nodiscard]] CentralMemory() noexcept = default;
+    CentralMemory() noexcept = default;
 
     void logging(CensusDropBox& dropBox) noexcept {
         if (employPlan_) {
