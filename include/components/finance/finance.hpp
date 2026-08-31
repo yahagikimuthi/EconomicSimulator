@@ -33,7 +33,7 @@ class FirmFinance final {
             ASSERT(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
-            postToPl(withdraw + cashOut, item);
+            postToPlFromMinus(withdraw + cashOut, item);
             return withdraw + cashOut;
         }
         const auto cashOut = std::min(cash_, sub);
@@ -42,15 +42,14 @@ class FirmFinance final {
         const auto withdraw    = depositSupplier_.tryWithdraw(rest);
         const auto moreCashOut = rest - withdraw;
         cash_ -= moreCashOut;
-        postToPl(cashOut + withdraw + moreCashOut, item);
+        postToPlFromPlus(cashOut + withdraw + moreCashOut, item);
         return cashOut + withdraw + moreCashOut;
     }
 
     void assetPlus(const Money add, const AccountItem item) noexcept {
         ASSERT(add.isZeroOrMore());
-        ASSERT(item == AccountItem::Sales);
 
-        pl_.sales += add;
+        postToPlFromPlus(add, item);
         // 現金比率が目標以上で、預金に成功した場合早期リターン
         if (currentCashRatio() > cashRatio_ and depositSupplier_.tryDeposit(add)) return;
         cash_ += add;
@@ -83,11 +82,30 @@ class FirmFinance final {
         return cash_ / asset();
     }
 
-    void postToPl(const Money money, const AccountItem item) noexcept {
+    void postToPlFromPlus(const Money money, const AccountItem item) noexcept {
         ASSERT(money.isZeroOrMore());
         switch (item) {
             case AccountItem::Sales:
                 pl_.sales += money;
+                break;
+            case AccountItem::CapitalGoodsCost:
+                pl_.capitalGoodsCost -= money;
+                break;
+            case AccountItem::Depreciation:
+                pl_.depreciation -= money;
+                break;
+            case AccountItem::Taxes:
+                pl_.taxes -= money;
+                break;
+            default:
+        }
+    }
+
+    void postToPlFromMinus(const Money money, const AccountItem item) noexcept {
+        ASSERT(money.isZeroOrMore());
+        switch (item) {
+            case AccountItem::Sales:
+                pl_.sales -= money;
                 break;
             case AccountItem::CapitalGoodsCost:
                 pl_.capitalGoodsCost += money;
