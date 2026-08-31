@@ -70,7 +70,7 @@ class CentralMemory final {
     }
 
     void listenMarkupPlan(const MarkupRate markup) noexcept {
-        ASSERT(markup.);
+        ASSERT(markup.isPositive());
         markupPlan_ = markup;
     }
 
