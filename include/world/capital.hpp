@@ -55,18 +55,18 @@ class Market final {
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
         totalSupply_.fetch_add(supply.value());
-        return *entryBox_.emplace_back(id, price, supply);
+        return *entries_.emplace_back(id, price, supply);
     }
 
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
         -> std::optional<Entry&> {
-        if (entryBox_.empty()) return std::nullopt;
-        if (entryBox_.size() == 1UZ and entryBox_[0].id == id) return std::nullopt;
+        if (entries_.empty()) return std::nullopt;
+        if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
 
         auto betterEntry = std::optional<Entry&>{std::nullopt};
         for (const auto _ : std::views::iota(0, sampleCnt)) {
             auto& sample = rng.discreteDistribution(
-                entryBox_,
+                entries_,
                 totalSupply_.load(),
                 [](const Entry& e) noexcept -> double { return e.supply.value(); }
             );
@@ -80,10 +80,10 @@ class Market final {
         return betterEntry;
     }
 
-    void clear() noexcept { entryBox_.clear(), totalSupply_.store(0.0); }
+    void clear() noexcept { entries_.clear(), totalSupply_.store(0.0); }
 
   private:
-    tbb::concurrent_vector<Entry> entryBox_;
+    tbb::concurrent_vector<Entry> entries_;
     std::atomic<double>           totalSupply_;
 };
 }  // namespace abm::capital
