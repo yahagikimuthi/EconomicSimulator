@@ -8,7 +8,6 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
 
@@ -77,16 +76,23 @@ class ConsumerGoodsDemander final {
     explicit ConsumerGoodsDemander(RandomGenerator& masterRng) noexcept
         : trader_{masterRng}, mpc_{masterRng.random(setting::mpc)} {}
 
+    [[nodiscard]] auto planAndRequestBudget(const Money asset) noexcept -> Money {
+        const auto requestBudget = asset * mpc_;
+        budget_                  = requestBudget;
+        return requestBudget;
+    }
+
+    void revisePlan(const Money budget) noexcept {
+        ASSERT(budget_);
+        ASSERT(budget_ <= budget);
+        budget_ = budget;
+    }
+
     void request(
-        const AgentID id,
-        const Money   asset,
-        const Date    today,
-        Market&       market,
-        const int     frequency = setting::maxPurchaseFrequency,
-        const int     sampleCnt = setting::goodsSampleCnt
+        const AgentID id, Market& market, const int sampleCnt = setting::goodsSampleCnt
     ) noexcept {
-        if (shouldPass(today, frequency)) return;
-        const auto budget = asset * mpc_;
+        ASSERT(budget_);
+        const auto budget = *budget_;
         if (budget <= Money{0.0}) return;
         trader_.request(id, budget, market, sampleCnt);
     }
@@ -102,14 +108,9 @@ class ConsumerGoodsDemander final {
     }
 
   private:
-    [[nodiscard]] auto shouldPass(const Date today, const int frequency) const noexcept -> bool {
-        return static_cast<int>(today.toFlatTime()) % frequency != myPhase_;
-    }
-
-    Trader            trader_;
-    const double      mpc_;
-    const int         myPhase_{instanceCnt_ % setting::maxPurchaseFrequency};
-    static inline int instanceCnt_{};
+    Trader               trader_;
+    const double         mpc_;
+    std::optional<Money> budget_;
 };
 }  // namespace abm::consumer_goods::demander
 
