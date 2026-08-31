@@ -12,7 +12,7 @@ namespace abm::capital {
 class Entry;
 class Request final {
   public:
-    Request(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
+    Request(const Money pay, const Entry& e) noexcept : payment_{pay}, entry_{e} {
         ASSERT(pay.isZeroOrMore());
     }
     Request(const Request&)                             = delete;
@@ -22,18 +22,17 @@ class Request final {
     ~Request() noexcept                                 = default;
 
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
-
-    void trade(const GoodsQuantity tradeAmount) noexcept {
-        ASSERT(tradeAmount_.isZero());
-        ASSERT(tradeAmount.isZeroOrMore());
-        tradeAmount_ = tradeAmount;
+    [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
+    [[nodiscard]] auto price() const noexcept -> Price;
+    [[nodiscard]] auto payment() const noexcept -> Money {
+        ASSERT(payment_.isZeroOrMore());
+        return payment_;
     }
 
-    const Money  payment;
-    const Entry& entry;
-
   private:
+    Money         payment_;
     GoodsQuantity tradeAmount_{0.0};
+    const Entry&  entry_;
 };
 
 class Entry final {
@@ -53,6 +52,17 @@ class Entry final {
   private:
     tbb::concurrent_vector<Request> requests_;
 };
+
+[[nodiscard]] auto Request::trade(const GoodsQuantity tradeAmount) noexcept -> Money {
+    ASSERT(tradeAmount_.isZero());
+    ASSERT(tradeAmount.isZeroOrMore());
+    tradeAmount_         = tradeAmount;
+    const auto actualPay = tradeAmount * entry_.price;
+    payment_ -= actualPay;
+    ASSERT(payment_.isZeroOrMore());
+    return actualPay;
+}
+[[nodiscard]] auto Request::price() const noexcept -> Price { return entry_.price; }
 
 class Market final {
   public:
