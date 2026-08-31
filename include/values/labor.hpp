@@ -9,7 +9,7 @@ class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
                                  value_object::CompareMixin<Wage>,
                                  value_object::AddMixin<Wage>,
                                  value_object::ScholarMixin<Wage>,
-                                 public value_object::SignMixin<Wage> {
+                                 public value_object::SignMixin {
     friend struct AddMixin<Wage>;
     friend struct ScholarMixin<Wage>;
 
@@ -24,7 +24,7 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
                                       value_object::CompareMixin<HeadCount>,
                                       value_object::AddMixin<HeadCount>,
                                       value_object::ScholarMixin<HeadCount>,
-                                      public value_object::SignMixin<HeadCount> {
+                                      public value_object::SignMixin {
     friend struct AddMixin<HeadCount>;
     friend struct ScholarMixin<HeadCount>;
 
@@ -63,7 +63,7 @@ class OfferRate : public value_object::BaseValueObject<double>,
                   public value_object::CompareMixin<OfferRate>,
                   value_object::AddMixin<OfferRate>,
                   value_object::ScholarMixin<OfferRate>,
-                  public value_object::SignMixin<OfferRate> {
+                  public value_object::SignMixin {
     friend struct AddMixin<OfferRate>;
     friend struct ScholarMixin<OfferRate>;
 

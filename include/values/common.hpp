@@ -9,7 +9,7 @@ class Money final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Money>,
                     value_object::AddMixin<Money>,
                     value_object::ScholarMixin<Money>,
-                    public value_object::SignMixin<Money> {
+                    public value_object::SignMixin {
     friend struct AddMixin<Money>;
     friend struct ScholarMixin<Money>;
 
@@ -24,7 +24,7 @@ class Budget final : public value_object::BaseValueObject<double>,
                      value_object::CompareMixin<Budget>,
                      value_object::AddMixin<Budget>,
                      value_object::ScholarMixin<Budget>,
-                     public value_object::SignMixin<Budget> {
+                     public value_object::SignMixin {
     friend struct AddMixin<Budget>;
     friend struct ScholarMixin<Budget>;
 

@@ -9,7 +9,7 @@ class TaxRate final : public value_object::BaseValueObject<double>,
                       value_object::CompareMixin<TaxRate>,
                       value_object::AddMixin<TaxRate>,
                       value_object::ScholarMixin<TaxRate>,
-                      public value_object::SignMixin<TaxRate> {
+                      public value_object::SignMixin {
     friend struct AddMixin<TaxRate>;
     friend struct ScholarMixin<TaxRate>;
 

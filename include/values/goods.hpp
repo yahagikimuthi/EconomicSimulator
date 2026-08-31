@@ -9,7 +9,7 @@ class Price final : public value_object::BaseValueObject<double>,
                     value_object::CompareMixin<Price>,
                     value_object::AddMixin<Price>,
                     value_object::ScholarMixin<Price>,
-                    public value_object::SignMixin<Price> {
+                    public value_object::SignMixin {
     friend struct AddMixin<Price>;
     friend struct ScholarMixin<Price>;
 
@@ -23,7 +23,7 @@ class GoodsQuantity final : public value_object::BaseValueObject<double>,
                             value_object::CompareMixin<GoodsQuantity>,
                             value_object::AddMixin<GoodsQuantity>,
                             value_object::ScholarMixin<GoodsQuantity>,
-                            public value_object::SignMixin<GoodsQuantity> {
+                            public value_object::SignMixin {
     friend struct AddMixin<GoodsQuantity>;
     friend struct ScholarMixin<GoodsQuantity>;
 
@@ -51,7 +51,7 @@ class MarkupRate final : public value_object::BaseValueObject<double>,
                          value_object::CompareMixin<MarkupRate>,
                          value_object::AddMixin<MarkupRate>,
                          value_object::ScholarMixin<MarkupRate>,
-                         public value_object::SignMixin<MarkupRate> {
+                         public value_object::SignMixin {
     friend struct AddMixin<MarkupRate>;
     friend struct ScholarMixin<MarkupRate>;
 

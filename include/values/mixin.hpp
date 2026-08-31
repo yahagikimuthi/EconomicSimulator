@@ -95,25 +95,34 @@ struct ScholarMixin {
     explicit constexpr ScholarMixin() noexcept = default;
 };
 
-template <typename Derived>
 struct SignMixin {
-    friend Derived;
-
   public:
-    [[nodiscard]] constexpr auto isPositive() const noexcept -> bool { return This() > Derived{0}; }
-    [[nodiscard]] constexpr auto isZeroOrMore() const noexcept -> bool {
-        return This() >= Derived{0};
+    template <typename Self>
+    [[nodiscard]] constexpr auto isPositive(this Self self) noexcept -> bool {
+        return self > Self{0};
     }
-    [[nodiscard]] constexpr auto isZero() const noexcept -> bool { return This() == Derived{0}; }
-    [[nodiscard]] constexpr auto isZeroOrLess() const noexcept -> bool {
-        return This() <= Derived{0};
-    }
-    [[nodiscard]] constexpr auto isNegative() const noexcept -> bool { return This() < Derived{0}; }
 
-  private:
-    [[nodiscard]] constexpr auto This() const noexcept -> const Derived& {
-        return static_cast<const Derived&>(*this);
+    template <typename Self>
+    [[nodiscard]] constexpr auto isZeroOrMore(this Self self) noexcept -> bool {
+        return self >= Self{0};
     }
+
+    template <typename Self>
+    [[nodiscard]] constexpr auto isZero(this Self self) noexcept -> bool {
+        return self == Self{0};
+    }
+
+    template <typename Self>
+    [[nodiscard]] constexpr auto isZeroOrLess(this Self self) noexcept -> bool {
+        return self <= Self{0};
+    }
+
+    template <typename Self>
+    [[nodiscard]] constexpr auto isNegative(this Self self) noexcept -> bool {
+        return self <= Self{0};
+    }
+
+  protected:
     [[nodiscard]] SignMixin() noexcept = default;
 };
 }  // namespace abm::value_object
