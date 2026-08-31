@@ -9,9 +9,8 @@
 #include "system/capital.hpp"
 #include "system/labor.hpp"
 #include "values/date.hpp"
-#include "world/capital.hpp"
+#include "world/base_goods.hpp"
 #include "world/common.hpp"
-#include "world/consumer_goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
@@ -171,10 +170,10 @@ class Engine final {
     std::vector<ConsumerFirm> consumerFirms_;
     std::vector<CapitalFirm>  capitalFirms_;
 
-    LaborMarket         laborMarket_;
-    ConsumerGoodsMarket consumerGoodsMarket_;
-    CapitalMarket       capitalMarket_;
-    CensusDropBox       dropBox_;
+    LaborMarket        laborMarket_;
+    base_goods::Market consumerGoodsMarket_;
+    base_goods::Market capitalMarket_;
+    CensusDropBox      dropBox_;
 
     const Date endingDay_;
     Date       today_{1U, 1U, 1U};

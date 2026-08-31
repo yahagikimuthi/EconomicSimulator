@@ -9,12 +9,12 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "world/consumer_goods.hpp"
+#include "world/base_goods.hpp"
 
 namespace abm::consumer_goods::demander {
-using Request = Request;
-using Entry   = Entry;
-using Market  = Market;
+using Request = base_goods::Request;
+using Entry   = base_goods::Entry;
+using Market  = base_goods::Market;
 
 struct ATradeResult final {
     const Price         price;

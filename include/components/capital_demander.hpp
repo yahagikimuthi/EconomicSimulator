@@ -11,9 +11,12 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "world/capital.hpp"
+#include "world/base_goods.hpp"
 
 namespace abm::capital::demander {
+using Market  = base_goods::Market;
+using Request = base_goods::Request;
+
 struct Log final {
     const Money         purchase{std::numeric_limits<double>::epsilon()};
     const GoodsQuantity tradeAmount{std::numeric_limits<double>::infinity()};

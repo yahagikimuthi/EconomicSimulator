@@ -4,10 +4,12 @@
 #include "components/capital_supplier.hpp"
 #include "components/finance/finance.hpp"
 #include "values/common.hpp"
-#include "world/capital.hpp"
+#include "world/base_goods.hpp"
 
 namespace abm::capital::supplier {
-inline void supplyCapital(const AgentID id, CapitalSupplier& supplier, Market& market) noexcept {
+inline void supplyCapital(
+    const AgentID id, CapitalSupplier& supplier, base_goods::Market& market
+) noexcept {
     supplier.post(id, market);
 }
 

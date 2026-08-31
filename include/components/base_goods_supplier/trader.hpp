@@ -3,7 +3,6 @@
 #include <optional>
 #include <ranges>
 #include <span>
-#include <type_traits>
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
@@ -12,27 +11,13 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "world/capital.hpp"
-#include "world/common.hpp"
-#include "world/consumer_goods.hpp"
+#include "world/base_goods.hpp"
 
 namespace abm::base_goods::supplier {
-
-template <EMarket SupplyGoodsType>
-    requires(SupplyGoodsType == EMarket::ConsumerGoods) or (SupplyGoodsType == EMarket::Capital)
 class Trader final {
-    using Market = std::conditional_t<
-        SupplyGoodsType == EMarket::ConsumerGoods,
-        ConsumerGoodsMarket,
-        CapitalMarket>;
-    using Request = std::conditional_t<
-        SupplyGoodsType == EMarket::ConsumerGoods,
-        consumer_goods::Request,
-        capital::Request>;
-    using Entry = std::conditional_t<
-        SupplyGoodsType == EMarket::ConsumerGoods,
-        consumer_goods::Entry,
-        capital::Entry>;
+    using Market  = base_goods::Market;
+    using Request = base_goods::Request;
+    using Entry   = base_goods::Entry;
 
   public:
     explicit Trader(RandomGenerator& masterRng) noexcept
@@ -72,7 +57,7 @@ class Trader final {
     [[nodiscard]] auto calcTotalDemand() const noexcept -> GoodsQuantity {
         const auto requests = myEntry_->requests();
         return std::ranges::fold_left(
-            requests | std::views::transform([this](const Request& req) -> GoodsQuantity {
+            requests | std::views::transform([this](const Request& req) noexcept -> GoodsQuantity {
                 return req.payment() / myEntry_->price;
             }),
             GoodsQuantity{0.0},

@@ -1,24 +1,16 @@
 #pragma once
 
-#include <type_traits>
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "components/base_goods_supplier/trader.hpp"
 #include "components/common.hpp"
 #include "components/finance/finance.hpp"
 #include "values/goods.hpp"
-#include "world/capital.hpp"
-#include "world/common.hpp"
-#include "world/consumer_goods.hpp"
+#include "world/base_goods.hpp"
 
 namespace abm::base_goods::supplier {
-template <EMarket SupplyGoodsType>
-    requires(SupplyGoodsType == EMarket::ConsumerGoods) or (SupplyGoodsType == EMarket::Capital)
 class TradingSystem final {
-    using Market = std::conditional_t<
-        SupplyGoodsType == EMarket::ConsumerGoods,
-        ConsumerGoodsMarket,
-        CapitalMarket>;
+    using Market = base_goods::Market;
 
   public:
     explicit TradingSystem(RandomGenerator& masterRng) noexcept
@@ -60,6 +52,6 @@ class TradingSystem final {
   private:
     std::optional<TradePlan> plan_;
     TradePlanner             planner_;
-    Trader<SupplyGoodsType>  trader_;
+    Trader                   trader_;
 };
 }  // namespace abm::base_goods::supplier

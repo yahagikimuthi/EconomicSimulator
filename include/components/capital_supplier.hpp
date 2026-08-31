@@ -16,11 +16,12 @@
 
 namespace abm::capital::supplier {
 class CapitalSupplier final {
-    using TradingSystem   = base_goods::supplier::TradingSystem<EMarket::Capital>;
+    using TradingSystem   = base_goods::supplier::TradingSystem;
     using ProducingSystem = base_goods::supplier::ProducingSystem;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
     using Workspace       = base_goods::Workspace;
+    using Market          = base_goods::Market;
 
   public:
     explicit CapitalSupplier(RandomGenerator& masterRng) noexcept
