@@ -6,7 +6,7 @@
 
 #include "values/common.hpp"
 #include "values/goods.hpp"
-#include "world/common.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
 struct TradePlan final {

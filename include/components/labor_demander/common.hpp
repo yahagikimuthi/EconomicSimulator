@@ -6,7 +6,7 @@
 
 #include "values/common.hpp"
 #include "values/labor.hpp"
-#include "world/common.hpp"
+#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander {

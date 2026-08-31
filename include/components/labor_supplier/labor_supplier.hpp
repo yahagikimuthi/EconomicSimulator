@@ -9,7 +9,7 @@
 #include "components/labor_supplier/job_hunter.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "world/common.hpp"
+#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {

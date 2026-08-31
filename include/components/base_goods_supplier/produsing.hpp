@@ -9,7 +9,7 @@
 #include "values/goods.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
-#include "world/common.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
 // TODO 生産関数を要検討

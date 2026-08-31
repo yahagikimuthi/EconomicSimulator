@@ -9,7 +9,7 @@
 
 #include "others/setting.hpp"
 #include "values/date.hpp"
-#include "world/common.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm {
 class Logger final {

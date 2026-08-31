@@ -12,7 +12,7 @@
 #include "system/labor.hpp"
 #include "values/date.hpp"
 #include "world/base_goods.hpp"
-#include "world/common.hpp"
+#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
