@@ -1,6 +1,5 @@
 #pragma once
 
-#include "others/util.hpp"
 #include "values/mixin.hpp"
 
 namespace abm {
@@ -23,22 +22,5 @@ class AgentID final : public value_object::BaseValueObject<int>,
                       public value_object::CompareMixin<AgentID> {
   public:
     explicit constexpr AgentID(const int value) noexcept : BaseValueObject<int>(value) {}
-};
-
-class Step final : public value_object::BaseValueObject<unsigned int>,
-                   value_object::CompareMixin<Step> {
-  public:
-    explicit constexpr Step(const unsigned int value) noexcept
-        : BaseValueObject<unsigned int>(value) {}
-
-    constexpr auto operator++() noexcept -> Step& {
-        ++value_;
-        return *this;
-    }
-    [[nodiscard]] constexpr auto operator%(const int other) const noexcept -> Step {
-        ASSERT(other != 0);
-        auto ret = static_cast<int>(value_) % other;
-        return Step{static_cast<unsigned int>(ret)};
-    }
 };
 }  // namespace abm
