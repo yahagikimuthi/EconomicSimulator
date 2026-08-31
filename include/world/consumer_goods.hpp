@@ -18,11 +18,11 @@ class ConsumerGoodsRequest final {
     ConsumerGoodsRequest(const Money pay, const Entry& e) noexcept : payment{pay}, entry{e} {
         ASSERT(pay.isPositive());
     }
-    ConsumerGoodsRequest(const Request&)               = delete;
-    auto operator=(const Request&) -> Request&         = delete;
-    ConsumerGoodsRequest(Request&&)                    = delete;
-    auto operator=(ConsumerGoodsRequest&&) -> Request& = delete;
-    ~ConsumerGoodsRequest() noexcept                   = default;
+    ConsumerGoodsRequest(const Request&)                        = delete;
+    auto operator=(const Request&) noexcept -> Request&         = delete;
+    ConsumerGoodsRequest(Request&&)                             = delete;
+    auto operator=(ConsumerGoodsRequest&&) noexcept -> Request& = delete;
+    ~ConsumerGoodsRequest() noexcept                            = default;
 
     [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
@@ -87,10 +87,15 @@ class ConsumerGoodsMarket final {
         auto currentBetter = std::optional<Entry&>{std::nullopt};
         for (const auto _ : std::views::iota(0, sampleCnt)) {
             auto& picked = rng.discreteDistribution(
-                entries_, totalSupply_.load(), [](Entry& e) -> double { return e.supply.value(); }
+                entries_,
+                totalSupply_.load(),
+                [](Entry& e) noexcept -> double { return e.supply.value(); }
             );
             if (picked.id == id) continue;
-            if (not currentBetter) currentBetter = picked;
+            if (not currentBetter) {
+                currentBetter = picked;
+                continue;
+            }
             if (picked.price < currentBetter->price) currentBetter = picked;
         }
         return currentBetter;
