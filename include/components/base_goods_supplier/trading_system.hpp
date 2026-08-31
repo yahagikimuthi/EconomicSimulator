@@ -10,8 +10,6 @@
 
 namespace abm::base_goods::supplier {
 class TradingSystem final {
-    using Market = base_goods::Market;
-
   public:
     explicit TradingSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng}, trader_{masterRng} {}

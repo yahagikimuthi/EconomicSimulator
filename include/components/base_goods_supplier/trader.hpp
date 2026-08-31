@@ -15,10 +15,6 @@
 
 namespace abm::base_goods::supplier {
 class Trader final {
-    using Market  = base_goods::Market;
-    using Request = base_goods::Request;
-    using Entry   = base_goods::Entry;
-
   public:
     explicit Trader(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
