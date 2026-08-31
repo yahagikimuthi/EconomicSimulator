@@ -26,9 +26,12 @@ class FirmFinance final {
 
     enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
 
-    [[nodiscard]] auto tryWithdraw(const Money sub, const AccountItem item) noexcept -> Money {
-        ASSERT(sub.isZeroOrMore());
+    [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw, const AccountItem item) noexcept
+        -> Money {
+        ASSERT(tryingWithdraw.isZeroOrMore());
         ASSERT(item != AccountItem::Sales);
+
+        const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
             const auto withdraw = depositSupplier_.tryWithdraw(sub);
             ASSERT(withdraw <= sub);
@@ -45,10 +48,6 @@ class FirmFinance final {
         cash_ -= moreCashOut;
         postToPlFromPlus(cashOut + withdraw + moreCashOut, item);
         return cashOut + withdraw + moreCashOut;
-    }
-
-    [[nodiscard]] auto tryWithdraw(const Budget sub, const AccountItem item) noexcept -> Money {
-        return tryWithdraw(Money{sub.value()}, item);
     }
 
     void assetPlus(const Money add, const AccountItem item) noexcept {

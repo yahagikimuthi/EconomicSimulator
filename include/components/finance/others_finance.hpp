@@ -15,8 +15,9 @@ class HHoldFinance final {
           cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
-        ASSERT(sub.isZeroOrMore());
+    [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw) noexcept -> Money {
+        ASSERT(tryingWithdraw.isZeroOrMore());
+        const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
             const auto withdraw = depositSupplier_.tryWithdraw(sub);
             ASSERT(withdraw <= sub);
@@ -31,10 +32,6 @@ class HHoldFinance final {
         const auto moreCashOut = rest - withdraw;
         cash_ -= moreCashOut;
         return cashOut + withdraw + moreCashOut;
-    }
-
-    [[nodiscard]] auto tryWithdraw(const Budget sub) noexcept -> Money {
-        return withdraw(Money{sub.value()});
     }
 
     void assetPlus(const Money add) noexcept {
