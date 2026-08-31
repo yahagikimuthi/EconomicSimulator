@@ -85,7 +85,9 @@ class Trader final {
     [[nodiscard]] auto packRequest() noexcept -> std::span<RefWrap<Request>> {
         static thread_local auto refs = std::vector<RefWrap<Request>>{};
         refs.clear();
-        for (auto& req : myEntry_->requests()) refs.emplace_back(std::ref(req));
+        auto requests = myEntry_->requests();
+        refs.reserve(requests.size());
+        for (auto& req : requests) refs.emplace_back(std::ref(req));
         return refs;
     }
 
