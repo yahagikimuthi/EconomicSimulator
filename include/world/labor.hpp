@@ -39,6 +39,16 @@ class RosterEntry final {
         ASSERT(Wage.isPositive());
         ASSERT(Id != companyBoard_.firmId);
     }
+    // std::deque<RosterEntry>に対しstd::sortを施すと
+    // entrantが持つ参照が無効化してしまう。
+    // std::sortはstd::swapを内部で行い、そのコンセプトはコピー及びムーブ構築が可能であること。
+    // よって、各種コンストラクタ及び演算子を明示的削除する。
+    RosterEntry(const RosterEntry&)                             = delete;
+    auto operator=(const RosterEntry&) noexcept -> RosterEntry& = delete;
+    RosterEntry(RosterEntry&&)                                  = delete;
+    auto operator=(RosterEntry&&) noexcept -> RosterEntry&      = delete;
+    ~RosterEntry() noexcept                                     = default;
+
     void addInput(const double productPower) noexcept { workspace_.addInput(productPower); }
     void resign() noexcept { companyBoard_.resign(*this); }
     void disable() noexcept { isOccupied_ = false; }
