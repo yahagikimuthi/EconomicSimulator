@@ -14,3 +14,4 @@ core.*
 uml/
 tests/
 *.supp/
+*/main.cpp
