@@ -19,8 +19,9 @@ class FirmFinance final {
     };
 
   public:
-    explicit FirmFinance(RandomGenerator& masterRng) noexcept
-        : cash_{Money{masterRng.random(setting::firmInitialAsset)}},
+    explicit FirmFinance(const AgentID id, RandomGenerator& masterRng) noexcept
+        : depositSupplier_{id},
+          cash_{Money{masterRng.random(setting::firmInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
@@ -51,7 +52,10 @@ class FirmFinance final {
 
         postToPlFromPlus(add, item);
         // 現金比率が目標以上で、預金に成功した場合早期リターン
-        if (currentCashRatio() > cashRatio_ and depositSupplier_.tryDeposit(add)) return;
+        if (currentCashRatio() > cashRatio_) {
+            depositSupplier_.deposit(add);
+            return;
+        }
         cash_ += add;
     }
 

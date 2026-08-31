@@ -1,7 +1,5 @@
 #pragma once
 
-#include <optional>
-
 #include "values/common.hpp"
 #include "world/deposit.hpp"
 
@@ -9,34 +7,22 @@ namespace abm::finance::deposit::supplier {
 
 class DepositSupplier final {
   public:
-    DepositSupplier() noexcept = default;
+    DepositSupplier(const AgentID id) noexcept;
 
-    [[nodiscard]] auto balance() const noexcept -> Money {
-        return account_.transform(&DepositAccount::balance).value_or(Money{0.0});
-    }
+    [[nodiscard]] auto balance() const noexcept -> Money { return account_.balance(); }
 
-    [[nodiscard]] auto tryDeposit(const Money deposit) noexcept -> bool {
+    void deposit(const Money deposit) noexcept {
         ASSERT(deposit >= Money{0.0});
-        if (not haveAccount()) return false;
-        account_->deposit(deposit);
-        return true;
+        account_.deposit(deposit);
     }
 
     [[nodiscard]] auto tryWithdraw(const Money withdraw) noexcept -> Money {
         ASSERT(withdraw >= Money{0.0});
-        if (not haveAccount()) return Money{0.0};
-        return account_->withdraw(withdraw);
-    }
-
-    void setAccount(DepositAccount& account) noexcept {
-        ASSERT(not haveAccount());
-        account_ = account;
+        return account_.withdraw(withdraw);
     }
 
   private:
-    [[nodiscard]] auto haveAccount() const noexcept -> bool { return account_.has_value(); }
-
-    std::optional<DepositAccount&> account_{std::nullopt};
+    DepositAccount account_;
 };
 }  // namespace abm::finance::deposit::supplier
 

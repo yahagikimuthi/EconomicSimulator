@@ -10,8 +10,9 @@
 namespace abm::finance {
 class HHoldFinance final {
   public:
-    explicit HHoldFinance(RandomGenerator& masterRng) noexcept
-        : cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
+    explicit HHoldFinance(const AgentID id, RandomGenerator& masterRng) noexcept
+        : depositSupplier_{id},
+          cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
@@ -35,7 +36,10 @@ class HHoldFinance final {
     void assetPlus(const Money add) noexcept {
         ASSERT(add.isZeroOrMore());
         // 現金比率が目標以上で、預金に成功した場合早期リターン
-        if (currentCashRatio() > cashRatio_ and depositSupplier_.tryDeposit(add)) return;
+        if (currentCashRatio() > cashRatio_) {
+            depositSupplier_.deposit(add);
+            return;
+        }
         cash_ += add;
     }
 
