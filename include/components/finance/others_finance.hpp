@@ -43,6 +43,23 @@ class HHoldFinance final {
         cash_ += add;
     }
 
+    [[nodiscard]] auto claimBudget(const Money claim) const noexcept -> Money {
+        ASSERT(claim.isZeroOrMore());
+
+        if (currentCashRatio() > cashRatio_) {
+            const auto cashOut     = std::min(cash_, claim);
+            const auto rest        = claim - cashOut;
+            const auto withdraw    = std::min(depositSupplier_.balance(), rest);
+            const auto moreCashOut = rest - withdraw;
+            return cashOut + withdraw + moreCashOut;
+        }
+
+        const auto withdraw = std::min(depositSupplier_.balance(), claim);
+        ASSERT(withdraw <= claim);
+        const auto cashOut = claim - withdraw;
+        return withdraw + cashOut;
+    }
+
     [[nodiscard]] auto asset() const noexcept -> Money {
         return cash_ + depositSupplier_.balance();
     }
