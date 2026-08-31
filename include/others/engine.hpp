@@ -186,6 +186,9 @@ class Engine final {
         for (auto& firm : consumerFirms_) {
             supplier::trade(firm.finance, firm.goodsSupplier);
         }
+        for (auto& hhold : hholds_) {
+            demander::afterTrade(hhold.finance, hhold.goodsDemander);
+        }
     }
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
