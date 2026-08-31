@@ -79,9 +79,7 @@ class ConsumerGoodsMarket final {
 
     auto pickEntry(const int sampleCnt, RandomGenerator& rng) noexcept -> std::optional<Entry&> {
         if (entries_.empty()) return std::nullopt;
-        auto toDouble = [] [[nodiscard]] (const Entry& entry) noexcept -> double {
-            return entry.supply.value();
-        };
+        auto toDouble = [](const Entry& entry) noexcept -> double { return entry.supply.value(); };
         auto betterEntry =
             std::ref(rng.discreteDistribution(entries_, totalSupply_.load(), toDouble));
         if (sampleCnt <= 1) return betterEntry.get();
