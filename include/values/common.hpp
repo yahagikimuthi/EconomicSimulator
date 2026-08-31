@@ -11,8 +11,8 @@ class Money final : public value_object::BaseValueObject<double>,
                     value_object::AddMixin<Money>,
                     value_object::ScholarMixin<Money>,
                     public value_object::SignMixin<Money> {
-    friend class AddMixin<Money>;
-    friend class ScholarMixin<Money>;
+    friend struct AddMixin<Money>;
+    friend struct ScholarMixin<Money>;
 
   public:
     explicit constexpr Money(const double value) noexcept : BaseValueObject<double>(value) {}
