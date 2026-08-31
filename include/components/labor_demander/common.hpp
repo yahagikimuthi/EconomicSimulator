@@ -10,9 +10,9 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::demander {
-using Entry   = LaborEntry;
-using Request = LaborRequest;
-using Market  = LaborMarket;
+using Entry   = Entry;
+using Request = Request;
+using Market  = Market;
 
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {

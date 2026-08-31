@@ -67,12 +67,10 @@ auto CompanyBoard::addRoster(
     return roster.emplace_back(id, wage, *this, workspace);
 }
 
-class LaborRequest;
-class LaborEntry final {
-    using Request = LaborRequest;
-
+class Request;
+class Entry final {
   public:
-    LaborEntry(const AgentID i, const double power, const Request& req) noexcept
+    Entry(const AgentID i, const double power, const Request& req) noexcept
         : hholdID{i}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
@@ -98,13 +96,9 @@ class LaborEntry final {
     bool                        isAccept_{false};
 };
 
-class LaborRequest final {
-    using Entry = LaborEntry;
-
+class Request final {
   public:
-    LaborRequest(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} {
-        ASSERT(w > Wage{0.0});
-    }
+    Request(const AgentID i, const Wage w) noexcept : firmID{i}, wage{w} { ASSERT(w > Wage{0.0}); }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
         ASSERT(productPower > 0.0);
         ASSERT(id != firmID);
@@ -123,11 +117,9 @@ class LaborRequest final {
     tbb::concurrent_vector<Entry> entryBox_;
 };
 
-class LaborMarket final {
-    using Request = LaborRequest;
-
+class Market final {
   public:
-    LaborMarket() noexcept = default;
+    Market() noexcept = default;
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
         ASSERT(wage > Wage{0.0});
@@ -165,10 +157,10 @@ class LaborMarket final {
         );
     }
 
-    tbb::concurrent_vector<LaborRequest> requestBox_;
+    tbb::concurrent_vector<Request> requestBox_;
 };
 }  // namespace abm::labor
 
 namespace abm {
-using LaborMarket = labor::LaborMarket;
+using LaborMarket = labor::Market;
 }

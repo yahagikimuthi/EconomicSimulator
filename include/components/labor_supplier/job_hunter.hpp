@@ -75,7 +75,7 @@ class JobHunter final {
     }
 
     [[nodiscard]] auto pickAndSortJobs(
-        LaborMarket& market, const int sampleCnt, const int entryCnt
+        Market& market, const int sampleCnt, const int entryCnt
     ) noexcept -> std::span<RefWrap<Request>> {
         static thread_local auto sampleRequest = std::vector<RefWrap<Request>>{};
         sampleRequest.clear();

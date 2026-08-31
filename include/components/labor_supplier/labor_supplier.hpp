@@ -33,7 +33,7 @@ class LaborSupplier final {
     explicit LaborSupplier(RandomGenerator& masterRng) noexcept
         : jobHunter_{masterRng}, employment_{masterRng}, likelihoodChangingJob_{masterRng} {}
 
-    void entry(const AgentID id, LaborMarket& market) noexcept {
+    void entry(const AgentID id, Market& market) noexcept {
         employment_.updateStatus();
         if (not shouldSearch()) return;
         jobHunter_.entry(
