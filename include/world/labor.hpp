@@ -39,10 +39,10 @@ class RosterEntry final {
         ASSERT(Wage.isPositive());
         ASSERT(Id != companyBoard_.firmId);
     }
-    // std::deque<RosterEntry>に対しstd::sortを施すと
-    // entrantが持つ参照が無効化してしまう。
-    // std::sortはstd::swapを内部で行い、そのコンセプトはコピー及びムーブ構築が可能であること。
+    // std::deque<RosterEntry>に対しstd::swapを施すと
+    // entrantが持つ参照が無意味となる。
     // よって、各種コンストラクタ及び演算子を明示的削除する。
+    // コピーコンストラクタはreserveを呼び出すのに必要であるから定義する。
     RosterEntry(const RosterEntry&) noexcept                    = default;
     auto operator=(const RosterEntry&) noexcept -> RosterEntry& = delete;
     RosterEntry(RosterEntry&&)                                  = delete;

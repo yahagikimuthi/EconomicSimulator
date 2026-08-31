@@ -52,9 +52,8 @@ class Request final {
     Request(const Money pay, const Entry& e) noexcept : payment_{pay}, remainPaid_{pay}, entry_{e} {
         ASSERT(pay.isZeroOrMore());
     }
-    // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
-    // Requestorが持つ参照が無効化してしまう。
-    // std::sortはstd::swapを内部で行い、そのコンセプトはコピー及びムーブ構築が可能であること。
+    // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
+    // Requestorが持つ参照が無意味となる。
     // よって、各種コンストラクタ及び演算子を明示的削除する。
     Request(const Request&)                             = delete;
     auto operator=(const Request&) noexcept -> Request& = delete;
