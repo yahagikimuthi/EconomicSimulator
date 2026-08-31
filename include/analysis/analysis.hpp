@@ -33,37 +33,37 @@ void analysisData() {
     analyzer.requireData(name::householdAssets);
     analyzer.requireData(name::wages);
 
-    analyzer.registerMetric("avgFirmAssets", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgFirmAssets", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::firmAssets));
     });
-    analyzer.registerMetric("avgPostedEmployments", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgPostedEmployments", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::postedEmployments));
     });
-    analyzer.registerMetric("avgPostedWages", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgPostedWages", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::postedWages));
     });
-    analyzer.registerMetric("avgEmployments", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgEmployments", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::employments));
     });
-    analyzer.registerMetric("avgSumWages", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgSumWages", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::sumWages));
     });
-    analyzer.registerMetric("avgPrices", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgPrices", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::prices));
     });
-    analyzer.registerMetric("avgSupplies", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgSupplies", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::supplies));
     });
-    analyzer.registerMetric("avgMarkups", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgMarkups", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::supplies));
     });
-    analyzer.registerMetric("avgInventories", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgInventories", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::supplies));
     });
-    analyzer.registerMetric("avgHholdAssets", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgHholdAssets", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::supplies));
     });
-    analyzer.registerMetric("avgWages", [](const DataContext& ctx) -> double {
+    analyzer.registerMetric("avgWages", [](const DataContext& ctx) noexcept -> double {
         return calcMean(ctx.get(name::supplies));
     });
 

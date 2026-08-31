@@ -17,7 +17,7 @@ namespace abm::analysis {
 class InputDataManager final {
   public:
     [[nodiscard]] InputDataManager()
-        : inFile_{[]() -> HighFive::File {
+        : inFile_{[]() noexcept -> HighFive::File {
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
 
               if (const auto path = std::filesystem::path{filepath}; path.has_parent_path())
@@ -37,9 +37,13 @@ class InputDataManager final {
 
     [[nodiscard]] auto getStepKeys() const -> std::vector<std::string> {
         auto stepKeys = inFile_.listObjectNames();
-        std::ranges::sort(stepKeys, std::ranges::less{}, [](const std::string& step) -> int {
-            return std::stoi(step.substr(5));  // NOLINT
-        });
+        std::ranges::sort(
+            stepKeys,
+            std::ranges::less{},
+            [](const std::string& step) noexcept -> int {
+                return std::stoi(step.substr(5));  // NOLINT
+            }
+        );
         return stepKeys;
     }
 
@@ -73,7 +77,7 @@ class InputDataManager final {
 class OutputDataManager final {
   public:
     [[nodiscard]] OutputDataManager()
-        : outFile_{[]() -> HighFive::File {
+        : outFile_{[]() noexcept -> HighFive::File {
               const auto filepath = static_cast<std::string>(setting::metricDataOutputPath);
               if (const auto path = std::filesystem::path{filepath}; path.has_parent_path()) {
                   std::filesystem::create_directories(path.parent_path());
