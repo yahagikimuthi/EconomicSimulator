@@ -80,12 +80,12 @@ class FirmFinance {
         return cash_ + depositSupplier_.balance();
     }
 
+  private:
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
         if (asset().isZero()) return 0.0;
         return cash_ / asset();
     }
 
-  private:
     void postToPl(const Money money, const AccountItem item) noexcept {
         ASSERT(money.isZeroOrMore());
         switch (item) {
@@ -141,33 +141,16 @@ class HHoldFinance final {
         cash_ += add;
     }
 
-    [[nodiscard]] auto claimBudget(const Money claim) const noexcept -> Money {
-        ASSERT(claim.isZeroOrMore());
-
-        if (currentCashRatio() > cashRatio_) {
-            const auto cashOut     = std::min(cash_, claim);
-            const auto rest        = claim - cashOut;
-            const auto withdraw    = std::min(static_cast<Money>(depositSupplier_.balance()), rest);
-            const auto moreCashOut = rest - withdraw;
-            return cashOut + withdraw + moreCashOut;
-        }
-
-        const auto withdraw = std::min(static_cast<Money>(depositSupplier_.balance()), claim);
-        ASSERT(withdraw <= claim);
-        const auto cashOut = claim - withdraw;
-        return withdraw + cashOut;
-    }
-
     [[nodiscard]] auto asset() const noexcept -> Money {
         return cash_ + depositSupplier_.balance();
     }
 
+  private:
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
         if (asset().isZero()) return 0.0;
         return cash_ / asset();
     }
 
-  private:
     DepositSupplier depositSupplier_;
     Money           cash_;
     const double    cashRatio_;
