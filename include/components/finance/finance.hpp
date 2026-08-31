@@ -10,7 +10,7 @@
 namespace abm::finance {
 enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
 
-struct PL {
+struct PL final {
     void reset() noexcept { sales = capitalGoodsCost = depreciation = taxes = Money{0.0}; }
 
     Money sales{0.0};
@@ -19,14 +19,11 @@ struct PL {
     Money taxes{0.0};
 };
 
-struct BS {};
-
-enum class Color : char { Red, Blue, Yellow };
-
-class FirmFinance {
+class FirmFinance final {
   public:
-    explicit FirmFinance(const Money asset, RandomGenerator& masterRng) noexcept
-        : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
+    explicit FirmFinance(RandomGenerator& masterRng) noexcept
+        : cash_{Money{masterRng.random(setting::firmInitialAsset)}},
+          cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     [[nodiscard]] auto withdraw(const Money sub, const AccountItem item) noexcept -> Money {
         ASSERT(sub.isZeroOrMore());
@@ -113,8 +110,9 @@ class FirmFinance {
 
 class HHoldFinance final {
   public:
-    explicit HHoldFinance(const Money asset, RandomGenerator& masterRng) noexcept
-        : cash_{asset}, cashRatio_{masterRng.random(setting::cashRatio)} {}
+    explicit HHoldFinance(RandomGenerator& masterRng) noexcept
+        : cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
+          cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
         ASSERT(sub.isZeroOrMore());
