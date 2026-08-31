@@ -1,10 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <utility>
 
-#include "components/common.hpp"
-#include "components/finance/deposit_demander.hpp"
 #include "components/finance/deposit_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
@@ -12,23 +9,6 @@
 #include "world/common.hpp"
 
 namespace abm::finance {
-
-class Bank final {
-  public:
-    explicit Bank() noexcept;
-
-  private:
-    DepositDemander depositDemander_;
-};
-
-class BankRegistry final {
-  public:
-    explicit BankRegistry() noexcept;
-
-  private:
-    std::vector<Bank> banks_;
-};
-
 enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
 
 struct PL {
@@ -71,7 +51,7 @@ class Finance {
     }
 
     void assetPlus(const Money add, const AccountItem item) noexcept {
-        ASSERT(add >= Money{0.0});
+        ASSERT(add.isZeroOrMore());
         ASSERT(item == AccountItem::Sales);
 
         pl_.sales += add;
@@ -81,22 +61,19 @@ class Finance {
     }
 
     [[nodiscard]] auto claimBudget(const Money claim) const noexcept -> Money {
-        ASSERT(claim >= Money{0.0});
-        ASSERT(asset() >= Money{0.0});
+        ASSERT(claim.isZeroOrMore());
 
         if (currentCashRatio() > cashRatio_) {
-            const auto cashOut  = std::min(cash_, claim);
-            const auto rest     = claim - cashOut;
-            const auto withdraw = std::min(static_cast<Money>(depositSupplier_.balance()), rest);
-            return cashOut + withdraw;
+            const auto cashOut     = std::min(cash_, claim);
+            const auto rest        = claim - cashOut;
+            const auto withdraw    = std::min(static_cast<Money>(depositSupplier_.balance()), rest);
+            const auto moreCashOut = rest - withdraw;
+            return cashOut + withdraw + moreCashOut;
         }
 
         const auto withdraw = std::min(static_cast<Money>(depositSupplier_.balance()), claim);
         ASSERT(withdraw <= claim);
-
-        const auto rest = claim - withdraw;
-        ASSERT(cash_ >= Money{0.0});
-        const auto cashOut = std::min(cash_, rest);
+        const auto cashOut = claim - withdraw;
         return withdraw + cashOut;
     }
 
@@ -105,9 +82,7 @@ class Finance {
     }
 
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
-        ASSERT(cash_ >= Money{0.0});
-        ASSERT(asset() >= Money{0.0});
-        if (asset() == Money{0.0}) return 0.0;
+        if (asset().isZero()) return 0.0;
         return cash_ / asset();
     }
 
@@ -135,28 +110,6 @@ class Finance {
     DepositSupplier depositSupplier_;
     Money           cash_;
     const double    cashRatio_;
-};
-
-class FirmFinance final {
-  public:
-    explicit FirmFinance(RandomGenerator& masterRng) noexcept
-        : asset_{masterRng.random(setting::firmInitialAsset)} {}
-
-    template <AfterTaxCalculatorFn F>
-    void endStep(F&& afterTaxCalculator, CensusDropBox& dropBox) noexcept {
-        const auto afterTax = std::forward<F>(afterTaxCalculator)(thisPeriodProfit_);
-        asset_ += afterTax;
-        dropBox.firmAssets.emplace_back(asset_.value());
-        thisPeriodProfit_ = Money{0.0};
-    }
-
-    void assetPlus(const Money plus) noexcept { thisPeriodProfit_ += plus; }
-
-    [[nodiscard]] auto asset() const noexcept -> Money { return asset_ + thisPeriodProfit_; }
-
-  private:
-    Money asset_;
-    Money thisPeriodProfit_{0.0};
 };
 
 class HHoldFinance final {
@@ -190,7 +143,6 @@ class GovernmentFinance final {
 }  // namespace abm::finance
 
 namespace abm {
-using FirmFinance       = finance::FirmFinance;
 using HHoldFinance      = finance::HHoldFinance;
 using GovernmentFinance = finance::GovernmentFinance;
 }  // namespace abm
