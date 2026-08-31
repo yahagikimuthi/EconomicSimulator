@@ -35,7 +35,6 @@ class HHoldFinance final {
 
     void assetPlus(const Money add) noexcept {
         ASSERT(add.isZeroOrMore());
-        // 現金比率が目標以上で、預金に成功した場合早期リターン
         if (currentCashRatio() > cashRatio_) {
             depositSupplier_.deposit(add);
             return;

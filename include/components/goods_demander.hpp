@@ -5,6 +5,7 @@
 #include <utility>
 
 #include "components/common.hpp"
+#include "components/finance/others_finance.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -51,7 +52,7 @@ class Trader final {
         myRequest_ = pickedEntry->request(budget);
     }
 
-    void afterTrade() noexcept {
+    void afterTrade(HHoldFinance& finance) noexcept {
         if (not myRequest_) return;
         ledger_.readTradeResult(
             {.price = myRequest_->price(), .purchaseAmount = myRequest_->tradeAmount()}
@@ -97,7 +98,7 @@ class GoodsDemander final {
         trader_.request(id, budget, market, sampleCnt);
     }
 
-    void afterTrade() noexcept { trader_.afterTrade(); }
+    void afterTrade(HHoldFinance& finance) noexcept { trader_.afterTrade(finance); }
 
     template <AssetMinusFn F>
     void endStep(F&& assetMinus) noexcept {
