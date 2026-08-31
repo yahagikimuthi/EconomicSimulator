@@ -12,10 +12,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
-
-namespace abm::base_goods {
-class Workspace;
-}
+#include "world/base_goods.hpp"
 
 namespace abm::labor {
 class RosterEntry;
@@ -41,7 +38,7 @@ class RosterEntry final {
         ASSERT(Wage.isPositive());
         ASSERT(Id != companyBoard_.firmId);
     }
-    void addInput(const double productPower) noexcept;
+    void addInput(const double productPower) noexcept { workspace_.addInput(productPower); }
     void resign() noexcept { companyBoard_.resign(*this); }
     void disable() noexcept { isOccupied_ = false; }
 
