@@ -47,6 +47,10 @@ class FirmFinance final {
         return cashOut + withdraw + moreCashOut;
     }
 
+    [[nodiscard]] auto tryWithdraw(const Budget sub, const AccountItem item) noexcept -> Money {
+        return tryWithdraw(Money{sub.value()}, item);
+    }
+
     void assetPlus(const Money add, const AccountItem item) noexcept {
         ASSERT(add.isZeroOrMore());
 
@@ -58,18 +62,19 @@ class FirmFinance final {
         cash_ += add;
     }
 
-    [[nodiscard]] auto claimBudget(const Money claim) const noexcept -> Money {
+    [[nodiscard]] auto claimBudget(const Budget claim) const noexcept -> Budget {
         ASSERT(claim.isZeroOrMore());
 
+        const auto balance = static_cast<Budget>(depositSupplier_.balance());
         if (currentCashRatio() > cashRatio_) {
-            const auto cashOut     = std::min(cash_, claim);
+            const auto cashOut     = std::min(static_cast<Budget>(cash_), claim);
             const auto rest        = claim - cashOut;
-            const auto withdraw    = std::min(depositSupplier_.balance(), rest);
+            const auto withdraw    = std::min(balance, rest);
             const auto moreCashOut = rest - withdraw;
             return cashOut + withdraw + moreCashOut;
         }
 
-        const auto withdraw = std::min(depositSupplier_.balance(), claim);
+        const auto withdraw = std::min(balance, claim);
         ASSERT(withdraw <= claim);
         const auto cashOut = claim - withdraw;
         return withdraw + cashOut;

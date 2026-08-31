@@ -43,16 +43,16 @@ class HumanResource final {
     explicit HumanResource(CompanyBoard&& companyBoard) noexcept
         : companyBoard_{std::move(companyBoard)} {}
 
-    [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Money {
+    [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Budget {
         const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
         layOffsPlan_           = layOffsPlan;
         const auto wageSum     = sumWage();
         const auto avgWage     = wageSum.value() / employeeCnt().value();
-        requestedBudget_       = (employeeCnt() - layOffsPlan) * Wage{avgWage};
+        requestedBudget_       = static_cast<Budget>((employeeCnt() - layOffsPlan) * Wage{avgWage});
         return *requestedBudget_;
     }
 
-    void revisePlan(const Money budget) noexcept {
+    void revisePlan(const Budget budget) noexcept {
         ASSERT(requestedBudget_);
         ASSERT(budget <= requestedBudget_);
         if (budget == requestedBudget_) return;
@@ -63,7 +63,7 @@ class HumanResource final {
         layOffsPlan_.emplace(layOffs);
     }
 
-    [[nodiscard]] auto requestedBudget() const noexcept -> Money {
+    [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
         ASSERT(requestedBudget_);
         return *requestedBudget_;
     }
@@ -129,7 +129,7 @@ class HumanResource final {
     CompanyBoard             companyBoard_;
     EmptyRosterPool          emptyRosterPool_;
     std::optional<HeadCount> layOffsPlan_;
-    std::optional<Money>     requestedBudget_;
+    std::optional<Budget>    requestedBudget_;
 };
 }  // namespace abm::labor::demander::human_resource
 

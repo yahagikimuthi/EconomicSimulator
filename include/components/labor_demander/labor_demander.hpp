@@ -22,25 +22,25 @@ class RecruitSystem final {
 
     [[nodiscard]] auto planAndRequestBudget(
         const HeadCount desiredEmploy, const Money salesPerWorker, IMediator auto& mediator
-    ) noexcept -> Money {
+    ) noexcept -> Budget {
         const auto plan = planner_.plan(desiredEmploy, salesPerWorker);
         // TODO ↓0値でも通達されるので、学習しないように修正が必要
         mediator.publishRecruitPlan(plan);
         plan_.emplace(plan);
-        requestedBudget_ = plan.employ * plan.wage;
+        requestedBudget_ = static_cast<Budget>(plan.employ * plan.wage);
         return *requestedBudget_;
     }
 
-    void revisePlan(const Money budget) noexcept {
+    void revisePlan(const Budget budget) noexcept {
         ASSERT(requestedBudget_);
         ASSERT(budget <= requestedBudget_);
         if (budget == requestedBudget_) return;
         if (plan_->employ.isZeroOrLess()) return;
-        const auto wage = budget / plan_->employ;
-        plan_.emplace(wage, plan_->employ, plan_->offer);
+        const auto wage = budget.value() / plan_->employ.value();
+        plan_.emplace(Wage{wage}, plan_->employ, plan_->offer);
     }
 
-    [[nodiscard]] auto requestedBudget() const noexcept -> Money {
+    [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
         ASSERT(requestedBudget_);
         return *requestedBudget_;
     }
@@ -72,7 +72,7 @@ class RecruitSystem final {
     RecruitPlanner             planner_;
     Recruiter                  recruiter_;
     std::optional<RecruitPlan> plan_;
-    std::optional<Money>       requestedBudget_;
+    std::optional<Budget>      requestedBudget_;
 };
 
 class LaborDemander final {
@@ -88,7 +88,7 @@ class LaborDemander final {
 
     [[nodiscard]] auto planAnnualAndRequestBudget(
         const HeadCount adjust, const Money salesForecast
-    ) noexcept -> Money {
+    ) noexcept -> Budget {
         const auto employee            = employeeCnt();
         const auto isEmploying         = not employee.isZero();
         const auto salesPerWorker      = isEmploying ? salesForecast.value() / employee.value()
@@ -101,12 +101,12 @@ class LaborDemander final {
         return recruitSystemBudget + hrBudget;
     }
 
-    void reviseAnnualPlan(const Money budget) noexcept {
+    void reviseAnnualPlan(const Budget budget) noexcept {
         const auto recruitSystemRequested = recruitSystem_.requestedBudget();
         const auto hrRequested            = humanResource_.requestedBudget();
         ASSERT(budget <= recruitSystemRequested + hrRequested);
         if (budget < hrRequested) {
-            recruitSystem_.revisePlan(Money{0.0});
+            recruitSystem_.revisePlan(Budget{0.0});
             humanResource_.revisePlan(budget);
             return;
         }

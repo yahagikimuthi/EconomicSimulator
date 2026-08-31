@@ -29,11 +29,11 @@ class BaseGoodsSupplier final {
         mediator_.subscribeTradeResult(producingSystem_);
     }
 
-    [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Money {
+    [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Budget {
         ASSERT(totalCost.isZeroOrMore());
         const auto supply = producingSystem_.produce();
         tradingSystem_.plan(supply, totalCost, mediator_);
-        return salesForecast();
+        return static_cast<Budget>(salesForecast());
     }
 
     void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }

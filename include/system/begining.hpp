@@ -15,14 +15,14 @@
 namespace abm::begining::detail {
 [[nodiscard]] inline auto laborDemanderAnnualRequestBudget(
     LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier
-) noexcept -> Money {
+) noexcept -> Budget {
     const auto adjust = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
     return laborDemander.planAnnualAndRequestBudget(adjust, goodsSupplier.salesForecast());
 }
 
 [[nodiscard]] inline auto capitalDemanderRequestBudget(
     CapitalDemander& capitalDemander, BaseGoodsSupplier& goodsSupplier
-) noexcept -> Money {
+) noexcept -> Budget {
     const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
 }
@@ -30,14 +30,14 @@ namespace abm::begining::detail {
 inline void distributeAnnualBudget(
     LaborDemander&   laborDemander,
     CapitalDemander& capitalDemander,
-    const Money      budget,
-    const Money      laborDemanderRequest,
-    const Money      capitalDemanderRequest
+    const Budget     budget,
+    const Budget     laborDemanderRequest,
+    const Budget     capitalDemanderRequest
 ) noexcept {
     ASSERT(budget <= laborDemanderRequest + capitalDemanderRequest);
     if (budget < laborDemanderRequest) {
         laborDemander.reviseAnnualPlan(budget);
-        capitalDemander.revisePlan(Money{0.0});
+        capitalDemander.revisePlan(Budget{0.0});
         return;
     }
     laborDemander.reviseAnnualPlan(laborDemanderRequest);
@@ -46,7 +46,7 @@ inline void distributeAnnualBudget(
 
 [[nodiscard]] auto capitalDemanderRequestBudget(
     BaseGoodsSupplier& goodsSupplier, CapitalDemander& capitalDemander
-) noexcept -> Money {
+) noexcept -> Budget {
     const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
 }
@@ -84,17 +84,17 @@ inline void beginingMonth(
     BaseGoodsSupplier& goodsSupplier
 ) noexcept {
     const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
-    const auto sumWage       = laborDemander.sumWage();
+    const auto sumWage       = static_cast<Budget>(laborDemander.sumWage());
     const auto capitalDemanderRequest =
         detail::capitalDemanderRequestBudget(capitalDemander, goodsSupplier);
-    const auto total = sumWage + capitalDemanderRequest - salesForecast;
+    const auto total = static_cast<Budget>(sumWage) + capitalDemanderRequest - salesForecast;
     if (total.isZeroOrLess()) {
         capitalDemander.revisePlan(capitalDemanderRequest);
         return;
     }
     const auto budget = finance.claimBudget(total) + salesForecast;
     ASSERT(budget <= total);
-    capitalDemander.revisePlan(std::max(budget - sumWage, Money{0.0}));
+    capitalDemander.revisePlan(std::max(budget - sumWage, Budget{0.0}));
 }
 
 inline void beginingYear(
@@ -128,7 +128,7 @@ inline void beginingMonth(
     CapitalDemander&   capitalDemander
 ) noexcept {
     const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
-    const auto sumWage       = laborDemander.sumWage();
+    const auto sumWage       = static_cast<Budget>(laborDemander.sumWage());
     const auto capitalDemanderRequest =
         detail::capitalDemanderRequestBudget(goodsSupplier, capitalDemander);
     const auto total = sumWage + capitalDemanderRequest - salesForecast;
@@ -138,15 +138,16 @@ inline void beginingMonth(
     }
     const auto budget = finance.claimBudget(total) + salesForecast;
     ASSERT(budget <= total);
-    capitalDemander.revisePlan(std::max(budget - sumWage, Money{0.0}));
+    capitalDemander.revisePlan(std::max(budget - sumWage, Budget{0.0}));
 }
 
 inline void beginingMonth(
     HHoldFinance& finance, LaborSupplier& laborSupplier, GoodsDemander& goodsDemander
 ) noexcept {
-    const auto wage                 = laborSupplier.wage();
-    const auto goodsDemanderRequest = goodsDemander.planAndRequestBudget(finance.asset() + wage);
-    const auto total                = goodsDemanderRequest - wage;
+    const auto wage = static_cast<Budget>(laborSupplier.wage());
+    const auto goodsDemanderRequest =
+        goodsDemander.planAndRequestBudget(static_cast<Budget>(finance.asset()) + wage);
+    const auto total = goodsDemanderRequest - wage;
     if (total.isZeroOrLess()) {
         goodsDemander.revisePlan(goodsDemanderRequest);
         return;

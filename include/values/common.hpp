@@ -30,6 +30,8 @@ class Budget final : public value_object::BaseValueObject<double>,
 
   public:
     explicit constexpr Budget(const double value) noexcept : BaseValueObject<double>(value) {}
+
+    operator Money() const noexcept = delete("予算とお金は別物！取引には使えない！");
 };
 
 constexpr Money::operator Budget() const noexcept { return Budget{value_}; }
