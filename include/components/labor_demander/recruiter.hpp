@@ -100,10 +100,14 @@ class Recruiter final {
 
     void offer() noexcept {
         if (not isPosting()) return;
-        auto entryBox = packEntry();
-        if (entryBox.empty()) return;
+        auto entries = myRequest_->entries();
+        if (entries.empty()) return;
+        if (HeadCount{entries.size()} < ledger_.remainOffer()) {
+            offerAll();
+            return;
+        }
 
-        auto applicants = sortApplicants(ledger_.remainOffer(), entryBox) |
+        auto applicants = sortApplicants(ledger_.remainOffer(), entries) |
                           std::views::take(ledger_.remainOffer().value());
 
         auto offerCnt = HeadCount{0.0};
@@ -114,7 +118,7 @@ class Recruiter final {
             ++offerCnt;
         }
 
-        ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entryBox.size()}});
+        ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entries.size()}});
     }
 
     void registerMember(AddRosterFn auto&& addRoster) noexcept {
@@ -122,7 +126,7 @@ class Recruiter final {
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
         for (auto& acceptApplicant : acceptApplicants) {
-            acceptApplicant.setRoster(addRoster(acceptApplicant.hholdID, myRequest_->wage));
+            acceptApplicant.setRoster(addRoster(acceptApplicant.entrantId, myRequest_->wage));
             ++employCnt;
         }
         ledger_.readEmployResult({.employ = employCnt});
@@ -142,6 +146,17 @@ class Recruiter final {
 
   private:
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myRequest_.has_value(); }
+
+    void offerAll() noexcept {
+        auto entries = myRequest_->entries();
+        for (auto& entry : entries) entry.offer();
+        const auto applicant = HeadCount{entries.size()};
+        ledger_.readOfferResult({.offer = applicant, .applicants = applicant});
+    }
+
+    void offerPart() noexcept {
+        std::vector<RefWrap<Entry>> {}
+    }
 
     [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {
         ASSERT(myRequest_);
