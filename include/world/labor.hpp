@@ -141,6 +141,7 @@ class Market final {
         ASSERT(out.empty());
         if (out.max_size() >= requests_.size()) {
             packAllRequest(requestorId, out);
+            return;
         }
         packPartRequest(requestorId, out, rng);
     }
