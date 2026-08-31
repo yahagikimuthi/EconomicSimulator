@@ -106,19 +106,7 @@ class Recruiter final {
             offerAll();
             return;
         }
-
-        auto applicants = sortApplicants(ledger_.remainOffer(), entries) |
-                          std::views::take(ledger_.remainOffer().value());
-
-        auto offerCnt = HeadCount{0.0};
-        for (auto entryRef : applicants) {
-            auto& entry = entryRef.get();
-            entry.offer();
-            offerApplicants_.add(entry);
-            ++offerCnt;
-        }
-
-        ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entries.size()}});
+        offerPart();
     }
 
     void registerMember(AddRosterFn auto&& addRoster) noexcept {
@@ -155,15 +143,28 @@ class Recruiter final {
     }
 
     void offerPart() noexcept {
-        std::vector<RefWrap<Entry>> {}
+        auto entries         = packEntry();
+        auto offerApplicants = sortApplicants(ledger_.remainOffer(), entries) |
+                               std::views::take(ledger_.remainOffer().value());
+
+        auto offerCnt = HeadCount{0.0};
+        for (auto entryRef : offerApplicants) {
+            auto& entry = entryRef.get();
+            entry.offer();
+            offerApplicants_.add(entry);
+            ++offerCnt;
+        }
+
+        ledger_.readOfferResult({.offer = offerCnt, .applicants = HeadCount{entries.size()}});
     }
 
     [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {
         ASSERT(myRequest_);
-        static thread_local auto box = std::vector<RefWrap<Entry>>{};
-        box.clear();
-        myRequest_->packEntry(box);
-        return box;
+        static thread_local auto refs = std::vector<RefWrap<Entry>>{};
+        refs.clear();
+        auto entries = myRequest_->entries();
+        for (auto& entry : entries) refs.emplace_back(std::ref(entry));
+        return refs;
     }
 
     [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) noexcept -> bool {
