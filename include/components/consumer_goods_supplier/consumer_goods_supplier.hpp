@@ -62,7 +62,7 @@ class ConsumerGoodsSupplier final {
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     void addCapitalEquip(const GoodsQuantity capital) noexcept {
-        ASSERT(capital >= GoodsQuantity{0.0});
+        ASSERT(capital.isZeroOrMore());
         producingSystem_.addProducingEquip(capital);
     }
 

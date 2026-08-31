@@ -64,7 +64,7 @@ class RosterEntry final {
 auto CompanyBoard::addRoster(
     const AgentID id, const Wage wage, base_goods::Workspace& workspace
 ) noexcept -> RosterEntry& {
-    ASSERT(wage > Wage{0.0});
+    ASSERT(wage.isPositive());
     return roster.emplace_back(id, wage, *this, workspace);
 }
 

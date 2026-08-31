@@ -38,11 +38,11 @@ class OfferPlannerMemory final {
     void clearLog() noexcept { employResult_.clearLog(), employPlan_.clearLog(); }
     void reset() noexcept { employResult_.reset(), employPlan_.reset(); }
     void listenEmployPlan(const HeadCount employPlan) noexcept {
-        ASSERT(employPlan >= HeadCount{0.0});
+        ASSERT(employPlan.isZeroOrMore());
         employPlan_.next(employPlan);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
-        ASSERT(result.employ >= HeadCount{0.0});
+        ASSERT(result.employ.isZeroOrMore());
         employResult_.next(result.applicants);
     }
 
@@ -82,7 +82,7 @@ class OfferPlanner final {
         if (not nextRate) return rateCache_.cache();
         rateCache_.next(*nextRate);
 
-        ASSERT(*nextRate > OfferRate{0.0});
+        ASSERT(*nextRate.isPositive());
         return *nextRate;
     }
 

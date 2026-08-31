@@ -116,7 +116,7 @@ class LaborDemander final {
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         const auto out = humanResource_.employeeCnt();
-        ASSERT(out >= HeadCount{0.0});
+        ASSERT(out.isZeroOrMore());
         return out;
     }
 
@@ -142,7 +142,7 @@ class LaborDemander final {
 
     [[nodiscard]] auto sumWage() const noexcept -> Money {
         const auto out = humanResource_.sumWage();
-        ASSERT(out >= Wage{0.0});
+        ASSERT(out.isZeroOrMore());
         return static_cast<Money>(out);
     }
 

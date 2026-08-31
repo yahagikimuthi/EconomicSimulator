@@ -66,8 +66,8 @@ class Market final {
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
-        ASSERT(price > Price{0.0});
-        ASSERT(supply > GoodsQuantity{0.0});
+        ASSERT(price.isPositive());
+        ASSERT(supply.isPositive());
         totalSupply_.fetch_add(supply.value());
         return *entries_.emplace_back(id, price, supply);
     }

@@ -21,7 +21,7 @@ class PricePlanner final {
     [[nodiscard]] auto plan(
         const GoodsQuantity supply, const MarkupRate markup, const Money totalCost
     ) const noexcept -> Price {
-        ASSERT(supply >= GoodsQuantity{0.0});
+        ASSERT(supply.isZeroOrMore());
         ASSERT(markup > MarkupRate{0.0});
         ASSERT(totalCost >= Money{0.0});
 
@@ -60,7 +60,7 @@ class DemandForecastManagerMemory final {
     void clearLog() noexcept { totalDemand_.clearLog(); }
     void reset() noexcept { totalDemand_.reset(); }
     void listenTradeResult(const TradeResult& result) noexcept {
-        ASSERT(result.totalDemand >= GoodsQuantity{0.0});
+        ASSERT(result.totalDemand.isZeroOrMore());
         totalDemand_.next(result.totalDemand);
     }
 
@@ -84,7 +84,7 @@ class DemandForecastManager final {
         if (not next) return cache_.cache();
         cache_.next(*next);
 
-        ASSERT(*next >= GoodsQuantity{0.0});
+        ASSERT(*next.isZeroOrMore());
         return *next;
     }
 

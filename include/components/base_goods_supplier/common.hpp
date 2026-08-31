@@ -63,8 +63,8 @@ class CentralMemory final {
     CentralMemory() noexcept = default;
 
     void listenTradePlan(const TradePlan& plan) noexcept {
-        ASSERT(plan.price >= Price{0.0});
-        ASSERT(plan.supply >= GoodsQuantity{0.0});
+        ASSERT(plan.price.isZeroOrMore());
+        ASSERT(plan.supply.isZeroOrMore());
         pricePlan_  = plan.price;
         supplyPlan_ = plan.supply;
     }

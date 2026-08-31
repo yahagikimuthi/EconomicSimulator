@@ -68,24 +68,24 @@ class CentralMemory final {
 
     void logging(CensusDropBox& dropBox) noexcept {
         if (employPlan_) {
-            ASSERT(employPlan_ >= HeadCount{0.0});
+            ASSERT(employPlan_.isZeroOrMore());
             dropBox.postedEmployments.emplace_back(employPlan_->value());
             employPlan_.reset();
         }
         if (wagePlan_) {
-            ASSERT(wagePlan_ >= Wage{0.0});
+            ASSERT(wagePlan_.isZeroOrMore());
             dropBox.postedWages.emplace_back(wagePlan_->value());
             wagePlan_.reset();
         }
     }
 
     void listenEmployPlan(const HeadCount employPlan) noexcept {
-        ASSERT(employPlan >= HeadCount{0.0});
+        ASSERT(employPlan.isZeroOrMore());
         employPlan_ = employPlan;
     }
 
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
-        ASSERT(plan.wage >= Wage{0.0});
+        ASSERT(plan.wage.isZeroOrMore());
         wagePlan_ = plan.wage;
     }
 

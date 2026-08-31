@@ -23,9 +23,9 @@ class Trader final {
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void post(const AgentID id, const TradePlan& plan, Market& market) noexcept {
-        ASSERT(plan.supply >= GoodsQuantity{0.0});
+        ASSERT(plan.supply.isZeroOrMore());
         isActive_ = true;
-        if (plan.supply == GoodsQuantity{0.0}) return;
+        if (plan.supply.isZero()) return;
         myEntry_ = market.entry(id, plan.price, plan.supply);
         ledger_.makeNewPage(plan.supply);
     }
@@ -34,7 +34,7 @@ class Trader final {
         if (not isPosting()) return;
         auto       requestBox = requestBoxRef();
         const auto demand     = myEntry_->totalDemand();
-        if (demand == GoodsQuantity{0.0}) return;
+        if (demand.isZero()) return;
         const auto tradeAmount    = ledger_.tradableAmount(demand);
         const auto isExcessDemand = ledger_.isExcessDemand(demand);
         isExcessDemand ? performRationedTrade(requestBox) : myEntry_->performFullTrade();

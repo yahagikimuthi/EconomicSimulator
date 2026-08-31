@@ -27,12 +27,12 @@ class MarkupPlannerMemory final {
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
-        ASSERT(result.soldAmount >= GoodsQuantity{0.0});
+        ASSERT(result.soldAmount.isZeroOrMore());
         salesAmount_.next(result.soldAmount);
     }
 
     void listenTradePlan(const TradePlan& plan) noexcept {
-        ASSERT(plan.supply >= GoodsQuantity{0.0});
+        ASSERT(plan.supply.isZeroOrMore());
         supply_.next(plan.supply);
     }
 
@@ -79,7 +79,7 @@ class MarkupPlanner final {
         const auto lastSupply      = memory_.lastSupply();
         const auto lastSalesAmount = memory_.lastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
-        ASSERT(*lastSupply >= GoodsQuantity{0.0});
+        ASSERT(*lastSupply.isZeroOrMore());
         const auto inventory  = *lastSupply - *lastSalesAmount;
         const auto isSupplied = *lastSupply != GoodsQuantity{0.0};
         const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio : true;

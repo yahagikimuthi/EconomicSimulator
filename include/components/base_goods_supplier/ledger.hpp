@@ -17,33 +17,33 @@ class Ledger final {
     Ledger() noexcept = default;
 
     void makeNewPage(const GoodsQuantity supply) noexcept {
-        ASSERT(supply >= GoodsQuantity{0.0});
+        ASSERT(supply.isZeroOrMore());
         supply_    = supply;
         inventory_ = supply;
     }
 
     [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity {
-        ASSERT(inventory_ >= GoodsQuantity{0.0});
+        ASSERT(inventory_.isZeroOrMore());
         return inventory_;
     }
 
     [[nodiscard]] auto tradableAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
-        ASSERT(demand >= GoodsQuantity{0.0});
+        ASSERT(demand.isZeroOrMore());
 
         const auto out = min(inventory_, demand);
-        ASSERT(out >= GoodsQuantity{0.0});
+        ASSERT(out.isZeroOrMore());
         return out;
     }
 
     [[nodiscard]] auto isExcessDemand(const GoodsQuantity demand) const noexcept -> bool {
-        ASSERT(demand >= GoodsQuantity{0.0});
+        ASSERT(demand.isZeroOrMore());
         return demand > inventory_;
     }
 
     void readResult(const ATradeResult& result) noexcept {
-        ASSERT(result.salesAmount >= GoodsQuantity{0.0});
-        ASSERT(result.price >= Price{0.0});
-        ASSERT(result.demand >= GoodsQuantity{0.0});
+        ASSERT(result.salesAmount.isZeroOrMore());
+        ASSERT(result.price.isZeroOrMore());
+        ASSERT(result.demand.isZeroOrMore());
 
         inventory_ -= result.salesAmount;
         currentSales_ += result.price * result.salesAmount;
@@ -58,9 +58,9 @@ class Ledger final {
             .sales        = currentSales_
         };
 
-        ASSERT(out.soldAmount >= GoodsQuantity{0.0});
-        ASSERT(out.unsoldAmount >= GoodsQuantity{0.0});
-        ASSERT(out.totalDemand >= GoodsQuantity{0.0});
+        ASSERT(out.soldAmount.isZeroOrMore());
+        ASSERT(out.unsoldAmount.isZeroOrMore());
+        ASSERT(out.totalDemand.isZeroOrMore());
         ASSERT(out.sales >= Money{0.0});
         return out;
     }

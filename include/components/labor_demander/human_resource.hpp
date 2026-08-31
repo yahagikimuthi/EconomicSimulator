@@ -72,7 +72,7 @@ class HumanResource final {
         ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
         const auto rosterSize = companyBoard_.roster.size() - emptyRosterPool_.size();
         const auto out        = HeadCount{rosterSize};
-        ASSERT(out >= HeadCount{0.0});
+        ASSERT(out.isZeroOrMore());
         return out;
     }
 
@@ -91,7 +91,7 @@ class HumanResource final {
     [[nodiscard]] auto addRoster(
         const AgentID id, const Wage wage, base_goods::Workspace& workspace
     ) noexcept -> RosterEntry& {
-        ASSERT(wage > Wage{0.0});
+        ASSERT(wage.isPositive());
 
         if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
         auto* newRoster = &emptyRosterPool_.popBackEntry();
@@ -113,7 +113,7 @@ class HumanResource final {
 
     void layOffs() noexcept {
         const auto layOffsCnt = layOffsPlan_;
-        ASSERT(layOffsCnt >= HeadCount{0.0});
+        ASSERT(layOffsCnt.isZeroOrMore());
 
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : companyBoard_.roster) {

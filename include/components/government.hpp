@@ -70,7 +70,7 @@ class Government final {
     }
 
     [[nodiscard]] auto provideUnemploymentBenefit(const Wage wage) noexcept -> Money {
-        if (wage > Wage{0.0}) return Money{0.0};
+        if (wage.isPositive()) return Money{0.0};
         if (finance_.asset() <= Money{0.0}) return Money{0.0};
         ++nextUnemploymentHHoldCnt_;
         const auto cnt     = (lastUnemploymentHHoldCnt_ != 0) ? lastUnemploymentHHoldCnt_ : 1;

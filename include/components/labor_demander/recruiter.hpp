@@ -44,25 +44,25 @@ class Ledger final {
     Ledger() = default;
 
     void makeNewPage(const HeadCount offerPlan) noexcept {
-        ASSERT(offerPlan >= HeadCount{0.0});
+        ASSERT(offerPlan.isZeroOrMore());
         remainOffer_ = offerPlan;
     }
 
     [[nodiscard]] auto remainOffer() const noexcept -> HeadCount {
-        ASSERT(remainOffer_ >= HeadCount{0.0});
+        ASSERT(remainOffer_.isZeroOrMore());
         return remainOffer_;
     }
 
     void readOfferResult(const OfferResult& result) noexcept {
-        ASSERT(result.offer >= HeadCount{0.0});
-        ASSERT(result.applicants >= HeadCount{0.0});
+        ASSERT(result.offer.isZeroOrMore());
+        ASSERT(result.applicants.isZeroOrMore());
 
         remainOffer_ -= result.offer;
         applicants_ += result.applicants;
     }
 
     void readEmployResult(const EmployResult add) noexcept {
-        ASSERT(add.employ >= HeadCount{0.0});
+        ASSERT(add.employ.isZeroOrMore());
         employ_ += add.employ;
     }
 
@@ -71,13 +71,11 @@ class Ledger final {
     }
 
     void reset() noexcept {
-        ASSERT(remainOffer_ >= HeadCount{0.0});
-        ASSERT(applicants_ >= HeadCount{0.0});
-        ASSERT(employ_ >= HeadCount{0.0});
+        ASSERT(remainOffer_.isZeroOrMore());
+        ASSERT(applicants_.isZeroOrMore());
+        ASSERT(employ_.isZeroOrMore());
 
-        remainOffer_ = HeadCount{0.0};
-        applicants_  = HeadCount{0.0};
-        employ_      = HeadCount{0.0};
+        remainOffer_ = applicants_ = employ_ = HeadCount{0.0};
     }
 
   private:
@@ -92,7 +90,7 @@ class Recruiter final {
 
     void post(const AgentID id, const RecruitPlan& plan, Market& laborMarket) noexcept {
         isActive_ = true;
-        ASSERT(plan.wage >= Wage{0.0});
+        ASSERT(plan.wage.isZeroOrMore());
         if (not shouldPost(plan)) return;
         ledger_.makeNewPage(plan.offer);
         myRequest_ = laborMarket.request(id, plan.wage);
@@ -168,13 +166,13 @@ class Recruiter final {
     }
 
     [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) noexcept -> bool {
-        return plan.offer > HeadCount{0.0};
+        return plan.offer.isPositive();
     }
 
     [[nodiscard]] static auto sortApplicants(
         const HeadCount offer, const std::span<RefWrap<Entry>> entryBox
     ) noexcept -> std::span<RefWrap<Entry>> {
-        ASSERT(offer >= HeadCount{0.0});
+        ASSERT(offer.isZeroOrMore());
 
         const auto k      = std::min(entryBox.size(), static_cast<std::size_t>(offer.value()));
         const auto isOver = entryBox.size() > static_cast<std::size_t>(offer.value());

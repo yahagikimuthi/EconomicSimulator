@@ -43,7 +43,7 @@ class CapitalSupplier final {
     void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
-        ASSERT(employee >= HeadCount{0.0});
+        ASSERT(employee.isZeroOrMore());
 
         const auto targetSupply = tradingSystem_.requiresSupply();
         return producingSystem_.calcDesiredEmploy(targetSupply, employee);
