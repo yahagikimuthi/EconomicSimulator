@@ -63,8 +63,8 @@ concept ReadResultFn = requires(F f, const TradeResult& result) {
 };
 
 class CapitalDemander final {
-    using Request = CapitalRequest;
-    using Market  = CapitalMarket;
+    using Request = Request;
+    using Market  = Market;
 
   public:
     explicit CapitalDemander(RandomGenerator& masterRng) noexcept

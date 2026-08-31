@@ -11,10 +11,10 @@
 #include "values/goods.hpp"
 
 namespace abm::capital {
-class CapitalEntry;
-class CapitalRequest final {
+class Entry;
+class Request final {
   public:
-    CapitalRequest(const GoodsQuantity a, const CapitalEntry& e) noexcept : amount{a}, entry{e} {
+    Request(const GoodsQuantity a, const Entry& e) noexcept : amount{a}, entry{e} {
         ASSERT(a.isZeroOrMore());
     }
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
@@ -26,17 +26,15 @@ class CapitalRequest final {
     }
 
     const GoodsQuantity amount;
-    const CapitalEntry& entry;
+    const Entry&        entry;
 
   private:
     GoodsQuantity tradeAmount_{0.0};
 };
 
-class CapitalEntry final {
-    using Request = CapitalRequest;
-
+class Entry final {
   public:
-    CapitalEntry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
+    Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
         : id{i}, price{p}, supply{s} {}
     [[nodiscard]] auto request(const GoodsQuantity amount) noexcept -> Request& {
         return *requestBox_.emplace_back(amount, *this);
@@ -71,11 +69,9 @@ class CapitalEntry final {
     tbb::concurrent_vector<Request> requestBox_;
 };
 
-class CapitalMarket final {
-    using Entry = CapitalEntry;
-
+class Market final {
   public:
-    CapitalMarket() noexcept = default;
+    Market() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> Entry& {
@@ -114,5 +110,5 @@ class CapitalMarket final {
 }  // namespace abm::capital
 
 namespace abm {
-using CapitalMarket = capital::CapitalMarket;
+using CapitalMarket = capital::Market;
 }

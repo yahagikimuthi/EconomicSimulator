@@ -6,9 +6,7 @@
 #include "world/capital.hpp"
 
 namespace abm::capital::supplier {
-inline void supplyCapital(
-    const AgentID id, CapitalSupplier& supplier, CapitalMarket& market
-) noexcept {
+inline void supplyCapital(const AgentID id, CapitalSupplier& supplier, Market& market) noexcept {
     supplier.post(id, market);
 }
 
@@ -19,9 +17,7 @@ inline void afterCapitalTrade(CapitalDemander& demander) noexcept { demander.aft
 }  // namespace abm::capital::supplier
 
 namespace abm::capital::demander {
-inline void purchaseCapital(
-    const AgentID id, CapitalDemander& demander, CapitalMarket& market
-) noexcept {
+inline void purchaseCapital(const AgentID id, CapitalDemander& demander, Market& market) noexcept {
     demander.request(id, market);
 }
 }  // namespace abm::capital::demander
