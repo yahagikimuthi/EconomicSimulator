@@ -144,6 +144,15 @@ inline void beginingMonth(
 inline void beginingMonth(
     HHoldFinance& finance, LaborSupplier& laborSupplier, GoodsDemander& goodsDemander
 ) noexcept {
-    const auto goodsDemanderRequest =
+    const auto wage                 = laborSupplier.wage();
+    const auto goodsDemanderRequest = goodsDemander.planAndRequestBudget(finance.asset() + wage);
+    const auto total                = goodsDemanderRequest - wage;
+    if (total.isZeroOrLess()) {
+        goodsDemander.revisePlan(goodsDemanderRequest);
+        return;
+    }
+    const auto budget = finance.claimBudget(total) + wage;
+    ASSERT(budget <= goodsDemanderRequest);
+    goodsDemander.revisePlan(budget);
 }
 }  // namespace abm::begining
