@@ -72,7 +72,7 @@ class Request;
 class Entry final {
   public:
     Entry(const AgentID Id, const double power, const Request& req) noexcept
-        : requestorId{Id}, productPower{power}, request{req} {
+        : entrantId{Id}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
     Entry(const Entry&)                             = delete;
@@ -81,7 +81,7 @@ class Entry final {
     auto operator=(Entry&&) noexcept -> Entry&      = delete;
     ~Entry() noexcept                               = default;
 
-    const AgentID requestorId;
+    const AgentID entrantId;
     const double  productPower;
 
     void offer() noexcept { isOffer_ = true; }

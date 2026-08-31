@@ -10,10 +10,6 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::demander {
-using Entry   = Entry;
-using Request = Request;
-using Market  = Market;
-
 template <typename F>
 concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;

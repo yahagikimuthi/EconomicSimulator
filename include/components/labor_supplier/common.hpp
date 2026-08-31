@@ -5,10 +5,6 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
-using Entry   = Entry;
-using Request = Request;
-using Market  = Market;
-
 template <typename F>
 concept IsAlignedFn = requires(F f, const Request& request) {
     { f(request) } -> std::same_as<bool>;
