@@ -9,6 +9,7 @@
 #include "others/util.hpp"
 #include "system/begining.hpp"
 #include "system/capital.hpp"
+#include "system/goods.hpp"
 #include "system/labor.hpp"
 #include "values/date.hpp"
 #include "world/base_goods.hpp"
@@ -174,7 +175,15 @@ class Engine final {
         }
     }
 
-    void runGoods() noexcept {}
+    void runGoods() noexcept {
+        using namespace goods;
+        for (auto& firm : consumerFirms_) {
+            supplier::supply(firm.id, firm.goodsSupplier, goodsMarket_);
+        }
+        for (auto& hhold : hholds_) {
+            demander::purchase(hhold.id, hhold.finance, hhold.goodsDemander, goodsMarket_);
+        }
+    }
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
