@@ -6,7 +6,7 @@
 #include "values/common.hpp"
 #include "values/goods.hpp"
 
-namespace abm::goods::supplier {
+namespace abm::base_goods::supplier {
 struct ATradeResult final {
     const Price         price;
     const GoodsQuantity demand;
@@ -14,8 +14,6 @@ struct ATradeResult final {
 };
 
 class Ledger final {
-    using TradeResult = base_goods::supplier::TradeResult;
-
   public:
     Ledger() noexcept = default;
 
@@ -81,4 +79,4 @@ class Ledger final {
     Money         currentSales_{0.0};
     GoodsQuantity totalDemand_{0.0};
 };
-}  // namespace abm::goods::supplier
+}  // namespace abm::base_goods::supplier
