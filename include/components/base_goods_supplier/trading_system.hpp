@@ -4,7 +4,6 @@
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "components/base_goods_supplier/trader.hpp"
 #include "components/common.hpp"
-#include "components/finance/firm_finance.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
@@ -40,7 +39,10 @@ class TradingSystem final {
         trader_.post(id, *plan_, market);
     }
 
-    void trade(FirmFinance& finance) noexcept { trader_.trade(finance); }
+    template <DepositFn F>
+    void trade(F&& depositFn) noexcept {
+        trader_.trade(std::forward<F>(depositFn));
+    }
 
     void endStep(AssetPlusFn auto&& assetPlus, IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();

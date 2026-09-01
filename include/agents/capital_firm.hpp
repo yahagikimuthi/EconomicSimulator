@@ -116,7 +116,9 @@ class CapitalFirm final {
 
     void actAfterOperationDay() noexcept { capitalDemander_.afterTrade(finance_); }
 
-    void actNothingDay() noexcept;
+    void actNothingDay() noexcept {
+        capitalSupplier_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
+    }
 
     FirmFinance     finance_;
     LaborDemander   labor_;

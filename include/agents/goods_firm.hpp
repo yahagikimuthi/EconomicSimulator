@@ -118,7 +118,9 @@ class GoodsFirm final {
 
     void actBeforeOperationDay() noexcept;
 
-    void actNothingDay() noexcept { goods_.trade(finance_); }
+    void actNothingDay() noexcept {
+        goods_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
+    }
 
     FirmFinance     finance_;
     LaborDemander   labor_;

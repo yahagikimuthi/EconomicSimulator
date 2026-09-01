@@ -3,11 +3,12 @@
 #include <optional>
 #include <ranges>
 #include <span>
+#include <utility>
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/ledger.hpp"
-#include "components/finance/firm_finance.hpp"
+#include "components/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -36,13 +37,15 @@ class Trader final {
         ledger_.makeNewPage(plan.supply);
     }
 
-    void trade(FirmFinance& finance) noexcept {
+    template <DepositFn F>
+    void trade(F&& depositFn) noexcept {
         if (not isPosting()) return;
         const auto demand = calcTotalDemand();
         if (demand.isZero()) return;
         const auto tradeAmount    = ledger_.tradableAmount(demand);
         const auto isExcessDemand = ledger_.isExcessDemand(demand);
-        isExcessDemand ? performRationedTrade(finance) : performFullTrade(finance);
+        isExcessDemand ? performRationedTrade(std::forward<F>(depositFn))
+                       : performFullTrade(std::forward<F>(depositFn));
         ledger_.readResult({.price = myEntry_->price, .demand = demand, .salesAmount = tradeAmount}
         );
     }
@@ -70,7 +73,7 @@ class Trader final {
         );
     }
 
-    void performRationedTrade(FirmFinance& finance) noexcept {
+    void performRationedTrade(DepositFn auto&& depositFn) noexcept {
         auto requests = packRequest();
         rng_.shuffle(requests);
 
@@ -80,11 +83,11 @@ class Trader final {
             const auto reqAmount = req.payment() / myEntry_->price;
             if (remainAmount <= reqAmount) {
                 const auto sales = req.trade(remainAmount);
-                finance.deposit(sales, FirmFinance::AccountItem::Sales);
+                depositFn(sales);
                 return;
             }
             const auto sales = req.trade(reqAmount);
-            finance.deposit(sales, FirmFinance::AccountItem::Sales);
+            depositFn(sales);
             remainAmount -= reqAmount;
         }
     }
@@ -100,11 +103,11 @@ class Trader final {
         return refs;
     }
 
-    void performFullTrade(FirmFinance& finance) noexcept {
+    void performFullTrade(DepositFn auto&& depositFn) noexcept {
         for (auto& request : myEntry_->requests()) {
             const auto tradeAmount = request.payment() / myEntry_->price;
             const auto sales       = request.trade(tradeAmount);
-            finance.deposit(sales, FirmFinance::AccountItem::Sales);
+            depositFn(sales);
         }
     }
 

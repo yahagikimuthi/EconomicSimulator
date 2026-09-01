@@ -7,7 +7,6 @@
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/base_goods_supplier/trading_system.hpp"
 #include "components/common.hpp"
-#include "components/finance/firm_finance.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 #include "values/labor.hpp"
@@ -69,7 +68,10 @@ class BaseGoodsSupplier final {
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
-    void trade(FirmFinance& finance) noexcept { tradingSystem_.trade(finance); }
+    template <DepositFn F>
+    void trade(F&& depositFn) noexcept {
+        tradingSystem_.trade(std::forward<F>(depositFn));
+    }
 
     void addCapitalEquip(const GoodsQuantity capital) noexcept {
         producingSystem_.addProducingEquip(capital);
