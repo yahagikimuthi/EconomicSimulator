@@ -84,13 +84,12 @@ class GoodsFirm final {
         const auto budget = finance_.claimBudget(total) + salesPlan;
         ASSERT(budget <= laborCost + capitalBudgetReq);
 
-        if (budget.isZeroOrLess()) {
+        if (budget.isZeroOrLess())
             capital_.revisePlan(capitalBudgetReq);
-        } else if (budget < laborCost) {
+        else if (budget < laborCost)
             capital_.revisePlan(Budget{0.0});
-        } else {
+        else
             capital_.revisePlan(budget - laborCost);
-        }
 
         const auto month = date.month();
         ASSERT(month > 1);
