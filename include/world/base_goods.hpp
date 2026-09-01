@@ -48,11 +48,9 @@ class Workspace final {
 };
 
 template <EMarket MarketT>
-    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Entry;
 
 template <EMarket MarketT>
-    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Request final {
   public:
     using Entry = Entry<MarketT>;
@@ -85,7 +83,6 @@ class Request final {
 };
 
 template <EMarket MarketT>
-    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Entry final {
     using Request = Request<MarketT>;
 
@@ -107,7 +104,6 @@ class Entry final {
 };
 
 template <EMarket MarketT>
-    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 [[nodiscard]] inline auto Request<MarketT>::trade(const GoodsQuantity tradeAmount
 ) noexcept -> Money {
     ASSERT(tradeAmount_.isZero());
@@ -120,7 +116,6 @@ template <EMarket MarketT>
 }
 
 template <EMarket MarketT>
-    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 [[nodiscard]] inline auto Request<MarketT>::price() const noexcept -> Price {
     return entry_.price;
 }
