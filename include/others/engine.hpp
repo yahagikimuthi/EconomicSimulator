@@ -154,9 +154,9 @@ class Engine final {
 
     Logger logger_;
 
-    std::vector<HHold> hholds_;
-    std::vector<Firm>  consumerFirms_;
-    std::vector<Firm>  capitalFirms_;
+    std::vector<HHold>     hholds_;
+    std::vector<GoodsFirm> consumerFirms_;
+    std::vector<GoodsFirm> capitalFirms_;
 
     LaborMarket     laborMarket_;
     BaseGoodsMarket goodsMarket_;
