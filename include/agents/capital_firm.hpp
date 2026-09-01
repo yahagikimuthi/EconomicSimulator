@@ -92,6 +92,12 @@ class CapitalFirm final {
         capitalSupplier_.post(id_, markets.capitalMarket);
     }
 
+    void actBeforeOperationDay() noexcept;
+
+    void actAfterOperationDay() noexcept { capitalDemander_.afterTrade(finance_); }
+
+    void actNothingDay() noexcept;
+
     FirmFinance     finance_;
     LaborDemander   labor_;
     CapitalDemander capitalDemander_;
