@@ -26,6 +26,9 @@ class AgentRegistry final {
     void reserve(const std::size_t n) noexcept { agents_.reserve(n); }
 
     template <typename Type, typename... Args>
+        requires requires(Args... args, std::vector<Agent> agents) {
+            agents.emplace_back(std::in_place_type<Type>, args...);
+        }
     void emplaceBack(Args&&... args) noexcept {
         agents_.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
     }
