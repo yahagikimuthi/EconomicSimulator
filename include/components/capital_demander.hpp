@@ -5,7 +5,6 @@
 #include <optional>
 
 #include "components/common.hpp"
-#include "components/finance/firm_finance.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -44,15 +43,15 @@ class CapitalDemander final {
         if (not pickedEntry) return;
         const auto payment =
             std::min(static_cast<Budget>(*purchaseAmountPlan_ * pickedEntry->price), *budget_);
-        const auto withdraw =
-            std::forward<F>(withdrawFn)(payment, FirmFinance::AccountItem::CapitalGoodsCost);
-        myRequest_ = pickedEntry->request(withdraw);
+        const auto withdraw = std::forward<F>(withdrawFn)(payment);
+        myRequest_          = pickedEntry->request(withdraw);
     }
 
-    void afterTrade(FirmFinance& finance) noexcept {
+    template <DepositFn F>
+    void afterTrade(F&& depositFn) noexcept {
         if (not myRequest_) return;
         const auto remain = myRequest_->remainPaid();
-        finance.deposit(remain, FirmFinance::AccountItem::CapitalGoodsCost);
+        std::forward<F>(depositFn)(remain);
     }
 
   private:
