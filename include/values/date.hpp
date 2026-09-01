@@ -19,6 +19,16 @@ class Date final {
     [[nodiscard]] constexpr auto operator==(const Date&) const noexcept -> bool  = default;
 
     [[nodiscard]] constexpr auto isBeginingYear() const noexcept -> bool { return year_ == 1U; }
+
+    [[nodiscard]] constexpr auto toFlatTime() const noexcept -> int {
+        const auto yearIdx   = year_ - 1;
+        const auto monthIdx  = month_ - 1;
+        const auto dayIdx    = day_ - 1;
+        const auto flatMonth = (yearIdx * setting::monthInYear) + monthIdx;
+        const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx;
+        return flatDay;
+    }
+
     [[nodiscard]] constexpr auto isSameDay(const int day) const noexcept -> bool {
         return day == day_;
     }
