@@ -46,7 +46,7 @@ class GoodsFirm final {
         const auto salesPlan = goods_.planAndExpectSales(totalCost);
 
         const auto desiredCapital   = goods_.requiresCapital();
-        const auto capitalBudgetReq = capital_.requestBudget(desiredCapital);
+        const auto capitalBudgetReq = capital_.planBudget(desiredCapital);
 
         const auto total = laborBudgetReq + capitalBudgetReq - salesPlan;
         if (total.isZeroOrLess()) {
@@ -81,7 +81,7 @@ class GoodsFirm final {
         const auto salesPlan = goods_.planAndExpectSales(totalCost);
 
         const auto desiredCapital   = goods_.requiresCapital();
-        const auto capitalBudgetReq = capital_.requestBudget(desiredCapital);
+        const auto capitalBudgetReq = capital_.planBudget(desiredCapital);
 
         const auto total  = laborCost + capitalBudgetReq - salesPlan;
         const auto budget = finance_.claimBudget(total) + salesPlan;

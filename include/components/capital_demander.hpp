@@ -23,7 +23,7 @@ class CapitalDemander final {
     explicit CapitalDemander(RandomGenerator& masterRng) noexcept
         : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    [[nodiscard]] auto requestBudget(const GoodsQuantity desiredAmount) noexcept -> Budget {
+    [[nodiscard]] auto planBudget(const GoodsQuantity desiredAmount) noexcept -> Budget {
         const auto avgPrice = log_.purchase / log_.tradeAmount;
         purchaseAmountPlan_ = desiredAmount;
         budget_             = static_cast<Budget>(avgPrice * desiredAmount);
@@ -31,8 +31,6 @@ class CapitalDemander final {
     }
 
     void revisePlan(const Budget budget) noexcept { budget_ = budget; }
-
-    void plan(const GoodsQuantity desiredAmount) noexcept { purchaseAmountPlan_ = desiredAmount; }
 
     void request(
         const AgentID id,
