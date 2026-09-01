@@ -1,6 +1,7 @@
 #pragma once
 
-#include "components/base_goods_supplier/base_goods_supplier.hpp"
+#include "components/capital_supplier/capital_supplier.hpp"
+#include "components/goods_supplier/goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "values/common.hpp"
