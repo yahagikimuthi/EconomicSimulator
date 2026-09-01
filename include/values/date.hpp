@@ -8,13 +8,11 @@
 namespace abm {
 class Date final {
   public:
-    explicit constexpr Date(
-        const unsigned int year, const unsigned int month, const unsigned int day
-    ) noexcept
+    explicit constexpr Date(const int year, const int month, const int day) noexcept
         : year_{year}, month_{month}, day_{day} {
-        ASSERT(year > 0U);
-        ASSERT(month > 0U);
-        ASSERT(day > 0U);
+        ASSERT(year > 0);
+        ASSERT(month > 0);
+        ASSERT(day > 0);
     }
 
     [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
@@ -29,10 +27,10 @@ class Date final {
         return month_ == setting::monthInYear;
     }
 
-    [[nodiscard]] constexpr auto toFlatTime() const noexcept -> unsigned int {
-        const auto yearIdx   = year_ - 1U;
-        const auto monthIdx  = month_ - 1U;
-        const auto dayIdx    = day_ - 1U;
+    [[nodiscard]] constexpr auto toFlatTime() const noexcept -> int {
+        const auto yearIdx   = year_ - 1;
+        const auto monthIdx  = month_ - 1;
+        const auto dayIdx    = day_ - 1;
         const auto flatMonth = (yearIdx * setting::monthInYear) + monthIdx;
         const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx;
         return flatDay;
@@ -55,8 +53,8 @@ class Date final {
     }
 
   private:
-    unsigned int year_;
-    unsigned int month_;
-    unsigned int day_;
+    int year_;
+    int month_;
+    int day_;
 };
 }  // namespace abm
