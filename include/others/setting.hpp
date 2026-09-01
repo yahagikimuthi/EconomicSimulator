@@ -112,7 +112,7 @@ inline constexpr RandomParameter hholdInitialAsset =
 inline constexpr RandomParameter cashRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
 
-namespace abm::save_name {
+namespace abm::setting::save_name {
 inline constexpr auto firmAssets        = "firmAssets"sv;
 inline constexpr auto postedEmployments = "postedEmployments"sv;
 inline constexpr auto postedWages       = "postedWages"sv;
@@ -124,4 +124,4 @@ inline constexpr auto markups           = "markups"sv;
 inline constexpr auto inventories       = "inventories"sv;
 inline constexpr auto householdAssets   = "householdAssets"sv;
 inline constexpr auto wages             = "wages"sv;
-}  // namespace abm::save_name
+}  // namespace abm::setting::save_name
