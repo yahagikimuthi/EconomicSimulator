@@ -37,7 +37,7 @@ class Trader final {
     void afterTrade(HHoldFinance& finance) noexcept {
         if (not myRequest_) return;
         const auto remain = myRequest_->remainPaid();
-        finance.assetPlus(remain);
+        finance.deposit(remain);
     }
 
     void reset() noexcept { myRequest_.reset(); }

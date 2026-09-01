@@ -34,7 +34,7 @@ class HHoldFinance final {
         return cashOut + withdraw + moreCashOut;
     }
 
-    void assetPlus(const Money add) noexcept {
+    void deposit(const Money add) noexcept {
         ASSERT(add.isZeroOrMore());
         if (currentCashRatio() > cashRatio_) {
             depositSupplier_.deposit(add);

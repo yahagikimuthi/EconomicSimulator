@@ -50,7 +50,7 @@ class FirmFinance final {
         return cashOut + withdraw + moreCashOut;
     }
 
-    void assetPlus(const Money add, const AccountItem item) noexcept {
+    void deposit(const Money add, const AccountItem item) noexcept {
         ASSERT(add.isZeroOrMore());
 
         postToPlFromPlus(add, item);

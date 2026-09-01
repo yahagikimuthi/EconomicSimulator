@@ -69,11 +69,11 @@ class Trader final {
             const auto reqAmount = req.payment() / myEntry_->price;
             if (remainAmount <= reqAmount) {
                 const auto sales = req.trade(remainAmount);
-                finance.assetPlus(sales, FirmFinance::AccountItem::Sales);
+                finance.deposit(sales, FirmFinance::AccountItem::Sales);
                 return;
             }
             const auto sales = req.trade(reqAmount);
-            finance.assetPlus(sales, FirmFinance::AccountItem::Sales);
+            finance.deposit(sales, FirmFinance::AccountItem::Sales);
             remainAmount -= reqAmount;
         }
     }
@@ -93,7 +93,7 @@ class Trader final {
         for (auto& request : myEntry_->requests()) {
             const auto tradeAmount = request.payment() / myEntry_->price;
             const auto sales       = request.trade(tradeAmount);
-            finance.assetPlus(sales, FirmFinance::AccountItem::Sales);
+            finance.deposit(sales, FirmFinance::AccountItem::Sales);
         }
     }
 
