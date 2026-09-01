@@ -104,6 +104,11 @@ inline constexpr auto capitalFirm  = 5;
 inline constexpr auto hhold        = 300;
 }  // namespace abm::setting::agent_count
 
+namespace abm::setting {
+inline constexpr auto dayInMonth  = 30;
+inline constexpr auto monthInYear = 12;
+}  // namespace abm::setting
+
 namespace abm::finance::setting {
 inline constexpr RandomParameter firmInitialAsset =
     UniformParameter<double>{.min = 100.0, .limit = 1000.0};
