@@ -44,6 +44,9 @@ class GoodsFirm final : public BaseFirm {
         : BaseFirm(Id, masterRng), goodsSupplier{masterRng} {}
 
     GoodsSupplier goodsSupplier;
+
+  private:
+    static inline constinit int nextBusinessDay{};
 };
 
 class CapitalFirm final : public BaseFirm {
@@ -52,5 +55,8 @@ class CapitalFirm final : public BaseFirm {
         : BaseFirm(Id, masterRng), capitalSupplier{masterRng} {}
 
     CapitalSupplier capitalSupplier;
+
+  private:
+    static inline constinit int nextBusinessDay{};
 };
 }  // namespace abm
