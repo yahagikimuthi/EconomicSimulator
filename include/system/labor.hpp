@@ -19,6 +19,10 @@ inline void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer()
 inline void endRecruiting(LaborDemander& laborDemander, GoodsSupplier& goodsSupplier) noexcept {
     laborDemander.endRecruiting(goodsSupplier.workspace());
 }
+
+inline void endRecruiting(LaborDemander& laborDemander, CapitalSupplier& goodsSupplier) noexcept {
+    laborDemander.endRecruiting(goodsSupplier.workspace());
+}
 }  // namespace abm::labor::demander
 
 namespace abm::labor::supplier {
