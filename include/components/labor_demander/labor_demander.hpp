@@ -94,7 +94,7 @@ class LaborDemander final {
     auto operator=(LaborDemander&&) -> LaborDemander&      = delete;
     ~LaborDemander() noexcept                              = default;
 
-    [[nodiscard]] auto planAnnualAndRequestBudget(
+    [[nodiscard]] auto requestAnnualBudget(
         const HeadCount adjust, const Money salesForecast
     ) noexcept -> Budget {
         const auto employee            = employeeCnt();
@@ -121,6 +121,8 @@ class LaborDemander final {
         recruitSystem_.revisePlan(budget - hrRequested);
         humanResource_.revisePlan(budget);
     }
+
+    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget;
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         const auto out = humanResource_.employeeCnt();
