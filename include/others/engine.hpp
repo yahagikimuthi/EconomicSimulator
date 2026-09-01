@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -14,6 +16,27 @@
 #include "world/drop_box.hpp"
 
 namespace abm {
+
+class AgentRegistry final {
+    using Agent = std::variant<CapitalFirm, GoodsFirm, HHold>;
+
+  public:
+    AgentRegistry() noexcept;
+
+    void reserve(const std::size_t n) noexcept { agents_.reserve(n); }
+
+    template <typename Type, typename... Args>
+    void emplaceBack(Args&&... args) noexcept {
+        agents_.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
+    }
+
+    template <typename F>
+    void visit(F&& f) noexcept;
+
+  private:
+    std::vector<Agent> agents_;
+};
+
 class Engine final {
     using Agent = std::variant<HHold, CapitalFirm, GoodsFirm>;
 
@@ -24,6 +47,10 @@ class Engine final {
         auto id       = 0;
 
         agents_.reserve(cnt::capitalFirm + cnt::goodsFirm + cnt::hhold);
+        for (; id < cnt::capitalFirm; ++id) {
+            agents_.emplaceBack<CapitalFirm>(AgentID{id}, rng_);
+        }
+
         capitalFirms_.reserve(cnt::capitalFirm);
         for (; id < cnt::capitalFirm; ++id) {
             capitalFirms_.emplace_back(AgentID{id}, rng_);
@@ -74,10 +101,10 @@ class Engine final {
     std::vector<GoodsFirm>   goodsFirms_;
     std::vector<CapitalFirm> capitalFirms_;
 
-    std::vector<Agent> agents_;
+    AgentRegistry agents_;
 
-    Markets       markets_;
-    CensusDropBox dropBox_;
+    MarketRegistry markets_;
+    CensusDropBox  dropBox_;
 
     const Date endingDay_;
     Date       today_{1, 1, 1};

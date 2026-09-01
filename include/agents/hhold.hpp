@@ -17,7 +17,7 @@ class HHold final {
     HHold(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng}, labor_{masterRng}, goods_{masterRng}, id_{id} {}
 
-    void act(const Date& date, Markets& markets) noexcept {
+    void act(const Date& date, MarketRegistry& markets) noexcept {
         labor_.product();
         const auto day = date.day();
         if (day == operationDay_)
@@ -27,7 +27,7 @@ class HHold final {
     }
 
   private:
-    void actOperationDay(const int month, Markets& markets) noexcept {
+    void actOperationDay(const int month, MarketRegistry& markets) noexcept {
         const auto wage         = static_cast<Budget>(labor_.wage());
         const auto asset        = static_cast<Budget>(finance_.asset());
         const auto purchasePlan = goods_.planAndRequestBudget(asset + wage);

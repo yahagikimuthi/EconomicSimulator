@@ -22,7 +22,7 @@ class GoodsFirm final {
           goods_{masterRng},
           id_{id} {}
 
-    void act(const Date& date, Markets& markets) noexcept {
+    void act(const Date& date, MarketRegistry& markets) noexcept {
         if (date.day() == operationDay_ and date.isBeginingYear())
             actJanuaryOperatingDay(markets);
         else if (date.day() == operationDay_ and not date.isBeginingYear())
@@ -36,7 +36,7 @@ class GoodsFirm final {
     }
 
   private:
-    void actJanuaryOperatingDay(Markets& markets) noexcept {
+    void actJanuaryOperatingDay(MarketRegistry& markets) noexcept {
         const auto employee       = labor_.employeeCnt();
         const auto adjustEmploy   = goods_.calcDesiredEmploy(employee);
         const auto sales          = goods_.salesForecast();
@@ -74,7 +74,7 @@ class GoodsFirm final {
         capital_.request(id_, finance_, markets.capitalMarket);
     }
 
-    void actRegularOperatingDay(const Date& date, Markets& markets) noexcept {
+    void actRegularOperatingDay(const Date& date, MarketRegistry& markets) noexcept {
         const auto laborCost = labor_.calcMonthlyCost();
 
         const auto totalCost = labor_.sumWage();

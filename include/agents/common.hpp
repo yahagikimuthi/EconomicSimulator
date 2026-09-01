@@ -5,12 +5,12 @@
 #include "world/labor.hpp"
 
 namespace abm {
-struct Markets final {
+struct MarketRegistry final {
     CapitalMarket capitalMarket;
     GoodsMarket   goodsMarket;
     LaborMarket   laborMarket;
 };
 
 template <typename T>
-concept IAgent = requires(T t, const Date& date, Markets& markets) { t.act(date, markets); };
+concept IAgent = requires(T t, const Date& date, MarketRegistry& markets) { t.act(date, markets); };
 }  // namespace abm

@@ -22,7 +22,7 @@ class CapitalFirm final {
           capitalSupplier_{masterRng},
           id_{id} {}
 
-    void act(const Date& today, Markets& markets) noexcept;
+    void act(const Date& today, MarketRegistry& markets) noexcept;
 
   private:
     FirmFinance     finance_;
