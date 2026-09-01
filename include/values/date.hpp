@@ -22,6 +22,7 @@ class Date final {
     [[nodiscard]] auto isBeginingMonth() const noexcept -> bool { return day_ == 1U; }
     [[nodiscard]] auto isBeginingYear() const noexcept -> bool { return year_ == 1U; }
     [[nodiscard]] auto isEndingMonth() const noexcept -> bool { return day_ == maxDay_; }
+    [[nodiscard]] auto isEndingYear() const noexcept -> bool { return year_ == maxMonth_; }
 
     [[nodiscard]] auto toFlatTime() const noexcept -> unsigned int {
         const auto yearIdx   = year_ - 1U;
