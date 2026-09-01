@@ -18,11 +18,7 @@ namespace abm::base_goods::supplier {
 
 template <EMarket SupplyGoodsT>
 class BaseGoodsSupplier final {
-    using Workspace       = Workspace;
-    using Mediator        = Mediator;
-    using CentralMemory   = CentralMemory;
-    using ProducingSystem = ProducingSystem;
-    using Market          = Market<SupplyGoodsT>;
+    using MarketT = Market<SupplyGoodsT>;
 
   public:
     explicit BaseGoodsSupplier(RandomGenerator& masterRng) noexcept
@@ -52,7 +48,7 @@ class BaseGoodsSupplier final {
         return static_cast<Budget>(salesForecast());
     }
 
-    void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }
+    void post(const AgentID id, MarketT& market) noexcept { tradingSystem_.post(id, market); }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
         ASSERT(employee.isZeroOrMore());

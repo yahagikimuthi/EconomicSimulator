@@ -19,9 +19,9 @@ namespace abm::base_goods::supplier {
 
 template <EMarket SupplyGoodsT>
 class Trader final {
-    using Market      = Market<SupplyGoodsT>;
-    using Request     = Request<SupplyGoodsT>;
-    using Entry       = Entry<SupplyGoodsT>;
+    using MarketT     = Market<SupplyGoodsT>;
+    using RequestT    = Request<SupplyGoodsT>;
+    using EntryT      = Entry<SupplyGoodsT>;
     using TradePlan   = supplier::TradePlan;
     using TradeResult = supplier::TradeResult;
 
@@ -29,7 +29,7 @@ class Trader final {
     explicit Trader(RandomGenerator& masterRng) noexcept
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    void post(const AgentID id, const TradePlan& plan, Market& market) noexcept {
+    void post(const AgentID id, const TradePlan& plan, MarketT& market) noexcept {
         ASSERT(plan.supply.isZeroOrMore());
         isActive_ = true;
         if (plan.supply.isZero()) return;
@@ -65,7 +65,7 @@ class Trader final {
     [[nodiscard]] auto calcTotalDemand() const noexcept -> GoodsQuantity {
         const auto requests = myEntry_->requests();
         return std::ranges::fold_left(
-            requests | std::views::transform([&](const Request& req) noexcept -> GoodsQuantity {
+            requests | std::views::transform([&](const RequestT& req) noexcept -> GoodsQuantity {
                 return req.payment() / myEntry_->price;
             }),
             GoodsQuantity{0.0},
@@ -94,8 +94,8 @@ class Trader final {
 
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
 
-    [[nodiscard]] auto packRequest() noexcept -> std::span<RefWrap<Request>> {
-        static thread_local auto refs = std::vector<RefWrap<Request>>{};
+    [[nodiscard]] auto packRequest() noexcept -> std::span<RefWrap<RequestT>> {
+        static thread_local auto refs = std::vector<RefWrap<RequestT>>{};
         refs.clear();
         auto requests = myEntry_->requests();
         refs.reserve(requests.size());
@@ -112,7 +112,7 @@ class Trader final {
     }
 
     Ledger                  ledger_;
-    std::optional<Entry&>   myEntry_{std::nullopt};
+    std::optional<EntryT&>  myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
     bool                    isActive_{false};
 };

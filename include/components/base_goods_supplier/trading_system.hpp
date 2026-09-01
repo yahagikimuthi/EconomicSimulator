@@ -12,9 +12,7 @@ namespace abm::base_goods::supplier {
 
 template <EMarket SupplyGoodsT>
 class TradingSystem final {
-    using Market       = Market<SupplyGoodsT>;
-    using TradePlanner = TradePlanner;
-    using TradePlan    = TradePlan;
+    using MarketT = Market<SupplyGoodsT>;
 
   public:
     explicit TradingSystem(RandomGenerator& masterRng) noexcept
@@ -34,7 +32,7 @@ class TradingSystem final {
         plan_.emplace(plan);
     }
 
-    void post(const AgentID id, Market& market) noexcept {
+    void post(const AgentID id, MarketT& market) noexcept {
         ASSERT(plan_);
         trader_.post(id, *plan_, market);
     }
