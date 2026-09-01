@@ -117,7 +117,25 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            capital::demander::purchase()
+            capital::demander::purchase(
+                firm.id, firm.finance, firm.capitalDemander, capitalMarket_
+            );
+        }
+        for (auto& firm : capitalFirms_) {
+            capital::demander::purchase(
+                firm.id, firm.finance, firm.capitalDemander, capitalMarket_
+            );
+        }
+
+        for (auto& firm : capitalFirms_) {
+            capital::supplier::trade(firm.finance, firm.goodsSupplier);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            capital::demander::afterTarde(firm.finance, firm.capitalDemander);
+        }
+        for (auto& firm : consumerFirms_) {
+            capital::demander::afterTarde(firm.finance, firm.capitalDemander);
         }
     }
 
