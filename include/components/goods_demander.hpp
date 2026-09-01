@@ -4,7 +4,6 @@
 #include <optional>
 #include <utility>
 
-#include "components/finance/others_finance.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -17,27 +16,34 @@ concept TryWithdrawFn = requires(F f, Budget budget) {
     { f(budget) } -> std::same_as<Money>;
 };
 
+template <typename F>
+concept DepositFn = requires(F f, Money deposit) {
+    { f(deposit) } -> std::same_as<void>;
+};
+
 class Trader final {
   public:
     explicit Trader(RandomGenerator& masterRng)
         : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
+    template <TryWithdrawFn F>
     void request(
-        const AgentID        id,
-        const Budget         budget,
-        TryWithdrawFn auto&& withdrawFn,
-        Market&              market,
-        const int            sampleCnt = setting::goodsSampleCnt
+        const AgentID id,
+        const Budget  budget,
+        F&&           withdrawFn,
+        Market&       market,
+        const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not myRequest_) return;
-        myRequest_ = pickedEntry->request(withdrawFn(budget));
+        myRequest_ = pickedEntry->request(std::forward<F>(withdrawFn)(budget));
     }
 
-    void afterTrade(HHoldFinance& finance) noexcept {
+    template <DepositFn F>
+    void afterTrade(F&& depositFn) noexcept {
         if (not myRequest_) return;
         const auto remain = myRequest_->remainPaid();
-        finance.deposit(remain);
+        std::forward<F>(depositFn)(remain);
     }
 
     void reset() noexcept { myRequest_.reset(); }
@@ -77,7 +83,10 @@ class GoodsDemander final {
         trader_.request(id, budget, std::forward<F>(withdrawFn), market, sampleCnt);
     }
 
-    void afterTrade(HHoldFinance& finance) noexcept { trader_.afterTrade(finance); }
+    template <DepositFn F>
+    void afterTrade(F&& depositFn) noexcept {
+        trader_.afterTrade(std::forward<F>(depositFn));
+    }
 
   private:
     Trader                trader_;

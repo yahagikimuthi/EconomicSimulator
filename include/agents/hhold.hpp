@@ -54,7 +54,9 @@ class HHold final {
         );
     }
 
-    void actAfterOperationDay() noexcept { goods_.afterTrade(finance_); }
+    void actAfterOperationDay() noexcept {
+        goods_.afterTrade([&](const Money deposit) noexcept -> void { finance_.deposit(deposit); });
+    }
 
     HHoldFinance  finance_;
     LaborSupplier labor_;
