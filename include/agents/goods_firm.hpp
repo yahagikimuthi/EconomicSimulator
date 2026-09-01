@@ -28,6 +28,11 @@ class GoodsFirm final {
         else if (date.day() == operationDay_ and not date.isBeginingYear())
             actRegularOperatingDay(date, markets);
         else if (date.day() == operationDay_ - 1)
+            actBeforeOperationDay();
+        else if (date.day() == operationDay_ + 1)
+            actAfterOperationDay();
+        else
+            actNothingDay();
     }
 
   private:
@@ -88,23 +93,22 @@ class GoodsFirm final {
         }
 
         const auto month = date.month();
-        ASSERT(month != 1);
-        switch (date.month()) {
-            case 3:
-                labor_.offer();
-            case 5:
-                labor_.endRecruiting(goods_.workspace());
-            default:
-        }
+        ASSERT(month > 1);
+        if (month == 3)
+            labor_.offer();
+        else if (month == 5)
+            labor_.endRecruiting(goods_.workspace());
 
         capital_.request(id_, finance_, markets.capitalMarket);
 
         goods_.post(id_, markets.goodsMarket);
     }
 
-    void actAfterOperationDay(Markets& markets) noexcept { labor_. }
+    void actAfterOperationDay() noexcept { capital_.afterTrade(finance_); }
 
-    void actBeforeOperationDay(Markets& markets) noexcept;
+    void actBeforeOperationDay() noexcept;
+
+    void actNothingDay() noexcept { goods_.trade(finance_); }
 
     FirmFinance     finance_;
     LaborDemander   labor_;
