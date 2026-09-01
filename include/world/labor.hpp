@@ -181,8 +181,22 @@ class Market final {
 
     tbb::concurrent_vector<Request> requests_;
 };
+
+enum class MarketPhase : char {
+    RequestAndLayOffs,
+    Entry,
+    Offer,
+    Accept,
+    EndRecruit,
+    RecordRosterEntry
+};
+
+[[nodiscard]] constexpr auto toMarketPhase(const int month) noexcept -> MarketPhase {
+    return static_cast<MarketPhase>(month);
+}
 }  // namespace abm::labor
 
 namespace abm {
-using LaborMarket = labor::Market;
-}
+using LaborMarket      = labor::Market;
+using LaborMarketPhase = labor::MarketPhase;
+}  // namespace abm
