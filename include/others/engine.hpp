@@ -30,8 +30,11 @@ class AgentRegistry final {
         agents_.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
     }
 
-    template <typename F>
-    void visit(F&& f) noexcept;
+    void act(const Date& date, MarketRegistry& markets) noexcept {
+        for (auto& anyAgent : agents_) {
+            anyAgent.visit([&](auto& agent) noexcept -> void { agent.act(date, markets); });
+        }
+    }
 
   private:
     std::vector<Agent> agents_;
@@ -50,34 +53,17 @@ class Engine final {
         for (; id < cnt::capitalFirm; ++id) {
             agents_.emplaceBack<CapitalFirm>(AgentID{id}, rng_);
         }
-
-        capitalFirms_.reserve(cnt::capitalFirm);
-        for (; id < cnt::capitalFirm; ++id) {
-            capitalFirms_.emplace_back(AgentID{id}, rng_);
+        for (; id < cnt::goodsFirm + cnt::goodsFirm; ++id) {
+            agents_.emplaceBack<GoodsFirm>(AgentID{id}, rng_);
         }
-
-        goodsFirms_.reserve(cnt::goodsFirm + 5);
-        for (; id < cnt::capitalFirm + cnt::goodsFirm; ++id) {
-            goodsFirms_.emplace_back(AgentID{id}, rng_);
-        }
-
-        hholds_.reserve(cnt::hhold + 10);
         for (; id < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++id) {
-            hholds_.emplace_back(AgentID{id}, rng_);
+            agents_.emplaceBack<HHold>(AgentID{id}, rng_);
         }
     }
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
-            for (auto& firm : capitalFirms_) {
-                firm.act(today_, markets_);
-            }
-            for (auto& firm : goodsFirms_) {
-                firm.act(today_, markets_);
-            }
-            for (auto& hhold : hholds_) {
-                hhold.act(today_, markets_);
-            }
+            agents_.act(today_, markets_);
         }
     }
 
@@ -96,10 +82,6 @@ class Engine final {
     RandomGenerator rng_;
 
     Logger logger_;
-
-    std::vector<HHold>       hholds_;
-    std::vector<GoodsFirm>   goodsFirms_;
-    std::vector<CapitalFirm> capitalFirms_;
 
     AgentRegistry agents_;
 
