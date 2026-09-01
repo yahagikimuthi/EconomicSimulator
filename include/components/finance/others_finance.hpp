@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "components/common.hpp"
 #include "components/finance/deposit_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
@@ -15,11 +16,11 @@ class HHoldFinance final {
           cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    [[nodiscard]] auto makeWithdrawFn() noexcept -> auto {
+    [[nodiscard]] auto makeWithdrawFn() noexcept -> TryWithdrawFn auto {
         return [&](const Budget withdraw) noexcept -> Money { return tryWithdraw(withdraw); };
     }
 
-    [[nodiscard]] auto makeDepositFn() noexcept -> auto {
+    [[nodiscard]] auto makeDepositFn() noexcept -> DepositFn auto {
         return [&](const Money depositAmount) noexcept -> void { deposit(depositAmount); };
     }
 

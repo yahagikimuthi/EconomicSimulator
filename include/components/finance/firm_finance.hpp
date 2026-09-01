@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "components/common.hpp"
 #include "components/finance/deposit_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
@@ -26,13 +27,13 @@ class FirmFinance final {
 
     enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
 
-    [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> auto {
+    [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> TryWithdrawFn auto {
         return [&, item](const Budget withdraw) noexcept -> Money {
             return tryWithdraw(withdraw, item);
         };
     }
 
-    [[nodiscard]] auto makeDepositFn(const AccountItem item) noexcept -> auto {
+    [[nodiscard]] auto makeDepositFn(const AccountItem item) noexcept -> DepositFn auto {
         return
             [&, item](const Money depositAmount) noexcept -> void { deposit(depositAmount, item); };
     }
