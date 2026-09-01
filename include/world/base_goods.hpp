@@ -164,7 +164,19 @@ class Market final {
 };
 }  // namespace abm::base_goods
 
+namespace abm::goods {
+using Market  = base_goods::Market<EMarket::Goods>;
+using Entry   = base_goods::Entry<EMarket::Goods>;
+using Request = base_goods::Request<EMarket::Goods>;
+}  // namespace abm::goods
+
+namespace abm::capital {
+using Market  = base_goods::Market<EMarket::Capital>;
+using Entry   = base_goods::Entry<EMarket::Capital>;
+using Request = base_goods::Request<EMarket::Capital>;
+}  // namespace abm::capital
+
 namespace abm {
-using GoodsMarket   = base_goods::Market<EMarket::Goods>;
-using CapitalMarket = base_goods::Market<EMarket::Capital>;
+using GoodsMarket   = goods::Market;
+using CapitalMarket = capital::Market;
 }  // namespace abm
