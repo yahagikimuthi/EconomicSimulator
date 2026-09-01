@@ -112,30 +112,33 @@ class Engine final {
     }
 
     void runMonthlyCapitalMarket() noexcept {
+        using namespace capital;
         for (auto& firm : capitalFirms_) {
-            capital::supplier::supply(firm.id, firm.capitalSupplier, capitalMarket_);
+            supplier::supply(firm.id, firm.capitalSupplier, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
-            capital::demander::purchase(
-                firm.id, firm.finance, firm.capitalDemander, capitalMarket_
-            );
+            demander::purchase(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
         }
         for (auto& firm : capitalFirms_) {
-            capital::demander::purchase(
-                firm.id, firm.finance, firm.capitalDemander, capitalMarket_
-            );
+            demander::purchase(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
-            capital::supplier::trade(firm.finance, firm.capitalSupplier);
+            supplier::trade(firm.finance, firm.capitalSupplier);
         }
 
         for (auto& firm : capitalFirms_) {
-            capital::demander::afterTarde(firm.finance, firm.capitalDemander);
+            demander::afterTarde(firm.finance, firm.capitalDemander);
         }
         for (auto& firm : consumerFirms_) {
-            capital::demander::afterTarde(firm.finance, firm.capitalDemander);
+            demander::afterTarde(firm.finance, firm.capitalDemander);
+        }
+    }
+
+    void runDailyGoodsMarket() noexcept {
+        for (auto& firm : consumerFirms_) {
+            goods::supplier
         }
     }
 
