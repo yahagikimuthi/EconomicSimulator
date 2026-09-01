@@ -23,6 +23,21 @@ class HHold final {
     const AgentID id;
 };
 
+class BaseFirm {
+  public:
+    FirmFinance     finance;
+    LaborDemander   laborDemander;
+    CapitalDemander capitalDemander;
+    const AgentID   id;
+
+  protected:
+    explicit BaseFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
+        : finance{Id, masterRng},
+          laborDemander{masterRng, {Id}},
+          capitalDemander{masterRng},
+          id{Id} {}
+};
+
 class GoodsFirm final {
   public:
     explicit GoodsFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
