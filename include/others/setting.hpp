@@ -79,8 +79,7 @@ inline constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.
 }  // namespace abm::base_goods::supplier::setting
 
 namespace abm::goods::demander::setting {
-inline constexpr auto            maxPurchaseFrequency = 1;
-inline constexpr auto            goodsSampleCnt       = 2;
+inline constexpr auto            goodsSampleCnt = 2;
 inline constexpr RandomParameter mpc = UniformParameter<double>{.min = 0.5, .limit = 0.8};
 }  // namespace abm::goods::demander::setting
 
