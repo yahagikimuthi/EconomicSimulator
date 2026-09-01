@@ -114,11 +114,11 @@ class GoodsFirm final {
         goods_.post(id_, markets.goodsMarket);
     }
 
+    void actBeforeOperationDay() noexcept;
+
     void actAfterOperationDay() noexcept {
         capital_.afterTrade(finance_.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost));
     }
-
-    void actBeforeOperationDay() noexcept;
 
     void actNothingDay() noexcept {
         goods_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
