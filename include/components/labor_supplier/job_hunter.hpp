@@ -94,8 +94,7 @@ class JobHunter final {
     }
 
     static void sortSample(std::span<RefWrap<Request>> sortRequests, const int entryCnt) noexcept {
-        const auto k =
-            std::size_t{std::min(static_cast<std::size_t>(entryCnt), sortRequests.size())};
+        const auto k = std::min(static_cast<std::size_t>(entryCnt), sortRequests.size());
         std::ranges::partial_sort(
             sortRequests,
             sortRequests.begin() + static_cast<int>(k),
