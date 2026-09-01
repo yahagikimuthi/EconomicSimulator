@@ -6,9 +6,9 @@
 
 namespace abm {
 struct Markets final {
-    BaseGoodsMarket& capitalMarket;
-    BaseGoodsMarket& goodsMarket;
-    LaborMarket&     laborMarket;
+    CapitalMarket& capitalMarket;
+    GoodsMarket&   goodsMarket;
+    LaborMarket&   laborMarket;
 };
 
 template <typename T>

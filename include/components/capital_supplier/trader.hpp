@@ -15,9 +15,6 @@
 
 namespace abm::capital::supplier {
 class Trader final {
-    using Market      = base_goods::Market;
-    using Request     = base_goods::Request;
-    using Entry       = base_goods::Entry;
     using TradePlan   = base_goods::supplier::TradePlan;
     using TradeResult = base_goods::supplier::TradeResult;
 

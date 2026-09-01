@@ -53,8 +53,9 @@ class Entry;
 template <EMarket MarketT>
 class Request final {
   public:
-    using Entry = Entry<MarketT>;
-    Request(const Money pay, const Entry& e) noexcept : payment_{pay}, remainPaid_{pay}, entry_{e} {
+    using EntryT = Entry<MarketT>;
+    Request(const Money pay, const EntryT& e) noexcept
+        : payment_{pay}, remainPaid_{pay}, entry_{e} {
         ASSERT(pay.isZeroOrMore());
     }
     // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
@@ -79,17 +80,18 @@ class Request final {
     const Money   payment_;
     Money         remainPaid_;
     GoodsQuantity tradeAmount_{0.0};
-    const Entry&  entry_;
+    const EntryT& entry_;
 };
 
 template <EMarket MarketT>
 class Entry final {
-    using Request = Request<MarketT>;
+    using RequestT = Request<MarketT>;
 
   public:
     Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
         : id{i}, price{p}, supply{s} {}
-    [[nodiscard]] auto request(const Money payment) noexcept -> Request& {
+
+    [[nodiscard]] auto request(const Money payment) noexcept -> RequestT& {
         return *requests_.emplace_back(payment, *this);
     }
 
@@ -100,7 +102,7 @@ class Entry final {
     const GoodsQuantity supply;
 
   private:
-    tbb::concurrent_vector<Request> requests_;
+    tbb::concurrent_vector<RequestT> requests_;
 };
 
 template <EMarket MarketT>
@@ -123,28 +125,28 @@ template <EMarket MarketT>
 template <EMarket MarketT>
     requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Market final {
-    using Entry = Entry<MarketT>;
+    using EntryT = Entry<MarketT>;
 
   public:
     Market() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
-    ) noexcept -> Entry& {
+    ) noexcept -> EntryT& {
         totalSupply_.fetch_add(supply.value());  // TODO 処理系が対応する場合store_addに変更
         return *entries_.emplace_back(id, price, supply);
     }
 
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
-        -> std::optional<Entry&> {
+        -> std::optional<EntryT&> {
         if (entries_.empty()) return std::nullopt;
         if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
 
-        auto betterEntry = std::optional<Entry&>{std::nullopt};
+        auto betterEntry = std::optional<EntryT&>{std::nullopt};
         for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
                 entries_,
                 totalSupply_.load(),
-                [](const Entry& e) noexcept -> double { return e.supply.value(); }
+                [](const EntryT& e) noexcept -> double { return e.supply.value(); }
             );
             if (sample.id == id) continue;
             if (not betterEntry) {
@@ -159,8 +161,8 @@ class Market final {
     void clear() noexcept { entries_.clear(), totalSupply_.store(0.0); }
 
   private:
-    tbb::concurrent_vector<Entry> entries_;
-    std::atomic<double>           totalSupply_;
+    tbb::concurrent_vector<EntryT> entries_;
+    std::atomic<double>            totalSupply_;
 };
 }  // namespace abm::base_goods
 

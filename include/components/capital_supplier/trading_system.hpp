@@ -12,7 +12,6 @@ template <typename T>
 concept IMediator = base_goods::supplier::IMediator<T>;
 
 class TradingSystem final {
-    using Market       = base_goods::Market;
     using TradePlanner = base_goods::supplier::TradePlanner;
     using TradePlan    = base_goods::supplier::TradePlan;
 

@@ -70,10 +70,10 @@ class Engine final {
     std::vector<GoodsFirm>   consumerFirms_;
     std::vector<CapitalFirm> capitalFirms_;
 
-    LaborMarket     laborMarket_;
-    BaseGoodsMarket goodsMarket_;
-    BaseGoodsMarket capitalMarket_;
-    CensusDropBox   dropBox_;
+    LaborMarket   laborMarket_;
+    CapitalMarket capitalMarket_;
+    GoodsMarket   goodsMarket_;
+    CensusDropBox dropBox_;
 
     const Date endingDay_;
     Date       today_{1U, 1U, 1U};

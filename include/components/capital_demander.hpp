@@ -13,8 +13,6 @@
 #include "world/base_goods.hpp"
 
 namespace abm::capital::demander {
-using Market  = BaseGoodsMarket;
-using Request = base_goods::Request;
 
 struct Log final {
     const Money         purchase{std::numeric_limits<double>::epsilon()};

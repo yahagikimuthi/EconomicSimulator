@@ -9,9 +9,6 @@
 #include "world/base_goods.hpp"
 
 namespace abm::goods::demander {
-using Request = base_goods::Request;
-using Entry   = base_goods::Entry;
-using Market  = BaseGoodsMarket;
 
 class Trader final {
   public:

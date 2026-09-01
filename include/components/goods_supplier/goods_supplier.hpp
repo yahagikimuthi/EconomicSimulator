@@ -16,7 +16,6 @@
 
 namespace abm::goods::supplier {
 class GoodsSupplier final {
-    using Market          = base_goods::Market;
     using Workspace       = base_goods::Workspace;
     using Mediator        = base_goods::supplier::Mediator;
     using CentralMemory   = base_goods::supplier::CentralMemory;
