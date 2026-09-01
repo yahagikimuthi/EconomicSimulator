@@ -114,7 +114,11 @@ class CapitalFirm final {
 
     void actBeforeOperationDay() noexcept;
 
-    void actAfterOperationDay() noexcept { capitalDemander_.afterTrade(finance_); }
+    void actAfterOperationDay() noexcept {
+        capitalDemander_.afterTrade(
+            finance_.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost)
+        );
+    }
 
     void actNothingDay() noexcept {
         capitalSupplier_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
