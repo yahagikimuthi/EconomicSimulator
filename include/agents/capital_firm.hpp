@@ -1,8 +1,8 @@
 #pragma once
 
 #include "agents/common.hpp"
+#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
-#include "components/capital_supplier/capital_supplier.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "others/setting.hpp"
@@ -69,7 +69,11 @@ class CapitalFirm final {
         labor_.layOffs();
         labor_.postLaborRequest(id_, markets.laborMarket);
 
-        capitalDemander_.request(id_, finance_, markets.capitalMarket);
+        capitalDemander_.request(
+            id_,
+            finance_.makeWithdrawFn(FirmFinance::AccountItem::CapitalGoodsCost),
+            markets.capitalMarket
+        );
 
         capitalSupplier_.post(id_, markets.capitalMarket);
     }
@@ -99,7 +103,11 @@ class CapitalFirm final {
         else if (month == 5)
             labor_.endRecruiting(capitalSupplier_.workspace());
 
-        capitalDemander_.request(id_, finance_, markets.capitalMarket);
+        capitalDemander_.request(
+            id_,
+            finance_.makeWithdrawFn(FirmFinance::AccountItem::CapitalGoodsCost),
+            markets.capitalMarket
+        );
 
         capitalSupplier_.post(id_, markets.capitalMarket);
     }

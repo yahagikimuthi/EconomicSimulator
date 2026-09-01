@@ -1,9 +1,9 @@
 #pragma once
 
 #include "agents/common.hpp"
+#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
 #include "components/finance/firm_finance.hpp"
-#include "components/goods_supplier/goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
