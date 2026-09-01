@@ -12,5 +12,5 @@ struct Markets final {
 };
 
 template <typename T>
-concept IAgent = requires(T t, const Date& today, Markets& markets) { t.act(today, markets); };
+concept IAgent = requires(T t, const Date& date, Markets& markets) { t.act(date, markets); };
 }  // namespace abm
