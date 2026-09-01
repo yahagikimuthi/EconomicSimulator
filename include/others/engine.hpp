@@ -7,10 +7,6 @@
 #include "others/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "system/capital.hpp"
-#include "system/finance.hpp"
-#include "system/goods.hpp"
-#include "system/labor.hpp"
 #include "values/date.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
@@ -55,95 +51,6 @@ class Engine final {
     }
 
   private:
-    void runYearly() noexcept {
-        for (auto& firm : capitalFirms_) {
-            finance::judgeYearlyAndMonthlyBudget(
-                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
-            );
-        }
-        for (auto& firm : consumerFirms_) {
-            finance::judgeYearlyAndMonthlyBudget(
-                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
-            );
-        }
-        runYearlyLaborMarket();
-    }
-
-    void runYearlyLaborMarket() noexcept {
-        using namespace labor;
-        for (auto& firm : capitalFirms_) {
-            demander::layOffs(firm.laborDemander);
-        }
-        for (auto& firm : capitalFirms_) {
-            demander::layOffs(firm.laborDemander);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
-        }
-        for (auto& firm : consumerFirms_) {
-            demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
-        }
-
-        for (auto& hhold : hholds_) {
-            supplier::entry(hhold.id, hhold.laborSupplier, laborMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            demander::offer(firm.laborDemander);
-        }
-        for (auto& firm : consumerFirms_) {
-            demander::offer(firm.laborDemander);
-        }
-
-        for (auto& hhold : hholds_) {
-            supplier::acceptOffer(hhold.laborSupplier);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            demander::endRecruiting(firm.laborDemander, firm.capitalSupplier);
-        }
-        for (auto& firm : consumerFirms_) {
-            demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
-        }
-
-        for (auto& hhold : hholds_) {
-            supplier::recordRosterEntry(hhold.laborSupplier);
-        }
-    }
-
-    void runMonthlyCapitalMarket() noexcept {
-        using namespace capital;
-        for (auto& firm : capitalFirms_) {
-            supplier::supply(firm.id, firm.capitalSupplier, capitalMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            demander::purchase(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-        }
-        for (auto& firm : capitalFirms_) {
-            demander::purchase(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            supplier::trade(firm.finance, firm.capitalSupplier);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            demander::afterTarde(firm.finance, firm.capitalDemander);
-        }
-        for (auto& firm : consumerFirms_) {
-            demander::afterTarde(firm.finance, firm.capitalDemander);
-        }
-    }
-
-    void runDailyGoodsMarket() noexcept {
-        using namespace goods;
-        for (auto& firm : consumerFirms_) {
-            supplier::supply(firm.id, firm.goodsSupplier, goodsMarket_);
-        }
-    }
-
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not setting::useRuntimeRandomSeed) {
             return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};
