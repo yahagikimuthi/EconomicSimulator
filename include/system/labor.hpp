@@ -16,7 +16,7 @@ inline void postRequest(const AgentID id, LaborDemander& laborDemander, Market& 
 
 inline void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer(); }
 
-inline void endRecruiting(LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier) noexcept {
+inline void endRecruiting(LaborDemander& laborDemander, GoodsSupplier& goodsSupplier) noexcept {
     laborDemander.endRecruiting(goodsSupplier.workspace());
 }
 }  // namespace abm::labor::demander
