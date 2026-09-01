@@ -149,11 +149,7 @@ class Market final {
                 [](const EntryT& e) noexcept -> double { return e.supply.value(); }
             );
             if (sample.id == id) continue;
-            if (not betterEntry) {
-                betterEntry = sample;
-                continue;
-            }
-            if (sample.price < betterEntry->price) betterEntry = sample;
+            if (not betterEntry or sample.price < betterEntry->price) betterEntry = sample;
         }
         return betterEntry;
     }

@@ -147,11 +147,10 @@ class Market final {
         RandomGenerator&                          rng
     ) noexcept {
         ASSERT(out.empty());
-        if (out.max_size() >= requests_.size()) {
+        if (out.max_size() >= requests_.size())
             packAllRequest(requestorId, out);
-            return;
-        }
-        packPartRequest(requestorId, out, rng);
+        else
+            packPartRequest(requestorId, out, rng);
     }
 
     void clear() noexcept { requests_.clear(); }
