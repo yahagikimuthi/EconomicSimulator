@@ -21,7 +21,7 @@ class AgentRegistry final {
     using Agent = std::variant<CapitalFirm, GoodsFirm, HHold>;
 
   public:
-    AgentRegistry() noexcept;
+    AgentRegistry() noexcept = default;
 
     void reserve(const std::size_t n) noexcept { agents_.reserve(n); }
 
