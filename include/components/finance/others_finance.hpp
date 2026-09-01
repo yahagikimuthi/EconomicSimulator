@@ -15,6 +15,14 @@ class HHoldFinance final {
           cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
+    [[nodiscard]] auto makeWithdrawFn() noexcept -> auto {
+        return [&](const Budget withdraw) noexcept -> Money { return tryWithdraw(withdraw); };
+    }
+
+    [[nodiscard]] auto makeDepositFn() noexcept -> auto {
+        return [&](const Money depositAmount) noexcept -> void { deposit(depositAmount); };
+    }
+
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw) noexcept -> Money {
         ASSERT(tryingWithdraw.isZeroOrMore());
         const auto sub = Money{tryingWithdraw.value()};

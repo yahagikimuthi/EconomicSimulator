@@ -26,6 +26,17 @@ class FirmFinance final {
 
     enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
 
+    [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> auto {
+        return [&, item](const Budget withdraw) noexcept -> Money {
+            return tryWithdraw(withdraw, item);
+        };
+    }
+
+    [[nodiscard]] auto makeDepositFn(const AccountItem item) noexcept -> auto {
+        return
+            [&, item](const Money depositAmount) noexcept -> void { deposit(depositAmount, item); };
+    }
+
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw, const AccountItem item) noexcept
         -> Money {
         ASSERT(tryingWithdraw.isZeroOrMore());
