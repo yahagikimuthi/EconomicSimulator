@@ -70,44 +70,45 @@ class Engine final {
     }
 
     void runYearlyLaborMarket() noexcept {
+        using namespace labor;
         for (auto& firm : capitalFirms_) {
-            labor::demander::layOffs(firm.laborDemander);
+            demander::layOffs(firm.laborDemander);
         }
         for (auto& firm : capitalFirms_) {
-            labor::demander::layOffs(firm.laborDemander);
+            demander::layOffs(firm.laborDemander);
         }
 
         for (auto& firm : capitalFirms_) {
-            labor::demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
+            demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
         }
         for (auto& firm : consumerFirms_) {
-            labor::demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
+            demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
         }
 
         for (auto& hhold : hholds_) {
-            labor::supplier::entry(hhold.id, hhold.laborSupplier, laborMarket_);
+            supplier::entry(hhold.id, hhold.laborSupplier, laborMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
-            labor::demander::offer(firm.laborDemander);
+            demander::offer(firm.laborDemander);
         }
         for (auto& firm : consumerFirms_) {
-            labor::demander::offer(firm.laborDemander);
+            demander::offer(firm.laborDemander);
         }
 
         for (auto& hhold : hholds_) {
-            labor::supplier::acceptOffer(hhold.laborSupplier);
+            supplier::acceptOffer(hhold.laborSupplier);
         }
 
         for (auto& firm : capitalFirms_) {
-            labor::demander::endRecruiting(firm.laborDemander, firm.capitalSupplier);
+            demander::endRecruiting(firm.laborDemander, firm.capitalSupplier);
         }
         for (auto& firm : consumerFirms_) {
-            labor::demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
+            demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
         }
 
         for (auto& hhold : hholds_) {
-            labor::supplier::recordRosterEntry(hhold.laborSupplier);
+            supplier::recordRosterEntry(hhold.laborSupplier);
         }
     }
 
@@ -137,8 +138,9 @@ class Engine final {
     }
 
     void runDailyGoodsMarket() noexcept {
+        using namespace goods;
         for (auto& firm : consumerFirms_) {
-            goods::supplier
+            supplier::supply(firm.id, firm.goodsSupplier, goodsMarket_);
         }
     }
 
