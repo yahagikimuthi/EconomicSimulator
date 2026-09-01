@@ -29,12 +29,9 @@ class Date final {
         return flatDay;
     }
 
-    [[nodiscard]] constexpr auto isSameDay(const int day) const noexcept -> bool {
-        return day == day_;
-    }
-    [[nodiscard]] constexpr auto isSameMonth(const int month) const noexcept -> bool {
-        return month == month_;
-    }
+    [[nodiscard]] constexpr auto day() const noexcept -> int { return day_; }
+
+    [[nodiscard]] constexpr auto month() const noexcept -> int { return month_; }
 
     constexpr auto operator++() noexcept -> Date& {
         if (day_ < setting::dayInMonth) {
