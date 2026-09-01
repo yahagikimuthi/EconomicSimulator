@@ -1,26 +1,15 @@
 #pragma once
 
-#include <concepts>
 #include <optional>
 #include <utility>
 
+#include "components/common.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::goods::demander {
-
-template <typename F>
-concept TryWithdrawFn = requires(F f, Budget budget) {
-    { f(budget) } -> std::same_as<Money>;
-};
-
-template <typename F>
-concept DepositFn = requires(F f, Money deposit) {
-    { f(deposit) } -> std::same_as<void>;
-};
-
 class Trader final {
   public:
     explicit Trader(RandomGenerator& masterRng)
