@@ -42,14 +42,12 @@ class InputDataManager final {
         const auto group = getGroup(path);
         if (not group) {
             container.clear();
-            return;
-        }
-        if (not group->exist(static_cast<std::string>(dataName))) {
+        } else if (not group->exist(static_cast<std::string>(dataName))) {
             std::cerr << "data: " << static_cast<std::string>(dataName) << "does not exit\n";
             container.clear();
-            return;
-        }
-        group->getDataSet(static_cast<std::string>(dataName)).read(container);
+
+        } else
+            group->getDataSet(static_cast<std::string>(dataName)).read(container);
     }
 
   private:
