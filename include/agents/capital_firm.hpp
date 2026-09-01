@@ -9,6 +9,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 class CapitalFirm final {
@@ -27,7 +28,7 @@ class CapitalFirm final {
             if (date.month() == 1)
                 actJanuaryOperationDay(markets);
             else
-                actRegularOperationDay(date.month(), markets);
+                actRegularOperationDay(labor::toMarketPhase(date.month()), markets);
         } else if (date.day() == operationDay_ - 1) {
             actBeforeOperationDay();
         } else if (date.day() == operationDay_ + 1) {
@@ -78,7 +79,7 @@ class CapitalFirm final {
         capitalSupplier_.post(id_, markets.capitalMarket);
     }
 
-    void actRegularOperationDay(const int month, MarketRegistry& markets) noexcept {
+    void actRegularOperationDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
         const auto laborCost = labor_.calcMonthlyCost();
 
         const auto desiredCapital   = capitalSupplier_.requiresCapital();
@@ -97,10 +98,9 @@ class CapitalFirm final {
             }
         }
 
-        ASSERT(month > 1);
-        if (month == 3)
+        if (phase == LaborMarketPhase::Offer)
             labor_.offer();
-        else if (month == 5)
+        else if (phase == LaborMarketPhase::EndRecruiting)
             labor_.endRecruiting(capitalSupplier_.workspace());
 
         capitalDemander_.request(

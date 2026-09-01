@@ -187,7 +187,7 @@ enum class MarketPhase : char {
     Entry,
     Offer,
     Accept,
-    EndRecruit,
+    EndRecruiting,
     RecordRosterEntry
 };
 

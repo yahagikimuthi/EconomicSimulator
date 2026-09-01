@@ -9,6 +9,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 class GoodsFirm final {
@@ -26,7 +27,7 @@ class GoodsFirm final {
         if (date.day() == operationDay_ and date.isBeginingYear())
             actJanuaryOperatingDay(markets);
         else if (date.day() == operationDay_ and not date.isBeginingYear())
-            actRegularOperatingDay(date, markets);
+            actRegularOperatingDay(labor::toMarketPhase(date.month()), markets);
         else if (date.day() == operationDay_ - 1)
             actBeforeOperationDay();
         else if (date.day() == operationDay_ + 1)
@@ -78,7 +79,7 @@ class GoodsFirm final {
         );
     }
 
-    void actRegularOperatingDay(const Date& date, MarketRegistry& markets) noexcept {
+    void actRegularOperatingDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
         const auto laborCost = labor_.calcMonthlyCost();
 
         const auto totalCost = labor_.sumWage();
@@ -98,11 +99,9 @@ class GoodsFirm final {
         else
             capital_.revisePlan(budget - laborCost);
 
-        const auto month = date.month();
-        ASSERT(month > 1);
-        if (month == 3)
+        if (phase == LaborMarketPhase::Offer)
             labor_.offer();
-        else if (month == 5)
+        else if (phase == LaborMarketPhase::EndRecruiting)
             labor_.endRecruiting(goods_.workspace());
 
         capital_.request(
