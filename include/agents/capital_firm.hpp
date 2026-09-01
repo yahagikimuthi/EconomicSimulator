@@ -22,7 +22,19 @@ class CapitalFirm final {
           capitalSupplier_{masterRng},
           id_{id} {}
 
-    void act(const Date& today, MarketRegistry& markets) noexcept;
+    void act(const Date& date, MarketRegistry& markets) noexcept {
+        if (date.day() == operationDay_) {
+            if (date.month() == 1)
+                actJanuaryOperationDay(markets);
+            else
+                actRegularOperationDay(date.month(), markets);
+        } else if (date.day() == operationDay_ - 1) {
+            actBeforeOperationDay();
+        } else if (date.day() == operationDay_ + 1) {
+            actAfterOperationDay();
+        } else
+            actNothingDay();
+    }
 
   private:
     void actJanuaryOperationDay(MarketRegistry& markets) noexcept {
