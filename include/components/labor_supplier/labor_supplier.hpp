@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <pcg_random.hpp>
 #include <utility>
 
 #include "components/common.hpp"
@@ -16,7 +15,7 @@ namespace abm::labor::supplier {
 class LikelihoodChangingJob final {
   public:
     explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           threshold_{masterRng.random(setting::changingJobThreshold)} {}
 
     auto shouldChangingJobs() const noexcept -> bool { return threshold_ < rng_.rand(); }

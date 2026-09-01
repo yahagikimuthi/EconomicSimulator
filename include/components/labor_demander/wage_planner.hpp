@@ -4,7 +4,6 @@
 #include <cmath>
 #include <limits>
 #include <optional>
-#include <pcg_random.hpp>
 
 #include "components/labor_demander/common.hpp"
 #include "others/setting.hpp"
@@ -49,7 +48,7 @@ class WagePlanner final {
     explicit WagePlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{Wage{masterRng.random(setting::lastWage)}},
-          rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::wageAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {

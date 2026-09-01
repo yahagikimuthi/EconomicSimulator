@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <limits>
 #include <optional>
-#include <pcg_random.hpp>
 
 #include "components/finance/firm_finance.hpp"
 #include "others/setting.hpp"
@@ -22,7 +21,7 @@ struct Log final {
 class CapitalDemander final {
   public:
     explicit CapitalDemander(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     [[nodiscard]] auto planAndRequestBudget(const GoodsQuantity desiredAmount) noexcept -> Budget {
         const auto avgPrice = log_.purchase / log_.tradeAmount;

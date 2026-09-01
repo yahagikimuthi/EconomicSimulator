@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <limits>
 #include <optional>
-#include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "others/setting.hpp"
@@ -49,7 +48,7 @@ class MarkupPlanner final {
     explicit MarkupPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{MarkupRate{masterRng.random(setting::lastMarkup)}},
-          rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::markupAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {

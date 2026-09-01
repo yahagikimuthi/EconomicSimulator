@@ -5,7 +5,6 @@
 #include <functional>
 #include <inplace_vector>
 #include <optional>
-#include <pcg_random.hpp>
 #include <ranges>
 #include <span>
 
@@ -44,7 +43,7 @@ concept MakeEntrySheetFn = requires(F f, Request request) {
 class JobHunter final {
   public:
     explicit JobHunter(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void entry(
         const AgentID           id,

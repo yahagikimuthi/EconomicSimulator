@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <limits>
-#include <pcg_random.hpp>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
@@ -15,7 +14,7 @@ namespace abm::base_goods::supplier {
 class PricePlanner final {
   public:
     explicit PricePlanner(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
 
     [[nodiscard]] auto plan(

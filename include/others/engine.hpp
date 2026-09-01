@@ -1,6 +1,5 @@
 #pragma once
 
-#include <pcg_random.hpp>
 #include <vector>
 
 #include "agents/capital_firm.hpp"
