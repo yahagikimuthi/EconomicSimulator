@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
-#include "components/base_goods_supplier/ledger.hpp"
 #include "components/finance/firm_finance.hpp"
+#include "components/goods_supplier/ledger.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -18,7 +18,6 @@ class Trader final {
     using Market      = base_goods::Market;
     using Request     = base_goods::Request;
     using Entry       = base_goods::Entry;
-    using Ledger      = base_goods::supplier::Ledger;
     using TradePlan   = base_goods::supplier::TradePlan;
     using TradeResult = base_goods::supplier::TradeResult;
 
