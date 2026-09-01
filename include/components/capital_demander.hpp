@@ -4,6 +4,7 @@
 #include <limits>
 #include <optional>
 
+#include "components/common.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
@@ -32,9 +33,10 @@ class CapitalDemander final {
 
     void revisePlan(const Budget budget) noexcept { budget_ = budget; }
 
+    template <TryWithdrawFn F>
     void request(
         const AgentID id,
-        FirmFinance&  finance,
+        F&&           withdrawFn,
         Market&       market,
         const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
@@ -43,7 +45,7 @@ class CapitalDemander final {
         const auto payment =
             std::min(static_cast<Budget>(*purchaseAmountPlan_ * pickedEntry->price), *budget_);
         const auto withdraw =
-            finance.tryWithdraw(payment, FirmFinance::AccountItem::CapitalGoodsCost);
+            std::forward<F>(withdrawFn)(payment, FirmFinance::AccountItem::CapitalGoodsCost);
         myRequest_ = pickedEntry->request(withdraw);
     }
 

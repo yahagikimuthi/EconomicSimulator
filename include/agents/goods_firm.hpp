@@ -71,7 +71,13 @@ class GoodsFirm final {
 
         goods_.post(id_, markets.goodsMarket);
 
-        capital_.request(id_, finance_, markets.capitalMarket);
+        capital_.request(
+            id_,
+            [&](const Budget withdraw) noexcept -> Money {
+                return finance_.tryWithdraw(withdraw, FirmFinance::AccountItem::CapitalGoodsCost);
+            },
+            markets.capitalMarket
+        );
     }
 
     void actRegularOperatingDay(const Date& date, MarketRegistry& markets) noexcept {
@@ -101,7 +107,13 @@ class GoodsFirm final {
         else if (month == 5)
             labor_.endRecruiting(goods_.workspace());
 
-        capital_.request(id_, finance_, markets.capitalMarket);
+        capital_.request(
+            id_,
+            [&](const Budget withdraw) noexcept -> Money {
+                return finance_.tryWithdraw(withdraw, FirmFinance::AccountItem::CapitalGoodsCost);
+            },
+            markets.capitalMarket
+        );
 
         goods_.post(id_, markets.goodsMarket);
     }
