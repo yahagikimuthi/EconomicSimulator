@@ -6,6 +6,54 @@
 #include "others/util.hpp"
 
 namespace abm {
+class Day final {
+  public:
+    explicit constexpr Day(const int day) : day_{day} { ASSERT(day > 0); }
+
+    auto operator<=>(const Day&) const noexcept -> auto = default;
+    auto operator==(const Day&) const noexcept -> bool  = default;
+
+    auto operator++() noexcept -> Day& {
+        ++day_;
+        return *this;
+    }
+
+  private:
+    int day_;
+};
+
+class Month final {
+  public:
+    explicit constexpr Month(const int month) : month_{month} { ASSERT(month > 0); }
+
+    auto operator<=>(const Month&) const noexcept -> auto = default;
+    auto operator==(const Month&) const noexcept -> bool  = default;
+
+    auto operator++() noexcept -> Month& {
+        ++month_;
+        return *this;
+    }
+
+  private:
+    int month_;
+};
+
+class Year final {
+  public:
+    explicit constexpr Year(const int year) : year_{year} { ASSERT(year > 0); }
+
+    auto operator<=>(const Year&) const noexcept -> auto = default;
+    auto operator==(const Year&) const noexcept -> bool  = default;
+
+    auto operator++() noexcept -> Year& {
+        ++year_;
+        return *this;
+    }
+
+  private:
+    int year_;
+};
+
 class Date final {
   public:
     explicit constexpr Date(const int year, const int month, const int day) noexcept
@@ -18,40 +66,33 @@ class Date final {
     [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
     [[nodiscard]] constexpr auto operator==(const Date&) const noexcept -> bool  = default;
 
-    [[nodiscard]] constexpr auto isBeginingYear() const noexcept -> bool { return year_ == 1U; }
-
-    [[nodiscard]] constexpr auto toFlatTime() const noexcept -> int {
-        const auto yearIdx   = year_ - 1;
-        const auto monthIdx  = month_ - 1;
-        const auto dayIdx    = day_ - 1;
-        const auto flatMonth = (yearIdx * setting::monthInYear) + monthIdx;
-        const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx;
-        return flatDay;
+    [[nodiscard]] constexpr auto isBeginingYear() const noexcept -> bool {
+        return year_ == Year{1};
     }
 
-    [[nodiscard]] constexpr auto day() const noexcept -> int { return day_; }
+    [[nodiscard]] constexpr auto day() const noexcept -> Day { return day_; }
 
-    [[nodiscard]] constexpr auto month() const noexcept -> int { return month_; }
+    [[nodiscard]] constexpr auto month() const noexcept -> Month { return month_; }
 
     constexpr auto operator++() noexcept -> Date& {
-        if (day_ < setting::dayInMonth) {
+        if (day_ < Day{setting::dayInMonth}) {
             ++day_;
             return *this;
         }
-        if (month_ < setting::monthInYear) {
-            day_ = 1U;
+        if (month_ < Month{setting::monthInYear}) {
+            day_ = Day{1};
             ++month_;
             return *this;
         }
-        day_   = 1U;
-        month_ = 1U;
+        day_   = Day{1};
+        month_ = Month{1};
         ++year_;
         return *this;
     }
 
   private:
-    int year_;
-    int month_;
-    int day_;
+    Year  year_;
+    Month month_;
+    Day   day_;
 };
 }  // namespace abm
