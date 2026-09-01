@@ -36,6 +36,8 @@ class Date final {
         return flatDay;
     }
 
+    [[nodiscard]] constexpr auto day() const noexcept -> int { return day_; }
+
     constexpr auto operator++() noexcept -> Date& {
         if (day_ < setting::dayInMonth) {
             ++day_;
