@@ -23,7 +23,7 @@ class HHold final {
         const auto day = date.day();
         if (day == operationDay_)
             actOperationDay(labor::toMarketPhase(date.month()), markets);
-        else if (day == operationDay_ + 1)
+        else if (day == operationDay_ + Day{1})
             actAfterOperationDay();
     }
 
@@ -57,6 +57,6 @@ class HHold final {
     LaborSupplier labor_;
     GoodsDemander goods_;
     const AgentID id_;
-    const int     operationDay_{instanceCnt++ % setting::dayInMonth};
+    const Day     operationDay_{instanceCnt++ % setting::dayInMonth};
 };
 }  // namespace abm
