@@ -73,9 +73,7 @@ class GoodsFirm final {
 
         capital_.request(
             id_,
-            [&](const Budget withdraw) noexcept -> Money {
-                return finance_.tryWithdraw(withdraw, FirmFinance::AccountItem::CapitalGoodsCost);
-            },
+            finance_.makeWithdrawFn(FirmFinance::AccountItem::CapitalGoodsCost),
             markets.capitalMarket
         );
     }
@@ -109,9 +107,7 @@ class GoodsFirm final {
 
         capital_.request(
             id_,
-            [&](const Budget withdraw) noexcept -> Money {
-                return finance_.tryWithdraw(withdraw, FirmFinance::AccountItem::CapitalGoodsCost);
-            },
+            finance_.makeWithdrawFn(FirmFinance::AccountItem::CapitalGoodsCost),
             markets.capitalMarket
         );
 

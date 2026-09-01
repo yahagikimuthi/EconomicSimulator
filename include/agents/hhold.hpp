@@ -47,16 +47,10 @@ class HHold final {
         else if (month == 5)
             labor_.recordRosterEntry();
 
-        goods_.request(
-            id_,
-            [&](const Budget withdraw) noexcept -> Money { return finance_.tryWithdraw(withdraw); },
-            markets.goodsMarket
-        );
+        goods_.request(id_, finance_.makeWithdrawFn(), markets.goodsMarket);
     }
 
-    void actAfterOperationDay() noexcept {
-        goods_.afterTrade([&](const Money deposit) noexcept -> void { finance_.deposit(deposit); });
-    }
+    void actAfterOperationDay() noexcept { goods_.afterTrade(finance_.makeDepositFn()); }
 
     HHoldFinance  finance_;
     LaborSupplier labor_;
