@@ -1,10 +1,11 @@
 #pragma once
 
-#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
+#include "components/capital_supplier/capital_supplier.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "components/finance/others_finance.hpp"
 #include "components/goods_demander.hpp"
+#include "components/goods_supplier/goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "others/util.hpp"
@@ -22,19 +23,35 @@ class HHold final {
     const AgentID id;
 };
 
-class Firm final {
+class GoodsFirm final {
   public:
-    explicit Firm(const AgentID Id, RandomGenerator& masterRng) noexcept
+    explicit GoodsFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
         : finance{Id, masterRng},
           laborDemander{masterRng, {Id}},
           capitalDemander{masterRng},
           goodsSupplier{masterRng},
           id{Id} {}
 
-    FirmFinance       finance;
-    LaborDemander     laborDemander;
-    CapitalDemander   capitalDemander;
-    BaseGoodsSupplier goodsSupplier;
-    const AgentID     id;
+    FirmFinance     finance;
+    LaborDemander   laborDemander;
+    CapitalDemander capitalDemander;
+    GoodsSupplier   goodsSupplier;
+    const AgentID   id;
+};
+
+class CapitalFirm final {
+  public:
+    explicit CapitalFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
+        : finance{Id, masterRng},
+          laborDemander{masterRng, {Id}},
+          capitalDemander{masterRng},
+          capitalSupplier{masterRng},
+          id{Id} {}
+
+    FirmFinance     finance;
+    LaborDemander   laborDemander;
+    CapitalDemander capitalDemander;
+    CapitalSupplier capitalSupplier;
+    const AgentID   id;
 };
 }  // namespace abm
