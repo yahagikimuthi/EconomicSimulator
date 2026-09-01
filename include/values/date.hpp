@@ -2,6 +2,7 @@
 
 #include <compare>
 
+#include "others/setting.hpp"
 #include "others/util.hpp"
 
 namespace abm {
@@ -21,26 +22,28 @@ class Date final {
 
     [[nodiscard]] constexpr auto isBeginingMonth() const noexcept -> bool { return day_ == 1U; }
     [[nodiscard]] constexpr auto isBeginingYear() const noexcept -> bool { return year_ == 1U; }
-    [[nodiscard]] constexpr auto isEndingMonth() const noexcept -> bool { return day_ == maxDay_; }
+    [[nodiscard]] constexpr auto isEndingMonth() const noexcept -> bool {
+        return day_ == setting::dayInMonth;
+    }
     [[nodiscard]] constexpr auto isEndingYear() const noexcept -> bool {
-        return year_ == maxMonth_;
+        return month_ == setting::monthInYear;
     }
 
     [[nodiscard]] constexpr auto toFlatTime() const noexcept -> unsigned int {
         const auto yearIdx   = year_ - 1U;
         const auto monthIdx  = month_ - 1U;
         const auto dayIdx    = day_ - 1U;
-        const auto flatMonth = (yearIdx * maxMonth_) + monthIdx;
-        const auto flatDay   = (flatMonth * maxDay_) + dayIdx;
+        const auto flatMonth = (yearIdx * setting::monthInYear) + monthIdx;
+        const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx;
         return flatDay;
     }
 
     constexpr auto operator++() noexcept -> Date& {
-        if (day_ < maxDay_) {
+        if (day_ < setting::dayInMonth) {
             ++day_;
             return *this;
         }
-        if (month_ < maxMonth_) {
+        if (month_ < setting::monthInYear) {
             day_ = 1U;
             ++month_;
             return *this;
@@ -55,8 +58,5 @@ class Date final {
     unsigned int year_;
     unsigned int month_;
     unsigned int day_;
-
-    static constexpr unsigned int maxMonth_ = 12;
-    static constexpr unsigned int maxDay_   = 20U;
 };
 }  // namespace abm
