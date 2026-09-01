@@ -14,11 +14,6 @@ inline void supply(const AgentID id, CapitalSupplier& supplier, BaseGoodsMarket&
 inline void trade(FirmFinance& finance, CapitalSupplier& supplier) noexcept {
     supplier.trade(finance);
 }
-
-inline void afterTrade(FirmFinance& finance, CapitalDemander& demander) noexcept {
-    demander.afterTrade(finance);
-}
-
 }  // namespace abm::capital::supplier
 
 namespace abm::capital::demander {
