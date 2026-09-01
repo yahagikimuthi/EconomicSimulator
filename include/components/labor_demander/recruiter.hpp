@@ -96,8 +96,9 @@ class Recruiter final {
         offerPart();
     }
 
-    void registerMember(AddRosterFn auto&& addRoster) noexcept {
-        if (not isPosting()) return;
+    [[nodiscard]] auto endRecruiting(AddRosterFn auto&& addRoster
+    ) noexcept -> std::optional<RecruitResult> {
+        if (not isPosting()) return std::nullopt;
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
         for (auto& acceptApplicant : acceptApplicants) {
@@ -105,9 +106,6 @@ class Recruiter final {
             ++employCnt;
         }
         ledger_.addEmployCnt(employCnt);
-    }
-
-    [[nodiscard]] auto publishResult() const noexcept -> std::optional<RecruitResult> {
         return ledger_.publishResult();
     }
 

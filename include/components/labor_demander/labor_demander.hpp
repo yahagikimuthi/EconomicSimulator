@@ -53,12 +53,8 @@ class RecruitSystem final {
     void offer() noexcept { recruiter_.offer(); }
 
     template <AddRosterFn F>
-    void registerMember(F&& addRoster) noexcept {
-        recruiter_.registerMember(std::forward<F>(addRoster));
-    }
-
-    void endRecruiting(IMediator auto& mediator) noexcept {
-        const auto result = recruiter_.publishResult();
+    void registerMember(F&& addRoster, IMediator auto& mediator) noexcept {
+        const auto result = recruiter_.endRecruiting(std::forward<F>(addRoster));
         if (not result) return;
         mediator.publishRecruitResult(*result);
     }
@@ -126,15 +122,14 @@ class LaborDemander final {
 
     void offer() noexcept { recruitSystem_.offer(); }
 
-    void registerMember(base_goods::Workspace& workspace) noexcept {
+    [[nodiscard]] auto registerMember(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.registerMember(
             [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
                 return humanResource_.addRoster(id, wage, workspace);
-            }
+            },
+            mediator_
         );
     };
-
-    void endRecruiting() noexcept { recruitSystem_.endRecruiting(mediator_); }
 
     void layOffs() noexcept { humanResource_.layOffs(); }
 
