@@ -34,7 +34,7 @@ class BaseFirm {
   protected:
     explicit BaseFirm(const AgentID Id, const int BusinessDay, RandomGenerator& masterRng) noexcept
         : finance{Id, masterRng},
-          laborDemander{masterRng, {Id}},
+          laborDemander{Id, masterRng},
           capitalDemander{masterRng},
           id{Id},
           businessDay{BusinessDay} {}
