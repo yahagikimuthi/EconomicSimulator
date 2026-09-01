@@ -75,13 +75,24 @@ class RecruitSystem final {
 class LaborDemander final {
   public:
     explicit LaborDemander(const AgentID id, RandomGenerator& masterRng) noexcept
-        : recruitSystem_{masterRng}, humanResource_{id} {}
-
-    void setMediator() noexcept {
-        recruitSystem_.acceptMediator(mediator_);
-        mediator_.subscribeRecruitPlan(memory_);
-        mediator_.subscribeEmployPlan(memory_);
+        : recruitSystem_{masterRng}, humanResource_{id} {
+        setMediator();
     }
+    LaborDemander(const LaborDemander& other) noexcept
+        : recruitSystem_{other.recruitSystem_},
+          humanResource_{other.humanResource_},
+          memory_{other.memory_} {
+        setMediator();
+    }
+    LaborDemander(LaborDemander&& other) noexcept
+        : recruitSystem_{std::move(other.recruitSystem_)},
+          humanResource_{std::move(other.humanResource_)},
+          memory_{other.memory_} {
+        setMediator();
+    }
+    auto operator=(const LaborDemander&) -> LaborDemander& = delete;
+    auto operator=(LaborDemander&&) -> LaborDemander&      = delete;
+    ~LaborDemander() noexcept                              = default;
 
     [[nodiscard]] auto planAnnualAndRequestBudget(
         const HeadCount adjust, const Money salesForecast
@@ -141,6 +152,12 @@ class LaborDemander final {
     }
 
   private:
+    void setMediator() noexcept {
+        recruitSystem_.acceptMediator(mediator_);
+        mediator_.subscribeRecruitPlan(memory_);
+        mediator_.subscribeEmployPlan(memory_);
+    }
+
     RecruitSystem recruitSystem_;
     HumanResource humanResource_;
     Mediator      mediator_;
