@@ -25,7 +25,8 @@
                 "xaver.clang-format",
                 "twxs.cmake",
                 "streetsidesoftware.code-spell-checker",
-                "oderwat.indent-rainbow"
+                "oderwat.indent-rainbow",
+                "ajshort.include-autocomplete"
             ]
         }
     },
