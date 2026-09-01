@@ -133,8 +133,6 @@ class LaborDemander final {
 
     void layOffs() noexcept { humanResource_.layOffs(); }
 
-    void acceptResignation() noexcept { humanResource_.acceptResignation(); }
-
     [[nodiscard]] auto sumWage() const noexcept -> Money {
         const auto out = humanResource_.sumWage();
         ASSERT(out.isZeroOrMore());

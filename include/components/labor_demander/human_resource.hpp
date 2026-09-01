@@ -101,16 +101,6 @@ class HumanResource final {
         return *newRoster;
     }
 
-    void acceptResignation() noexcept {
-        auto& resignationBox = companyBoard_.resignationBox;
-        for (RosterEntry& resignEntry : resignationBox) {
-            ASSERT(resignEntry.isOccupied());
-            resignEntry.disable();
-            emptyRosterPool_.add(resignEntry);
-        }
-        resignationBox.clear();
-    }
-
     void layOffs() noexcept {
         const auto layOffsCnt = layOffsPlan_;
         ASSERT(layOffsCnt->isZeroOrMore());

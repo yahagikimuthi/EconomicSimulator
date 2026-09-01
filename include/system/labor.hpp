@@ -18,10 +18,6 @@ inline void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer()
 inline void endRecruiting(LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier) noexcept {
     laborDemander.endRecruiting(goodsSupplier.workspace());
 }
-
-inline void acceptResignation(LaborDemander& laborDemander) noexcept {
-    laborDemander.acceptResignation();
-}
 }  // namespace abm::labor::demander
 
 namespace abm::labor::supplier {
