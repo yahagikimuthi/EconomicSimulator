@@ -24,7 +24,7 @@ struct CensusDropBox final {
 
     CensusDropBox() noexcept {
         namespace cnt       = setting::agent_count;
-        const auto firmCnt  = cnt::capitalFirm + cnt::consumerFirm;
+        const auto firmCnt  = cnt::capitalFirm + cnt::goodsFirm;
         const auto hholdCnt = cnt::hhold;
 
         firmAssets.reserve(firmCnt);

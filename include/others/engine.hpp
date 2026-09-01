@@ -1,5 +1,6 @@
 #pragma once
 
+#include <variant>
 #include <vector>
 
 #include "agents/capital_firm.hpp"
@@ -14,23 +15,27 @@
 
 namespace abm {
 class Engine final {
+    using Agent = std::variant<HHold, CapitalFirm, GoodsFirm>;
+
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
         : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endingDay_{endingDay} {
         namespace cnt = setting::agent_count;
         auto id       = 0;
+
+        agents_.reserve(cnt::capitalFirm + cnt::goodsFirm + cnt::hhold);
         capitalFirms_.reserve(cnt::capitalFirm);
         for (; id < cnt::capitalFirm; ++id) {
             capitalFirms_.emplace_back(AgentID{id}, rng_);
         }
 
-        goodsFirms_.reserve(cnt::consumerFirm + 5);
-        for (; id < cnt::capitalFirm + cnt::consumerFirm; ++id) {
+        goodsFirms_.reserve(cnt::goodsFirm + 5);
+        for (; id < cnt::capitalFirm + cnt::goodsFirm; ++id) {
             goodsFirms_.emplace_back(AgentID{id}, rng_);
         }
 
         hholds_.reserve(cnt::hhold + 10);
-        for (; id < cnt::capitalFirm + cnt::consumerFirm + cnt::hhold; ++id) {
+        for (; id < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++id) {
             hholds_.emplace_back(AgentID{id}, rng_);
         }
     }
@@ -68,6 +73,8 @@ class Engine final {
     std::vector<HHold>       hholds_;
     std::vector<GoodsFirm>   goodsFirms_;
     std::vector<CapitalFirm> capitalFirms_;
+
+    std::vector<Agent> agents_;
 
     Markets       markets_;
     CensusDropBox dropBox_;

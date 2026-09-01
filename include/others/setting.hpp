@@ -98,9 +98,9 @@ inline constexpr auto corporateTaxRate = 0.1;
 }  // namespace abm::government::setting
 
 namespace abm::setting::agent_count {
-inline constexpr auto consumerFirm = 2;
-inline constexpr auto capitalFirm  = 5;
-inline constexpr auto hhold        = 300;
+inline constexpr auto goodsFirm   = 2;
+inline constexpr auto capitalFirm = 5;
+inline constexpr auto hhold       = 300;
 }  // namespace abm::setting::agent_count
 
 namespace abm::setting {
