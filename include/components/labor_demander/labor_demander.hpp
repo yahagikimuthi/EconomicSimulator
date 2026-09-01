@@ -9,6 +9,7 @@
 #include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
@@ -73,8 +74,8 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    explicit LaborDemander(RandomGenerator& masterRng, CompanyBoard&& board) noexcept
-        : recruitSystem_{masterRng}, humanResource_{std::move(board)} {}
+    explicit LaborDemander(const AgentID id, RandomGenerator& masterRng) noexcept
+        : recruitSystem_{masterRng}, humanResource_{id} {}
 
     void setMediator() noexcept {
         recruitSystem_.acceptMediator(mediator_);

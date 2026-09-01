@@ -6,7 +6,6 @@
 #include <memory>
 #include <optional>
 #include <ranges>
-#include <utility>
 #include <vector>
 
 #include "others/util.hpp"
@@ -40,8 +39,7 @@ class EmptyRosterPool final {
 
 class HumanResource final {
   public:
-    explicit HumanResource(CompanyBoard&& companyBoard) noexcept
-        : companyBoard_{std::move(companyBoard)} {}
+    explicit HumanResource(const AgentID id) noexcept : companyBoard_{id} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Budget {
         const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
