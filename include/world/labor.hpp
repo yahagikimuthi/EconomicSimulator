@@ -11,6 +11,7 @@
 
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 
@@ -191,8 +192,8 @@ enum class MarketPhase : char {
     RecordRosterEntry
 };
 
-[[nodiscard]] constexpr auto toMarketPhase(const int month) noexcept -> MarketPhase {
-    return static_cast<MarketPhase>(month);
+[[nodiscard]] constexpr auto toMarketPhase(const Month month) noexcept -> MarketPhase {
+    return static_cast<MarketPhase>(month.value());
 }
 }  // namespace abm::labor
 

@@ -28,9 +28,9 @@ class GoodsFirm final {
             actJanuaryOperatingDay(markets);
         else if (date.day() == operationDay_ and not date.isBeginingYear())
             actRegularOperatingDay(labor::toMarketPhase(date.month()), markets);
-        else if (date.day() == operationDay_ - 1)
+        else if (date.day() == operationDay_ - Day{1})
             actBeforeOperationDay();
-        else if (date.day() == operationDay_ + 1)
+        else if (date.day() == operationDay_ + Day{1})
             actAfterOperationDay();
         else
             actNothingDay();
@@ -128,6 +128,6 @@ class GoodsFirm final {
     CapitalDemander capital_;
     GoodsSupplier   goods_;
     const AgentID   id_;
-    const int       operationDay_{instanceCnt++ % setting::dayInMonth};
+    const Day       operationDay_{instanceCnt++ % setting::dayInMonth};
 };
 }  // namespace abm

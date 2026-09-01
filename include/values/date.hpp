@@ -18,6 +18,9 @@ class Day final {
         return *this;
     }
 
+    [[nodiscard]] auto operator+(Day other) const noexcept -> Day { return Day{day_ + other.day_}; }
+    [[nodiscard]] auto operator-(Day other) const noexcept -> Day { return Day{day_ - other.day_}; }
+
   private:
     int day_;
 };
@@ -33,6 +36,8 @@ class Month final {
         ++month_;
         return *this;
     }
+
+    [[nodiscard]] auto value() const noexcept -> int { return month_; }
 
   private:
     int month_;
