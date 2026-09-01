@@ -23,15 +23,20 @@ class GoodsSupplier final {
 
   public:
     explicit GoodsSupplier(RandomGenerator& masterRng) noexcept
-        : producingSystem_{masterRng}, tradingSystem_{masterRng} {}
-
-    void setMediator() noexcept {
-        producingSystem_.acceptMediator(mediator_);
-        tradingSystem_.acceptMediator(mediator_);
-        mediator_.subscribeMarkupPlan(memory_);
-        mediator_.subscribeTradePlan(memory_);
-        mediator_.subscribeTradeResult(memory_);
-        mediator_.subscribeTradeResult(producingSystem_);
+        : producingSystem_{masterRng}, tradingSystem_{masterRng} {
+        setMediator();
+    }
+    GoodsSupplier(const GoodsSupplier& other) noexcept
+        : producingSystem_{other.producingSystem_},
+          tradingSystem_{other.tradingSystem_},
+          memory_{other.memory_} {
+        setMediator();
+    }
+    GoodsSupplier(GoodsSupplier&& other) noexcept
+        : producingSystem_{std::move(other.producingSystem_)},
+          tradingSystem_{std::move(other.tradingSystem_)},
+          memory_{other.memory_} {
+        setMediator();
     }
 
     [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Budget {
@@ -76,6 +81,15 @@ class GoodsSupplier final {
         memory_.logging(dropBox);
         producingSystem_.reset(dropBox);
         tradingSystem_.reset();
+    }
+
+    void setMediator() noexcept {
+        producingSystem_.acceptMediator(mediator_);
+        tradingSystem_.acceptMediator(mediator_);
+        mediator_.subscribeMarkupPlan(memory_);
+        mediator_.subscribeTradePlan(memory_);
+        mediator_.subscribeTradeResult(memory_);
+        mediator_.subscribeTradeResult(producingSystem_);
     }
 
     ProducingSystem producingSystem_;
