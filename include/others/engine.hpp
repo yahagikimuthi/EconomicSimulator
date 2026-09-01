@@ -29,7 +29,7 @@ class Engine final {
         }
         for (auto& firm : capitalFirms_) {
             firm.laborDemander.setMediator();
-            firm.goodsSupplier.setMediator();
+            firm.capitalSupplier.setMediator();
         }
 
         consumerFirms_.reserve(cnt::consumerFirm + 5);
@@ -58,12 +58,12 @@ class Engine final {
     void runYearly() noexcept {
         for (auto& firm : capitalFirms_) {
             finance::judgeYearlyAndMonthlyBudget(
-                firm.finance, firm.laborDemander, firm.goodsSupplier, firm.capitalDemander
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
             );
         }
         for (auto& firm : consumerFirms_) {
             finance::judgeYearlyAndMonthlyBudget(
-                firm.finance, firm.laborDemander, firm.goodsSupplier, firm.capitalDemander
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
             );
         }
         runYearlyLaborMarket();
@@ -100,7 +100,7 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            labor::demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
+            labor::demander::endRecruiting(firm.laborDemander, firm.capitalSupplier);
         }
         for (auto& firm : consumerFirms_) {
             labor::demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
@@ -113,7 +113,7 @@ class Engine final {
 
     void runMonthlyCapitalMarket() noexcept {
         for (auto& firm : capitalFirms_) {
-            capital::supplier::supply(firm.id, firm.goodsSupplier, capitalMarket_);
+            capital::supplier::supply(firm.id, firm.capitalSupplier, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -128,7 +128,7 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            capital::supplier::trade(firm.finance, firm.goodsSupplier);
+            capital::supplier::trade(firm.finance, firm.capitalSupplier);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -154,9 +154,9 @@ class Engine final {
 
     Logger logger_;
 
-    std::vector<HHold>     hholds_;
-    std::vector<GoodsFirm> consumerFirms_;
-    std::vector<GoodsFirm> capitalFirms_;
+    std::vector<HHold>       hholds_;
+    std::vector<GoodsFirm>   consumerFirms_;
+    std::vector<CapitalFirm> capitalFirms_;
 
     LaborMarket     laborMarket_;
     BaseGoodsMarket goodsMarket_;
