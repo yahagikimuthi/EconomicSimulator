@@ -8,6 +8,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
+#include "world/common.hpp"
 
 namespace abm::base_goods {
 class Workspace final {
@@ -46,9 +47,15 @@ class Workspace final {
     std::atomic<double> totalInput_;
 };
 
+template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Entry;
+
+template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Request final {
   public:
+    using Entry = Entry<MarketT>;
     Request(const Money pay, const Entry& e) noexcept : payment_{pay}, remainPaid_{pay}, entry_{e} {
         ASSERT(pay.isZeroOrMore());
     }
@@ -77,7 +84,11 @@ class Request final {
     const Entry&  entry_;
 };
 
+template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Entry final {
+    using Request = Request<MarketT>;
+
   public:
     Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
         : id{i}, price{p}, supply{s} {}
@@ -95,7 +106,10 @@ class Entry final {
     tbb::concurrent_vector<Request> requests_;
 };
 
-[[nodiscard]] inline auto Request::trade(const GoodsQuantity tradeAmount) noexcept -> Money {
+template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
+[[nodiscard]] inline auto Request<MarketT>::trade(const GoodsQuantity tradeAmount
+) noexcept -> Money {
     ASSERT(tradeAmount_.isZero());
     ASSERT(tradeAmount.isZeroOrMore());
     tradeAmount_         = tradeAmount;
@@ -104,9 +118,18 @@ class Entry final {
     ASSERT(payment_.isZeroOrMore());
     return actualPay;
 }
-[[nodiscard]] inline auto Request::price() const noexcept -> Price { return entry_.price; }
 
+template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
+[[nodiscard]] inline auto Request<MarketT>::price() const noexcept -> Price {
+    return entry_.price;
+}
+
+template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
 class Market final {
+    using Entry = Entry<MarketT>;
+
   public:
     Market() noexcept = default;
     [[nodiscard]] auto entry(
@@ -147,5 +170,6 @@ class Market final {
 }  // namespace abm::base_goods
 
 namespace abm {
-using BaseGoodsMarket = base_goods::Market;
-}
+using GoodsMarket   = base_goods::Market<EMarket::Goods>;
+using CapitalMarket = base_goods::Market<EMarket::Capital>;
+}  // namespace abm
