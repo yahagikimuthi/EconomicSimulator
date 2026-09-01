@@ -6,7 +6,7 @@ module;
 export module abm;
 
 namespace abm {
-export void run(const unsigned int step, const bool isAnalysis = false) {
+export void run(const int step, const bool isAnalysis = false) {
     auto engine = Engine{Date{1U, 1U, step}};
     engine.run();
     if (isAnalysis) {
