@@ -1,20 +1,17 @@
 #pragma once
 
-#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
-#include "components/capital_supplier/
+#include "components/capital_supplier/capital_supplier.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::capital::supplier {
-inline void supply(
-    const AgentID id, BaseGoodsSupplier& supplier, BaseGoodsMarket& market
-) noexcept {
+inline void supply(const AgentID id, CapitalSupplier& supplier, BaseGoodsMarket& market) noexcept {
     supplier.post(id, market);
 }
 
-inline void trade(FirmFinance& finance, BaseGoodsSupplier& supplier) noexcept {
+inline void trade(FirmFinance& finance, CapitalSupplier& supplier) noexcept {
     supplier.trade(finance);
 }
 
