@@ -29,34 +29,36 @@ class BaseFirm {
     LaborDemander   laborDemander;
     CapitalDemander capitalDemander;
     const AgentID   id;
+    const int       businessDay;
 
   protected:
-    explicit BaseFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
+    explicit BaseFirm(const AgentID Id, const int BusinessDay, RandomGenerator& masterRng) noexcept
         : finance{Id, masterRng},
           laborDemander{masterRng, {Id}},
           capitalDemander{masterRng},
-          id{Id} {}
+          id{Id},
+          businessDay{BusinessDay} {}
 };
 
 class GoodsFirm final : public BaseFirm {
   public:
     explicit GoodsFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
-        : BaseFirm(Id, masterRng), goodsSupplier{masterRng} {}
+        : BaseFirm(Id, instanceCnt++, masterRng), goodsSupplier{masterRng} {}
 
     GoodsSupplier goodsSupplier;
 
   private:
-    static inline constinit int nextBusinessDay{};
+    static inline constinit int instanceCnt{};
 };
 
 class CapitalFirm final : public BaseFirm {
   public:
     explicit CapitalFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
-        : BaseFirm(Id, masterRng), capitalSupplier{masterRng} {}
+        : BaseFirm(Id, instanceCnt++, masterRng), capitalSupplier{masterRng} {}
 
     CapitalSupplier capitalSupplier;
 
   private:
-    static inline constinit int nextBusinessDay{};
+    static inline constinit int instanceCnt{};
 };
 }  // namespace abm
