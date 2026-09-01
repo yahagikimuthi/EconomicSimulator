@@ -48,14 +48,17 @@ class GoodsFirm final {
         const auto desiredCapital   = goods_.requiresCapital();
         const auto capitalBudgetReq = capital_.requestBudget(desiredCapital);
 
-        const auto total  = laborBudgetReq + capitalBudgetReq - salesPlan;
+        const auto total = laborBudgetReq + capitalBudgetReq - salesPlan;
+        if (total.isZeroOrLess()) {
+            labor_.reviseAnnualPlan(laborBudgetReq);
+            capital_.revisePlan(capitalBudgetReq);
+            return;
+        }
+
         const auto budget = finance_.claimBudget(total) + salesPlan;
         ASSERT(budget <= laborBudgetReq + capitalBudgetReq);
 
-        if (budget.isZeroOrLess()) {
-            labor_.reviseAnnualPlan(laborBudgetReq);
-            capital_.revisePlan(capitalBudgetReq);
-        } else if (budget < laborBudgetReq) {
+        if (budget < laborBudgetReq) {
             labor_.reviseAnnualPlan(budget);
             capital_.revisePlan(Budget{0.0});
         } else {
