@@ -7,24 +7,24 @@
 #include "world/base_goods.hpp"
 
 namespace abm::capital::supplier {
-inline void supplyCapital(
+inline void supply(
     const AgentID id, BaseGoodsSupplier& supplier, BaseGoodsMarket& market
 ) noexcept {
     supplier.post(id, market);
 }
 
-inline void tradeCapital(FirmFinance& finance, BaseGoodsSupplier& supplier) noexcept {
+inline void trade(FirmFinance& finance, BaseGoodsSupplier& supplier) noexcept {
     supplier.trade(finance);
 }
 
-inline void afterCapitalTrade(FirmFinance& finance, CapitalDemander& demander) noexcept {
+inline void afterTrade(FirmFinance& finance, CapitalDemander& demander) noexcept {
     demander.afterTrade(finance);
 }
 
 }  // namespace abm::capital::supplier
 
 namespace abm::capital::demander {
-inline void purchaseCapital(
+inline void purchase(
     const AgentID id, FirmFinance& finance, CapitalDemander& demander, Market& market
 ) noexcept {
     demander.request(id, finance, market);
