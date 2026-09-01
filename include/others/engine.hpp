@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -16,9 +17,10 @@
 #include "world/drop_box.hpp"
 
 namespace abm {
-
+template <typename... Agents>
+    requires(IAgent<Agents> and ...)
 class AgentRegistry final {
-    using Agent = std::variant<CapitalFirm, GoodsFirm, HHold>;
+    using Agent = std::variant<Agents...>;
 
   public:
     AgentRegistry() noexcept = default;
@@ -26,9 +28,7 @@ class AgentRegistry final {
     void reserve(const std::size_t n) noexcept { agents_.reserve(n); }
 
     template <typename Type, typename... Args>
-        requires requires(Args... args, std::vector<Agent> agents) {
-            agents.emplace_back(std::in_place_type<Type>, args...);
-        }
+        requires((std::is_same_v<Type, Agents> or ...) and std::is_constructible_v<Type, Args...>)
     void emplaceBack(Args&&... args) noexcept {
         agents_.emplace_back(std::in_place_type<Type>, std::forward<Args>(args)...);
     }
@@ -44,7 +44,7 @@ class AgentRegistry final {
 };
 
 class Engine final {
-    using Agent = std::variant<HHold, CapitalFirm, GoodsFirm>;
+    using Agent = AgentRegistry<CapitalFirm, GoodsFirm, HHold>;
 
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
@@ -86,7 +86,7 @@ class Engine final {
 
     Logger logger_;
 
-    AgentRegistry agents_;
+    Agent agents_;
 
     MarketRegistry markets_;
     CensusDropBox  dropBox_;
