@@ -2,11 +2,12 @@
 
 #include <algorithm>
 
-#include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
+#include "components/capital_supplier/capital_supplier.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "components/finance/others_finance.hpp"
 #include "components/goods_demander.hpp"
+#include "components/goods_supplier/goods_supplier.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "others/util.hpp"
@@ -14,14 +15,14 @@
 
 namespace abm::finance::detail {
 [[nodiscard]] inline auto laborDemanderAnnualRequestBudget(
-    LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier
+    LaborDemander& laborDemander, GoodsSupplier& goodsSupplier
 ) noexcept -> Budget {
     const auto adjust = goodsSupplier.calcDesiredEmploy(laborDemander.employeeCnt());
     return laborDemander.planAnnualAndRequestBudget(adjust, goodsSupplier.salesForecast());
 }
 
 [[nodiscard]] inline auto capitalDemanderRequestBudget(
-    CapitalDemander& capitalDemander, BaseGoodsSupplier& goodsSupplier
+    CapitalDemander& capitalDemander, GoodsSupplier& goodsSupplier
 ) noexcept -> Budget {
     const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
@@ -45,7 +46,7 @@ inline void distributeAnnualBudget(
 }
 
 [[nodiscard]] auto capitalDemanderRequestBudget(
-    BaseGoodsSupplier& goodsSupplier, CapitalDemander& capitalDemander
+    GoodsSupplier& goodsSupplier, CapitalDemander& capitalDemander
 ) noexcept -> Budget {
     const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
@@ -54,10 +55,10 @@ inline void distributeAnnualBudget(
 
 namespace abm::finance {
 inline void judgeYearlyAndMonthlyBudget(
-    FirmFinance&       finance,
-    LaborDemander&     laborDemander,
-    CapitalDemander&   capitalDemander,
-    BaseGoodsSupplier& goodsSupplier
+    FirmFinance&     finance,
+    LaborDemander&   laborDemander,
+    CapitalDemander& capitalDemander,
+    GoodsSupplier&   goodsSupplier
 ) noexcept {
     const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto laborDemanderRequest =
@@ -78,10 +79,10 @@ inline void judgeYearlyAndMonthlyBudget(
 }
 
 inline void judgeMonthlyBudget(
-    FirmFinance&       finance,
-    LaborDemander&     laborDemander,
-    CapitalDemander&   capitalDemander,
-    BaseGoodsSupplier& goodsSupplier
+    FirmFinance&     finance,
+    LaborDemander&   laborDemander,
+    CapitalDemander& capitalDemander,
+    GoodsSupplier&   goodsSupplier
 ) noexcept {
     const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto sumWage       = static_cast<Budget>(laborDemander.sumWage());
@@ -98,10 +99,10 @@ inline void judgeMonthlyBudget(
 }
 
 inline void judgeYearlyAndMonthlyBudget(
-    FirmFinance&       finance,
-    LaborDemander&     laborDemander,
-    BaseGoodsSupplier& goodsSupplier,
-    CapitalDemander&   capitalDemander
+    FirmFinance&     finance,
+    LaborDemander&   laborDemander,
+    GoodsSupplier&   goodsSupplier,
+    CapitalDemander& capitalDemander
 ) noexcept {
     const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto laborDemanderRequest =
@@ -122,10 +123,10 @@ inline void judgeYearlyAndMonthlyBudget(
 }
 
 inline void judgeMonthlyBudget(
-    FirmFinance&       finance,
-    LaborDemander&     laborDemander,
-    BaseGoodsSupplier& goodsSupplier,
-    CapitalDemander&   capitalDemander
+    FirmFinance&     finance,
+    LaborDemander&   laborDemander,
+    GoodsSupplier&   goodsSupplier,
+    CapitalDemander& capitalDemander
 ) noexcept {
     const auto salesForecast = goodsSupplier.planAndExpectSales(laborDemander.sumWage());
     const auto sumWage       = static_cast<Budget>(laborDemander.sumWage());
