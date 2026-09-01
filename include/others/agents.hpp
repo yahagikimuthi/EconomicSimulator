@@ -38,35 +38,19 @@ class BaseFirm {
           id{Id} {}
 };
 
-class GoodsFirm final {
+class GoodsFirm final : public BaseFirm {
   public:
     explicit GoodsFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
-        : finance{Id, masterRng},
-          laborDemander{masterRng, {Id}},
-          capitalDemander{masterRng},
-          goodsSupplier{masterRng},
-          id{Id} {}
+        : BaseFirm(Id, masterRng), goodsSupplier{masterRng} {}
 
-    FirmFinance     finance;
-    LaborDemander   laborDemander;
-    CapitalDemander capitalDemander;
-    GoodsSupplier   goodsSupplier;
-    const AgentID   id;
+    GoodsSupplier goodsSupplier;
 };
 
-class CapitalFirm final {
+class CapitalFirm final : public BaseFirm {
   public:
     explicit CapitalFirm(const AgentID Id, RandomGenerator& masterRng) noexcept
-        : finance{Id, masterRng},
-          laborDemander{masterRng, {Id}},
-          capitalDemander{masterRng},
-          capitalSupplier{masterRng},
-          id{Id} {}
+        : BaseFirm(Id, masterRng), capitalSupplier{masterRng} {}
 
-    FirmFinance     finance;
-    LaborDemander   laborDemander;
-    CapitalDemander capitalDemander;
     CapitalSupplier capitalSupplier;
-    const AgentID   id;
 };
 }  // namespace abm
