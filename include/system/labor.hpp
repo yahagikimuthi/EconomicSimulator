@@ -9,18 +9,14 @@
 namespace abm::labor::demander {
 inline void layOffs(LaborDemander& laborDemander) noexcept { laborDemander.layOffs(); }
 
-inline void postLaborRequest(
-    const AgentID id, LaborDemander& laborDemander, Market& market
-) noexcept {
+inline void postRequest(const AgentID id, LaborDemander& laborDemander, Market& market) noexcept {
     laborDemander.postLaborRequest(id, market);
 }
 
 inline void offer(LaborDemander& laborDemander) noexcept { laborDemander.offer(); }
 
-inline void registerMember(
-    LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier
-) noexcept {
-    laborDemander.registerMember(goodsSupplier.workspace());
+inline void endRecruiting(LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier) noexcept {
+    laborDemander.endRecruiting(goodsSupplier.workspace());
 }
 
 inline void acceptResignation(LaborDemander& laborDemander) noexcept {
@@ -31,7 +27,7 @@ inline void acceptResignation(LaborDemander& laborDemander) noexcept {
 namespace abm::labor::supplier {
 inline void work(LaborSupplier& laborSupplier) noexcept { laborSupplier.product(); }
 
-inline void laborEntry(const AgentID id, LaborSupplier& laborSupplier, Market& market) noexcept {
+inline void entry(const AgentID id, LaborSupplier& laborSupplier, Market& market) noexcept {
     laborSupplier.entry(id, market);
 }
 

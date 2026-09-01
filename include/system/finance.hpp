@@ -12,7 +12,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 
-namespace abm::begining::detail {
+namespace abm::finance::detail {
 [[nodiscard]] inline auto laborDemanderAnnualRequestBudget(
     LaborDemander& laborDemander, BaseGoodsSupplier& goodsSupplier
 ) noexcept -> Budget {
@@ -50,10 +50,10 @@ inline void distributeAnnualBudget(
     const auto desired = goodsSupplier.requiresCapital();
     return capitalDemander.planAndRequestBudget(desired);
 }
-}  // namespace abm::begining::detail
+}  // namespace abm::finance::detail
 
-namespace abm::begining {
-inline void beginingYear(
+namespace abm::finance {
+inline void judgeYearlyAndMonthlyBudget(
     FirmFinance&       finance,
     LaborDemander&     laborDemander,
     CapitalDemander&   capitalDemander,
@@ -77,7 +77,7 @@ inline void beginingYear(
     );
 }
 
-inline void beginingMonth(
+inline void judgeMonthlyBudget(
     FirmFinance&       finance,
     LaborDemander&     laborDemander,
     CapitalDemander&   capitalDemander,
@@ -97,7 +97,7 @@ inline void beginingMonth(
     capitalDemander.revisePlan(std::max(budget - sumWage, Budget{0.0}));
 }
 
-inline void beginingYear(
+inline void judgeYearlyAndMonthlyBudget(
     FirmFinance&       finance,
     LaborDemander&     laborDemander,
     BaseGoodsSupplier& goodsSupplier,
@@ -121,7 +121,7 @@ inline void beginingYear(
     );
 }
 
-inline void beginingMonth(
+inline void judgeMonthlyBudget(
     FirmFinance&       finance,
     LaborDemander&     laborDemander,
     BaseGoodsSupplier& goodsSupplier,
@@ -141,7 +141,7 @@ inline void beginingMonth(
     capitalDemander.revisePlan(std::max(budget - sumWage, Budget{0.0}));
 }
 
-inline void beginingMonth(
+inline void judgeMonthlyBudget(
     HHoldFinance& finance, LaborSupplier& laborSupplier, GoodsDemander& goodsDemander
 ) noexcept {
     const auto wage = static_cast<Budget>(laborSupplier.wage());
@@ -156,4 +156,4 @@ inline void beginingMonth(
     ASSERT(budget <= goodsDemanderRequest);
     goodsDemander.revisePlan(budget);
 }
-}  // namespace abm::begining
+}  // namespace abm::finance
