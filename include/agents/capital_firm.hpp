@@ -30,6 +30,6 @@ class CapitalFirm final {
     CapitalDemander capitalDemander_;
     CapitalSupplier capitalSupplier_;
     const AgentID   id_;
-    const int       businessDay_{instanceCnt++ % setting::dayInMonth};
+    const int       operationDay_{instanceCnt++ % setting::dayInMonth};
 };
 }  // namespace abm
