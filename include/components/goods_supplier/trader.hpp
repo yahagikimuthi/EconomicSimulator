@@ -56,7 +56,7 @@ class Trader final {
     [[nodiscard]] auto calcTotalDemand() const noexcept -> GoodsQuantity {
         const auto requests = myEntry_->requests();
         return std::ranges::fold_left(
-            requests | std::views::transform([this](const Request& req) noexcept -> GoodsQuantity {
+            requests | std::views::transform([&](const Request& req) noexcept -> GoodsQuantity {
                 return req.payment() / myEntry_->price;
             }),
             GoodsQuantity{0.0},
