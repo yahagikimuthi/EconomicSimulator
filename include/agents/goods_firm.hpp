@@ -17,19 +17,100 @@ class GoodsFirm final {
   public:
     explicit GoodsFirm(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng},
-          laborDemander_{id, masterRng},
-          capitalDemander_{masterRng},
-          goodsSupplier_{masterRng},
+          labor_{id, masterRng},
+          capital_{masterRng},
+          goods_{masterRng},
           id_{id} {}
 
-    void act(const Date& today, Markets& markets) noexcept;
+    void act(const Date& date, Markets& markets) noexcept {
+        if (date.day() == operationDay_ and date.isBeginingYear())
+            actJanuaryOperatingDay(markets);
+        else if (date.day() == operationDay_ and not date.isBeginingYear())
+            actRegularOperatingDay(date, markets);
+        else if (date.day() == operationDay_ - 1)
+    }
 
   private:
+    void actJanuaryOperatingDay(Markets& markets) noexcept {
+        const auto employee       = labor_.employeeCnt();
+        const auto adjustEmploy   = goods_.calcDesiredEmploy(employee);
+        const auto sales          = goods_.salesForecast();
+        const auto laborBudgetReq = labor_.requestAnnualBudget(adjustEmploy, sales);
+
+        const auto totalCost = labor_.sumWage();
+        const auto salesPlan = goods_.planAndExpectSales(totalCost);
+
+        const auto desiredCapital   = goods_.requiresCapital();
+        const auto capitalBudgetReq = capital_.requestBudget(desiredCapital);
+
+        const auto total  = laborBudgetReq + capitalBudgetReq - salesPlan;
+        const auto budget = finance_.claimBudget(total) + salesPlan;
+        ASSERT(budget <= laborBudgetReq + capitalBudgetReq);
+
+        if (budget.isZeroOrLess()) {
+            labor_.reviseAnnualPlan(laborBudgetReq);
+            capital_.revisePlan(capitalBudgetReq);
+        } else if (budget < laborBudgetReq) {
+            labor_.reviseAnnualPlan(budget);
+            capital_.revisePlan(Budget{0.0});
+        } else {
+            labor_.reviseAnnualPlan(laborBudgetReq);
+            capital_.revisePlan(budget - laborBudgetReq);
+        }
+
+        labor_.layOffs();
+        labor_.postLaborRequest(id_, markets.laborMarket);
+
+        goods_.post(id_, markets.goodsMarket);
+
+        capital_.request(id_, finance_, markets.capitalMarket);
+    }
+
+    void actRegularOperatingDay(const Date& date, Markets& markets) noexcept {
+        const auto laborCost = labor_.calcMonthlyCost();
+
+        const auto totalCost = labor_.sumWage();
+        const auto salesPlan = goods_.planAndExpectSales(totalCost);
+
+        const auto desiredCapital   = goods_.requiresCapital();
+        const auto capitalBudgetReq = capital_.requestBudget(desiredCapital);
+
+        const auto total  = laborCost + capitalBudgetReq - salesPlan;
+        const auto budget = finance_.claimBudget(total) + salesPlan;
+        ASSERT(budget <= laborCost + capitalBudgetReq);
+
+        if (budget.isZeroOrLess()) {
+            capital_.revisePlan(capitalBudgetReq);
+        } else if (budget < laborCost) {
+            capital_.revisePlan(Budget{0.0});
+        } else {
+            capital_.revisePlan(budget - laborCost);
+        }
+
+        const auto month = date.month();
+        ASSERT(month != 1);
+        switch (date.month()) {
+            case 3:
+                labor_.offer();
+            case 5:
+                labor_.endRecruiting(goods_.workspace());
+            default:
+        }
+
+        capital_.request(id_, finance_, markets.capitalMarket);
+
+        goods_.post(id_, markets.goodsMarket);
+    }
+
+    void actAfterOperationDay(Markets& markets) noexcept { labor_. }
+
+    void actBeforeOperationDay(Markets& markets) noexcept;
+
     FirmFinance     finance_;
-    LaborDemander   laborDemander_;
-    CapitalDemander capitalDemander_;
-    GoodsSupplier   goodsSupplier_;
+    LaborDemander   labor_;
+    CapitalDemander capital_;
+    GoodsSupplier   goods_;
     const AgentID   id_;
-    const int       businessDay_{instanceCnt++ % setting::dayInMonth};
+    const int       operationDay_{instanceCnt++ % setting::dayInMonth};
 };
 }  // namespace abm
