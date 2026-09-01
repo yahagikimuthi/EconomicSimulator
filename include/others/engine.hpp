@@ -7,8 +7,8 @@
 #include "others/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "system/begining.hpp"
 #include "system/capital.hpp"
+#include "system/finance.hpp"
 #include "system/goods.hpp"
 #include "system/labor.hpp"
 #include "values/date.hpp"
@@ -50,144 +50,74 @@ class Engine final {
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
             if (today_.isBeginingYear()) {
-                runYearlyPhase();
-            } else if (today_.isBeginingMonth()) {
-                runMonthlyPhase();
-            } else {
-                runDailyPhase();
             }
         }
     }
 
   private:
-    void runYearlyPhase() noexcept {
-        for (auto& hhold : hholds_) {
-            labor::supplier::work(hhold.laborSupplier);
-        }
-        for (auto& firm : consumerFirms_) {
-            begining::beginingMonth(
+    void runYearly() noexcept {
+        for (auto& firm : capitalFirms_) {
+            finance::judgeYearlyAndMonthlyBudget(
                 firm.finance, firm.laborDemander, firm.goodsSupplier, firm.capitalDemander
             );
         }
-        for (auto& firm : capitalFirms_) {
-            begining::beginingYear(
-                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
-            );
-        }
-        runLabor();
-        runCapital();
-        runGoods();
-    }
-
-    void runMonthlyPhase() noexcept {
-        for (auto& hhold : hholds_) {
-            labor::supplier::work(hhold.laborSupplier);
-        }
         for (auto& firm : consumerFirms_) {
-            begining::beginingMonth(
+            finance::judgeYearlyAndMonthlyBudget(
                 firm.finance, firm.laborDemander, firm.goodsSupplier, firm.capitalDemander
             );
         }
-        for (auto& firm : capitalFirms_) {
-            begining::beginingMonth(
-                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
-            );
-        }
-        runCapital();
-        runGoods();
+        runYearlyLaborMarket();
     }
 
-    void runDailyPhase() noexcept {
-        for (auto& hhold : hholds_) {
-            labor::supplier::work(hhold.laborSupplier);
-        }
-        runCapital();
-        runGoods();
-    }
-
-    void runLabor() noexcept {
-        using namespace labor;
-        for (auto& firm : consumerFirms_) {
-            demander::layOffs(firm.laborDemander);
-            demander::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
+    void runYearlyLaborMarket() noexcept {
+        for (auto& firm : capitalFirms_) {
+            labor::demander::layOffs(firm.laborDemander);
         }
         for (auto& firm : capitalFirms_) {
-            demander::layOffs(firm.laborDemander);
-            demander::postLaborRequest(firm.id, firm.laborDemander, laborMarket_);
+            labor::demander::layOffs(firm.laborDemander);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            labor::demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
+        }
+        for (auto& firm : consumerFirms_) {
+            labor::demander::postRequest(firm.id, firm.laborDemander, laborMarket_);
         }
 
         for (auto& hhold : hholds_) {
-            supplier::laborEntry(hhold.id, hhold.laborSupplier, laborMarket_);
+            labor::supplier::entry(hhold.id, hhold.laborSupplier, laborMarket_);
         }
 
-        for (auto& firm : consumerFirms_) {
-            demander::offer(firm.laborDemander);
-        }
         for (auto& firm : capitalFirms_) {
-            demander::offer(firm.laborDemander);
+            labor::demander::offer(firm.laborDemander);
+        }
+        for (auto& firm : consumerFirms_) {
+            labor::demander::offer(firm.laborDemander);
         }
 
         for (auto& hhold : hholds_) {
-            supplier::acceptOffer(hhold.laborSupplier);
+            labor::supplier::acceptOffer(hhold.laborSupplier);
         }
 
-        for (auto& firm : consumerFirms_) {
-            demander::registerMember(firm.laborDemander, firm.goodsSupplier);
-        }
         for (auto& firm : capitalFirms_) {
-            demander::registerMember(firm.laborDemander, firm.goodsSupplier);
+            labor::demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
+        }
+        for (auto& firm : consumerFirms_) {
+            labor::demander::endRecruiting(firm.laborDemander, firm.goodsSupplier);
         }
 
         for (auto& hhold : hholds_) {
-            supplier::recordRosterEntry(hhold.laborSupplier);
-        }
-
-        for (auto& firm : consumerFirms_) {
-            demander::acceptResignation(firm.laborDemander);
-        }
-        for (auto& firm : capitalFirms_) {
-            demander::acceptResignation(firm.laborDemander);
+            labor::supplier::recordRosterEntry(hhold.laborSupplier);
         }
     }
 
-    void runCapital() noexcept {
-        using namespace capital;
+    void runMonthlyCapitalMarket() noexcept {
         for (auto& firm : capitalFirms_) {
-            supplier::supplyCapital(firm.id, firm.goodsSupplier, capitalMarket_);
+            capital::supplier::supply(firm.id, firm.goodsSupplier, capitalMarket_);
         }
 
         for (auto& firm : capitalFirms_) {
-            demander::purchaseCapital(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-        }
-        for (auto& firm : consumerFirms_) {
-            demander::purchaseCapital(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            supplier::tradeCapital(firm.finance, firm.goodsSupplier);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            supplier::afterCapitalTrade(firm.finance, firm.capitalDemander);
-        }
-        for (auto& firm : consumerFirms_) {
-            supplier::afterCapitalTrade(firm.finance, firm.capitalDemander);
-        }
-    }
-
-    void runGoods() noexcept {
-        using namespace goods;
-        for (auto& firm : consumerFirms_) {
-            supplier::supply(firm.id, firm.goodsSupplier, goodsMarket_);
-        }
-        for (auto& hhold : hholds_) {
-            demander::purchase(hhold.id, hhold.finance, hhold.goodsDemander, goodsMarket_);
-        }
-        for (auto& firm : consumerFirms_) {
-            supplier::trade(firm.finance, firm.goodsSupplier);
-        }
-        for (auto& hhold : hholds_) {
-            demander::afterTrade(hhold.finance, hhold.goodsDemander);
+            capital::demander::purchase()
         }
     }
 
