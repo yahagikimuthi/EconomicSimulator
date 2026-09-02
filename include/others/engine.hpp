@@ -21,8 +21,6 @@ namespace abm {
 template <typename... Agents>
     requires(IAgent<Agents> and ...)
 class AgentRegistry final {
-    using Agent = std::variant<Agents...>;
-
   public:
     AgentRegistry() noexcept = default;
 
@@ -41,7 +39,7 @@ class AgentRegistry final {
     }
 
   private:
-    std::vector<Agent> agents_;
+    std::vector<std::variant<Agents...>> agents_;
 };
 
 class Engine final {
