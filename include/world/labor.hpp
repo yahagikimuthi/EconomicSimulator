@@ -15,7 +15,6 @@
 #include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
-#include "world/deposit.hpp"
 
 namespace abm::labor {
 class RosterEntry;
@@ -114,13 +113,9 @@ inline void RosterEntry::resign() noexcept { roster_.resign(*this); }
 
 class Request;
 class Entry final {
-    using DepositAccount = finance::deposit::DepositAccount;
-
   public:
-    Entry(
-        const AgentID Id, const double power, DepositAccount& account, const Request& req
-    ) noexcept
-        : entrantId{Id}, productPower{power}, request{req}, depositAccount_{account} {
+    Entry(const AgentID Id, const double power, const Request& req) noexcept
+        : entrantId{Id}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
     // Request::entries() -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
@@ -147,8 +142,7 @@ class Entry final {
         return *rosterEntry_;
     }
 
-    const Request&  request;
-    DepositAccount& depositAccount_;
+    const Request& request;
 
   private:
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
@@ -161,12 +155,10 @@ class Request final {
     Request(const AgentID Id, const Wage Wage) noexcept : firmID{Id}, wage{Wage} {
         ASSERT(Wage.isPositive());
     }
-    [[nodiscard]] auto entry(
-        const AgentID id, const double productPower, finance::deposit::DepositAccount& account
-    ) noexcept -> Entry& {
+    [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
         ASSERT(productPower > 0.0);
         ASSERT(id != firmID);
-        return *entries_.emplace_back(id, productPower, account, *this);
+        return *entries_.emplace_back(id, productPower, *this);
     }
 
     [[nodiscard]] auto entries() noexcept -> auto { return std::ranges::subrange{entries_}; }
