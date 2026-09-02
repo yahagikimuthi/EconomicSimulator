@@ -18,7 +18,7 @@ class GoodsFirm final {
   public:
     explicit GoodsFirm(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng},
-          labor_{id, masterRng},
+          labor_{id, masterRng, Day{instanceCnt % setting::dayInMonth}},
           capital_{masterRng},
           goods_{masterRng},
           id_{id} {}

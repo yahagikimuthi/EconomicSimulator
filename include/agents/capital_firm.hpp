@@ -18,7 +18,7 @@ class CapitalFirm final {
   public:
     CapitalFirm(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng},
-          labor_{id, masterRng},
+          labor_{id, masterRng, Day{instanceCnt % setting::dayInMonth}},
           capitalDemander_{masterRng},
           capitalSupplier_{masterRng},
           id_{id} {}

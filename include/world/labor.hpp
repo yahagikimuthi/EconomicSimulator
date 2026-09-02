@@ -19,8 +19,9 @@
 namespace abm::labor {
 class RosterEntry;
 struct CompanyBoard final {
-    CompanyBoard(const AgentID Id) noexcept : firmId{Id} {}
+    CompanyBoard(const AgentID Id, const Day WorkDay) noexcept : firmId{Id}, workDay{WorkDay} {}
     const AgentID firmId;
+    const Day     workDay;
 };
 
 class Roster;
@@ -53,6 +54,7 @@ class RosterEntry final {
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
+    [[nodiscard]] auto workDay() const noexcept -> Day { return companyBoard_.workDay; }
 
     const AgentID employeeId;
     const Wage    wage;
