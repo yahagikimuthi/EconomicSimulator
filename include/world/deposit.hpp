@@ -30,3 +30,7 @@ class DepositAccount final {
     Money deposit_{0.0};
 };
 }  // namespace abm::finance::deposit
+
+namespace abm {
+using DepositAccount = finance::deposit::DepositAccount;
+}
