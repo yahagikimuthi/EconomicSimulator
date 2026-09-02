@@ -76,7 +76,10 @@ class Roster final {
     ) noexcept -> RosterEntry& {
         if (empties_.empty()) return entries_.emplace_back(id, wage, board, space, *this);
         auto& newEntry = empties_.back().get();
-        empties_.resize(empties_.size() - 1UZ);
+        empties_.resize(  // 第二引数はコンパイルエラーを防止するためのダミー
+            empties_.size() - 1UZ,
+            newEntry
+        );
         std::destroy_at(&newEntry);
         std::construct_at(&newEntry, id, wage, board, space, *this);
         return newEntry;

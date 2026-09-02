@@ -124,7 +124,9 @@ class LaborDemander final {
         humanResource_.revisePlan(budget);
     }
 
-    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget;
+    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
+        return static_cast<Budget>(sumWage());
+    }
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         const auto out = humanResource_.employeeCnt();

@@ -78,7 +78,8 @@ class HumanResource final {
     void payWage(TryWithdrawFn auto&& withdrawFn) noexcept {
         for (auto& entry : roster_.rawEntries()) {
             if (not entry.isOccupied()) continue;
-            entry.payWage(withdrawFn(entry.wage));
+            const auto wage = static_cast<Money>(entry.wage);
+            entry.payWage(withdrawFn(static_cast<Budget>(wage)));
         }
     }
 
