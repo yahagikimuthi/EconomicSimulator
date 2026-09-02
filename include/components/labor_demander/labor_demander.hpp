@@ -76,8 +76,10 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    explicit LaborDemander(const AgentID id, RandomGenerator& masterRng, const Day workDay) noexcept
-        : recruitSystem_{masterRng}, humanResource_{id, workDay} {
+    explicit LaborDemander(
+        const AgentID id, RandomGenerator& masterRng, const Day operationDay
+    ) noexcept
+        : recruitSystem_{masterRng}, humanResource_{id, operationDay} {
         setMediator();
     }
     LaborDemander(const LaborDemander& other) noexcept
