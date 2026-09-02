@@ -16,8 +16,8 @@
 namespace abm::labor::demander::human_resource {
 class HumanResource final {
   public:
-    explicit HumanResource(const AgentID id, const Day workDay) noexcept
-        : companyBoard_{id, workDay} {}
+    explicit HumanResource(const AgentID id, const Day operationDay) noexcept
+        : companyBoard_{id, operationDay - Day{1}} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Budget {
         const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
