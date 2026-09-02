@@ -10,6 +10,10 @@ class Day final {
   public:
     explicit constexpr Day(const int day) : day_{day} { ASSERT(day > 0); }
 
+    [[nodiscard]] auto operator+(Day other) const noexcept -> Day { return Day{day_ + other.day_}; }
+    [[nodiscard]] auto operator-(Day other) const noexcept -> Day { return Day{day_ - other.day_}; }
+    [[nodiscard]] auto value() const noexcept -> int { return day_; }
+
     auto operator<=>(const Day&) const noexcept -> auto = default;
     auto operator==(const Day&) const noexcept -> bool  = default;
 
@@ -17,9 +21,6 @@ class Day final {
         ++day_;
         return *this;
     }
-
-    [[nodiscard]] auto operator+(Day other) const noexcept -> Day { return Day{day_ + other.day_}; }
-    [[nodiscard]] auto operator-(Day other) const noexcept -> Day { return Day{day_ - other.day_}; }
 
   private:
     int day_;
@@ -29,6 +30,8 @@ class Month final {
   public:
     explicit constexpr Month(const int month) : month_{month} { ASSERT(month > 0); }
 
+    [[nodiscard]] auto value() const noexcept -> int { return month_; }
+
     auto operator<=>(const Month&) const noexcept -> auto = default;
     auto operator==(const Month&) const noexcept -> bool  = default;
 
@@ -36,8 +39,9 @@ class Month final {
         ++month_;
         return *this;
     }
-
-    [[nodiscard]] auto value() const noexcept -> int { return month_; }
+    auto operator-(const Month other) const noexcept -> Month {
+        return Month{month_ - other.month_};
+    }
 
   private:
     int month_;
@@ -47,9 +51,13 @@ class Year final {
   public:
     explicit constexpr Year(const int year) : year_{year} { ASSERT(year > 0); }
 
+    [[nodiscard]] auto operator-(const Year other) const noexcept -> Year {
+        return Year{year_ + other.year_};
+    }
+    [[nodiscard]] auto value() const noexcept -> int { return year_; }
+
     auto operator<=>(const Year&) const noexcept -> auto = default;
     auto operator==(const Year&) const noexcept -> bool  = default;
-
     auto operator++() noexcept -> Year& {
         ++year_;
         return *this;
@@ -78,6 +86,15 @@ class Date final {
     [[nodiscard]] constexpr auto day() const noexcept -> Day { return day_; }
 
     [[nodiscard]] constexpr auto month() const noexcept -> Month { return month_; }
+
+    [[nodiscard]] constexpr auto toFlatTime() const noexcept -> Day {
+        const auto yearIdx   = year_ - Year{1};
+        const auto monthIdx  = month_ - Month{1};
+        const auto dayIdx    = day_ - Day{1};
+        const auto flatMonth = (yearIdx.value() * setting::monthInYear) + monthIdx.value();
+        const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx.value();
+        return Day{flatDay};
+    }
 
     constexpr auto operator++() noexcept -> Date& {
         if (day_ < Day{setting::dayInMonth}) {

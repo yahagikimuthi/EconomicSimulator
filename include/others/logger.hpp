@@ -32,7 +32,7 @@ class Logger final {
 
     void save(const CensusDropBox& dropBox, const Date date) noexcept {
         namespace name = setting::save_name;
-        auto groupPath = std::string{"/step_" + std::to_string(date.toFlatTime())};
+        auto groupPath = std::string{"/step_" + std::to_string(date.toFlatTime().value())};
         auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
         auto create =
