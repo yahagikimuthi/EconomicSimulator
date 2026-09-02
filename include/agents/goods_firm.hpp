@@ -114,7 +114,7 @@ class GoodsFirm final {
     }
 
     void actBeforeOperationDay() noexcept {
-        labor_.payWage(finance_.makeWithdrawFn(FirmFinance::AccountItem::))
+        labor_.payWage(finance_.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
     }
 
     void actAfterOperationDay() noexcept {

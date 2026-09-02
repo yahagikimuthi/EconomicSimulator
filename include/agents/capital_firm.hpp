@@ -112,7 +112,9 @@ class CapitalFirm final {
         capitalSupplier_.post(id_, markets.capitalMarket);
     }
 
-    void actBeforeOperationDay() noexcept;
+    void actBeforeOperationDay() noexcept {
+        labor_.payWage(finance_.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
+    }
 
     void actAfterOperationDay() noexcept {
         capitalDemander_.afterTrade(
