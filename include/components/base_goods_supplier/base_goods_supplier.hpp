@@ -73,11 +73,7 @@ class BaseGoodsSupplier final {
         producingSystem_.addProducingEquip(capital);
     }
 
-    template <AssetPlusFn F>
-    void endStep(F&& assetPlus, CensusDropBox& dropBox) noexcept {
-        tradingSystem_.endStep(std::forward<F>(assetPlus), mediator_);
-        reset(dropBox);
-    }
+    void endTrading() noexcept { tradingSystem_.endTrading(mediator_); }
 
     [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 

@@ -42,11 +42,9 @@ class TradingSystem final {
         trader_.trade(std::forward<F>(depositFn));
     }
 
-    void endStep(AssetPlusFn auto&& assetPlus, IMediator auto& mediator) noexcept {
+    void endTrading(IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
-        if (not result) return;
-        assetPlus(result->sales);
-        mediator.publishTradeResult(*result);
+        if (result) mediator.publishTradeResult(result);
     }
 
     void reset() noexcept {
