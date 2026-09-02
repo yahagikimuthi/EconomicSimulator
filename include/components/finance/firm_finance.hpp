@@ -14,6 +14,7 @@ class FirmFinance final {
         void reset() noexcept { sales = capitalGoodsCost = depreciation = taxes = Money{0.0}; }
 
         Money sales{0.0};
+        Money personalCost{0.0};
         Money capitalGoodsCost{0.0};
         Money depreciation{0.0};
         Money taxes{0.0};
@@ -25,7 +26,7 @@ class FirmFinance final {
           cash_{Money{masterRng.random(setting::firmInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    enum class AccountItem : char { Sales, CapitalGoodsCost, Depreciation, Taxes };
+    enum class AccountItem : char { Sales, PersonalCost, CapitalGoodsCost, Depreciation, Taxes };
 
     [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> TryWithdrawFn auto {
         return [&, item](const Budget withdraw) noexcept -> Money {
@@ -107,6 +108,9 @@ class FirmFinance final {
             case AccountItem::Sales:
                 pl_.sales += money;
                 break;
+            case AccountItem::PersonalCost:
+                pl_.personalCost -= money;
+                break;
             case AccountItem::CapitalGoodsCost:
                 pl_.capitalGoodsCost -= money;
                 break;
@@ -124,6 +128,9 @@ class FirmFinance final {
         switch (item) {
             case AccountItem::Sales:
                 pl_.sales -= money;
+                break;
+            case AccountItem::PersonalCost:
+                pl_.personalCost += money;
                 break;
             case AccountItem::CapitalGoodsCost:
                 pl_.capitalGoodsCost += money;
