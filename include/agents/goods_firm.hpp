@@ -115,10 +115,12 @@ class GoodsFirm final {
 
     void actBeforeOperationDay() noexcept {
         labor_.payWage(finance_.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
+        goods_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
     }
 
     void actAfterOperationDay() noexcept {
         capital_.afterTrade(finance_.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost));
+        goods_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
     }
 
     void actNothingDay() noexcept {

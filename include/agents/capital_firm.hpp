@@ -114,12 +114,14 @@ class CapitalFirm final {
 
     void actBeforeOperationDay() noexcept {
         labor_.payWage(finance_.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
+        capitalSupplier_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
     }
 
     void actAfterOperationDay() noexcept {
         capitalDemander_.afterTrade(
             finance_.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost)
         );
+        capitalSupplier_.trade(finance_.makeDepositFn(FirmFinance::AccountItem::Sales));
     }
 
     void actNothingDay() noexcept {
