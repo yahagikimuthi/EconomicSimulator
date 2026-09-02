@@ -47,7 +47,10 @@ class Engine final {
 
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
-        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endingDay_{endingDay} {
+        : seed_{generateSeed()},
+          rng_{{seed_.state, seed_.stream}},
+          endingDay_{endingDay},
+          markets_{today_} {
         namespace cnt = setting::agent_count;
         auto id       = 0;
 
@@ -83,14 +86,14 @@ class Engine final {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
+    const Date endingDay_;
+    Date       today_{1, 1, 1};
+
     Logger logger_;
 
     Agent agents_;
 
     MarketRegistry markets_;
     CensusDropBox  dropBox_;
-
-    const Date endingDay_;
-    Date       today_{1, 1, 1};
 };
 }  // namespace abm

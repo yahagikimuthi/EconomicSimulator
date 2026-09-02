@@ -7,6 +7,7 @@
 
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/goods.hpp"
 #include "world/common.hpp"
 
@@ -128,7 +129,7 @@ class Market final {
     using EntryT = Entry<MarketT>;
 
   public:
-    Market() noexcept = default;
+    Market(const Date& today) noexcept : today_{today} {}
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> EntryT& {
@@ -159,6 +160,7 @@ class Market final {
   private:
     tbb::concurrent_vector<EntryT> entries_;
     std::atomic<double>            totalSupply_;
+    const Date&                    today_;
 };
 }  // namespace abm::base_goods
 
