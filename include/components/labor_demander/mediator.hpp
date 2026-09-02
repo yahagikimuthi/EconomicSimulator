@@ -18,14 +18,14 @@ class Listener final {
     Listener() noexcept = default;
 
     template <typename T>
-        requires std::disjunction_v<std::is_same<T, Ts>...>
+        requires(std::is_same_v<T, Ts> or ...)
     void add(T& t) noexcept {
         ASSERT(not std::get<std::optional<T&>>(listeners_));
         std::get<std::optional<T&>>(listeners_) = t;
     }
 
     template <typename F>
-        requires std::conjunction_v<std::is_invocable<F, Ts>...>
+        requires(std::is_invocable_v<F, Ts> and ...)
     void notice(F&& methodCaller) noexcept {
         template for (auto& opt : listeners_) {
             if (opt) {
