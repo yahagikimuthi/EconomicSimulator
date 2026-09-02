@@ -1,12 +1,9 @@
 #pragma once
 
 #include <algorithm>
-#include <cstddef>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <ranges>
-#include <vector>
 
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -15,28 +12,6 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::human_resource {
-class EmptyRosterPool final {
-  public:
-    EmptyRosterPool() noexcept = default;
-    [[nodiscard]] auto size() const noexcept -> std::size_t { return pool_.size(); }
-    [[nodiscard]] auto empty() const noexcept -> bool { return size() == 0UZ; }
-
-    auto popBackEntry() noexcept -> RosterEntry& {
-        ASSERT(not empty());
-        auto& back = pool_.back().get();
-        ASSERT(not back.isOccupied());
-        pool_.pop_back();
-        return back;
-    }
-    void add(RosterEntry& entry) noexcept {
-        ASSERT(not entry.isOccupied());
-        pool_.emplace_back(std::ref(entry));
-    }
-
-  private:
-    std::vector<RefWrap<RosterEntry>> pool_;
-};
-
 class HumanResource final {
   public:
     explicit HumanResource(const AgentID id) noexcept : companyBoard_{id} {}
@@ -66,37 +41,22 @@ class HumanResource final {
         return *requestedBudget_;
     }
 
-    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
-        ASSERT(companyBoard_.roster.size() >= emptyRosterPool_.size());
-        const auto rosterSize = companyBoard_.roster.size() - emptyRosterPool_.size();
-        const auto out        = HeadCount{rosterSize};
-        ASSERT(out.isZeroOrMore());
-        return out;
-    }
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount { return roster_.employeeCnt(); }
 
     [[nodiscard]] auto sumWage() const noexcept -> Wage {
-        const auto& roster = companyBoard_.roster;
-
-        auto wages = roster | std::views::filter(&RosterEntry::isOccupied) |
-                     std::views::transform([](const RosterEntry& e) noexcept -> double {
-                         return e.wage.value();
-                     });
-        const auto sumWage = std::ranges::fold_left(wages, 0.0, std::plus{});
-        ASSERT(sumWage >= 0.0);
-        return Wage{sumWage};
+        auto       entries = roster_.validEntries();
+        const auto out     = std::ranges::fold_left(
+            entries | std::views::transform(&RosterEntry::wage), Wage{0.0}, std::plus{}
+        );
+        ASSERT(out >= Wage{0.0});
+        return out;
     }
 
     [[nodiscard]] auto addRoster(
         const AgentID id, const Wage wage, base_goods::Workspace& workspace
     ) noexcept -> RosterEntry& {
         ASSERT(wage.isPositive());
-
-        if (emptyRosterPool_.empty()) return companyBoard_.addRoster(id, wage, workspace);
-        auto* newRoster = &emptyRosterPool_.popBackEntry();
-        ASSERT(newRoster != nullptr);
-        std::destroy_at(newRoster);
-        std::construct_at(newRoster, id, wage, companyBoard_, workspace);
-        return *newRoster;
+        return roster_.add(id, wage, companyBoard_, workspace);
     }
 
     void layOffs() noexcept {
@@ -104,18 +64,17 @@ class HumanResource final {
         ASSERT(layOffsCnt->isZeroOrMore());
 
         auto currentLayOffs = HeadCount{0.0};
-        for (auto& entry : companyBoard_.roster) {
+        for (auto& entry : roster_.rawEntries()) {
             if (currentLayOffs >= layOffsCnt) break;
             if (not entry.isOccupied()) continue;
-            entry.disable();
-            emptyRosterPool_.add(entry);
+            entry.resign();
             ++currentLayOffs;
         }
     }
 
   private:
+    Roster                   roster_;
     CompanyBoard             companyBoard_;
-    EmptyRosterPool          emptyRosterPool_;
     std::optional<HeadCount> layOffsPlan_;
     std::optional<Budget>    requestedBudget_;
 };
