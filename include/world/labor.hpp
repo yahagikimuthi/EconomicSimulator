@@ -6,6 +6,7 @@
 #include <functional>
 #include <inplace_vector>
 #include <iterator>
+#include <memory>
 #include <optional>
 #include <ranges>
 
@@ -14,29 +15,26 @@
 #include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
+#include "world/deposit.hpp"
 
 namespace abm::labor {
 class RosterEntry;
 struct CompanyBoard final {
     CompanyBoard(const AgentID Id) noexcept : firmId{Id} {}
-    void resign(RosterEntry& resignEntry) noexcept {
-        resignationBox.emplace_back(std::ref(resignEntry));
-    }
-    [[nodiscard]] auto addRoster(
-        const AgentID id, const Wage wage, base_goods::Workspace& workspace
-    ) noexcept -> RosterEntry&;
-
-    const AgentID                                firmId;
-    std::deque<RosterEntry>                      roster;
-    tbb::concurrent_vector<RefWrap<RosterEntry>> resignationBox;
+    const AgentID firmId;
 };
 
+class Roster;
 class RosterEntry final {
   public:
     RosterEntry(
-        const AgentID Id, const Wage Wage, CompanyBoard& board, base_goods::Workspace& space
+        const AgentID          Id,
+        const Wage             Wage,
+        CompanyBoard&          board,
+        base_goods::Workspace& space,
+        Roster&                roster
     ) noexcept
-        : employeeId{Id}, wage{Wage}, companyBoard_{board}, workspace_{space} {
+        : employeeId{Id}, wage{Wage}, companyBoard_{board}, workspace_{space}, roster_{roster} {
         ASSERT(Wage.isPositive());
         ASSERT(Id != companyBoard_.firmId);
     }
@@ -50,7 +48,7 @@ class RosterEntry final {
     ~RosterEntry() noexcept                                     = default;
 
     void addInput(const double productPower) noexcept { workspace_.addInput(productPower); }
-    void resign() noexcept { companyBoard_.resign(*this); }
+    void resign() noexcept;
     void disable() noexcept { isOccupied_ = false; }
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
@@ -62,21 +60,56 @@ class RosterEntry final {
   private:
     CompanyBoard&          companyBoard_;
     base_goods::Workspace& workspace_;
+    Roster&                roster_;
+    Money                  paidWage_{0.0};
     bool                   isOccupied_{true};
 };
 
-inline auto CompanyBoard::addRoster(
-    const AgentID id, const Wage wage, base_goods::Workspace& workspace
-) noexcept -> RosterEntry& {
-    ASSERT(wage.isPositive());
-    return roster.emplace_back(id, wage, *this, workspace);
-}
+class Roster final {
+  public:
+    Roster() noexcept = default;
+
+    [[nodiscard]] auto add(
+        const AgentID id, const Wage wage, CompanyBoard& board, base_goods::Workspace& space
+    ) noexcept -> RosterEntry& {
+        if (empties_.empty()) return entries_.emplace_back(id, wage, board, space, *this);
+        auto& newEntry = empties_.back().get();
+        empties_.resize(empties_.size() - 1UZ);
+        std::destroy_at(&newEntry);
+        std::construct_at(&newEntry, id, wage, board, space, *this);
+        return newEntry;
+    }
+
+    void resign(RosterEntry& resignation) noexcept {
+        resignation.disable();
+        empties_.emplace_back(std::ref(resignation));
+    }
+
+    [[nodiscard]] auto entries() noexcept -> auto {
+        return entries_ | std::views::filter(&RosterEntry::isOccupied);
+    }
+
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
+        ASSERT(entries_.size() >= empties_.size());
+        return HeadCount{entries_.size() - empties_.size()};
+    }
+
+  private:
+    std::deque<RosterEntry>                      entries_;
+    tbb::concurrent_vector<RefWrap<RosterEntry>> empties_;
+};
+
+inline void RosterEntry::resign() noexcept { roster_.resign(*this); }
 
 class Request;
 class Entry final {
+    using DepositAccount = finance::deposit::DepositAccount;
+
   public:
-    Entry(const AgentID Id, const double power, const Request& req) noexcept
-        : entrantId{Id}, productPower{power}, request{req} {
+    Entry(
+        const AgentID Id, const double power, DepositAccount& account, const Request& req
+    ) noexcept
+        : entrantId{Id}, productPower{power}, request{req}, depositAccount_{account} {
         ASSERT(power > 0.0);
     }
     // Request::entries() -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
@@ -103,7 +136,8 @@ class Entry final {
         return *rosterEntry_;
     }
 
-    const Request& request;
+    const Request&  request;
+    DepositAccount& depositAccount_;
 
   private:
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
@@ -116,10 +150,12 @@ class Request final {
     Request(const AgentID Id, const Wage Wage) noexcept : firmID{Id}, wage{Wage} {
         ASSERT(Wage.isPositive());
     }
-    [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
+    [[nodiscard]] auto entry(
+        const AgentID id, const double productPower, finance::deposit::DepositAccount& account
+    ) noexcept -> Entry& {
         ASSERT(productPower > 0.0);
         ASSERT(id != firmID);
-        return *entries_.emplace_back(id, productPower, *this);
+        return *entries_.emplace_back(id, productPower, account, *this);
     }
 
     [[nodiscard]] auto entries() noexcept -> auto { return std::ranges::subrange{entries_}; }
