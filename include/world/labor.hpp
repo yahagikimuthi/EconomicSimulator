@@ -42,8 +42,7 @@ class RosterEntry final {
     }
     // std::deque<RosterEntry>に対しstd::swapを施すと
     // entrantが持つ参照が無意味となる。
-    // よって、各種コンストラクタ及び演算子を明示的削除する。
-    // コピーコンストラクタはreserveを呼び出すのに必要であるから定義する。
+    // よって、代入演算子を明示的削除する。
     RosterEntry(const RosterEntry&) noexcept                    = default;
     auto operator=(const RosterEntry&) noexcept -> RosterEntry& = delete;
     RosterEntry(RosterEntry&&)                                  = delete;
@@ -83,8 +82,8 @@ class Entry final {
     // Request::entries() -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
     // entrantが持つ参照が無効化してしまう。
     // std::sortはstd::swapを内部で行い、そのコンセプトはコピー及びムーブ構築が可能であること。
-    // よって、各種コンストラクタ及び演算子を明示的削除する。
-    Entry(const Entry&)                             = delete;
+    // よって、代入演算子を明示的削除する。
+    Entry(const Entry&)                             = default;
     auto operator=(const Entry&) noexcept -> Entry& = delete;
     Entry(Entry&&)                                  = delete;
     auto operator=(Entry&&) noexcept -> Entry&      = delete;

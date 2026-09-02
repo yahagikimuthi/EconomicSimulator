@@ -60,9 +60,9 @@ class Request final {
     }
     // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
     // Requestorが持つ参照が無意味となる。
-    // よって、各種コンストラクタ及び演算子を明示的削除する。
-    Request(const Request&)                             = delete;
-    auto operator=(const Request&) noexcept -> Request& = delete;
+    // よって、代入演算子を明示的削除する。
+    Request(const Request&)                             = default;
+    auto operator=(const Request&) noexcept -> Request& = default;
     Request(Request&&)                                  = delete;
     auto operator=(Request&&) noexcept -> Request&      = delete;
     ~Request() noexcept                                 = default;
