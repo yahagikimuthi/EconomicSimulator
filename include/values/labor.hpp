@@ -16,6 +16,7 @@ class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
   public:
     explicit constexpr Wage(const double value) noexcept : BaseValueObject<double>(value) {}
     explicit constexpr operator Money() const noexcept { return Money{value_}; }
+    explicit constexpr operator Budget() const noexcept { return Budget{value_}; }
 };
 
 constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
