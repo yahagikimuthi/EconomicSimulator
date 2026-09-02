@@ -1,9 +1,7 @@
 #pragma once
 
 #include <optional>
-#include <utility>
 
-#include "components/common.hpp"
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
 #include "others/setting.hpp"
@@ -51,12 +49,6 @@ class LaborSupplier final {
         const auto acceptedEntry = jobHunter_.huntedResult();
         if (not acceptedEntry) return;
         employment_.startWorking(acceptedEntry->rosterEntry());
-    }
-
-    template <AssetPlusFn F>
-    void endStep(F&& assetPlus, CensusDropBox& dropBox) noexcept {
-        std::forward<F>(assetPlus)(wage());
-        reset(dropBox);
     }
 
     void product() noexcept { employment_.work(); }
