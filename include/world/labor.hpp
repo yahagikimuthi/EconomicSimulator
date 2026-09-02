@@ -50,6 +50,7 @@ class RosterEntry final {
     void addInput(const double productPower) noexcept { workspace_.addInput(productPower); }
     void resign() noexcept;
     void disable() noexcept { isOccupied_ = false; }
+    void payWage(const Money payment) noexcept { paidWage_ += payment; }
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
@@ -85,9 +86,12 @@ class Roster final {
         empties_.emplace_back(std::ref(resignation));
     }
 
-    [[nodiscard]] auto validEntries() noexcept -> auto {
-        return entries_ | std::views::filter(&RosterEntry::isOccupied);
-    }
+    [[nodiscard]] auto validEntries() noexcept
+        -> auto = delete(
+               "&RosterEntry::isOccupied = "
+               "falseと途中でされると、rangesは遅延評価であるから、filterを施すことにより意図通りに"
+               "動かなくなるため"
+           );
 
     [[nodiscard]] auto validEntries() const noexcept -> auto {
         const auto& entries = entries_;

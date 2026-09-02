@@ -68,7 +68,7 @@ class GoodsFirm final {
         }
 
         labor_.layOffs();
-        labor_.postLaborRequest(id_, markets.laborMarket);
+        labor_.postRequest(id_, markets.laborMarket);
 
         goods_.post(id_, markets.goodsMarket);
 

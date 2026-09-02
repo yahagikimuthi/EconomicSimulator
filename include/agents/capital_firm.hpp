@@ -68,7 +68,7 @@ class CapitalFirm final {
         }
 
         labor_.layOffs();
-        labor_.postLaborRequest(id_, markets.laborMarket);
+        labor_.postRequest(id_, markets.laborMarket);
 
         capitalDemander_.request(
             id_,

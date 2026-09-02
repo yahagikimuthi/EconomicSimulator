@@ -5,6 +5,7 @@
 #include <optional>
 #include <ranges>
 
+#include "components/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
@@ -69,6 +70,13 @@ class HumanResource final {
             if (not entry.isOccupied()) continue;
             entry.resign();
             ++currentLayOffs;
+        }
+    }
+
+    void payWage(TryWithdrawFn auto&& withdrawFn) noexcept {
+        for (auto& entry : roster_.rawEntries()) {
+            if (not entry.isOccupied()) continue;
+            entry.payWage(withdrawFn(entry.wage));
         }
     }
 

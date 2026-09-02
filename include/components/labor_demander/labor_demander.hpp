@@ -4,6 +4,7 @@
 #include <limits>
 #include <utility>
 
+#include "components/common.hpp"
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/human_resource.hpp"
 #include "components/labor_demander/mediator.hpp"
@@ -130,13 +131,11 @@ class LaborDemander final {
         return out;
     }
 
-    void postLaborRequest(const AgentID id, Market& market) noexcept {
-        recruitSystem_.post(id, market);
-    }
+    void postRequest(const AgentID id, Market& market) noexcept { recruitSystem_.post(id, market); }
 
     void offer() noexcept { recruitSystem_.offer(); }
 
-    [[nodiscard]] auto endRecruiting(base_goods::Workspace& workspace) noexcept {
+    void endRecruiting(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.endRecruiting(
             [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
                 return humanResource_.addRoster(id, wage, workspace);
@@ -146,6 +145,11 @@ class LaborDemander final {
     };
 
     void layOffs() noexcept { humanResource_.layOffs(); }
+
+    template <TryWithdrawFn F>
+    void payWage(F&& withdrawFn) noexcept {
+        humanResource_.payWage(std::forward<F>(withdrawFn));
+    }
 
     [[nodiscard]] auto sumWage() const noexcept -> Money {
         const auto out = humanResource_.sumWage();
