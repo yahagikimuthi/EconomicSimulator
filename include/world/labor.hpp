@@ -85,9 +85,16 @@ class Roster final {
         empties_.emplace_back(std::ref(resignation));
     }
 
-    [[nodiscard]] auto entries() noexcept -> auto {
+    [[nodiscard]] auto validEntries() noexcept -> auto {
         return entries_ | std::views::filter(&RosterEntry::isOccupied);
     }
+
+    [[nodiscard]] auto validEntries() const noexcept -> auto {
+        const auto& entries = entries_;
+        return entries | std::views::filter(&RosterEntry::isOccupied);
+    }
+
+    [[nodiscard]] auto rawEntries() noexcept -> auto { return std::ranges::subrange{entries_}; }
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         ASSERT(entries_.size() >= empties_.size());
