@@ -1,11 +1,14 @@
 #pragma once
 
 #include <optional>
+#include <utility>
 
+#include "components/common.hpp"
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
+#include "values/date.hpp"
 #include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
@@ -35,10 +38,8 @@ class LaborSupplier final {
         if (not shouldSearch()) return;
         jobHunter_.entry(
             id,
-            [&] [[nodiscard]] (const Request& req) noexcept -> bool { return isAligned(req); },
-            [&] [[nodiscard]] (Request & req) noexcept -> Entry& {
-                return makeEntrySheet(id, req);
-            },
+            [&](const Request& req) noexcept -> bool { return isAligned(req); },
+            [&](Request& req) noexcept -> Entry& { return makeEntrySheet(id, req); },
             market
         );
     }
@@ -51,7 +52,12 @@ class LaborSupplier final {
         employment_.startWorking(acceptedEntry->rosterEntry());
     }
 
-    void product() noexcept { employment_.work(); }
+    template <DepositFn F>
+    void work(F&& depositFn, const Date& today) noexcept {
+        employment_.work(today);
+        const auto paidWage = employment_.takeOutPaidWage();
+        std::forward<F>(depositFn)(paidWage);
+    }
 
     [[nodiscard]] auto wage() const noexcept -> Money {
         const auto out = employment_.wage();

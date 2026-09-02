@@ -4,6 +4,7 @@
 
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/labor.hpp"
 
@@ -31,9 +32,13 @@ class Employment final {
         return rosterEntry_.transform(&RosterEntry::wage).value_or(Wage{0.0});
     }
 
-    void work() noexcept {
+    [[nodiscard]] auto takeOutPaidWage() const noexcept -> Money {
+        return rosterEntry_.transform(&RosterEntry::takeOutPaidWage).value_or(Money{0.0});
+    }
+
+    void work(const Date& today) noexcept {
         if (not isEmployed()) return;
-        rosterEntry_->addInput(productPower_);
+        if (today.day() == rosterEntry_->workDay()) rosterEntry_->addInput(productPower_);
     }
 
     [[nodiscard]] auto productPower() const noexcept -> double { return productPower_; }

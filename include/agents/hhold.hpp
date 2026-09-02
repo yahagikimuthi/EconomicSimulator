@@ -19,7 +19,7 @@ class HHold final {
         : finance_{id, masterRng}, labor_{masterRng}, goods_{masterRng}, id_{id} {}
 
     void act(const Date& date, MarketRegistry& markets) noexcept {
-        labor_.product();
+        labor_.work(finance_.makeDepositFn(), date);
         const auto day = date.day();
         if (day == operationDay_)
             actOperationDay(labor::toMarketPhase(date.month()), markets);
