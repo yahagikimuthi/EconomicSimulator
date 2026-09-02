@@ -23,7 +23,8 @@ class HumanResource final {
         const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
         layOffsPlan_           = layOffsPlan;
         const auto wageSum     = sumWage();
-        const auto avgWage     = wageSum.value() / employeeCnt().value();
+        const auto isEmploy    = not employeeCnt().isZero();
+        const auto avgWage     = isEmploy ? wageSum.value() / employeeCnt().value() : 0.0;
         requestedBudget_       = static_cast<Budget>((employeeCnt() - layOffsPlan) * Wage{avgWage});
         return *requestedBudget_;
     }
