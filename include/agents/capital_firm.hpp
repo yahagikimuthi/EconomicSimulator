@@ -39,16 +39,15 @@ class CapitalFirm final {
 
   private:
     void actJanuaryOperationDay(MarketRegistry& markets) noexcept {
-        const auto employee       = labor_.employeeCnt();
-        const auto adjust         = capitalSupplier_.calcDesiredEmploy(employee);
-        const auto sales          = capitalSupplier_.salesForecast();
-        const auto laborReqBudget = labor_.requestAnnualBudget(adjust, sales);
-
-        const auto desiredCapital   = capitalSupplier_.requiresCapital();
-        const auto capitalReqBudget = capitalDemander_.planBudget(desiredCapital);
-
-        const auto totalCost = labor_.sumWage();
-        const auto salesPlan = capitalSupplier_.planAndExpectSales(totalCost);
+        const auto laborReqBudget = [&]() -> Budget {
+            const auto employee = labor_.employeeCnt();
+            const auto adjust   = capitalSupplier_.calcDesiredEmploy(employee);
+            const auto sales    = capitalSupplier_.salesForecast();
+            return labor_.requestAnnualBudget(adjust, sales);
+        }();
+        const auto capitalReqBudget =
+            capitalDemander_.planBudget(capitalSupplier_.requiresCapital());
+        const auto salesPlan = capitalSupplier_.planAndExpectSales(labor_.sumWage());
 
         const auto total = laborReqBudget + capitalReqBudget - salesPlan;
         if (total.isZeroOrLess()) {
@@ -81,12 +80,9 @@ class CapitalFirm final {
 
     void actRegularOperationDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
         const auto laborCost = labor_.calcMonthlyCost();
-
-        const auto desiredCapital   = capitalSupplier_.requiresCapital();
-        const auto capitalReqBudget = capitalDemander_.planBudget(desiredCapital);
-
-        const auto totalCost = labor_.sumWage();
-        const auto salesPlan = capitalSupplier_.planAndExpectSales(totalCost);
+        const auto capitalReqBudget =
+            capitalDemander_.planBudget(capitalSupplier_.requiresCapital());
+        const auto salesPlan = capitalSupplier_.planAndExpectSales(labor_.sumWage());
 
         const auto total = laborCost + capitalReqBudget - salesPlan;
         if (total.isZeroOrLess()) {

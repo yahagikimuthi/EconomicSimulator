@@ -38,16 +38,14 @@ class GoodsFirm final {
 
   private:
     void actJanuaryOperatingDay(MarketRegistry& markets) noexcept {
-        const auto employee       = labor_.employeeCnt();
-        const auto adjustEmploy   = goods_.calcDesiredEmploy(employee);
-        const auto sales          = goods_.salesForecast();
-        const auto laborBudgetReq = labor_.requestAnnualBudget(adjustEmploy, sales);
-
-        const auto totalCost = labor_.sumWage();
-        const auto salesPlan = goods_.planAndExpectSales(totalCost);
-
-        const auto desiredCapital   = goods_.requiresCapital();
-        const auto capitalBudgetReq = capital_.planBudget(desiredCapital);
+        const auto laborBudgetReq = [&]() -> Budget {
+            const auto employee = labor_.employeeCnt();
+            const auto adjust   = goods_.calcDesiredEmploy(employee);
+            const auto sales    = goods_.salesForecast();
+            return labor_.requestAnnualBudget(adjust, sales);
+        }();
+        const auto salesPlan        = goods_.planAndExpectSales(labor_.sumWage());
+        const auto capitalBudgetReq = capital_.planBudget(goods_.requiresCapital());
 
         const auto total = laborBudgetReq + capitalBudgetReq - salesPlan;
         if (total.isZeroOrLess()) {
@@ -80,13 +78,9 @@ class GoodsFirm final {
     }
 
     void actRegularOperatingDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
-        const auto laborCost = labor_.calcMonthlyCost();
-
-        const auto totalCost = labor_.sumWage();
-        const auto salesPlan = goods_.planAndExpectSales(totalCost);
-
-        const auto desiredCapital   = goods_.requiresCapital();
-        const auto capitalBudgetReq = capital_.planBudget(desiredCapital);
+        const auto laborCost        = labor_.calcMonthlyCost();
+        const auto salesPlan        = goods_.planAndExpectSales(labor_.sumWage());
+        const auto capitalBudgetReq = capital_.planBudget(goods_.requiresCapital());
 
         const auto total  = laborCost + capitalBudgetReq - salesPlan;
         const auto budget = finance_.claimBudget(total) + salesPlan;
