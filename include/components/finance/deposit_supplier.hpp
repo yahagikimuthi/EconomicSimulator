@@ -22,7 +22,7 @@ class DepositSupplier final {
     }
 
   private:
-    DepositAccount account_;
+    BankAccount account_;
 };
 }  // namespace abm::finance::deposit::supplier
 
