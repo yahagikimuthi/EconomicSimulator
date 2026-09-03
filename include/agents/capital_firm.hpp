@@ -56,7 +56,7 @@ class CapitalFirm final {
             capitalDemander_.revisePlan(capitalReqBudget);
         } else {
             const auto budget = finance_.claimBudget(total) + salesPlan;
-            ASSERT(budget < laborReqBudget + capitalReqBudget);
+            ASSERT(budget <= laborReqBudget + capitalReqBudget);
 
             if (budget < laborReqBudget) {
                 labor_.reviseAnnualPlan(budget);
