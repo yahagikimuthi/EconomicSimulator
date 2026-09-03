@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <atomic>
 
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -15,20 +14,20 @@ class BankAccount final {
 
     void deposit(const Money add) noexcept {
         ASSERT(add.isZeroOrMore());
-        deposit_.fetch_add(add.value());  // 処理系が対応する場合store_addに変更
+        deposit_ += add;
     }
 
     [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
         ASSERT(sub.isPositive());
-        const auto out = std::min(sub, Money{deposit_.load()});
-        deposit_.fetch_sub(out.value());
+        const auto out = std::min(sub, deposit_);
+        deposit_ -= out;
         return out;
     }
 
-    [[nodiscard]] auto balance() const noexcept -> Money { return Money{deposit_.load()}; }
+    [[nodiscard]] auto balance() const noexcept -> Money { return deposit_; }
 
   private:
-    std::atomic<double> deposit_;
+    Money deposit_{0.0};
 };
 
 class DepositAccount {
