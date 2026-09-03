@@ -22,7 +22,7 @@ struct CensusDropBox final {
     std::vector<double> hholdAssets;
     std::vector<double> wages;
 
-    CensusDropBox() noexcept {
+    explicit CensusDropBox() noexcept {
         namespace cnt       = setting::agent_count;
         const auto firmCnt  = cnt::capitalFirm + cnt::goodsFirm;
         const auto hholdCnt = cnt::hhold;

@@ -15,7 +15,7 @@
 namespace abm::analysis {
 class InputDataManager final {
   public:
-    [[nodiscard]] InputDataManager()
+    explicit InputDataManager()
         : inFile_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
@@ -64,7 +64,7 @@ class InputDataManager final {
 
 class OutputDataManager final {
   public:
-    [[nodiscard]] OutputDataManager()
+    explicit OutputDataManager()
         : outFile_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
               const auto filepath = static_cast<std::string>(setting::metricDataOutputPath);

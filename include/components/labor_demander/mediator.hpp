@@ -15,7 +15,7 @@ template <typename... Ts>
     requires(sizeof...(Ts) > 0UZ)
 class Listener final {
   public:
-    Listener() noexcept = default;
+    explicit Listener() noexcept = default;
 
     template <typename T>
         requires(std::is_same_v<T, Ts> or ...)
@@ -45,7 +45,7 @@ class Mediator final {
     using RecruitResultListener = Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
   public:
-    Mediator() noexcept = default;
+    explicit Mediator() noexcept = default;
 
     template <typename T>
     void subscribeEmployPlan(T& t) noexcept {

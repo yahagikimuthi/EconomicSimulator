@@ -19,7 +19,8 @@
 namespace abm::labor {
 class RosterEntry;
 struct CompanyBoard final {
-    CompanyBoard(const AgentID Id, const Day WorkDay) noexcept : firmId{Id}, workDay{WorkDay} {}
+    explicit CompanyBoard(const AgentID Id, const Day WorkDay) noexcept
+        : firmId{Id}, workDay{WorkDay} {}
     const AgentID firmId;
     const Day     workDay;
 };
@@ -27,7 +28,7 @@ struct CompanyBoard final {
 class Roster;
 class RosterEntry final {
   public:
-    RosterEntry(
+    explicit RosterEntry(
         const AgentID          Id,
         const Wage             Wage,
         CompanyBoard&          board,
@@ -70,7 +71,7 @@ class RosterEntry final {
 
 class Roster final {
   public:
-    Roster() noexcept = default;
+    explicit Roster() noexcept = default;
 
     [[nodiscard]] auto add(
         const AgentID id, const Wage wage, CompanyBoard& board, base_goods::Workspace& space
@@ -120,7 +121,7 @@ inline void RosterEntry::resign() noexcept { roster_.resign(*this); }
 class Request;
 class Entry final {
   public:
-    Entry(const AgentID Id, const double power, const Request& req) noexcept
+    explicit Entry(const AgentID Id, const double power, const Request& req) noexcept
         : entrantId{Id}, productPower{power}, request{req} {
         ASSERT(power > 0.0);
     }
@@ -158,7 +159,7 @@ class Entry final {
 
 class Request final {
   public:
-    Request(const AgentID Id, const Wage Wage) noexcept : firmID{Id}, wage{Wage} {
+    explicit Request(const AgentID Id, const Wage Wage) noexcept : firmID{Id}, wage{Wage} {
         ASSERT(Wage.isPositive());
     }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
@@ -178,7 +179,7 @@ class Request final {
 
 class Market final {
   public:
-    Market() noexcept = default;
+    explicit Market() noexcept = default;
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
         ASSERT(wage.isPositive());

@@ -16,7 +16,7 @@ namespace abm::labor::demander::planner {
 // 要求雇用数を雇用計画に変換するための意味論的クラス
 class EmployPlanner final {
   public:
-    EmployPlanner() = delete;  // インスタンス化は想定しない
+    explicit EmployPlanner() = delete("静的関数のみなのでインスタンス化は想定しない");
     [[nodiscard]] static auto plan(const HeadCount desiredEmploy) noexcept -> HeadCount {
         return desiredEmploy;
     }

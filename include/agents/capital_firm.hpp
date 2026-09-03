@@ -16,7 +16,7 @@ class CapitalFirm final {
     static inline constinit int instanceCnt{};
 
   public:
-    CapitalFirm(const AgentID id, RandomGenerator& masterRng) noexcept
+    explicit CapitalFirm(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng},
           labor_{id, masterRng, Day{(instanceCnt % (setting::dayInMonth - 1)) + 2}},
           capitalDemander_{masterRng},

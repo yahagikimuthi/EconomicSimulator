@@ -15,7 +15,7 @@
 namespace abm::labor::demander::recruiter {
 class OfferApplicants final {
   public:
-    OfferApplicants() noexcept = default;
+    explicit OfferApplicants() noexcept = default;
 
     void add(Entry& entry) noexcept { applicants_.emplace_back(std::ref(entry)); }
     void clear() noexcept { applicants_.clear(); }
@@ -32,7 +32,7 @@ class OfferApplicants final {
 
 class Ledger final {
   public:
-    Ledger() = default;
+    explicit Ledger() = default;
 
     void makeNewPage(const HeadCount offerPlan) noexcept {
         ASSERT(offerPlan.isZeroOrMore());
@@ -76,7 +76,7 @@ class Ledger final {
 
 class Recruiter final {
   public:
-    Recruiter() noexcept = default;
+    explicit Recruiter() noexcept = default;
 
     void post(const AgentID id, const RecruitPlan& plan, Market& laborMarket) noexcept {
         ASSERT(plan.wage.isZeroOrMore());

@@ -22,7 +22,7 @@ template <typename... Agents>
     requires(IAgent<Agents> and ...)
 class AgentRegistry final {
   public:
-    AgentRegistry() noexcept = default;
+    explicit AgentRegistry() noexcept = default;
 
     void reserve(const std::size_t n) noexcept { agents_.reserve(n); }
 

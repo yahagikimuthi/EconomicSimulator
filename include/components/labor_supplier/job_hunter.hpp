@@ -15,7 +15,7 @@
 namespace abm::labor::supplier {
 class MyEntries final {
   public:
-    MyEntries() noexcept = default;
+    explicit MyEntries() noexcept = default;
     [[nodiscard]] auto takeOfferedEntry() noexcept -> auto {
         return entries_ | std::views::transform([](RefWrap<Entry> ref) noexcept -> Entry& {
                    return ref.get();

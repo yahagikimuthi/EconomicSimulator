@@ -64,7 +64,7 @@ class Cache final {
 
 class CentralMemory final {
   public:
-    CentralMemory() noexcept = default;
+    explicit CentralMemory() noexcept = default;
 
     void logging(CensusDropBox& dropBox) noexcept {
         if (employPlan_) {

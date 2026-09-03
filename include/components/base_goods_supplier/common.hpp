@@ -60,7 +60,7 @@ class Cache final {
 
 class CentralMemory final {
   public:
-    CentralMemory() noexcept = default;
+    explicit CentralMemory() noexcept = default;
 
     void listenTradePlan(const TradePlan& plan) noexcept {
         ASSERT(plan.price.isZeroOrMore());

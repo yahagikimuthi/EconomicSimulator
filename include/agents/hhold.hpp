@@ -15,7 +15,7 @@ class HHold final {
     static inline constinit int instanceCnt{};
 
   public:
-    HHold(const AgentID id, RandomGenerator& masterRng) noexcept
+    explicit HHold(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng}, labor_{masterRng}, goods_{masterRng}, id_{id} {}
 
     void act(const Date& date, MarketRegistry& markets) noexcept {

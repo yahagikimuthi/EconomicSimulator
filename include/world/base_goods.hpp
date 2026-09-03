@@ -14,8 +14,8 @@
 namespace abm::base_goods {
 class Workspace final {
   public:
-    Workspace() noexcept  = default;
-    ~Workspace() noexcept = default;
+    explicit Workspace() noexcept = default;
+    ~Workspace() noexcept         = default;
     Workspace(const Workspace& other) noexcept : totalInput_{other.totalInput_.load()} {}
     auto operator=(const Workspace& other) noexcept -> Workspace& {
         if (this == &other) return *this;
@@ -55,7 +55,7 @@ template <EMarket MarketT>
 class Request final {
   public:
     using EntryT = Entry<MarketT>;
-    Request(const Money pay, const EntryT& e) noexcept
+    explicit Request(const Money pay, const EntryT& e) noexcept
         : payment_{pay}, remainPaid_{pay}, entry_{e} {
         ASSERT(pay.isZeroOrMore());
     }
@@ -89,7 +89,7 @@ class Entry final {
     using RequestT = Request<MarketT>;
 
   public:
-    Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
+    explicit Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
         : id{i}, price{p}, supply{s} {}
 
     [[nodiscard]] auto request(const Money payment) noexcept -> RequestT& {
@@ -129,7 +129,7 @@ class Market final {
     using EntryT = Entry<MarketT>;
 
   public:
-    Market(const Date& today) noexcept : today_{today} {}
+    explicit Market(const Date& today) noexcept : today_{today} {}
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> EntryT& {

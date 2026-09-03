@@ -13,7 +13,7 @@
 namespace abm::analysis {
 class DataContext final {
   public:
-    [[nodiscard]] DataContext() noexcept = default;
+    explicit DataContext() noexcept = default;
     void set(std::string_view name, std::vector<double>&& data) noexcept {
         cache_.try_emplace(name, std::move(data));
     }
@@ -74,7 +74,7 @@ class IMetricTask {
 template <LogicType Logic>
 class MetricTask final : public IMetricTask {
   public:
-    [[nodiscard]] MetricTask(std::string&& outName, const Logic& logic) noexcept
+    explicit MetricTask(std::string&& outName, const Logic& logic) noexcept
         : IMetricTask(std::move(outName)), logic_{logic} {}
 
     void process(const DataContext& ctx) noexcept override { pushBackData(logic_(ctx)); }

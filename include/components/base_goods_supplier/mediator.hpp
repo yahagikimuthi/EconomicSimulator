@@ -16,7 +16,7 @@ template <typename... Ts>
     requires(sizeof...(Ts) > 0UZ)
 class Listener final {
   public:
-    Listener() noexcept = default;
+    explicit Listener() noexcept = default;
 
     template <typename T>
         requires(std::is_same_v<T, Ts> or ...)
@@ -46,7 +46,7 @@ class Mediator final {
         Listener<DemandForecastManagerMemory, MarkupPlannerMemory, ProducingSystem, CentralMemory>;
 
   public:
-    Mediator() noexcept = default;
+    explicit Mediator() noexcept = default;
 
     template <typename T>
     void subscribeTradePlan(T& t) noexcept {
