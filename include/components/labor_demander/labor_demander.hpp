@@ -166,7 +166,7 @@ class LaborDemander final {
     void setMediator() noexcept {
         recruitSystem_.acceptMediator(mediator_);
         mediator_.subscribeRecruitPlan(memory_);
-        mediator_.subscribeEmployPlan(memory_);
+        mediator_.subscribeRecruitPlan(memory_);
     }
 
     RecruitSystem recruitSystem_;

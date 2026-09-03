@@ -37,9 +37,9 @@ class OfferPlannerMemory final {
     }
     void clearLog() noexcept { employResult_.clearLog(), employPlan_.clearLog(); }
     void reset() noexcept { employResult_.reset(), employPlan_.reset(); }
-    void listenEmployPlan(const HeadCount employPlan) noexcept {
-        ASSERT(employPlan.isZeroOrMore());
-        employPlan_.next(employPlan);
+    void listenRecruitPlan(const RecruitPlan& plan) noexcept {
+        ASSERT(plan.employ.isZeroOrMore());
+        employPlan_.next(plan.employ);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.employ.isZeroOrMore());
@@ -61,7 +61,7 @@ class OfferPlanner final {
 
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeRecruitResult(memory_);
-        mediator.subscribeEmployPlan(memory_);
+        mediator.subscribeRecruitPlan(memory_);
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {

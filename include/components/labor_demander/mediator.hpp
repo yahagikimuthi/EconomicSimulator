@@ -7,7 +7,6 @@
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/empoy_planner.hpp"
 #include "components/labor_demander/wage_planner.hpp"
-#include "values/labor.hpp"
 
 namespace abm::labor::demander {
 
@@ -39,18 +38,12 @@ class Listener final {
 };
 
 class Mediator final {
-    using EmployPlanListener =
+    using RecruitPlanListener =
         Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory, CentralMemory>;
-    using RecruitPlanListener   = Listener<CentralMemory>;
     using RecruitResultListener = Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
 
   public:
     explicit Mediator() noexcept = default;
-
-    template <typename T>
-    void subscribeEmployPlan(T& t) noexcept {
-        employPlanListeners_.add(t);
-    }
 
     template <typename T>
     void subscribeRecruitPlan(T& t) noexcept {
@@ -60,12 +53,6 @@ class Mediator final {
     template <typename T>
     void subscribeRecruitResult(T& t) noexcept {
         recruitResultListeners_.add(t);
-    }
-
-    void publishEmployPlan(const HeadCount employPlan) noexcept {
-        employPlanListeners_.notice([employPlan](auto&& listener) noexcept -> void {
-            listener.listenEmployPlan(employPlan);
-        });
     }
 
     void publishRecruitPlan(const RecruitPlan& plan) noexcept {
@@ -81,7 +68,6 @@ class Mediator final {
     }
 
   private:
-    EmployPlanListener    employPlanListeners_;
     RecruitPlanListener   recruitPlanListeners_;
     RecruitResultListener recruitResultListeners_;
 };

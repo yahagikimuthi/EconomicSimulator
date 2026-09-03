@@ -18,9 +18,9 @@ class WagePlannerMemory final {
     explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}},
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
-    void listenEmployPlan(const HeadCount employPlan) noexcept {
-        ASSERT(employPlan.isZeroOrMore());
-        employPlan_.next(employPlan);
+    void listenRecruitPlan(const RecruitPlan& plan) noexcept {
+        ASSERT(plan.employ.isZeroOrMore());
+        employPlan_.next(plan.employ);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.applicants.isZeroOrMore());
@@ -52,7 +52,7 @@ class WagePlanner final {
           adjustVol_{masterRng.random(setting::wageAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
-        mediator.subscribeEmployPlan(memory_);
+        mediator.subscribeRecruitPlan(memory_);
         mediator.subscribeRecruitResult(memory_);
     }
 

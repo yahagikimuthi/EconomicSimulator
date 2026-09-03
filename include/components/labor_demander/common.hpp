@@ -97,10 +97,8 @@ class CentralMemory final {
 template <typename T, typename U = std::monostate>
 concept IMediator =
     requires(T t, U& u, HeadCount employPlan, RecruitPlan plan, RecruitResult result) {
-        { t.publishEmployPlan(employPlan) } -> std::same_as<void>;
         { t.publishRecruitPlan(plan) } -> std::same_as<void>;
         { t.publishRecruitResult(result) } -> std::same_as<void>;
-        { t.subscribeEmployPlan(u) } -> std::same_as<void>;
         { t.subscribeRecruitPlan(u) } -> std::same_as<void>;
         { t.subscribeRecruitResult(u) } -> std::same_as<void>;
     };
