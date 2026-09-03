@@ -81,7 +81,6 @@ class BaseGoodsSupplier final {
     void reset(CensusDropBox& dropBox) noexcept {
         memory_.logging(dropBox);
         producingSystem_.reset(dropBox);
-        tradingSystem_.reset();
     }
 
     void setMediator() noexcept {
