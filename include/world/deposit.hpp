@@ -15,7 +15,7 @@ class BankAccount final {
 
     void deposit(const Money add) noexcept {
         ASSERT(add.isZeroOrMore());
-        deposit_.fetch_add(add.value());
+        deposit_.fetch_add(add.value());  // 処理系が対応する場合store_addに変更
     }
 
     [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
