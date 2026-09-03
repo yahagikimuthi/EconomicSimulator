@@ -54,6 +54,7 @@ target_compile_options(project_warnings INTERFACE
     -fno-omit-frame-pointer
     -fcontracts
     -D_GLIBCXX_ASSERTIONS
+    -mtune=native
     -march=native
     -flto
 )
