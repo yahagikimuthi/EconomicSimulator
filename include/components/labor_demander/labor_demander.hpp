@@ -60,7 +60,7 @@ class RecruitSystem final {
     void endRecruiting(F&& addRoster, IMediator auto& mediator) noexcept {
         plan_.reset();
         const auto result = recruiter_.endRecruiting(std::forward<F>(addRoster));
-        if (result) mediator.publishRecruitResult(*result);
+        mediator.publishRecruitResult(result);
     }
 
     [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
@@ -136,7 +136,7 @@ class LaborDemander final {
 
     void endRecruiting(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.endRecruiting(
-            [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
+            [&](const AgentID id, const Wage wage) noexcept -> RosterEntry& {
                 return humanResource_.addRoster(id, wage, workspace);
             },
             mediator_

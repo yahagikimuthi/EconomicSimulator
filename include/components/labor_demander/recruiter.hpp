@@ -89,16 +89,11 @@ class Recruiter final {
         if (not isPosting()) return;
         auto entries = myRequest_->entries();
         if (entries.empty()) return;
-        if (HeadCount{entries.size()} < ledger_.offerPlan()) {
-            offerAll();
-            return;
-        }
-        offerPart();
+        HeadCount{entries.size()} < ledger_.offerPlan() ? offerAll() : offerPart();
     }
 
-    [[nodiscard]] auto endRecruiting(AddRosterFn auto&& addRoster
-    ) noexcept -> std::optional<RecruitResult> {
-        if (not isPosting()) return std::nullopt;
+    [[nodiscard]] auto endRecruiting(AddRosterFn auto&& addRoster) noexcept -> RecruitResult {
+        if (not isPosting()) return {.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
         for (auto& acceptApplicant : acceptApplicants) {
