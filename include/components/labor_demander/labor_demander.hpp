@@ -96,12 +96,7 @@ class LaborDemander final {
           memory_{other.memory_} {
         setMediator();
     }
-    LaborDemander(LaborDemander&& other) noexcept
-        : recruitSystem_{std::move(other.recruitSystem_)},
-          humanResource_{std::move(other.humanResource_)},
-          memory_{other.memory_} {
-        setMediator();
-    }
+    LaborDemander(LaborDemander&& other) noexcept          = delete;
     auto operator=(const LaborDemander&) -> LaborDemander& = delete;
     auto operator=(LaborDemander&&) -> LaborDemander&      = delete;
     ~LaborDemander() noexcept                              = default;

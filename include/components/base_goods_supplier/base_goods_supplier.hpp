@@ -30,12 +30,7 @@ class BaseGoodsSupplier final {
           memory_{other.memory_} {
         setMediator();
     }
-    BaseGoodsSupplier(BaseGoodsSupplier&& other) noexcept
-        : producingSystem_{std::move(other.producingSystem_)},
-          tradingSystem_{std::move(other.tradingSystem_)},
-          memory_{other.memory_} {
-        setMediator();
-    }
+    BaseGoodsSupplier(BaseGoodsSupplier&& other) noexcept          = delete;
     auto operator=(const BaseGoodsSupplier&) -> BaseGoodsSupplier& = delete;
     auto operator=(BaseGoodsSupplier&&) -> BaseGoodsSupplier&      = delete;
     ~BaseGoodsSupplier() noexcept                                  = default;
