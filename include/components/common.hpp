@@ -40,12 +40,14 @@ class Listener final {
     template <typename F>
         requires(std::is_invocable_v<F, Ts> and ...)
     void notice(F&& methodCaller) noexcept {
-        auto callFunc = [&](auto& listener) -> void {
+        auto callFunc = [&](auto& listener) noexcept -> void {
             if (listener) {
                 methodCaller(*listener);
             }
         };
-        std::apply([&](auto&... listener) -> void { ((callFunc(listener)), ...); }, listeners_);
+        std::apply(
+            [&](auto&... listener) noexcept -> void { ((callFunc(listener)), ...); }, listeners_
+        );
     }
 
   private:
