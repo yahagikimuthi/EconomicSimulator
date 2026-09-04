@@ -18,11 +18,11 @@ class PricePlanner final {
           adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
 
     [[nodiscard]] auto plan(
-        const GoodsQuantity supply, const MarkupRate markup, const Money totalCost
+        const GoodsQuantity supply, const MarkupRate markup, const Budget totalCost
     ) const noexcept -> Price {
         ASSERT(supply.isZeroOrMore());
         ASSERT(markup > MarkupRate{0.0});
-        ASSERT(totalCost >= Money{0.0});
+        ASSERT(totalCost >= Budget{0.0});
 
         const auto price = calcPrice(supply, markup, totalCost);
         const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
@@ -31,7 +31,7 @@ class PricePlanner final {
 
   private:
     [[nodiscard]] static auto calcPrice(
-        const GoodsQuantity supply, const MarkupRate markup, const Money totalCost
+        const GoodsQuantity supply, const MarkupRate markup, const Budget totalCost
     ) noexcept -> Price {
         const auto avgCost =
             Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
@@ -124,7 +124,7 @@ class TradePlanner final {
     }
 
     [[nodiscard]] auto planTrading(
-        const GoodsQuantity supply, const Money totalCost, IMediator auto& mediator
+        const GoodsQuantity supply, const Budget totalCost, IMediator auto& mediator
     ) noexcept -> TradePlan {
         const auto markup = markupPlanner_.plan(targetInvRatio_);
         mediator.publishMarkupPlan(markup);

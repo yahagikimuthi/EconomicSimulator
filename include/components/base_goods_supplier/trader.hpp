@@ -31,7 +31,6 @@ class Trader final {
 
     void post(const AgentID id, const TradePlan& plan, MarketT& market) noexcept {
         ASSERT(plan.supply.isZeroOrMore());
-        isActive_ = true;
         if (plan.supply.isZero()) return;
         myEntry_ = market.entry(id, plan.price, plan.supply);
         ledger_.makeNewPage(plan.supply);
@@ -50,15 +49,13 @@ class Trader final {
         );
     }
 
-    [[nodiscard]] auto publishTradeResult() const noexcept -> std::optional<TradeResult> {
-        if (not isActive_) return std::nullopt;
+    [[nodiscard]] auto publishTradeResult() const noexcept -> TradeResult {
         return ledger_.publishResult();
     }
 
     void reset() noexcept {
         myEntry_.reset();
         ledger_.reset();
-        isActive_ = false;
     }
 
   private:
@@ -114,6 +111,5 @@ class Trader final {
     Ledger                  ledger_;
     std::optional<EntryT&>  myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
-    bool                    isActive_{false};
 };
 }  // namespace abm::base_goods::supplier

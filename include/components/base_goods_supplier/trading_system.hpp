@@ -25,7 +25,7 @@ class TradingSystem final {
     }
 
     void plan(
-        const GoodsQuantity supply, const Money totalCost, IMediator auto& mediator
+        const GoodsQuantity supply, const Budget totalCost, IMediator auto& mediator
     ) noexcept {
         ASSERT(supply.isZeroOrMore());
         const auto plan = planner_.planTrading(supply, totalCost, mediator);
@@ -44,7 +44,7 @@ class TradingSystem final {
 
     void endTrading(IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
-        if (result) mediator.publishTradeResult(*result);
+        mediator.publishTradeResult(result);
     }
 
     void reset() noexcept {
