@@ -15,17 +15,15 @@ class Trader final {
     explicit Trader(RandomGenerator& masterRng)
         : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    template <TryWithdrawFn F>
     void request(
         const AgentID id,
-        const Budget  budget,
-        F&&           withdrawFn,
+        const Money   budget,
         Market&       market,
         const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not myRequest_) return;
-        myRequest_ = pickedEntry->request(std::forward<F>(withdrawFn)(budget));
+        myRequest_ = pickedEntry->request(budget);
     }
 
     template <DepositFn F>
@@ -60,16 +58,11 @@ class GoodsDemander final {
     }
 
     template <TryWithdrawFn F>
-    void request(
-        const AgentID id,
-        F&&           withdrawFn,
-        Market&       market,
-        const int     sampleCnt = setting::goodsSampleCnt
-    ) noexcept {
+    void request(const AgentID id, F&& withdrawFn, Market& market) noexcept {
         ASSERT(budget_);
-        const auto budget = *budget_;
-        if (budget.isZeroOrLess()) return;
-        trader_.request(id, budget, std::forward<F>(withdrawFn), market, sampleCnt);
+        if (budget_->isZeroOrLess()) return;
+        const auto availableCash = std::forward<F>(withdrawFn)(*budget_);
+        trader_.request(id, availableCash, market);
     }
 
     template <DepositFn F>
