@@ -82,9 +82,8 @@ class CapitalFirm final : public Agent {
             capitalDemander_.revisePlan(capitalReqBudget);
         } else {
             const auto budget = finance_.claimBudget(total);
-            if (budget < laborCost) {
-                capitalDemander_.revisePlan(Budget{0.0});
-            }
+            ASSERT(budget <= laborCost + capitalReqBudget);
+            capitalDemander_.revisePlan(std::min(budget - laborCost, Budget{0.0}));
         }
 
         if (phase == LaborMarketPhase::Offer)

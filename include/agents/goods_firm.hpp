@@ -75,16 +75,14 @@ class GoodsFirm final : public Agent {
         const auto salesPlan        = goods_.planAndExpectSales(labor_.calcMonthlyCost());
         const auto capitalBudgetReq = capital_.planBudget(goods_.requiresCapital());
 
-        const auto total  = laborCost + capitalBudgetReq - salesPlan;
-        const auto budget = finance_.claimBudget(total) + salesPlan;
-        ASSERT(budget <= laborCost + capitalBudgetReq);
-
-        if (budget.isZeroOrLess())
+        const auto total = laborCost + capitalBudgetReq - salesPlan;
+        if (total.isZeroOrLess()) {
             capital_.revisePlan(capitalBudgetReq);
-        else if (budget < laborCost)
-            capital_.revisePlan(Budget{0.0});
-        else
-            capital_.revisePlan(budget - laborCost);
+        } else {
+            const auto budget = finance_.claimBudget(total) + salesPlan;
+            ASSERT(budget <= laborCost + capitalBudgetReq);
+            capital_.revisePlan(std::min(budget - laborCost, Budget{0.0}));
+        }
 
         if (phase == LaborMarketPhase::Offer)
             labor_.offer();
