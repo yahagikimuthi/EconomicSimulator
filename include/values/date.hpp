@@ -53,7 +53,7 @@ class Year final : public value_object::BaseValueObject<int>, value_object::Comp
     }
 };
 
-class Date final : value_object::CompareMixin<Date> {
+class Date final {
     struct Normalized final {
         const Year  year;
         const Month month;
@@ -94,6 +94,8 @@ class Date final : value_object::CompareMixin<Date> {
         const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx.value();
         return Day{flatDay};
     }
+
+    [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
 
     constexpr auto operator++() noexcept -> Date& {
         if (day_ < Day{setting::dayInMonth}) {
