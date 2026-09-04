@@ -72,9 +72,9 @@ class Date final {
               const auto normalizedMonth = (totalMonth % setting::monthInYear) + 1;
 
               return {
-                  .year  = Year{normalizedYear},
-                  .month = Month{normalizedMonth},
-                  .day   = Day{normalizedDay}
+                  .year  = Year{normalizedYear + 1},
+                  .month = Month{normalizedMonth + 1},
+                  .day   = Day{normalizedDay + 1}
               };
           }()} {}
 
