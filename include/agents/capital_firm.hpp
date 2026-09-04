@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "agents/common.hpp"
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
@@ -52,14 +53,10 @@ class CapitalFirm final : public Agent {
         } else {
             const auto budget = finance_.claimBudget(total) + salesPlan;
             ASSERT(budget <= laborReqBudget + capitalReqBudget);
-
-            if (budget < laborReqBudget) {
-                labor_.reviseAnnualPlan(budget);
-                capitalDemander_.revisePlan(Budget{0.0});
-            } else {
-                labor_.reviseAnnualPlan(laborReqBudget);
-                capitalDemander_.revisePlan(budget - laborReqBudget);
-            }
+            const auto laborBudget   = std::min(budget, laborReqBudget);
+            const auto capitalBudget = std::max(budget - laborReqBudget, Budget{0.0});
+            labor_.reviseAnnualPlan(laborBudget);
+            capitalDemander_.revisePlan(capitalBudget);
         }
 
         labor_.layOffs();

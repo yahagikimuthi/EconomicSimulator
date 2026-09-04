@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include "agents/common.hpp"
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
@@ -47,18 +48,14 @@ class GoodsFirm final : public Agent {
         if (total.isZeroOrLess()) {
             labor_.reviseAnnualPlan(laborBudgetReq);
             capital_.revisePlan(capitalBudgetReq);
-            return;
-        }
-
-        const auto budget = finance_.claimBudget(total) + salesPlan;
-        ASSERT(budget <= laborBudgetReq + capitalBudgetReq);
-
-        if (budget < laborBudgetReq) {
-            labor_.reviseAnnualPlan(budget);
-            capital_.revisePlan(Budget{0.0});
         } else {
-            labor_.reviseAnnualPlan(laborBudgetReq);
-            capital_.revisePlan(budget - laborBudgetReq);
+            const auto budget = finance_.claimBudget(total) + salesPlan;
+            ASSERT(budget <= laborBudgetReq + capitalBudgetReq);
+
+            const auto laborBudget   = std::min(budget, laborBudgetReq);
+            const auto capitalBudget = std::max(budget - laborBudget, Budget{0.0});
+            labor_.reviseAnnualPlan(laborBudget);
+            capital_.revisePlan(capitalBudget);
         }
 
         labor_.layOffs();
