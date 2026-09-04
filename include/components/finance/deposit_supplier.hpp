@@ -19,7 +19,7 @@ class DepositSupplier final {
     }
 
     [[nodiscard]] auto tryWithdraw(const Money withdraw) noexcept -> Money {
-        ASSERT(withdraw >= Money{0.0});
+        ASSERT(withdraw.isZeroOrMore());
         return account_.withdraw(withdraw);
     }
 
