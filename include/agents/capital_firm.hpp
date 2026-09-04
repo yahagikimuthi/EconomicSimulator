@@ -31,7 +31,7 @@ class CapitalFirm final {
                 actRegularOperationDay(labor::toMarketPhase(date.month()), markets);
         } else if (date.day() == operationDay_ - Day{1}) {
             actBeforeOperationDay();
-        } else if (date.day() == operationDay_ + Day{1}) {
+        } else if (date.day() == operationDay_ + Day{2}) {
             actAfterOperationDay();
         } else
             actNothingDay();
