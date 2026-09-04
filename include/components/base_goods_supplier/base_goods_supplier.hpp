@@ -12,7 +12,6 @@
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/common.hpp"
-#include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
 
@@ -50,6 +49,16 @@ class BaseGoodsSupplier final {
 
     void post(const AgentID id, MarketT& market) noexcept { tradingSystem_.post(id, market); }
 
+    template <DepositFn F>
+    void trade(F&& depositFn) noexcept {
+        tradingSystem_.trade(std::forward<F>(depositFn));
+    }
+
+    void endTrading() noexcept {
+        tradingSystem_.endTrading(mediator_);
+        reset();
+    }
+
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
         ASSERT(employee.isZeroOrMore());
 
@@ -64,23 +73,16 @@ class BaseGoodsSupplier final {
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
-    template <DepositFn F>
-    void trade(F&& depositFn) noexcept {
-        tradingSystem_.trade(std::forward<F>(depositFn));
-    }
-
     void addCapitalEquip(const GoodsQuantity capital) noexcept {
         producingSystem_.addProducingEquip(capital);
     }
 
-    void endTrading() noexcept { tradingSystem_.endTrading(mediator_); }
-
     [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
 
   private:
-    void reset(CensusDropBox& dropBox) noexcept {
-        memory_.logging(dropBox);
-        producingSystem_.reset(dropBox);
+    void reset() noexcept {
+        tradingSystem_.reset();
+        producingSystem_.reset();
     }
 
     void setMediator() noexcept {

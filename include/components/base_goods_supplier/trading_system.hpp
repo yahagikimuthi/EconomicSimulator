@@ -45,6 +45,9 @@ class TradingSystem final {
     void endTrading(IMediator auto& mediator) noexcept {
         const auto result = trader_.publishTradeResult();
         if (result) mediator.publishTradeResult(*result);
+    }
+
+    void reset() noexcept {
         planner_.reset();
         trader_.reset();
     }

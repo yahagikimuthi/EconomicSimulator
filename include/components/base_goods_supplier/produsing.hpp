@@ -9,7 +9,6 @@
 #include "values/goods.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
-#include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
 // TODO 生産関数を要検討
@@ -101,10 +100,7 @@ class ProducingSystem final {
         inventory_ += result.unsoldAmount;
     }
 
-    void reset(CensusDropBox& dropBox) noexcept {
-        dropBox.inventories.emplace_back(inventory_.value());
-        employPlanner_.reset();
-    }
+    void reset() noexcept { employPlanner_.reset(); }
 
   private:
     EmployPlanner employPlanner_;
