@@ -41,9 +41,10 @@ class Listener final {
         requires(std::is_invocable_v<F, Ts> and ...)
     void notice(F&& methodCaller) noexcept {
         auto callFunc = [&](auto& listener) noexcept -> void {
-            if (listener) {
+            if (listener)
                 methodCaller(*listener);
-            }
+            else
+                ASSERT(false);
         };
         std::apply(
             [&](auto&... listener) noexcept -> void { ((callFunc(listener)), ...); }, listeners_
