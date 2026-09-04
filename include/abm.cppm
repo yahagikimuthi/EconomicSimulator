@@ -7,7 +7,7 @@ export module abm;
 
 namespace abm {
 export void run(const int step, const bool isAnalysis = false) {
-    auto engine = Engine{Date{1U, 1U, step}};
+    auto engine = Engine{Date{step}};
     engine.run();
     if (isAnalysis) {
         analysis::analysisData();

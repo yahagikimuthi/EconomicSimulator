@@ -87,7 +87,7 @@ class Engine final {
     RandomGenerator rng_;
 
     const Date endingDay_;
-    Date       today_{1, 1, 1};
+    Date       today_{1};
 
     Logger logger_;
 
