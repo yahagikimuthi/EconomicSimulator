@@ -18,7 +18,7 @@ class BankAccount final {
     }
 
     [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
-        ASSERT(sub.isPositive());
+        ASSERT(sub.isZeroOrMore());
         const auto out = std::min(sub, deposit_);
         deposit_ -= out;
         return out;

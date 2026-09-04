@@ -68,13 +68,29 @@ class Year final {
 };
 
 class Date final {
+    struct Normalized final {
+        const Year  year;
+        const Month month;
+        const Day   day;
+    };
+
   public:
-    explicit constexpr Date(const int year, const int month, const int day) noexcept
-        : year_{year}, month_{month}, day_{day} {
-        ASSERT(year > 0);
-        ASSERT(month > 0);
-        ASSERT(day > 0);
-    }
+    explicit constexpr Date(const int day) noexcept
+        : Date{[day]() noexcept -> Normalized {
+              const auto totalDays     = day - 1;
+              const auto month         = totalDays / setting::dayInMonth;
+              const auto normalizedDay = (totalDays % setting::dayInMonth) + 1;
+
+              const auto totalMonth      = month - 1;
+              const auto normalizedYear  = totalMonth / setting::monthInYear;
+              const auto normalizedMonth = (totalMonth % setting::monthInYear) + 1;
+
+              return {
+                  .year  = Year{normalizedYear},
+                  .month = Month{normalizedMonth},
+                  .day   = Day{normalizedDay}
+              };
+          }()} {}
 
     [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
     [[nodiscard]] constexpr auto operator==(const Date&) const noexcept -> bool  = default;
@@ -113,6 +129,9 @@ class Date final {
     }
 
   private:
+    explicit constexpr Date(const Normalized& normalized) noexcept
+        : year_{normalized.year}, month_{normalized.month}, day_{normalized.day} {}
+
     Year  year_;
     Month month_;
     Day   day_;
