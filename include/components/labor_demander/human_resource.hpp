@@ -32,35 +32,15 @@ class HumanResource final {
     void revisePlan(const Budget budget) noexcept {
         ASSERT(requestedBudget_);
         ASSERT(budget <= requestedBudget_);
-        if (budget == requestedBudget_) return;
-        const auto cutSumWage = sumWage().value() - budget.value();
-        if (cutSumWage <= 0.0) return;
-        const auto avgWage = sumWage() / employeeCnt().value();
-        const auto layOffs = cutSumWage / avgWage.value();
-        layOffsPlan_.emplace(layOffs);
-    }
+        const auto reqBudget = *requestedBudget_;
+        requestedBudget_.reset();
 
-    [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
-        ASSERT(requestedBudget_);
-        return *requestedBudget_;
-    }
-
-    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount { return roster_.employeeCnt(); }
-
-    [[nodiscard]] auto sumWage() const noexcept -> Wage {
-        auto       entries = roster_.validEntries();
-        const auto out     = std::ranges::fold_left(
-            entries | std::views::transform(&RosterEntry::wage), Wage{0.0}, std::plus{}
-        );
-        ASSERT(out >= Wage{0.0});
-        return out;
-    }
-
-    [[nodiscard]] auto addRoster(
-        const AgentID id, const Wage wage, base_goods::Workspace& workspace
-    ) noexcept -> RosterEntry& {
-        ASSERT(wage.isPositive());
-        return roster_.add(id, wage, companyBoard_, workspace);
+        if (budget == reqBudget) return;
+        const auto cutWage = static_cast<Budget>(sumWage()) - budget;
+        if (not cutWage.isPositive()) return;
+        const auto avgWage = static_cast<Money>(sumWage()) / employeeCnt();
+        const auto layOffs = cutWage.value() / avgWage.value();
+        layOffsPlan_       = HeadCount{layOffs};
     }
 
     void layOffs() noexcept {
@@ -81,6 +61,29 @@ class HumanResource final {
             if (not entry.isOccupied()) continue;
             entry.payWage(withdrawFn(static_cast<Budget>(entry.wage)));
         }
+    }
+
+    [[nodiscard]] auto addRoster(
+        const AgentID id, const Wage wage, base_goods::Workspace& workspace
+    ) noexcept -> RosterEntry& {
+        ASSERT(wage.isPositive());
+        return roster_.add(id, wage, companyBoard_, workspace);
+    }
+
+    [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
+        ASSERT(requestedBudget_);
+        return *requestedBudget_;
+    }
+
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount { return roster_.employeeCnt(); }
+
+    [[nodiscard]] auto sumWage() const noexcept -> Wage {
+        auto       entries = roster_.validEntries();
+        const auto out     = std::ranges::fold_left(
+            entries | std::views::transform(&RosterEntry::wage), Wage{0.0}, std::plus{}
+        );
+        ASSERT(out >= Wage{0.0});
+        return out;
     }
 
   private:
