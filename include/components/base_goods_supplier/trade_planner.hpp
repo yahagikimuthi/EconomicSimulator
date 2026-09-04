@@ -21,8 +21,8 @@ class PricePlanner final {
         const GoodsQuantity supply, const MarkupRate markup, const Budget totalCost
     ) const noexcept -> Price {
         ASSERT(supply.isZeroOrMore());
-        ASSERT(markup > MarkupRate{0.0});
-        ASSERT(totalCost >= Budget{0.0});
+        ASSERT(markup.isPositive());
+        ASSERT(totalCost.isZeroOrMore());
 
         const auto price = calcPrice(supply, markup, totalCost);
         const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
@@ -33,9 +33,8 @@ class PricePlanner final {
     [[nodiscard]] static auto calcPrice(
         const GoodsQuantity supply, const MarkupRate markup, const Budget totalCost
     ) noexcept -> Price {
-        const auto avgCost =
-            Money{(supply != GoodsQuantity{0.0}) ? totalCost.value() / supply.value() : 0.0};
-        const auto price = avgCost * (MarkupRate{1.0} + markup);
+        const auto avgCost = Money{not supply.isZero() ? totalCost.value() / supply.value() : 0.0};
+        const auto price   = avgCost * (MarkupRate{1.0} + markup);
         return price;
     }
 
