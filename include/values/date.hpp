@@ -4,70 +4,56 @@
 
 #include "others/setting.hpp"
 #include "others/util.hpp"
+#include "values/mixin.hpp"
 
 namespace abm {
-class Day final {
+class Day final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Day> {
   public:
-    explicit constexpr Day(const int day) : day_{day} { ASSERT(day > 0); }
+    explicit constexpr Day(const int day) noexcept : BaseValueObject<int>(day) { ASSERT(day > 0); }
 
-    [[nodiscard]] auto operator+(Day other) const noexcept -> Day { return Day{day_ + other.day_}; }
-    [[nodiscard]] auto operator-(Day other) const noexcept -> Day { return Day{day_ - other.day_}; }
-    [[nodiscard]] auto value() const noexcept -> int { return day_; }
+    [[nodiscard]] constexpr auto operator+(Day other) const noexcept -> Day {
+        return Day{value_ + other.value_};
+    }
+    [[nodiscard]] constexpr auto operator-(Day other) const noexcept -> Day {
+        return Day{value_ - other.value_};
+    }
 
-    auto operator<=>(const Day&) const noexcept -> auto = default;
-    auto operator==(const Day&) const noexcept -> bool  = default;
-
-    auto operator++() noexcept -> Day& {
-        ++day_;
+    constexpr auto operator++() noexcept -> Day& {
+        ++value_;
         return *this;
     }
-
-  private:
-    int day_;
 };
 
-class Month final {
+class Month final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Month> {
   public:
-    explicit constexpr Month(const int month) : month_{month} { ASSERT(month > 0); }
-
-    [[nodiscard]] auto value() const noexcept -> int { return month_; }
-
-    auto operator<=>(const Month&) const noexcept -> auto = default;
-    auto operator==(const Month&) const noexcept -> bool  = default;
-
-    auto operator++() noexcept -> Month& {
-        ++month_;
+    explicit constexpr Month(const int month) noexcept : BaseValueObject<int>(month) {
+        ASSERT(month > 0);
+    }
+    constexpr auto operator++() noexcept -> Month& {
+        ++value_;
         return *this;
     }
-    auto operator-(const Month other) const noexcept -> Month {
-        return Month{month_ - other.month_};
+    constexpr auto operator-(const Month other) const noexcept -> Month {
+        return Month{value_ - other.value_};
     }
-
-  private:
-    int month_;
 };
 
-class Year final {
+class Year final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Year> {
   public:
-    explicit constexpr Year(const int year) : year_{year} { ASSERT(year > 0); }
-
-    [[nodiscard]] auto operator-(const Year other) const noexcept -> Year {
-        return Year{year_ + other.year_};
+    explicit constexpr Year(const int year) noexcept : BaseValueObject<int>(year) {
+        ASSERT(year > 0);
     }
-    [[nodiscard]] auto value() const noexcept -> int { return year_; }
 
-    auto operator<=>(const Year&) const noexcept -> auto = default;
-    auto operator==(const Year&) const noexcept -> bool  = default;
-    auto operator++() noexcept -> Year& {
-        ++year_;
+    [[nodiscard]] constexpr auto operator-(const Year other) const noexcept -> Year {
+        return Year{value_ + other.value_};
+    }
+    constexpr auto operator++() noexcept -> Year& {
+        ++value_;
         return *this;
     }
-
-  private:
-    int year_;
 };
 
-class Date final {
+class Date final : value_object::CompareMixin<Date> {
     struct Normalized final {
         const Year  year;
         const Month month;
@@ -76,7 +62,7 @@ class Date final {
 
   public:
     explicit constexpr Date(const int day) noexcept
-        : Date{[day]() noexcept -> Normalized {
+        : Date{[day]() constexpr noexcept -> Normalized {
               const auto totalDays     = day - 1;
               const auto month         = totalDays / setting::dayInMonth;
               const auto normalizedDay = (totalDays % setting::dayInMonth) + 1;
@@ -91,9 +77,6 @@ class Date final {
                   .day   = Day{normalizedDay}
               };
           }()} {}
-
-    [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
-    [[nodiscard]] constexpr auto operator==(const Date&) const noexcept -> bool  = default;
 
     [[nodiscard]] constexpr auto isBeginingYear() const noexcept -> bool {
         return year_ == Year{1};
