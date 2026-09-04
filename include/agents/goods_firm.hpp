@@ -14,9 +14,9 @@
 namespace abm {
 class GoodsFirm final : public Agent {
   public:
-    explicit GoodsFirm(const AgentID id, RandomGenerator& masterRng) noexcept
-        : finance_{id, masterRng},
-          labor_{id, masterRng, operationDay_},
+    explicit GoodsFirm(RandomGenerator& masterRng) noexcept
+        : finance_{id_, masterRng},
+          labor_{id_, masterRng, operationDay_},
           capital_{masterRng},
           goods_{masterRng} {}
 

@@ -12,8 +12,8 @@
 namespace abm {
 class HHold final : public Agent {
   public:
-    explicit HHold(const AgentID id, RandomGenerator& masterRng) noexcept
-        : finance_{id, masterRng}, labor_{masterRng}, goods_{masterRng} {}
+    explicit HHold(RandomGenerator& masterRng) noexcept
+        : finance_{id_, masterRng}, labor_{masterRng}, goods_{masterRng} {}
 
     void act(const Date& date, MarketRegistry& markets) noexcept {
         labor_.work(finance_.makeDepositFn(), date);
