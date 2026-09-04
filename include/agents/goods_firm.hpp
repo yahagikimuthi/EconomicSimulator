@@ -5,23 +5,19 @@
 #include "components/capital_demander.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "components/labor_demander/labor_demander.hpp"
-#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
-class GoodsFirm final {
-    static inline constinit int instanceCnt{};
-
+class GoodsFirm final : public Agent {
   public:
     explicit GoodsFirm(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng},
-          labor_{id, masterRng, Day{(instanceCnt % (setting::dayInMonth - 2)) + 2}},
+          labor_{id, masterRng, operationDay_},
           capital_{masterRng},
-          goods_{masterRng},
-          id_{id} {}
+          goods_{masterRng} {}
 
     void act(const Date& date, MarketRegistry& markets) noexcept {
         if (date.day() == operationDay_ and date.isBeginingYear())
@@ -126,7 +122,5 @@ class GoodsFirm final {
     LaborDemander   labor_;
     CapitalDemander capital_;
     GoodsSupplier   goods_;
-    const AgentID   id_;
-    const Day       operationDay_{(instanceCnt++ % (setting::dayInMonth - 2)) + 2};
 };
 }  // namespace abm

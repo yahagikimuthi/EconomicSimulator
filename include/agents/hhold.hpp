@@ -4,19 +4,16 @@
 #include "components/finance/others_finance.hpp"
 #include "components/goods_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
-#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
-class HHold final {
-    static inline constinit int instanceCnt{};
-
+class HHold final : public Agent {
   public:
     explicit HHold(const AgentID id, RandomGenerator& masterRng) noexcept
-        : finance_{id, masterRng}, labor_{masterRng}, goods_{masterRng}, id_{id} {}
+        : finance_{id, masterRng}, labor_{masterRng}, goods_{masterRng} {}
 
     void act(const Date& date, MarketRegistry& markets) noexcept {
         labor_.work(finance_.makeDepositFn(), date);
@@ -55,7 +52,5 @@ class HHold final {
     HHoldFinance  finance_;
     LaborSupplier labor_;
     GoodsDemander goods_;
-    const AgentID id_;
-    const Day     operationDay_{(instanceCnt++ % (setting::dayInMonth - 2)) + 2};
 };
 }  // namespace abm
