@@ -23,24 +23,25 @@ class RecruitSystem final {
 
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
 
-    [[nodiscard]] auto planAndRequestBudget(
-        const HeadCount desiredEmploy, const Money salesPerWorker, IMediator auto& mediator
+    [[nodiscard]] auto requestBudget(
+        const HeadCount desiredEmploy, const Money salesPerWorker
     ) noexcept -> Budget {
         const auto plan = planner_.plan(desiredEmploy, salesPerWorker);
-        // TODO ↓0値でも通達されるので、学習しないように修正が必要
-        mediator.publishRecruitPlan(plan);
         plan_.emplace(plan);
         requestedBudget_ = static_cast<Budget>(plan.employ * plan.wage);
         return *requestedBudget_;
     }
 
-    void revisePlan(const Budget budget) noexcept {
+    void revisePlan(const Budget budget, IMediator auto& mediator) noexcept {
         ASSERT(requestedBudget_);
         ASSERT(budget <= requestedBudget_);
-        if (budget == requestedBudget_) return;
+        const auto reqBudget = *requestedBudget_;
+        requestedBudget_.reset();
+        if (budget == reqBudget) return;
         if (plan_->employ.isZeroOrLess()) return;
         const auto wage = budget.value() / plan_->employ.value();
         plan_.emplace(Wage{wage}, plan_->employ, plan_->offer);
+        mediator.publishRecruitPlan(*plan_);
     }
 
     [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
@@ -57,6 +58,7 @@ class RecruitSystem final {
 
     template <AddRosterFn F>
     void endRecruiting(F&& addRoster, IMediator auto& mediator) noexcept {
+        plan_.reset();
         const auto result = recruiter_.endRecruiting(std::forward<F>(addRoster));
         if (not result) return;
         mediator.publishRecruitResult(*result);
@@ -108,13 +110,12 @@ class LaborDemander final {
     [[nodiscard]] auto requestAnnualBudget(
         const HeadCount adjust, const Budget salesForecast
     ) noexcept -> Budget {
-        const auto employee            = employeeCnt();
-        const auto isEmploying         = not employee.isZero();
-        const auto salesPerWorker      = isEmploying ? salesForecast.value() / employee.value()
-                                                     : std::numeric_limits<double>::infinity();
-        const auto recruitSystemBudget = recruitSystem_.planAndRequestBudget(
-            std::max(adjust, HeadCount{0.0}), Money{salesPerWorker}, mediator_
-        );
+        const auto employee       = employeeCnt();
+        const auto isEmploying    = not employee.isZero();
+        const auto salesPerWorker = isEmploying ? salesForecast.value() / employee.value()
+                                                : std::numeric_limits<double>::infinity();
+        const auto recruitSystemBudget =
+            recruitSystem_.requestBudget(std::max(adjust, HeadCount{0.0}), Money{salesPerWorker});
         const auto hrBudget =
             humanResource_.planAndRequestBudget(-std::min(adjust, HeadCount{0.0}));
         return recruitSystemBudget + hrBudget;
@@ -125,11 +126,11 @@ class LaborDemander final {
         const auto hrRequested            = humanResource_.requestedBudget();
         ASSERT(budget <= recruitSystemRequested + hrRequested);
         if (budget < hrRequested) {
-            recruitSystem_.revisePlan(Budget{0.0});
+            recruitSystem_.revisePlan(Budget{0.0}, mediator_);
             humanResource_.revisePlan(budget);
             return;
         }
-        recruitSystem_.revisePlan(budget - hrRequested);
+        recruitSystem_.revisePlan(budget - hrRequested, mediator_);
         humanResource_.revisePlan(budget);
     }
 
