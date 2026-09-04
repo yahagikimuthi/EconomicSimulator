@@ -38,6 +38,10 @@ class Employment final {
 
     void work(const Date& today) noexcept {
         if (not isEmployed()) return;
+        if (not rosterEntry_->isOccupied()) {
+            rosterEntry_.reset();
+            return;
+        }
         if (today.day() == rosterEntry_->workDay()) rosterEntry_->addInput(productPower_);
     }
 

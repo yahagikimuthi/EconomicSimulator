@@ -34,7 +34,6 @@ class LaborSupplier final {
         : jobHunter_{masterRng}, employment_{masterRng}, likelihoodChangingJob_{masterRng} {}
 
     void entry(const AgentID id, Market& market) noexcept {
-        employment_.updateStatus();
         if (not shouldSearch()) return;
         jobHunter_.entry(
             id,
@@ -54,8 +53,8 @@ class LaborSupplier final {
 
     template <DepositFn F>
     void work(F&& depositFn, const Date& today) noexcept {
-        employment_.work(today);
         const auto paidWage = employment_.takeOutPaidWage();
+        employment_.work(today);
         std::forward<F>(depositFn)(paidWage);
     }
 
