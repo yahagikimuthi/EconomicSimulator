@@ -47,7 +47,7 @@ class GoodsDemander final {
     explicit GoodsDemander(RandomGenerator& masterRng) noexcept
         : trader_{masterRng}, mpc_{masterRng.random(setting::mpc)} {}
 
-    [[nodiscard]] auto planAndRequestBudget(const Budget asset) noexcept -> Budget {
+    [[nodiscard]] auto requestBudget(const Budget asset) noexcept -> Budget {
         const auto requestBudget = asset * mpc_;
         budget_                  = static_cast<Budget>(requestBudget);
         return *budget_;
@@ -75,9 +75,15 @@ class GoodsDemander final {
     template <DepositFn F>
     void afterTrade(F&& depositFn) noexcept {
         trader_.afterTrade(std::forward<F>(depositFn));
+        reset();
     }
 
   private:
+    void reset() noexcept {
+        trader_.reset();
+        budget_.reset();
+    }
+
     Trader                trader_;
     const double          mpc_;
     std::optional<Budget> budget_;
