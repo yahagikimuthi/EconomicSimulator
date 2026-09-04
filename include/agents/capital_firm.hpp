@@ -18,7 +18,7 @@ class CapitalFirm final {
   public:
     explicit CapitalFirm(const AgentID id, RandomGenerator& masterRng) noexcept
         : finance_{id, masterRng},
-          labor_{id, masterRng, Day{(instanceCnt % (setting::dayInMonth - 1)) + 2}},
+          labor_{id, masterRng, Day{(instanceCnt % (setting::dayInMonth - 2)) + 2}},
           capitalDemander_{masterRng},
           capitalSupplier_{masterRng},
           id_{id} {}
@@ -130,6 +130,6 @@ class CapitalFirm final {
     CapitalDemander capitalDemander_;
     CapitalSupplier capitalSupplier_;
     const AgentID   id_;
-    const Day       operationDay_{(instanceCnt++ % (setting::dayInMonth - 1)) + 2};
+    const Day       operationDay_{(instanceCnt++ % (setting::dayInMonth - 2)) + 2};
 };
 }  // namespace abm

@@ -56,11 +56,6 @@ class HHold final {
     LaborSupplier labor_;
     GoodsDemander goods_;
     const AgentID id_;
-    const Day     operationDay_{(instanceCnt++ % (setting::dayInMonth - 1)) + 2};
+    const Day     operationDay_{(instanceCnt++ % (setting::dayInMonth - 2)) + 2};
 };
-
-auto foo() {
-    auto                  _ = 0;
-    [[maybe_unused]] auto x = (_ % (29)) + 2;
-}
 }  // namespace abm
