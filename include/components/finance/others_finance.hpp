@@ -55,7 +55,7 @@ class HHoldFinance final {
     [[nodiscard]] auto claimBudget(const Budget claim) const noexcept -> Budget {
         ASSERT(claim.isZeroOrMore());
 
-        const auto balance = static_cast<Budget>(depositSupplier_.balance());
+        const auto balance = depositSupplier_.balance();
         if (currentCashRatio() > cashRatio_) {
             const auto cashOut     = std::min(static_cast<Budget>(cash_), claim);
             const auto rest        = claim - cashOut;

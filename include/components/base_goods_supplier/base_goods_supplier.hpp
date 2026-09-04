@@ -40,11 +40,11 @@ class BaseGoodsSupplier final {
     auto operator=(BaseGoodsSupplier&&) -> BaseGoodsSupplier&      = delete;
     ~BaseGoodsSupplier() noexcept                                  = default;
 
-    [[nodiscard]] auto planAndExpectSales(const Money totalCost) noexcept -> Budget {
+    [[nodiscard]] auto planAndExpectSales(const Budget totalCost) noexcept -> Budget {
         ASSERT(totalCost.isZeroOrMore());
         const auto supply = producingSystem_.produce();
         tradingSystem_.plan(supply, totalCost, mediator_);
-        return static_cast<Budget>(salesForecast());
+        return salesForecast();
     }
 
     void post(const AgentID id, MarketT& market) noexcept { tradingSystem_.post(id, market); }
@@ -77,7 +77,9 @@ class BaseGoodsSupplier final {
         producingSystem_.addProducingEquip(capital);
     }
 
-    [[nodiscard]] auto salesForecast() const noexcept -> Money { return memory_.lastSales(); }
+    [[nodiscard]] auto salesForecast() const noexcept -> Budget {
+        return static_cast<Budget>(memory_.lastSales());
+    }
 
   private:
     void reset() noexcept {

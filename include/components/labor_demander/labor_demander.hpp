@@ -62,6 +62,13 @@ class RecruitSystem final {
         mediator.publishRecruitResult(*result);
     }
 
+    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
+        if (not plan_) return Budget{0.0};
+        const auto out = plan_->employ * plan_->wage / 6.0;
+        ASSERT(out.isZeroOrMore());
+        return static_cast<Budget>(out);
+    }
+
     void reset() noexcept {
         planner_.reset();
         recruiter_.reset();
@@ -99,7 +106,7 @@ class LaborDemander final {
     ~LaborDemander() noexcept                              = default;
 
     [[nodiscard]] auto requestAnnualBudget(
-        const HeadCount adjust, const Money salesForecast
+        const HeadCount adjust, const Budget salesForecast
     ) noexcept -> Budget {
         const auto employee            = employeeCnt();
         const auto isEmploying         = not employee.isZero();
@@ -126,16 +133,6 @@ class LaborDemander final {
         humanResource_.revisePlan(budget);
     }
 
-    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
-        return static_cast<Budget>(sumWage());
-    }
-
-    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
-        const auto out = humanResource_.employeeCnt();
-        ASSERT(out.isZeroOrMore());
-        return out;
-    }
-
     void postRequest(const AgentID id, Market& market) noexcept { recruitSystem_.post(id, market); }
 
     void offer() noexcept { recruitSystem_.offer(); }
@@ -156,10 +153,15 @@ class LaborDemander final {
         humanResource_.payWage(std::forward<F>(withdrawFn));
     }
 
-    [[nodiscard]] auto sumWage() const noexcept -> Money {
-        const auto out = humanResource_.sumWage();
+    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
+        const auto recruitCost = recruitSystem_.calcMonthlyCost();
+        return static_cast<Budget>(humanResource_.sumWage()) + recruitCost;
+    }
+
+    [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
+        const auto out = humanResource_.employeeCnt();
         ASSERT(out.isZeroOrMore());
-        return static_cast<Money>(out);
+        return out;
     }
 
   private:

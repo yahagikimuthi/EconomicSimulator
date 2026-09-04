@@ -47,7 +47,7 @@ class CapitalFirm final {
         }();
         const auto capitalReqBudget =
             capitalDemander_.planBudget(capitalSupplier_.requiresCapital());
-        const auto salesPlan = capitalSupplier_.planAndExpectSales(labor_.sumWage());
+        const auto salesPlan = capitalSupplier_.planAndExpectSales(labor_.calcMonthlyCost());
 
         const auto total = laborReqBudget + capitalReqBudget - salesPlan;
         if (total.isZeroOrLess()) {
@@ -82,7 +82,7 @@ class CapitalFirm final {
         const auto laborCost = labor_.calcMonthlyCost();
         const auto capitalReqBudget =
             capitalDemander_.planBudget(capitalSupplier_.requiresCapital());
-        const auto salesPlan = capitalSupplier_.planAndExpectSales(labor_.sumWage());
+        const auto salesPlan = capitalSupplier_.planAndExpectSales(labor_.calcMonthlyCost());
 
         const auto total = laborCost + capitalReqBudget - salesPlan;
         if (total.isZeroOrLess()) {

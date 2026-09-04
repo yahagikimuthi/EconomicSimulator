@@ -44,7 +44,7 @@ class GoodsFirm final {
             const auto sales    = goods_.salesForecast();
             return labor_.requestAnnualBudget(adjust, sales);
         }();
-        const auto salesPlan        = goods_.planAndExpectSales(labor_.sumWage());
+        const auto salesPlan        = goods_.planAndExpectSales(labor_.calcMonthlyCost());
         const auto capitalBudgetReq = capital_.planBudget(goods_.requiresCapital());
 
         const auto total = laborBudgetReq + capitalBudgetReq - salesPlan;
@@ -79,7 +79,7 @@ class GoodsFirm final {
 
     void actRegularOperatingDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
         const auto laborCost        = labor_.calcMonthlyCost();
-        const auto salesPlan        = goods_.planAndExpectSales(labor_.sumWage());
+        const auto salesPlan        = goods_.planAndExpectSales(labor_.calcMonthlyCost());
         const auto capitalBudgetReq = capital_.planBudget(goods_.requiresCapital());
 
         const auto total  = laborCost + capitalBudgetReq - salesPlan;
