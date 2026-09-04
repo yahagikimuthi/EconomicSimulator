@@ -19,11 +19,9 @@ namespace abm::base_goods::supplier {
 
 template <EMarket SupplyGoodsT>
 class Trader final {
-    using MarketT     = Market<SupplyGoodsT>;
-    using RequestT    = Request<SupplyGoodsT>;
-    using EntryT      = Entry<SupplyGoodsT>;
-    using TradePlan   = supplier::TradePlan;
-    using TradeResult = supplier::TradeResult;
+    using MarketT  = Market<SupplyGoodsT>;
+    using RequestT = Request<SupplyGoodsT>;
+    using EntryT   = Entry<SupplyGoodsT>;
 
   public:
     explicit Trader(RandomGenerator& masterRng) noexcept
