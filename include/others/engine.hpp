@@ -52,17 +52,17 @@ class Engine final {
           endingDay_{endingDay},
           markets_{today_} {
         namespace cnt = setting::agent_count;
-        auto id       = 0;
+        auto count    = 0;
 
         agents_.reserve(cnt::capitalFirm + cnt::goodsFirm + cnt::hhold);
-        for (; id < cnt::capitalFirm; ++id) {
-            agents_.emplaceBack<CapitalFirm>(AgentID{id}, rng_);
+        for (; count < cnt::capitalFirm; ++count) {
+            agents_.emplaceBack<CapitalFirm>(rng_);
         }
-        for (; id < cnt::goodsFirm + cnt::goodsFirm; ++id) {
-            agents_.emplaceBack<GoodsFirm>(AgentID{id}, rng_);
+        for (; count < cnt::goodsFirm + cnt::goodsFirm; ++count) {
+            agents_.emplaceBack<GoodsFirm>(rng_);
         }
-        for (; id < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++id) {
-            agents_.emplaceBack<HHold>(AgentID{id}, rng_);
+        for (; count < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++count) {
+            agents_.emplaceBack<HHold>(rng_);
         }
     }
 
