@@ -23,7 +23,7 @@ class HHold final {
         const auto day = date.day();
         if (day == operationDay_)
             actOperationDay(labor::toMarketPhase(date.month()), markets);
-        else if (day == operationDay_ + Day{1})
+        else if (day == operationDay_ + Day{2})
             actAfterOperationDay();
     }
 
@@ -31,16 +31,15 @@ class HHold final {
     void actOperationDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
         const auto wage         = static_cast<Budget>(labor_.wage());
         const auto asset        = static_cast<Budget>(finance_.asset());
-        const auto purchasePlan = goods_.planAndRequestBudget(asset + wage);
+        const auto purchasePlan = goods_.requestBudget(asset + wage);
         const auto total        = purchasePlan - wage;
         if (total.isZeroOrLess()) {
             goods_.revisePlan(purchasePlan);
-            return;
+        } else {
+            const auto budget = finance_.claimBudget(total) + wage;
+            ASSERT(budget <= total + wage);
+            goods_.revisePlan(budget);
         }
-        const auto budget = finance_.claimBudget(total) + wage;
-        ASSERT(budget <= total + wage);
-        goods_.revisePlan(budget);
-
         if (phase == LaborMarketPhase::Entry)
             labor_.entry(id_, markets.laborMarket);
         else if (phase == LaborMarketPhase::Accept)
