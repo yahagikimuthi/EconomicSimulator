@@ -70,14 +70,14 @@ class HHoldFinance final {
         return withdraw + cashOut;
     }
 
-    [[nodiscard]] auto asset() const noexcept -> Money {
-        return cash_ + depositSupplier_.balance();
+    [[nodiscard]] auto asset() const noexcept -> Budget {
+        return static_cast<Budget>(cash_) + depositSupplier_.balance();
     }
 
   private:
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
         if (asset().isZero()) return 0.0;
-        return cash_ / asset();
+        return static_cast<Budget>(cash_) / asset();
     }
 
     DepositSupplier depositSupplier_;

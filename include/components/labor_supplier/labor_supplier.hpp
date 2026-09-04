@@ -49,6 +49,7 @@ class LaborSupplier final {
         const auto acceptedEntry = jobHunter_.huntedResult();
         if (not acceptedEntry) return;
         employment_.startWorking(acceptedEntry->rosterEntry());
+        jobHunter_.reset();
     }
 
     template <DepositFn F>
@@ -56,10 +57,10 @@ class LaborSupplier final {
         employment_.work(std::forward<F>(depositFn), today);
     }
 
-    [[nodiscard]] auto wage() const noexcept -> Money {
+    [[nodiscard]] auto wage() const noexcept -> Budget {
         const auto out = employment_.wage();
         ASSERT(out.isZeroOrMore());
-        return static_cast<Money>(out);
+        return static_cast<Budget>(out);
     }
 
   private:

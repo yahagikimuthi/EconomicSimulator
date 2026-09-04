@@ -9,7 +9,9 @@ class DepositSupplier final {
   public:
     explicit DepositSupplier(const AgentID id) noexcept : account_{id} {}
 
-    [[nodiscard]] auto balance() const noexcept -> Money { return account_.balance(); }
+    [[nodiscard]] auto balance() const noexcept -> Budget {
+        return static_cast<Budget>(account_.balance());
+    }
 
     void deposit(const Money deposit) noexcept {
         ASSERT(deposit >= Money{0.0});

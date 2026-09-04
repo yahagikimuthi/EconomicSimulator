@@ -52,25 +52,22 @@ class JobHunter final {
         Market&                 market,
         const int               entryCnt = setting::jobEntryCnt
     ) noexcept {
-        if (acceptedEntry_) return;
-        std::ranges::view auto alignedRequests{
-            pickAndSortJobs(id, market, entryCnt) |
-            std::views::filter([&](const Request& req) noexcept -> bool {
-                return isAligned(req);
-            }) |
-            std::views::take(entryCnt)
-        };
+        auto alignedRequests = pickAndSortJobs(id, market, entryCnt) |
+                               std::views::filter([&](const Request& req) noexcept -> bool {
+                                   return isAligned(req);
+                               }) |
+                               std::views::take(entryCnt);
         if (alignedRequests.empty()) return;
         for (auto& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
     }
 
     void accept() noexcept {
-        if (acceptedEntry_) return;
         const auto offeredEntry = takeOfferedEntry();
         if (not offeredEntry) return;
         offeredEntry->accept();
         acceptedEntry_ = offeredEntry;
     }
+
     [[nodiscard]] auto huntedResult() noexcept -> std::optional<Entry&> { return acceptedEntry_; }
 
     void reset() noexcept { myEntries_.clear(), acceptedEntry_.reset(); }

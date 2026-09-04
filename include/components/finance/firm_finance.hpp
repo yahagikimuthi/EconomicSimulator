@@ -77,7 +77,7 @@ class FirmFinance final {
     [[nodiscard]] auto claimBudget(const Budget claim) const noexcept -> Budget {
         ASSERT(claim.isZeroOrMore());
 
-        const auto balance = static_cast<Budget>(depositSupplier_.balance());
+        const auto balance = depositSupplier_.balance();
         if (currentCashRatio() > cashRatio_) {
             const auto cashOut     = std::min(static_cast<Budget>(cash_), claim);
             const auto rest        = claim - cashOut;
@@ -92,14 +92,14 @@ class FirmFinance final {
         return withdraw + cashOut;
     }
 
-    [[nodiscard]] auto asset() const noexcept -> Money {
-        return cash_ + depositSupplier_.balance();
+    [[nodiscard]] auto asset() const noexcept -> Budget {
+        return static_cast<Budget>(cash_) + depositSupplier_.balance();
     }
 
   private:
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
         if (asset().isZero()) return 0.0;
-        return cash_ / asset();
+        return static_cast<Budget>(cash_) / asset();
     }
 
     void postToPlFromPlus(const Money money, const AccountItem item) noexcept {

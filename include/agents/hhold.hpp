@@ -29,8 +29,8 @@ class HHold final {
 
   private:
     void actOperationDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
-        const auto wage         = static_cast<Budget>(labor_.wage());
-        const auto asset        = static_cast<Budget>(finance_.asset());
+        const auto wage         = labor_.wage();
+        const auto asset        = finance_.asset();
         const auto purchasePlan = goods_.requestBudget(asset + wage);
         const auto total        = purchasePlan - wage;
         if (total.isZeroOrLess()) {
