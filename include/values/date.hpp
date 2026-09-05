@@ -86,6 +86,8 @@ class Date final {
 
     [[nodiscard]] constexpr auto month() const noexcept -> Month { return month_; }
 
+    [[nodiscard]] constexpr auto year() const noexcept -> Year { return year_; }
+
     [[nodiscard]] constexpr auto toFlatTime() const noexcept -> Day {
         const auto yearIdx   = year_ - Year{1};
         const auto monthIdx  = month_ - Month{1};
