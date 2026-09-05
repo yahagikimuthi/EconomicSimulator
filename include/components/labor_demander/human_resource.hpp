@@ -44,6 +44,7 @@ class HumanResource final {
     }
 
     void layOffs() noexcept {
+        ASSERT(layOffsPlan_);
         const auto layOffsCnt = layOffsPlan_;
         ASSERT(layOffsCnt->isZeroOrMore());
 
@@ -54,6 +55,7 @@ class HumanResource final {
             entry.resign();
             ++currentLayOffs;
         }
+        layOffsPlan_.reset();
     }
 
     void payWage(TryWithdrawFn auto&& withdrawFn) noexcept {
