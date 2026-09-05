@@ -173,8 +173,6 @@ class Market final {
         totalSupply_.fetch_sub(entry.supply.value());
     }
 
-    void clear() noexcept { entries_.clear(), totalSupply_.store(0.0); }
-
   private:
     tbb::concurrent_vector<EntryT>          entries_;
     tbb::concurrent_vector<RefWrap<EntryT>> emptyEntries_;
