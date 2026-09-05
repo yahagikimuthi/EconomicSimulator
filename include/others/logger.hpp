@@ -16,9 +16,10 @@ class Logger final {
   public:
     explicit Logger()
         : file_{[]() noexcept -> HighFive::File {
-              namespace fs        = std::filesystem;
-              const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
-              const auto path     = fs::path{filepath};
+              namespace fs = std::filesystem;
+              const auto filepath =
+                  static_cast<std::string>(global_setting::simulationResultOutputPath);
+              const auto path = fs::path{filepath};
               if (path.has_parent_path()) fs::create_directories(path.parent_path());
               return HighFive::File{
                   filepath,
@@ -31,7 +32,7 @@ class Logger final {
     [[nodiscard]] auto isValid() const noexcept -> bool { return file_.isValid(); }
 
     void save(const CensusDropBox& dropBox, const Date date) noexcept {
-        namespace name = setting::save_name;
+        namespace name = global_setting::save_name;
         auto groupPath = std::string{"/step_" + std::to_string(date.toFlatTime().value())};
         auto group     = HighFive::Group{file_.createGroup(groupPath)};
 

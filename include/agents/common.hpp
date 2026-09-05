@@ -24,10 +24,10 @@ class Agent {
 
   protected:
     explicit Agent() noexcept {
-        ASSERT(Day{2} <= operationDay_ and operationDay_ <= Day{setting::dayInMonth - 1});
+        ASSERT(Day{2} <= operationDay_ and operationDay_ <= Day{global_setting::dayInMonth - 1});
     }
 
     const AgentID id_{agentCnt};
-    const Day     operationDay_{(agentCnt++ % (setting::dayInMonth - 2)) + 2};
+    const Day     operationDay_{(agentCnt++ % (global_setting::dayInMonth - 2)) + 2};
 };
 }  // namespace abm

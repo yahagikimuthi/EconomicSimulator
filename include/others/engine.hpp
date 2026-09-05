@@ -51,7 +51,7 @@ class Engine final {
           rng_{{seed_.state, seed_.stream}},
           endingDay_{endingDay},
           markets_{today_} {
-        namespace cnt = setting::agent_count;
+        namespace cnt = global_setting::agent_count;
         auto count    = 0;
 
         agents_.reserve(cnt::capitalFirm + cnt::goodsFirm + cnt::hhold);
@@ -68,14 +68,19 @@ class Engine final {
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
+            if (today_.year() == Year{2}) {
+                nothing();
+            }
             agents_.act(today_, markets_);
         }
     }
 
   private:
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
-        if constexpr (not setting::useRuntimeRandomSeed) {
-            return {.state = setting::fixedSeedState, .stream = setting::fixedSeedStream};
+        if constexpr (not global_setting::useRuntimeRandomSeed) {
+            return {
+                .state = global_setting::fixedSeedState, .stream = global_setting::fixedSeedStream
+            };
         }
         auto       rd     = std::random_device{};
         const auto state  = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};

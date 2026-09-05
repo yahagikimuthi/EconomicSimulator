@@ -25,13 +25,13 @@ using RandomParameter =
     std::variant<UniformParameter<int>, UniformParameter<double>, NormalParameter>;
 }  // namespace abm
 
-namespace abm::setting {
+namespace abm::global_setting {
 inline constexpr auto useRuntimeRandomSeed       = false;
 inline constexpr auto fixedSeedState             = std::uint64_t{0x853c49e6748fea9bULL};
 inline constexpr auto fixedSeedStream            = std::uint64_t{0xda3e39cb94b95bdbULL};
 inline constexpr auto simulationResultOutputPath = "../outputs/result.h5"sv;
 inline constexpr auto metricDataOutputPath       = "../outputs/metrics.h5"sv;
-}  // namespace abm::setting
+}  // namespace abm::global_setting
 
 namespace abm::labor::demander::setting {
 inline constexpr RandomParameter lastApplicants = UniformParameter<int>{.min = 10, .limit = 20};
@@ -97,16 +97,16 @@ inline constexpr auto salesTaxRate     = 0.1;
 inline constexpr auto corporateTaxRate = 0.1;
 }  // namespace abm::government::setting
 
-namespace abm::setting::agent_count {
+namespace abm::global_setting::agent_count {
 inline constexpr auto goodsFirm   = 2;
 inline constexpr auto capitalFirm = 5;
 inline constexpr auto hhold       = 300;
-}  // namespace abm::setting::agent_count
+}  // namespace abm::global_setting::agent_count
 
-namespace abm::setting {
+namespace abm::global_setting {
 inline constexpr auto dayInMonth  = 30;
 inline constexpr auto monthInYear = 12;
-}  // namespace abm::setting
+}  // namespace abm::global_setting
 
 namespace abm::finance::setting {
 inline constexpr RandomParameter firmInitialAsset =
@@ -116,7 +116,7 @@ inline constexpr RandomParameter hholdInitialAsset =
 inline constexpr RandomParameter cashRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
 
-namespace abm::setting::save_name {
+namespace abm::global_setting::save_name {
 inline constexpr auto firmAssets        = "firmAssets"sv;
 inline constexpr auto postedEmployments = "postedEmployments"sv;
 inline constexpr auto postedWages       = "postedWages"sv;
@@ -128,4 +128,4 @@ inline constexpr auto markups           = "markups"sv;
 inline constexpr auto inventories       = "inventories"sv;
 inline constexpr auto householdAssets   = "householdAssets"sv;
 inline constexpr auto wages             = "wages"sv;
-}  // namespace abm::setting::save_name
+}  // namespace abm::global_setting::save_name

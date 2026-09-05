@@ -17,9 +17,10 @@ class InputDataManager final {
   public:
     explicit InputDataManager()
         : inFile_{[]() noexcept -> HighFive::File {
-              namespace fs        = std::filesystem;
-              const auto filepath = static_cast<std::string>(setting::simulationResultOutputPath);
-              const auto path     = fs::path{filepath};
+              namespace fs = std::filesystem;
+              const auto filepath =
+                  static_cast<std::string>(global_setting::simulationResultOutputPath);
+              const auto path = fs::path{filepath};
               path.has_parent_path();
               if (path.has_parent_path()) fs::create_directories(path.parent_path());
               return HighFive::File{filepath, HighFive::File::ReadOnly};
@@ -67,7 +68,7 @@ class OutputDataManager final {
     explicit OutputDataManager()
         : outFile_{[]() noexcept -> HighFive::File {
               namespace fs        = std::filesystem;
-              const auto filepath = static_cast<std::string>(setting::metricDataOutputPath);
+              const auto filepath = static_cast<std::string>(global_setting::metricDataOutputPath);
               const auto path     = fs::path{filepath};
               if (path.has_parent_path()) {
                   fs::create_directories(path.parent_path());

@@ -64,12 +64,12 @@ class Date final {
     explicit constexpr Date(const int day) noexcept
         : Date{[day]() constexpr noexcept -> Normalized {
               const auto totalDays     = day - 1;
-              const auto month         = totalDays / setting::dayInMonth;
-              const auto normalizedDay = (totalDays % setting::dayInMonth) + 1;
+              const auto month         = totalDays / global_setting::dayInMonth;
+              const auto normalizedDay = (totalDays % global_setting::dayInMonth) + 1;
 
               const auto totalMonth      = month - 1;
-              const auto normalizedYear  = totalMonth / setting::monthInYear;
-              const auto normalizedMonth = (totalMonth % setting::monthInYear) + 1;
+              const auto normalizedYear  = totalMonth / global_setting::monthInYear;
+              const auto normalizedMonth = (totalMonth % global_setting::monthInYear) + 1;
 
               return {
                   .year  = Year{normalizedYear + 1},
@@ -92,19 +92,19 @@ class Date final {
         const auto yearIdx   = year_ - Year{1};
         const auto monthIdx  = month_ - Month{1};
         const auto dayIdx    = day_ - Day{1};
-        const auto flatMonth = (yearIdx.value() * setting::monthInYear) + monthIdx.value();
-        const auto flatDay   = (flatMonth * setting::dayInMonth) + dayIdx.value();
+        const auto flatMonth = (yearIdx.value() * global_setting::monthInYear) + monthIdx.value();
+        const auto flatDay   = (flatMonth * global_setting::dayInMonth) + dayIdx.value();
         return Day{flatDay};
     }
 
     [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
 
     constexpr auto operator++() noexcept -> Date& {
-        if (day_ < Day{setting::dayInMonth}) {
+        if (day_ < Day{global_setting::dayInMonth}) {
             ++day_;
             return *this;
         }
-        if (month_ < Month{setting::monthInYear}) {
+        if (month_ < Month{global_setting::monthInYear}) {
             day_ = Day{1};
             ++month_;
             return *this;
