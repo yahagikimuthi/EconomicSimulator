@@ -106,6 +106,7 @@ inline constexpr auto hhold       = 300;
 namespace abm::global_setting {
 inline constexpr auto dayInMonth  = 30;
 inline constexpr auto monthInYear = 12;
+inline constexpr auto epsilon     = 1e-9;
 }  // namespace abm::global_setting
 
 namespace abm::finance::setting {
