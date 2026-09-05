@@ -34,11 +34,8 @@ class RecruitSystem final {
 
     void revisePlan(const Budget budget, IMediator auto& mediator) noexcept {
         ASSERT(requestedBudget_);
-        ASSERT(budget <= requestedBudget_);
-        const auto reqBudget = *requestedBudget_;
+        ASSERT(budget <= *requestedBudget_ + Budget{std::numeric_limits<double>::epsilon()});
         requestedBudget_.reset();
-        if (budget == reqBudget) return;
-        if (plan_->employ.isZeroOrLess()) return;
         const auto wage = budget.value() / plan_->employ.value();
         plan_.emplace(Wage{wage}, plan_->employ, plan_->offer);
         mediator.publishRecruitPlan(*plan_);
