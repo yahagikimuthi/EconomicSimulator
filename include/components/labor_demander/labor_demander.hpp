@@ -10,6 +10,7 @@
 #include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
+#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
@@ -34,8 +35,12 @@ class RecruitSystem final {
 
     void revisePlan(const Budget budget, IMediator auto& mediator) noexcept {
         ASSERT(requestedBudget_);
-        ASSERT(budget <= *requestedBudget_ + Budget{std::numeric_limits<double>::epsilon()});
+        ASSERT(budget <= *requestedBudget_ + Budget{global_setting::epsilon});
         requestedBudget_.reset();
+        if (plan_->employ.isZero()) {
+            mediator.publishRecruitPlan(*plan_);
+            return;
+        }
         const auto wage = budget.value() / plan_->employ.value();
         plan_.emplace(Wage{wage}, plan_->employ, plan_->offer);
         mediator.publishRecruitPlan(*plan_);
