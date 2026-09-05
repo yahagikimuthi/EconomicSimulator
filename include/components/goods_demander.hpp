@@ -29,15 +29,15 @@ class Trader final {
     template <DepositFn F>
     void afterTrade(F&& depositFn) noexcept {
         if (not myRequest_) return;
-        const auto remain = myRequest_->remainPaid();
+        const auto remain = myRequest_->takeOutRemainPaid();
         std::forward<F>(depositFn)(remain);
     }
 
     void reset() noexcept { myRequest_.reset(); }
 
   private:
-    RandomGenerator               rng_;
-    std::optional<const Request&> myRequest_{std::nullopt};
+    RandomGenerator         rng_;
+    std::optional<Request&> myRequest_{std::nullopt};
 };
 
 class GoodsDemander final {

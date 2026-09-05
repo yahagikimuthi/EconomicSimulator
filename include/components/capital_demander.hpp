@@ -50,16 +50,16 @@ class CapitalDemander final {
     template <DepositFn F>
     void afterTrade(F&& depositFn) noexcept {
         if (not myRequest_) return;
-        const auto remain = myRequest_->remainPaid();
+        const auto remain = myRequest_->takeOutRemainPaid();
         std::forward<F>(depositFn)(remain);
     }
 
   private:
-    RandomGenerator               rng_;
-    Log                           log_;
-    std::optional<GoodsQuantity>  purchaseAmountPlan_{std::nullopt};
-    std::optional<Budget>         budget_{std::nullopt};
-    std::optional<const Request&> myRequest_{std::nullopt};
+    RandomGenerator              rng_;
+    Log                          log_;
+    std::optional<GoodsQuantity> purchaseAmountPlan_{std::nullopt};
+    std::optional<Budget>        budget_{std::nullopt};
+    std::optional<Request&>      myRequest_{std::nullopt};
 };
 }  // namespace abm::capital::demander
 

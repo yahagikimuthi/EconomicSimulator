@@ -76,7 +76,12 @@ class Request final {
         ASSERT(payment_.isZeroOrMore());
         return payment_;
     }
-    [[nodiscard]] auto remainPaid() const noexcept -> Money { return remainPaid_; }
+    [[nodiscard]] auto takeOutRemainPaid() noexcept -> Money {
+        const auto out = remainPaid_;
+        remainPaid_    = Money{0.0};
+        ASSERT(out.isZeroOrMore());
+        return out;
+    }
 
   private:
     const Money   payment_;
@@ -126,6 +131,7 @@ template <EMarket MarketT>
     const auto actualPay = tradeAmount * entry_.price;
     remainPaid_ -= actualPay;
     ASSERT(payment_.isZeroOrMore());
+    ASSERT(remainPaid_.isZeroOrMore());
     return actualPay;
 }
 
