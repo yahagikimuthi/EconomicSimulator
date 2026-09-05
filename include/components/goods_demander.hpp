@@ -53,7 +53,7 @@ class GoodsDemander final {
 
     void revisePlan(const Budget budget) noexcept {
         ASSERT(budget_);
-        ASSERT(budget_ <= budget);
+        ASSERT(budget <= budget_);
         budget_ = budget;
     }
 
