@@ -8,9 +8,6 @@
 
 namespace abm {
 struct MarketRegistry final {
-    explicit MarketRegistry(const Date& today) noexcept
-        : capitalMarket{today}, goodsMarket{today} {}
-
     CapitalMarket capitalMarket;
     GoodsMarket   goodsMarket;
     LaborMarket   laborMarket;

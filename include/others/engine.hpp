@@ -55,10 +55,7 @@ class Engine final {
 
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
-        : seed_{generateSeed()},
-          rng_{{seed_.state, seed_.stream}},
-          endingDay_{endingDay},
-          markets_{today_} {
+        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endingDay_{endingDay} {
         namespace cnt = global_setting::agent_count;
         auto count    = 0;
 
