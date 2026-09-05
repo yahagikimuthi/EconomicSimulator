@@ -115,7 +115,10 @@ class Recruiter final {
 
     void offerAll() noexcept {
         auto entries = myRequest_->entries();
-        for (auto& entry : entries) entry.offer();
+        for (auto& entry : entries) {
+            entry.offer();
+            offerApplicants_.add(entry);
+        }
         const auto applicant = HeadCount{entries.size()};
         ledger_.addApplicantsCnt(applicant);
     }
