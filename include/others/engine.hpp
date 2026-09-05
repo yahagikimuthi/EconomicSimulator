@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <print>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -51,30 +50,39 @@ class AgentRegistry final {
 };
 
 class Engine final {
-    using Agent = AgentRegistry<CapitalFirm, GoodsFirm, HHold>;
-
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
         : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endingDay_{endingDay} {
         namespace cnt = global_setting::agent_count;
         auto count    = 0;
 
-        agents_.reserve(cnt::capitalFirm + cnt::goodsFirm + cnt::hhold);
+        capitalFirms_.reserve(cnt::capitalFirm);
         for (; count < cnt::capitalFirm; ++count) {
-            agents_.emplaceBack<CapitalFirm>(rng_);
+            capitalFirms_.emplace_back(rng_);
         }
+
+        goodsFirms_.reserve(cnt::goodsFirm);
         for (; count < cnt::capitalFirm + cnt::goodsFirm; ++count) {
-            agents_.emplaceBack<GoodsFirm>(rng_);
+            goodsFirms_.emplace_back(rng_);
         }
+
+        hholds_.reserve(cnt::hhold);
         for (; count < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++count) {
-            agents_.emplaceBack<HHold>(rng_);
+            hholds_.emplace_back(rng_);
         }
     }
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
-            agents_.act(today_, markets_);
-            std::println("{}", agents_.sumAsset().value());
+            for (auto& firm : capitalFirms_) {
+                firm.act(today_, markets_);
+            }
+            for (auto& firm : goodsFirms_) {
+                firm.act(today_, markets_);
+            }
+            for (auto& hhold : hholds_) {
+                hhold.act(today_, markets_);
+            }
             if (labor::toMarketPhase(today_.month()) == LaborMarketPhase::RecordRosterEntry)
                 markets_.laborMarket.clear();
         }
@@ -101,7 +109,9 @@ class Engine final {
 
     Logger logger_;
 
-    Agent agents_;
+    std::vector<CapitalFirm> capitalFirms_;
+    std::vector<GoodsFirm>   goodsFirms_;
+    std::vector<HHold>       hholds_;
 
     MarketRegistry markets_;
     CensusDropBox  dropBox_;
