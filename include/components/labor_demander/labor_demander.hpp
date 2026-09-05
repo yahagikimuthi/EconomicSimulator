@@ -136,6 +136,7 @@ class LaborDemander final {
             },
             mediator_
         );
+        recruitSystem_.reset();
     };
 
     void layOffs() noexcept { humanResource_.layOffs(); }
