@@ -63,7 +63,7 @@ class Engine final {
         for (; count < cnt::capitalFirm; ++count) {
             agents_.emplaceBack<CapitalFirm>(rng_);
         }
-        for (; count < cnt::goodsFirm + cnt::goodsFirm; ++count) {
+        for (; count < cnt::capitalFirm + cnt::goodsFirm; ++count) {
             agents_.emplaceBack<GoodsFirm>(rng_);
         }
         for (; count < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++count) {
@@ -77,8 +77,6 @@ class Engine final {
             std::println("{}", agents_.sumAsset().value());
             if (labor::toMarketPhase(today_.month()) == LaborMarketPhase::RecordRosterEntry)
                 markets_.laborMarket.clear();
-            markets_.capitalMarket.clear();
-            markets_.goodsMarket.clear();
         }
     }
 
