@@ -51,7 +51,6 @@ class RosterEntry final {
 
     void addInput(const double productPower) noexcept { workspace_.addInput(productPower); }
     void resign() noexcept;
-    void disable() noexcept { isOccupied_ = false; }
     void payWage(const Money payment) noexcept { paidWage_ += payment; }
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
@@ -88,10 +87,7 @@ class Roster final {
         return newEntry;
     }
 
-    void resign(RosterEntry& resignation) noexcept {
-        resignation.disable();
-        empties_.emplace_back(std::ref(resignation));
-    }
+    void resign(RosterEntry& resignation) noexcept { empties_.emplace_back(std::ref(resignation)); }
 
     [[nodiscard]] auto validEntries() noexcept
         -> auto = delete(
@@ -116,7 +112,10 @@ class Roster final {
     tbb::concurrent_vector<RefWrap<RosterEntry>> empties_;
 };
 
-inline void RosterEntry::resign() noexcept { roster_.resign(*this); }
+inline void RosterEntry::resign() noexcept {
+    isOccupied_ = false;
+    roster_.resign(*this);
+}
 
 class Request;
 class Entry final {
