@@ -76,6 +76,11 @@ class Roster final {
     [[nodiscard]] auto add(
         const AgentID id, const Wage wage, CompanyBoard& board, base_goods::Workspace& space
     ) noexcept -> RosterEntry& {
+        ASSERT(wage.isPositive());
+        ASSERT(id != board.firmId);
+
+        sumWage_ += wage;
+
         if (empties_.empty()) return entries_.emplace_back(id, wage, board, space, *this);
         auto& newEntry = empties_.back().get();
         empties_.resize(  // 第二引数はコンパイルエラーを防止するためのダミー
@@ -87,7 +92,10 @@ class Roster final {
         return newEntry;
     }
 
-    void resign(RosterEntry& resignation) noexcept { empties_.emplace_back(std::ref(resignation)); }
+    void resign(RosterEntry& resignation) noexcept {
+        empties_.emplace_back(std::ref(resignation));
+        sumWage_ -= resignation.wage;
+    }
 
     [[nodiscard]] auto validEntries() noexcept
         -> auto = delete(
@@ -107,9 +115,12 @@ class Roster final {
         return HeadCount{entries_.size() - empties_.size()};
     }
 
+    [[nodiscard]] auto sumWage() const noexcept -> Wage { return sumWage_; }
+
   private:
     std::deque<RosterEntry>                      entries_;
     tbb::concurrent_vector<RefWrap<RosterEntry>> empties_;
+    Wage                                         sumWage_{0.0};
 };
 
 inline void RosterEntry::resign() noexcept {

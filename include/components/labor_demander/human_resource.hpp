@@ -1,9 +1,7 @@
 #pragma once
 
 #include <algorithm>
-#include <functional>
 #include <optional>
-#include <ranges>
 
 #include "components/common.hpp"
 #include "others/util.hpp"
@@ -80,10 +78,7 @@ class HumanResource final {
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount { return roster_.employeeCnt(); }
 
     [[nodiscard]] auto sumWage() const noexcept -> Wage {
-        auto       entries = roster_.validEntries();
-        const auto out     = std::ranges::fold_left(
-            entries | std::views::transform(&RosterEntry::wage), Wage{0.0}, std::plus{}
-        );
+        const auto out = roster_.sumWage();
         ASSERT(out >= Wage{0.0});
         return out;
     }
