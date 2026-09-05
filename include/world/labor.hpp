@@ -237,7 +237,8 @@ enum class MarketPhase : char {
 };
 
 [[nodiscard]] constexpr auto toMarketPhase(const Month month) noexcept -> MarketPhase {
-    return static_cast<MarketPhase>(month.value());
+    ASSERT(month.value() >= 1);
+    return static_cast<MarketPhase>(month.value() - 1);
 }
 }  // namespace abm::labor
 
