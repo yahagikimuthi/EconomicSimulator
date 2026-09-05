@@ -115,6 +115,14 @@ class Roster final {
         return HeadCount{entries_.size() - empties_.size()};
     }
 
+    [[nodiscard]] auto employeeCnt() noexcept -> HeadCount {
+        if (entries_.size() == empties_.size()) {
+            entries_.clear();
+            empties_.clear();
+        }
+        return std::as_const(*this).employeeCnt();
+    }
+
     [[nodiscard]] auto sumWage() const noexcept -> Wage { return sumWage_; }
 
   private:
