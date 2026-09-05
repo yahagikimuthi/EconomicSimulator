@@ -52,8 +52,7 @@ class Trader final {
     }
 
     void reset() noexcept {
-        ASSERT(myEntry_);
-        myEntry_->disable();
+        if (myEntry_) myEntry_->disable();
         myEntry_.reset();
         ledger_.reset();
     }
