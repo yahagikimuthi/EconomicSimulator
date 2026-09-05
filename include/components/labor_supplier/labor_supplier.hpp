@@ -47,8 +47,7 @@ class LaborSupplier final {
 
     void recordRosterEntry() noexcept {
         const auto acceptedEntry = jobHunter_.huntedResult();
-        if (not acceptedEntry) return;
-        employment_.startWorking(acceptedEntry->rosterEntry());
+        if (acceptedEntry) employment_.startWorking(acceptedEntry->rosterEntry());
         jobHunter_.reset();
     }
 
