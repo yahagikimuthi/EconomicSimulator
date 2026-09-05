@@ -1,14 +1,16 @@
 #pragma once
 
+#include <tbb/concurrent_queue.h>
 #include <tbb/concurrent_vector.h>
 #include <atomic>
-#include <functional>
 #include <memory>
 #include <optional>
 #include <ranges>
 
+#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/goods.hpp"
 #include "world/common.hpp"
 
@@ -132,22 +134,30 @@ template <EMarket MarketT>
 class Market final {
     using EntryT = Entry<MarketT>;
 
+    struct EmptyEntry final {
+        explicit EmptyEntry(EntryT& Entry, const Day DisableDay) noexcept
+            : entry{Entry}, disableDay{DisableDay} {}
+        explicit EmptyEntry() noexcept = default;
+        std::optional<EntryT&> entry{std::nullopt};
+        Day                    disableDay{1};
+    };
+
   public:
-    explicit Market() noexcept = default;
+    explicit Market(const Date& today) noexcept : today_{today} {}
+
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> EntryT& {
         totalSupply_.fetch_add(supply.value());  // TODO 処理系が対応する場合store_addに変更
-        if (emptyEntries_.empty()) return *entries_.emplace_back(id, price, supply, *this);
-        auto& newEntry = emptyEntries_.back().get();
-        ASSERT(not newEntry.isValid());
-        emptyEntries_.resize(  // 第二引数はコンパイルエラーを防止するダミー
-            emptyEntries_.size() - 1UZ,
-            newEntry
-        );
-        std::destroy_at(&newEntry);
-        std::construct_at(&newEntry, id, price, supply, *this);
-        return newEntry;
+        auto       newEntry = EmptyEntry{};
+        const auto result   = emptyEntries_.try_pop(newEntry);
+        if (not result or not canReuse(newEntry.disableDay))
+            return *entries_.emplace_back(id, price, supply, *this);
+
+        ASSERT(newEntry.entry);
+        ASSERT(not newEntry.entry->isValid());
+        std::destroy_at(&*newEntry.entry);
+        return *std::construct_at(&*newEntry.entry, id, price, supply, *this);
     }
 
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
@@ -169,14 +179,22 @@ class Market final {
     }
 
     void disable(EntryT& entry) noexcept {
-        emptyEntries_.emplace_back(std::ref(entry));
+        emptyEntries_.emplace(entry, today_.day());
         totalSupply_.fetch_sub(entry.supply.value());
     }
 
+    [[nodiscard]] auto canReuse(const Day disableDay) const noexcept -> bool {
+        ASSERT(disableDay < Day{global_setting::dayInMonth});
+        if (disableDay == today_.day()) return false;
+        if (disableDay + Day{1} == today_.day()) return false;
+        return true;
+    }
+
   private:
-    tbb::concurrent_vector<EntryT>          entries_;
-    tbb::concurrent_vector<RefWrap<EntryT>> emptyEntries_;
-    std::atomic<double>                     totalSupply_;
+    tbb::concurrent_vector<EntryT>    entries_;
+    tbb::concurrent_queue<EmptyEntry> emptyEntries_;
+    std::atomic<double>               totalSupply_;
+    const Date&                       today_;
 };
 
 template <EMarket MarketT>
