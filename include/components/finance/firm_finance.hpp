@@ -39,6 +39,16 @@ class FirmFinance final {
             [&, item](const Money depositAmount) noexcept -> void { deposit(depositAmount, item); };
     }
 
+    [[nodiscard]] static auto claimBudget(const Budget claim) noexcept -> Budget {
+        ASSERT(claim.isZeroOrMore());
+        return claim;
+    }
+
+    [[nodiscard]] auto asset() const noexcept -> Budget {
+        return static_cast<Budget>(cash_) + bankAccount_.balance();
+    }
+
+  private:
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw, const AccountItem item) noexcept
         -> Money {
         ASSERT(tryingWithdraw.isZeroOrMore());
@@ -73,16 +83,6 @@ class FirmFinance final {
             cash_ += add;
     }
 
-    [[nodiscard]] static auto claimBudget(const Budget claim) noexcept -> Budget {
-        ASSERT(claim.isZeroOrMore());
-        return claim;
-    }
-
-    [[nodiscard]] auto asset() const noexcept -> Budget {
-        return static_cast<Budget>(cash_) + bankAccount_.balance();
-    }
-
-  private:
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
         if (asset().isZero()) return 0.0;
         return static_cast<Budget>(cash_) / asset();
