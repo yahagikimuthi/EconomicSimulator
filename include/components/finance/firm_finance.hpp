@@ -3,10 +3,10 @@
 #include <algorithm>
 
 #include "components/common.hpp"
-#include "components/finance/deposit_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "world/deposit.hpp"
 
 namespace abm::finance {
 class FirmFinance final {
@@ -22,7 +22,7 @@ class FirmFinance final {
 
   public:
     explicit FirmFinance(const AgentID id, RandomGenerator& masterRng) noexcept
-        : depositSupplier_{id},
+        : bankAccount_{id},
           cash_{Money{masterRng.random(setting::firmInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
@@ -46,7 +46,7 @@ class FirmFinance final {
 
         const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
-            const auto withdraw = depositSupplier_.tryWithdraw(sub);
+            const auto withdraw = bankAccount_.withdraw(sub);
             ASSERT(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
@@ -56,10 +56,10 @@ class FirmFinance final {
         const auto cashOut = std::min(cash_, sub);
         cash_ -= cashOut;
         const auto rest        = sub - cashOut;
-        const auto withdraw    = depositSupplier_.tryWithdraw(rest);
+        const auto withdraw    = bankAccount_.withdraw(rest);
         const auto moreCashOut = rest - withdraw;
         cash_ -= moreCashOut;
-        postToPlFromPlus(cashOut + withdraw + moreCashOut, item);
+        postToPlFromMinus(cashOut + withdraw + moreCashOut, item);
         return cashOut + withdraw + moreCashOut;
     }
 
@@ -67,11 +67,10 @@ class FirmFinance final {
         ASSERT(add.isZeroOrMore());
 
         postToPlFromPlus(add, item);
-        if (currentCashRatio() > cashRatio_) {
-            depositSupplier_.deposit(add);
-            return;
-        }
-        cash_ += add;
+        if (currentCashRatio() > cashRatio_)
+            bankAccount_.deposit(add);
+        else
+            cash_ += add;
     }
 
     [[nodiscard]] static auto claimBudget(const Budget claim) noexcept -> Budget {
@@ -80,7 +79,7 @@ class FirmFinance final {
     }
 
     [[nodiscard]] auto asset() const noexcept -> Budget {
-        return static_cast<Budget>(cash_) + depositSupplier_.balance();
+        return static_cast<Budget>(cash_) + bankAccount_.balance();
     }
 
   private:
@@ -131,10 +130,10 @@ class FirmFinance final {
         }
     }
 
-    PL              pl_;
-    DepositSupplier depositSupplier_;
-    Money           cash_;
-    const double    cashRatio_;
+    PL           pl_;
+    BankAccount  bankAccount_;
+    Money        cash_;
+    const double cashRatio_;
 };
 }  // namespace abm::finance
 

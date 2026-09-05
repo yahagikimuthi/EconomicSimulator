@@ -24,7 +24,7 @@ class BankAccount final {
         return out;
     }
 
-    [[nodiscard]] auto balance() const noexcept -> Money { return deposit_; }
+    [[nodiscard]] auto balance() const noexcept -> Budget { return static_cast<Budget>(deposit_); }
 
   private:
     Money deposit_{0.0};

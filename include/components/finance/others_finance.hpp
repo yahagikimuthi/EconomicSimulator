@@ -3,16 +3,16 @@
 #include <algorithm>
 
 #include "components/common.hpp"
-#include "components/finance/deposit_supplier.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "world/deposit.hpp"
 
 namespace abm::finance {
 class HHoldFinance final {
   public:
     explicit HHoldFinance(const AgentID id, RandomGenerator& masterRng) noexcept
-        : depositSupplier_{id},
+        : bankAccount_{id},
           cash_{Money{masterRng.random(setting::hholdInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
@@ -28,7 +28,7 @@ class HHoldFinance final {
         ASSERT(tryingWithdraw.isZeroOrMore());
         const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
-            const auto withdraw = depositSupplier_.tryWithdraw(sub);
+            const auto withdraw = bankAccount_.withdraw(sub);
             ASSERT(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
@@ -37,7 +37,7 @@ class HHoldFinance final {
         const auto cashOut = std::min(cash_, sub);
         cash_ -= cashOut;
         const auto rest        = sub - cashOut;
-        const auto withdraw    = depositSupplier_.tryWithdraw(rest);
+        const auto withdraw    = bankAccount_.withdraw(rest);
         const auto moreCashOut = rest - withdraw;
         cash_ -= moreCashOut;
         return cashOut + withdraw + moreCashOut;
@@ -46,7 +46,7 @@ class HHoldFinance final {
     void deposit(const Money add) noexcept {
         ASSERT(add.isZeroOrMore());
         if (currentCashRatio() > cashRatio_) {
-            depositSupplier_.deposit(add);
+            bankAccount_.deposit(add);
             return;
         }
         cash_ += add;
@@ -58,7 +58,7 @@ class HHoldFinance final {
     }
 
     [[nodiscard]] auto asset() const noexcept -> Budget {
-        return static_cast<Budget>(cash_) + depositSupplier_.balance();
+        return static_cast<Budget>(cash_) + bankAccount_.balance();
     }
 
   private:
@@ -67,9 +67,9 @@ class HHoldFinance final {
         return static_cast<Budget>(cash_) / asset();
     }
 
-    DepositSupplier depositSupplier_;
-    Money           cash_;
-    const double    cashRatio_;
+    BankAccount  bankAccount_;
+    Money        cash_;
+    const double cashRatio_;
 };
 
 class GovernmentFinance final {
