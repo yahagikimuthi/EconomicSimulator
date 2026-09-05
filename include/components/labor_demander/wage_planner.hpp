@@ -18,6 +18,11 @@ class WagePlannerMemory final {
     explicit WagePlannerMemory(RandomGenerator& masterRng) noexcept
         : employPlan_{HeadCount{masterRng.random(setting::lastEmployPlan)}},
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
+    explicit WagePlannerMemory(
+        const Memory<HeadCount>& employPlan, const Memory<HeadCount>& applicants
+    ) noexcept
+        : employPlan_{employPlan}, applicants_{applicants} {}
+
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
         ASSERT(plan.employ.isZeroOrMore());
         if (plan.employ.isPositive()) employPlan_.next(plan.employ);
