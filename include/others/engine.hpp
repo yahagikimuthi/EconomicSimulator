@@ -1,7 +1,10 @@
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <print>
+#include <ranges>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -88,6 +91,7 @@ class Engine final {
             }
             if (labor::toMarketPhase(today_.month()) == LaborMarketPhase::RecordRosterEntry)
                 markets_.laborMarket.clear();
+            std::println("{}", calcSumAsset());
         }
     }
 
@@ -102,6 +106,19 @@ class Engine final {
         const auto state  = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
         const auto stream = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
         return {.state = state, .stream = stream};
+    }
+
+    [[nodiscard]] auto calcSumAsset() const noexcept -> double {
+        auto calcSum = [](const auto& agents) noexcept -> double {
+            return std::ranges::fold_left(
+                agents | std::views::transform([](const auto& agent) noexcept -> double {
+                    return agent.asset().value();
+                }),
+                0.0,
+                std::plus{}
+            );
+        };
+        return calcSum(capitalFirms_) + calcSum(goodsFirms_) + calcSum(hholds_);
     }
 
     const PCG32Seed seed_;
