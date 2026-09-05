@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <print>
 #include <type_traits>
 #include <utility>
 #include <variant>
@@ -16,6 +17,7 @@
 #include "others/util.hpp"
 #include "values/date.hpp"
 #include "world/drop_box.hpp"
+#include "world/labor.hpp"
 
 namespace abm {
 template <typename... Agents>
@@ -33,9 +35,15 @@ class AgentRegistry final {
     }
 
     void act(const Date& date, MarketRegistry& markets) noexcept {
-        for (auto& anyAgent : agents_) {
+        for (auto& anyAgent : agents_)
             anyAgent.visit([&](auto& agent) noexcept -> void { agent.act(date, markets); });
-        }
+    }
+
+    [[nodiscard]] auto sumAsset() const noexcept -> Budget {
+        auto sum = Budget{0.0};
+        for (auto& anyAgent : agents_)
+            sum += anyAgent.visit([](auto& agent) noexcept -> Budget { return agent.asset(); });
+        return sum;
     }
 
   private:
@@ -68,10 +76,12 @@ class Engine final {
 
     void run() noexcept {
         for (; today_ < endingDay_; ++today_) {
-            if (today_.year() == Year{2}) {
-                nothing();
-            }
             agents_.act(today_, markets_);
+            std::println("{}", agents_.sumAsset().value());
+            if (labor::toMarketPhase(today_.month()) == LaborMarketPhase::RecordRosterEntry)
+                markets_.laborMarket.clear();
+            markets_.capitalMarket.clear();
+            markets_.goodsMarket.clear();
         }
     }
 

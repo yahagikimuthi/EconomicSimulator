@@ -33,6 +33,8 @@ class GoodsFirm final : public Agent {
             actNothingDay();
     }
 
+    [[nodiscard]] auto asset() const noexcept -> Budget { return finance_.asset(); }
+
   private:
     void actJanuaryOperatingDay(MarketRegistry& markets) noexcept {
         const auto laborBudgetReq = [&]() -> Budget {

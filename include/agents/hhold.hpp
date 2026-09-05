@@ -24,6 +24,8 @@ class HHold final : public Agent {
             actAfterOperationDay();
     }
 
+    [[nodiscard]] auto asset() const noexcept -> Budget { return finance_.asset(); }
+
   private:
     void actOperationDay(const LaborMarketPhase phase, MarketRegistry& markets) noexcept {
         const auto wage         = labor_.wage();

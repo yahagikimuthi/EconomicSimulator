@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_vector.h>
 #include <atomic>
+#include <functional>
 #include <optional>
 #include <ranges>
 
@@ -50,7 +51,6 @@ class Workspace final {
 
 template <EMarket MarketT>
 class Entry;
-
 template <EMarket MarketT>
 class Request final {
   public:
@@ -70,7 +70,6 @@ class Request final {
 
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
     [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
-    [[nodiscard]] auto price() const noexcept -> Price;
     [[nodiscard]] auto payment() const noexcept -> Money {
         ASSERT(payment_.isZeroOrMore());
         return payment_;
@@ -85,18 +84,26 @@ class Request final {
 };
 
 template <EMarket MarketT>
+    requires(MarketT == EMarket::Capital or MarketT == EMarket::Goods)
+class Market;
+template <EMarket MarketT>
 class Entry final {
     using RequestT = Request<MarketT>;
 
   public:
-    explicit Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
-        : id{i}, price{p}, supply{s} {}
+    explicit Entry(
+        const AgentID i, const Price p, const GoodsQuantity s, Market<MarketT>& market
+    ) noexcept
+        : id{i}, price{p}, supply{s}, market_{market} {}
 
     [[nodiscard]] auto request(const Money payment) noexcept -> RequestT& {
         return *requests_.emplace_back(payment, *this);
     }
 
     [[nodiscard]] auto requests() noexcept -> auto { return std::ranges::subrange{requests_}; }
+    [[nodiscard]] auto isValid() const noexcept -> bool { return isValid_; }
+
+    void disable() noexcept;
 
     const AgentID       id;
     const Price         price;
@@ -104,6 +111,8 @@ class Entry final {
 
   private:
     tbb::concurrent_vector<RequestT> requests_;
+    Market<MarketT>&                 market_;
+    bool                             isValid_{true};
 };
 
 template <EMarket MarketT>
@@ -116,11 +125,6 @@ template <EMarket MarketT>
     remainPaid_ -= actualPay;
     ASSERT(payment_.isZeroOrMore());
     return actualPay;
-}
-
-template <EMarket MarketT>
-[[nodiscard]] inline auto Request<MarketT>::price() const noexcept -> Price {
-    return entry_.price;
 }
 
 template <EMarket MarketT>
@@ -155,13 +159,25 @@ class Market final {
         return betterEntry;
     }
 
+    void disable(EntryT& entry) noexcept {
+        emptyEntries_.emplace_back(std::ref(entry));
+        totalSupply_.fetch_sub(entry.supply.value());
+    }
+
     void clear() noexcept { entries_.clear(), totalSupply_.store(0.0); }
 
   private:
-    tbb::concurrent_vector<EntryT> entries_;
-    std::atomic<double>            totalSupply_;
-    const Date&                    today_;
+    tbb::concurrent_vector<EntryT>          entries_;
+    tbb::concurrent_vector<RefWrap<EntryT>> emptyEntries_;
+    std::atomic<double>                     totalSupply_;
+    const Date&                             today_;
 };
+
+template <EMarket MarketT>
+inline void Entry<MarketT>::disable() noexcept {
+    isValid_ = false;
+    market_.disable(*this);
+}
 }  // namespace abm::base_goods
 
 namespace abm::goods {
