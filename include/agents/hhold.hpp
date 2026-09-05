@@ -44,7 +44,7 @@ class HHold final : public Agent {
         else if (phase == LaborMarketPhase::Accept)
             labor_.accept();
         else if (phase == LaborMarketPhase::RecordRosterEntry)
-            labor_.recordRosterEntry();
+            labor_.recordRosterEntry(finance_.makeDepositFn());
 
         goods_.request(id_, finance_.makeWithdrawFn(), markets.goodsMarket);
     }

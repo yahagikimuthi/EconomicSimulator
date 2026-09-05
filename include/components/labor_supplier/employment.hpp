@@ -17,10 +17,12 @@ class Employment final {
 
     [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_.has_value(); }
 
-    void startWorking(RosterEntry& rosterEntry) noexcept {
+    template <DepositFn F>
+    void startWorking(RosterEntry& rosterEntry, F&& depositFn) noexcept {
         if (isEmployed()) {
             ASSERT(rosterEntry_->firmId() != rosterEntry.firmId());
             ASSERT(rosterEntry_->wage <= rosterEntry.wage);
+            std::forward<F>(depositFn)(rosterEntry.takeOutPaidWage());
         }
         resign();
         rosterEntry_ = rosterEntry;
@@ -51,6 +53,7 @@ class Employment final {
     void resign() noexcept {
         if (not isEmployed()) return;
         rosterEntry_->resign();
+        rosterEntry_.reset();
     }
 
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
