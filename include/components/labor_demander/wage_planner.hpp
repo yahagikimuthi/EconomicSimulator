@@ -23,11 +23,6 @@ class WagePlannerMemory final {
     ) noexcept
         : employPlan_{employPlan}, applicants_{applicants} {}
 
-    void acceptMediator(IMediator auto& mediator) noexcept {
-        mediator.subscribeRecruitPlan(*this);
-        mediator.subscribeRecruitResult(*this);
-    }
-
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
         ASSERT(plan.employ.isZeroOrMore());
         if (plan.employ.isPositive()) employPlan_.next(plan.employ);
@@ -61,7 +56,10 @@ class WagePlanner final {
           rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::wageAdjustVol)} {}
 
-    void acceptMediator(IMediator auto& mediator) noexcept { memory_.acceptMediator(mediator); }
+    void acceptMediator(IMediator auto& mediator) noexcept {
+        mediator.subscribeRecruitPlan(memory_);
+        mediator.subscribeRecruitResult(memory_);
+    }
 
     [[nodiscard]] auto plan(const Money salesPerWorker) noexcept -> Wage {
         const auto next = [&]() noexcept -> std::optional<Wage> {
