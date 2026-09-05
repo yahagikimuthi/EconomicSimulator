@@ -3,12 +3,12 @@
 #include <tbb/concurrent_vector.h>
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <ranges>
 
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/goods.hpp"
 #include "world/common.hpp"
 
@@ -133,12 +133,21 @@ class Market final {
     using EntryT = Entry<MarketT>;
 
   public:
-    explicit Market(const Date& today) noexcept : today_{today} {}
+    explicit Market() noexcept = default;
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> EntryT& {
         totalSupply_.fetch_add(supply.value());  // TODO 処理系が対応する場合store_addに変更
-        return *entries_.emplace_back(id, price, supply);
+        if (emptyEntries_.empty()) return *entries_.emplace_back(id, price, supply, *this);
+        auto& newEntry = emptyEntries_.back().get();
+        ASSERT(not newEntry.isValid());
+        emptyEntries_.resize(  // 第二引数はコンパイルエラーを防止するダミー
+            emptyEntries_.size() - 1UZ,
+            newEntry
+        );
+        std::destroy_at(&newEntry);
+        std::construct_at(&newEntry, id, price, supply, *this);
+        return newEntry;
     }
 
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
@@ -149,7 +158,7 @@ class Market final {
         auto betterEntry = std::optional<EntryT&>{std::nullopt};
         for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
-                entries_,
+                entries_ | std::views::filter(&EntryT::isValid),
                 totalSupply_.load(),
                 [](const EntryT& e) noexcept -> double { return e.supply.value(); }
             );
@@ -170,7 +179,6 @@ class Market final {
     tbb::concurrent_vector<EntryT>          entries_;
     tbb::concurrent_vector<RefWrap<EntryT>> emptyEntries_;
     std::atomic<double>                     totalSupply_;
-    const Date&                             today_;
 };
 
 template <EMarket MarketT>
