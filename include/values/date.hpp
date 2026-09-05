@@ -7,24 +7,24 @@
 #include "values/mixin.hpp"
 
 namespace abm {
-class Day final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Day> {
+class Day final : public value_object::BaseValueObject<int>,
+                  value_object::CompareMixin<Day>,
+                  value_object::AddMixin<Day> {
+    friend struct AddMixin<Day>;
+
   public:
     explicit constexpr Day(const int day) noexcept : BaseValueObject<int>(day) { ASSERT(day > 0); }
-
-    [[nodiscard]] constexpr auto operator+(Day other) const noexcept -> Day {
-        return Day{value_ + other.value_};
-    }
-    [[nodiscard]] constexpr auto operator-(Day other) const noexcept -> Day {
-        return Day{value_ - other.value_};
-    }
-
     constexpr auto operator++() noexcept -> Day& {
         ++value_;
         return *this;
     }
 };
 
-class Month final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Month> {
+class Month final : public value_object::BaseValueObject<int>,
+                    value_object::CompareMixin<Month>,
+                    value_object::AddMixin<Month> {
+    friend struct AddMixin<Month>;
+
   public:
     explicit constexpr Month(const int month) noexcept : BaseValueObject<int>(month) {
         ASSERT(month > 0);
@@ -33,20 +33,18 @@ class Month final : public value_object::BaseValueObject<int>, value_object::Com
         ++value_;
         return *this;
     }
-    constexpr auto operator-(const Month other) const noexcept -> Month {
-        return Month{value_ - other.value_};
-    }
 };
 
-class Year final : public value_object::BaseValueObject<int>, value_object::CompareMixin<Year> {
+class Year final : public value_object::BaseValueObject<int>,
+                   value_object::CompareMixin<Year>,
+                   value_object::AddMixin<Year> {
+    friend struct AddMixin<Year>;
+
   public:
     explicit constexpr Year(const int year) noexcept : BaseValueObject<int>(year) {
         ASSERT(year > 0);
     }
 
-    [[nodiscard]] constexpr auto operator-(const Year other) const noexcept -> Year {
-        return Year{value_ + other.value_};
-    }
     constexpr auto operator++() noexcept -> Year& {
         ++value_;
         return *this;
