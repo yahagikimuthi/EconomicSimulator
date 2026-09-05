@@ -27,12 +27,12 @@ class MarkupPlannerMemory final {
 
     void listenTradeResult(const TradeResult& result) noexcept {
         ASSERT(result.soldAmount.isZeroOrMore());
-        salesAmount_.next(result.soldAmount);
+        if (result.soldAmount.isPositive()) salesAmount_.next(result.soldAmount);
     }
 
     void listenTradePlan(const TradePlan& plan) noexcept {
         ASSERT(plan.supply.isZeroOrMore());
-        supply_.next(plan.supply);
+        if (salesAmount_.wasSetNext()) supply_.next(plan.supply);
     }
 
     void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }

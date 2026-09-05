@@ -23,7 +23,7 @@ class EmployPlannerMemory final {
     void reset() noexcept { supply_.reset(); }
     void listenTradePlan(const TradePlan& plan) noexcept {
         ASSERT(plan.supply.isZeroOrMore());
-        supply_.next(plan.supply);
+        if (plan.supply.isPositive()) supply_.next(plan.supply);
     }
 
   private:

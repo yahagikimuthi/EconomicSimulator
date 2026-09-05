@@ -20,11 +20,11 @@ class WagePlannerMemory final {
           applicants_{HeadCount{masterRng.random(setting::lastApplicants)}} {}
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
         ASSERT(plan.employ.isZeroOrMore());
-        employPlan_.next(plan.employ);
+        if (plan.employ.isPositive()) employPlan_.next(plan.employ);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.applicants.isZeroOrMore());
-        applicants_.next(result.applicants);
+        if (employPlan_.wasSetNext()) applicants_.next(result.applicants);
     }
     [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.log();

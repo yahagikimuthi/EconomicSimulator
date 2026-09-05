@@ -1,12 +1,21 @@
 #pragma once
 
 #include "components/labor_demander/common.hpp"
-#include "components/labor_demander/empoy_planner.hpp"
+#include "components/labor_demander/offer_planner.hpp"
 #include "components/labor_demander/wage_planner.hpp"
 #include "others/util.hpp"
 #include "values/labor.hpp"
 
 namespace abm::labor::demander::planner {
+// 要求雇用数を雇用計画に変換するための意味論的クラス
+class EmployPlanner final {
+  public:
+    explicit EmployPlanner() = delete("静的関数のみなのでインスタンス化は想定しない");
+    [[nodiscard]] static auto plan(const HeadCount desiredEmploy) noexcept -> HeadCount {
+        return desiredEmploy;
+    }
+};
+
 class RecruitPlanner final {
   public:
     explicit RecruitPlanner(RandomGenerator& masterRng) noexcept

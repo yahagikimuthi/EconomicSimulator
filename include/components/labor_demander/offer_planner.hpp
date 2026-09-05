@@ -12,16 +12,6 @@
 #include "values/math.hpp"
 
 namespace abm::labor::demander::planner {
-
-// 要求雇用数を雇用計画に変換するための意味論的クラス
-class EmployPlanner final {
-  public:
-    explicit EmployPlanner() = delete("静的関数のみなのでインスタンス化は想定しない");
-    [[nodiscard]] static auto plan(const HeadCount desiredEmploy) noexcept -> HeadCount {
-        return desiredEmploy;
-    }
-};
-
 // 前回雇用計画が必要
 // 前回雇用結果中、雇用数が必要
 class OfferPlannerMemory final {
@@ -39,11 +29,11 @@ class OfferPlannerMemory final {
     void reset() noexcept { employResult_.reset(), employPlan_.reset(); }
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
         ASSERT(plan.employ.isZeroOrMore());
-        employPlan_.next(plan.employ);
+        if (plan.employ.isPositive()) employPlan_.next(plan.employ);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.employ.isZeroOrMore());
-        employResult_.next(result.applicants);
+        if (employPlan_.wasSetNext()) employResult_.next(result.applicants);
     }
 
   private:

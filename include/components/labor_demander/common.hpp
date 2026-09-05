@@ -31,14 +31,15 @@ class Memory final {
   public:
     explicit Memory(const T log) noexcept : log_{log} {}
 
+    [[nodiscard]] auto wasSetNext() const noexcept -> bool { return next_.has_value(); }
+    [[nodiscard]] auto log() const noexcept -> std::optional<T> { return log_; }
+
     void reset() noexcept {
         if (not next_) return;
         log_ = next_, next_.reset();
     }
     void clearLog() noexcept { log_.reset(); }
     void next(const T next) noexcept { next_ = next; }
-
-    [[nodiscard]] auto log() const noexcept -> std::optional<T> { return log_; }
 
   private:
     std::optional<T> log_;
