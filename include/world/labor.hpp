@@ -9,6 +9,7 @@
 #include <memory>
 #include <optional>
 #include <ranges>
+#include <utility>
 
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -100,8 +101,7 @@ class Roster final {
            );
 
     [[nodiscard]] auto validEntries() const noexcept -> auto {
-        const auto& entries = entries_;
-        return entries | std::views::filter(&RosterEntry::isOccupied);
+        return std::as_const(entries_) | std::views::filter(&RosterEntry::isOccupied);
     }
 
     [[nodiscard]] auto rawEntries() noexcept -> auto { return std::ranges::subrange{entries_}; }
