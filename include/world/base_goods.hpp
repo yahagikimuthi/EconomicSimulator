@@ -122,6 +122,7 @@ template <EMarket MarketT>
 ) noexcept -> Money {
     ASSERT(tradeAmount_.isZero());
     ASSERT(tradeAmount.isZeroOrMore());
+    ASSERT(tradeAmount <= entry_.supply);
     ASSERT([&]() -> bool {
         const auto desired = payment / entry_.price;
         return tradeAmount <= desired;
