@@ -88,5 +88,11 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
         const auto input = space.takeOut();
         CHECK(input.isZero());
     }
+
+    SUBCASE("resignが呼ばれた場合、isOccupiedがfalseとなること") {
+        entry.resign();
+
+        CHECK(not entry.isOccupied());
+    }
 }
 }  // namespace abm::labor
