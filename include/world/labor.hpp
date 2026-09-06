@@ -66,6 +66,7 @@ class RosterEntry final {
     [[nodiscard]] auto takeOutPaidWage() noexcept -> Money {
         const auto out = paidWage_;
         ASSERT(out.isZeroOrMore());
+        paidWage_ = Money{0.0};
         return out;
     }
 
