@@ -11,7 +11,7 @@
 #include "world/base_goods.hpp"
 #include "world/labor.hpp"
 
-namespace abm::labor::demander::human_resource {
+namespace abm::labor::demander {
 class HumanResource final {
   public:
     explicit HumanResource(const AgentID id, const Day operationDay) noexcept
@@ -89,8 +89,4 @@ class HumanResource final {
     std::optional<HeadCount> layOffsPlan_;
     std::optional<Budget>    requestedBudget_;
 };
-}  // namespace abm::labor::demander::human_resource
-
-namespace abm::labor::demander {
-using HumanResource = human_resource::HumanResource;
-}
+}  // namespace abm::labor::demander
