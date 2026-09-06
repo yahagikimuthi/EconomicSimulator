@@ -33,10 +33,11 @@ class Workspace final {
         ASSERT(workerProductPower > 0.0);
         totalInput_.fetch_add(workerProductPower);  // TODO 処理系が対応する場合store_addに変更
     }
-    [[nodiscard]] auto totalInput() const noexcept -> GoodsQuantity {
-        return GoodsQuantity{totalInput_.load()};
+    [[nodiscard]] auto pickUpInput() noexcept -> GoodsQuantity {
+        const auto out = GoodsQuantity{totalInput_.load()};
+        totalInput_.store(0.0);
+        return out;
     }
-    void resetInput() noexcept { totalInput_.store(0.0); }
 
   private:
     std::atomic<double> totalInput_;

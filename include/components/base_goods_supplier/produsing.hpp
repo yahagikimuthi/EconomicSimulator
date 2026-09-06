@@ -21,10 +21,9 @@ class Producer final {
     }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
-        const auto workerInput = workspace_.totalInput();
+        const auto workerInput = workspace_.pickUpInput();
         ASSERT(workerInput.isZeroOrMore());
 
-        workspace_.resetInput();
         const auto capitalEquipInput = capital_ * producerGoodsEfficiency_;
         ASSERT(capital_.isZeroOrMore());
         capital_ *= (1.0 - producerGoodsDepreciationRate_);
