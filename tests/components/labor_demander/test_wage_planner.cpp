@@ -1,5 +1,6 @@
-#include <limits>
 #include "components/labor_demander/wage_planner.hpp"
+
+#include <limits>
 
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/mediator.hpp"
