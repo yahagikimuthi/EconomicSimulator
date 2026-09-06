@@ -39,10 +39,7 @@ class RecruitPlanner final {
         return plan;
     }
 
-    void reset() noexcept {
-        wagePlanner_.reset();
-        offerPlanner_.reset();
-    }
+    void reset() noexcept { offerPlanner_.reset(); }
 
   private:
     WagePlanner  wagePlanner_;
