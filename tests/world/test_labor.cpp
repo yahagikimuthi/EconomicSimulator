@@ -118,7 +118,7 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
 TEST_CASE("Marketのテスト") {  // NOLINT
     auto market = Market{};
 
-    auto requests = std::array{
+    const auto requests = std::array{
         std::pair{AgentID{101}, Wage{101}},
         std::pair{AgentID{202}, Wage{202}},
         std::pair{AgentID{303}, Wage{303}}
@@ -137,9 +137,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         market.pickRequest(AgentID{42}, out, rng);
 
         const auto sumID = std::ranges::fold_left(
-            out | std::views::transform([](Request& req) noexcept -> int {
-                return req.firmID.value();
-            }),
+            out | std::views::transform(&Request::firmID) | std::views::transform(&AgentID::value),
             0.0,
             std::plus{}
         );
@@ -153,9 +151,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         market.pickRequest(AgentID{101}, out, rng);
 
         const auto sumID = std::ranges::fold_left(
-            out | std::views::transform([](Request& req) noexcept -> int {
-                return req.firmID.value();
-            }),
+            out | std::views::transform(&Request::firmID) | std::views::transform(&AgentID::value),
             0.0,
             std::plus{}
         );
@@ -182,6 +178,25 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         market.pickRequest(AgentID{42}, out, rng);
 
         CHECK(out.empty());
+    }
+}
+
+TEST_CASE("Requestのテスト") {  // NOLINT
+    constexpr auto entries = std::array{
+        std::pair{AgentID{101}, 101}, std::pair{AgentID{202}, 202}, std::pair{AgentID{303}, 303}
+    };
+    auto  market  = Market{};
+    auto& request = market.request(AgentID{42}, Wage{10.0});
+
+    SUBCASE("デフォルトでentriesは空") { CHECK(request.entries().empty()); }
+
+    SUBCASE("entriesが正しく返ることのテスト") {
+        for (auto [id, power] : entries) nothing(request.entry(id, power));
+
+        const auto entryIds = request.entries() | std::views::transform(&Entry::entrantId) |
+                              std::views::transform(&AgentID::value);
+        const auto sumIds = std::ranges::fold_left(entryIds, 0.0, std::plus{});
+        CHECK(sumIds == 606);
     }
 }
 }  // namespace abm::labor
