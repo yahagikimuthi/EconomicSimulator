@@ -50,12 +50,14 @@ class RosterEntry final {
     ~RosterEntry() noexcept                                     = default;
 
     void addInput(const double productPower, const Date& today) noexcept {
+        ASSERT(not isOccupied_);
         if (today.day() == companyBoard_.workDay) workspace_.addInput(productPower);
     }
     void resign() noexcept;
     void payWage(const Money payment) noexcept {
         ASSERT(paidWage_.isZeroOrMore());
         ASSERT(payment.isZeroOrMore());
+        ASSERT(not isOccupied_);
         paidWage_ += payment;
     }
 
@@ -133,6 +135,7 @@ class Roster final {
 };
 
 inline void RosterEntry::resign() noexcept {
+    ASSERT(paidWage_.isZero());
     isOccupied_ = false;
     roster_.resign(*this);
 }
