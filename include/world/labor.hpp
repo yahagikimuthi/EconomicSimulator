@@ -228,8 +228,7 @@ class Market final {
     template <std::size_t N>
     void packAllRequest(const AgentID id, std::inplace_vector<RefWrap<Request>, N>& out) {
         for (auto& req : requests_) {
-            if (req.firmID == id) continue;
-            out.unchecked_emplace_back(std::ref(req));
+            if (req.firmID != id) out.unchecked_emplace_back(std::ref(req));
         }
     }
 
