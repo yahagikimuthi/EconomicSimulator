@@ -64,9 +64,8 @@ class WagePlanner final {
     [[nodiscard]] auto plan(const Money salesPerWorker) noexcept -> Wage {
         ASSERT(salesPerWorker.isZeroOrMore());
         const auto next = [&]() noexcept -> std::optional<Wage> {
-            if (salesPerWorker == Money{0.0}) {
+            if (salesPerWorker <= Money{global_setting::epsilon})
                 return calcWage(Money{std::numeric_limits<double>::infinity()});
-            }
             return calcWage(salesPerWorker);
         }();
         memory_.clearLog();
