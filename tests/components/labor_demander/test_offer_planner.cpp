@@ -1,7 +1,9 @@
-#include "components/labor_demander/common.hpp"
-#include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/offer_planner.hpp"
 
+#include <limits>
+
+#include "components/labor_demander/common.hpp"
+#include "components/labor_demander/mediator.hpp"
 #include "doctest.h"
 #include "tests/util.hpp"
 #include "values/labor.hpp"
@@ -51,12 +53,13 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
     auto planner  = OfferPlanner{rng};
     auto mediator = Mediator{};
     planner.acceptMediator(mediator);
+    constexpr auto laborSupplier = HeadCount{std::numeric_limits<double>::infinity()};
 
     SUBCASE("mediateしない場合、2回目と1回目のオファー数が同じであること") {
         constexpr auto employ = HeadCount{10.0};
 
-        const auto first  = planner.plan(employ);
-        const auto second = planner.plan(employ);
+        const auto first  = planner.plan(employ, laborSupplier);
+        const auto second = planner.plan(employ, laborSupplier);
 
         CHECK(first.value() == doctest::Approx(second.value()));
     }
@@ -68,12 +71,12 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
         constexpr auto result =
             RecruitResult{.applicants = HeadCount{15.0}, .employ = HeadCount{5.0}};
 
-        const auto beforePlan = planner.plan(inEmploy);
+        const auto beforePlan = planner.plan(inEmploy, laborSupplier);
 
         mediator.publishRecruitPlan(plan);
         mediator.publishRecruitResult(result);
 
-        const auto afterPlan = planner.plan(inEmploy);
+        const auto afterPlan = planner.plan(inEmploy, laborSupplier);
 
         CHECK(afterPlan.value() > doctest::Approx(beforePlan.value()));
     }
