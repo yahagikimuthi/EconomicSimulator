@@ -59,15 +59,15 @@ class OfferPlanner final {
         const HeadCount employPlan,
         const HeadCount laborSupplier = HeadCount{global_setting::agent_count::hhold}
     ) noexcept -> HeadCount {
-        const auto out = employPlan * (OfferRate{1.0} + planOfferRate());
+        const auto out = employPlan * (OfferRate{1.0} + planOfferRate(laborSupplier));
         ASSERT(out >= employPlan);
         const auto guarded = std::min(out, laborSupplier);
         return ceil(guarded);
     }
 
   private:
-    [[nodiscard]] auto planOfferRate() noexcept -> OfferRate {
-        const auto nextRate = calcOfferRate();
+    [[nodiscard]] auto planOfferRate(const HeadCount laborSupplier) noexcept -> OfferRate {
+        const auto nextRate = calcOfferRate(laborSupplier);
         memory_.clearLog();
         if (not nextRate) return rateCache_;
         rateCache_ = *nextRate;
@@ -76,7 +76,8 @@ class OfferPlanner final {
         return *nextRate;
     }
 
-    [[nodiscard]] auto calcOfferRate() const noexcept -> std::optional<OfferRate> {
+    [[nodiscard]] auto calcOfferRate(const HeadCount laborSupplier
+    ) const noexcept -> std::optional<OfferRate> {
         const auto lastEmployResult = memory_.lastEmployResult();
         const auto lastEmployPlan   = memory_.lastEmployPlan();
         if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
@@ -86,7 +87,7 @@ class OfferPlanner final {
         const auto guarded     = std::clamp(
             next,
             OfferRate{std::numeric_limits<double>::epsilon()},
-            OfferRate{global_setting::agent_count::hhold}
+            OfferRate{laborSupplier.value()}
         );
         return guarded;
     }
