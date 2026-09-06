@@ -29,7 +29,7 @@ class RecruitPlanner final {
     [[nodiscard]] auto plan(const HeadCount desiredEmploy, const Money salesPerWorker) noexcept
         -> RecruitPlan {
         ASSERT(desiredEmploy.isZeroOrMore());
-        ASSERT(salesPerWorker >= Money{0.0});
+        ASSERT(salesPerWorker.isZeroOrMore());
 
         const auto wage   = wagePlanner_.plan(salesPerWorker);
         const auto employ = EmployPlanner::plan(desiredEmploy);
