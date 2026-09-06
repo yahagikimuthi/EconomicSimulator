@@ -21,7 +21,7 @@ TEST_CASE("OfferPlannerMemoryのテスト") {  // NOLINT
         memory.listenRecruitResult(result);
 
         CHECK(memory.lastEmployPlan() == lastPlan);
-        CHECK(memory.lastEmployResult() = lastResult);
+        CHECK(memory.lastEmployResult() == lastResult);
     }
 }
 }  // namespace abm::labor::demander::planner
