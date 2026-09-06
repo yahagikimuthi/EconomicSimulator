@@ -23,5 +23,19 @@ TEST_CASE("OfferPlannerMemoryのテスト") {  // NOLINT
         CHECK(memory.lastEmployPlan() == lastPlan);
         CHECK(memory.lastEmployResult() == lastResult);
     }
+
+    SUBCASE("雇用計画が0でないとき、正しいログを返すこと") {
+        constexpr auto employPlan   = HeadCount{100.0};
+        constexpr auto employResult = HeadCount{150.0};
+        constexpr auto plan =
+            RecruitPlan{.wage = Wage{1}, .employ = employPlan, .offer = HeadCount{1}};
+        constexpr auto result = RecruitResult{.applicants = HeadCount{1}, .employ = employResult};
+
+        memory.listenRecruitPlan(plan);
+        memory.listenRecruitResult(result);
+
+        CHECK(memory.lastEmployResult()->value() == employResult.value());
+        CHECK(memory.lastEmployPlan()->value() == employPlan.value());
+    }
 }
 }  // namespace abm::labor::demander::planner
