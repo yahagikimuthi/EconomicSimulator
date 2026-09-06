@@ -63,6 +63,7 @@ class RecruitSystem final {
         plan_.reset();
         const auto result = recruiter_.endRecruiting(std::forward<F>(addRoster));
         mediator.publishRecruitResult(result);
+        recruiter_.reset();
     }
 
     [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
@@ -71,8 +72,6 @@ class RecruitSystem final {
         ASSERT(out.isZeroOrMore());
         return static_cast<Budget>(out);
     }
-
-    void reset() noexcept { recruiter_.reset(); }
 
   private:
     RecruitPlanner             planner_;
@@ -135,7 +134,6 @@ class LaborDemander final {
             },
             mediator_
         );
-        recruitSystem_.reset();
     };
 
     void layOffs() noexcept { humanResource_.layOffs(); }
