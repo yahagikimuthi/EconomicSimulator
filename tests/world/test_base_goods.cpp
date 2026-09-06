@@ -1,7 +1,6 @@
 #include "world/base_goods.hpp"
 
 #include "doctest.h"
-
 #include "others/util.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
@@ -136,7 +135,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         CHECK(not pick.has_value());
     }
 
-    SUBCASE("disbaleしたentryについて2日目以降は再利用を行う") {
+    SUBCASE("disableしたentryについて2日目以降は再利用を行う") {
         auto&       entry = market.entry(AgentID{42}, Price{10.0}, GoodsQuantity{100.0});
         auto* const ptr   = &entry;
 
@@ -148,7 +147,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         CHECK(ptr == &newEntry);
     }
 
-    SUBCASE("disbaleしたentryについて2日目より前は再利用を行わない") {
+    SUBCASE("disableしたentryについて2日目より前は再利用を行わない") {
         constexpr auto id     = AgentID{-1};
         constexpr auto price  = Price{1.0};
         constexpr auto supply = GoodsQuantity{1.0};
