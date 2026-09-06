@@ -55,10 +55,13 @@ class OfferPlanner final {
         mediator.subscribeRecruitPlan(memory_);
     }
 
-    [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
+    [[nodiscard]] auto plan(
+        const HeadCount employPlan,
+        const HeadCount laborSupplier = HeadCount{global_setting::agent_count::hhold}
+    ) noexcept -> HeadCount {
         const auto out = employPlan * (OfferRate{1.0} + planOfferRate());
         ASSERT(out >= employPlan);
-        const auto guarded = std::min(out, HeadCount{global_setting::agent_count::hhold});
+        const auto guarded = std::min(out, laborSupplier);
         return ceil(guarded);
     }
 
