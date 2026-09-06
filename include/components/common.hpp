@@ -33,6 +33,7 @@ class Listener final {
     template <typename T>
         requires(std::is_same_v<T, Ts> or ...)
     void add(T& t) noexcept {
+        ASSERT(not std::get<std::optional<T&>>(listeners_));  // 再セットは禁止
         std::get<std::optional<T&>>(listeners_) = t;
     }
 
@@ -40,10 +41,7 @@ class Listener final {
         requires(std::is_invocable_v<F, Ts> and ...)
     void notice(F&& methodCaller) noexcept {
         auto callFunc = [&](auto& listener) noexcept -> void {
-            if (listener)
-                methodCaller(*listener);
-            else
-                ASSERT(false);
+            if (listener) methodCaller(*listener);
         };
         std::apply(
             [&](auto&... listener) noexcept -> void { ((callFunc(listener)), ...); }, listeners_
