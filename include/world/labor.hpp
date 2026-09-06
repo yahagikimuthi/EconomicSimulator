@@ -56,7 +56,11 @@ class RosterEntry final {
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
     [[nodiscard]] auto workDay() const noexcept -> Day { return companyBoard_.workDay; }
-    [[nodiscard]] auto takeOutPaidWage() noexcept -> Money { return paidWage_; }
+    [[nodiscard]] auto takeOutPaidWage() noexcept -> Money {
+        const auto out = paidWage_;
+        ASSERT(out.isZeroOrMore());
+        return out;
+    }
 
     const AgentID employeeId;
     const Wage    wage;
