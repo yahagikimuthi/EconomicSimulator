@@ -26,17 +26,8 @@ class Workspace final {
         totalInput_.store(input);
         return *this;
     }
-    Workspace(Workspace&& other) noexcept : totalInput_{other.totalInput_.load()} {
-        other.totalInput_.store(0.0);
-    }
-    auto operator=(Workspace&& other) noexcept -> Workspace& {
-        if (this == &other) return *this;
-        const double input{other.totalInput_.load()};
-        totalInput_.store(input);
-
-        other.totalInput_.store(0.0);
-        return *this;
-    }
+    Workspace(Workspace&& other) noexcept              = delete;
+    auto operator=(Workspace&&) noexcept -> Workspace& = delete;
 
     void addInput(const double workerProductPower) noexcept {
         ASSERT(workerProductPower > 0.0);
