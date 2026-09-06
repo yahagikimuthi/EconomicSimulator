@@ -66,4 +66,27 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
         CHECK(roster.employeeCnt().value() == 2);
     }
 }
+
+TEST_CASE("RosterEntryのテスト") {  // NOLINT
+    constexpr auto workDay = Day{15};
+
+    auto  roster = Roster{};
+    auto  board  = CompanyBoard{AgentID{42}, workDay};
+    auto  space  = base_goods::Workspace{};
+    auto& entry  = roster.add(AgentID{101}, Wage{101}, board, space);
+
+    SUBCASE("労働日の場合、Workspaceに労働貢献を実際に行うこと") {
+        entry.addInput(10.0, Date{workDay.value() - 1});
+
+        const auto input = space.takeOut();
+        CHECK(input.value() == 10.0);
+    }
+
+    SUBCASE("労働日でない場合、労働貢献は事実上行わないこと") {
+        entry.addInput(10.0, Date{2});
+
+        const auto input = space.takeOut();
+        CHECK(input.isZero());
+    }
+}
 }  // namespace abm::labor
