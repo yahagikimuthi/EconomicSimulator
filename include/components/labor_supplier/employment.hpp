@@ -44,7 +44,7 @@ class Employment final {
             rosterEntry_.reset();
             return;
         }
-        if (today.day() == rosterEntry_->workDay()) rosterEntry_->addInput(productPower_);
+        rosterEntry_->addInput(productPower_, today);
     }
 
     [[nodiscard]] auto productPower() const noexcept -> double { return productPower_; }

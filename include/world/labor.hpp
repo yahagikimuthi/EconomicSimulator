@@ -49,13 +49,14 @@ class RosterEntry final {
     auto operator=(RosterEntry&&) noexcept -> RosterEntry&      = delete;
     ~RosterEntry() noexcept                                     = default;
 
-    void addInput(const double productPower) noexcept { workspace_.addInput(productPower); }
+    void addInput(const double productPower, const Date& today) noexcept {
+        if (today.day() == companyBoard_.workDay) workspace_.addInput(productPower);
+    }
     void resign() noexcept;
     void payWage(const Money payment) noexcept { paidWage_ += payment; }
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
-    [[nodiscard]] auto workDay() const noexcept -> Day { return companyBoard_.workDay; }
     [[nodiscard]] auto takeOutPaidWage() noexcept -> Money {
         const auto out = paidWage_;
         ASSERT(out.isZeroOrMore());
