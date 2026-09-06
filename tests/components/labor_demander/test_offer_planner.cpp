@@ -53,12 +53,29 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
     planner.acceptMediator(mediator);
 
     SUBCASE("mediateしない場合、2回目と1回目のオファー数が同じであること") {
-        const auto employ = HeadCount{10.0};
+        constexpr auto employ = HeadCount{10.0};
 
         const auto first  = planner.plan(employ);
         const auto second = planner.plan(employ);
 
         CHECK(first.value() == doctest::Approx(second.value()));
+    }
+
+    SUBCASE("雇用数 < 雇用計画の場合、オファー率が上がること") {
+        constexpr auto inEmploy = HeadCount{1000.0};
+        constexpr auto plan =
+            RecruitPlan{.wage = Wage{1.0}, .employ = HeadCount{10.0}, .offer = HeadCount{20.0}};
+        constexpr auto result =
+            RecruitResult{.applicants = HeadCount{15.0}, .employ = HeadCount{5.0}};
+
+        const auto beforePlan = planner.plan(inEmploy);
+
+        mediator.publishRecruitPlan(plan);
+        mediator.publishRecruitResult(result);
+
+        const auto afterPlan = planner.plan(inEmploy);
+
+        CHECK(afterPlan.value() > doctest::Approx(beforePlan.value()));
     }
 }
 }  // namespace abm::labor::demander::planner
