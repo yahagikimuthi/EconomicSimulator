@@ -72,10 +72,7 @@ class RecruitSystem final {
         return static_cast<Budget>(out);
     }
 
-    void reset() noexcept {
-        planner_.reset();
-        recruiter_.reset();
-    }
+    void reset() noexcept { recruiter_.reset(); }
 
   private:
     RecruitPlanner             planner_;

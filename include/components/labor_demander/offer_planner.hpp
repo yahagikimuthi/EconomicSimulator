@@ -26,7 +26,6 @@ class OfferPlannerMemory final {
         return employPlan_.log();
     }
     void clearLog() noexcept { employResult_.clearLog(), employPlan_.clearLog(); }
-    void reset() noexcept { employResult_.reset(), employPlan_.reset(); }
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
         ASSERT(plan.employ.isZeroOrMore());
         if (plan.employ.isPositive()) employPlan_.next(plan.employ);
@@ -34,6 +33,8 @@ class OfferPlannerMemory final {
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.employ.isZeroOrMore());
         if (employPlan_.wasSetNext()) employResult_.next(result.applicants);
+        employResult_.reset();
+        employPlan_.reset();
     }
 
   private:
@@ -59,8 +60,6 @@ class OfferPlanner final {
         const auto guarded = std::min(out, HeadCount{global_setting::agent_count::hhold});
         return ceil(guarded);
     }
-
-    void reset() noexcept { memory_.reset(); }
 
   private:
     [[nodiscard]] auto planOfferRate() noexcept -> OfferRate {
