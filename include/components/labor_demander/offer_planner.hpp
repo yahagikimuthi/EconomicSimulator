@@ -56,7 +56,8 @@ class OfferPlanner final {
     }
 
     [[nodiscard]] auto plan(const HeadCount employPlan) noexcept -> HeadCount {
-        const auto out     = employPlan * (OfferRate{1.0} + planOfferRate());
+        const auto out = employPlan * (OfferRate{1.0} + planOfferRate());
+        ASSERT(out >= employPlan);
         const auto guarded = std::min(out, HeadCount{global_setting::agent_count::hhold});
         return ceil(guarded);
     }
