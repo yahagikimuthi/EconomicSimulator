@@ -30,7 +30,8 @@ class WagePlannerMemory final {
     void listenRecruitResult(const RecruitResult& result) noexcept {
         ASSERT(result.applicants.isZeroOrMore());
         if (employPlan_.wasSetNext()) applicants_.next(result.applicants);
-        reset();
+        employPlan_.reset();
+        applicants_.reset();
     }
     [[nodiscard]] auto lastApplicants() const noexcept -> std::optional<HeadCount> {
         return applicants_.log();
@@ -41,10 +42,6 @@ class WagePlannerMemory final {
     void clearLog() noexcept { employPlan_.clearLog(), applicants_.clearLog(); }
 
   private:
-    void reset() noexcept {
-        employPlan_.reset();
-        applicants_.reset();
-    }
     Memory<HeadCount> employPlan_;
     Memory<HeadCount> applicants_;
 };
