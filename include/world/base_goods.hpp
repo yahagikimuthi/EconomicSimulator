@@ -142,10 +142,10 @@ class Market final {
 
     struct EmptyEntry final {
         explicit EmptyEntry(EntryT& Entry, const Day DisableDay) noexcept
-            : entry{Entry}, disableDay{DisableDay} {}
+            : entry{&Entry}, disableDay{DisableDay} {}
         explicit EmptyEntry() noexcept = default;
-        std::optional<EntryT&> entry{std::nullopt};
-        Day                    disableDay{1};
+        EntryT* entry{nullptr};
+        Day     disableDay{1};
     };
 
   public:
@@ -162,8 +162,8 @@ class Market final {
 
         ASSERT(newEntry.entry);
         ASSERT(not newEntry.entry->isValid());
-        std::destroy_at(&*newEntry.entry);
-        return *std::construct_at(&*newEntry.entry, id, price, supply, *this);
+        std::destroy_at(newEntry.entry);
+        return *std::construct_at(newEntry.entry, id, price, supply, *this);
     }
 
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
