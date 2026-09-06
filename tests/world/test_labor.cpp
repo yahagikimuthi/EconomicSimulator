@@ -19,5 +19,15 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
 
         CHECK(roster.sumWage().value() == doctest::Approx(306));
     }
+
+    SUBCASE("名簿を削除する場合もsumWageが機能することのテスト") {
+        nothing(roster.add(AgentID{101}, Wage{101}, board, space));
+        auto& disableEntry = roster.add(AgentID{202}, Wage{202}, board, space);
+        nothing(roster.add(AgentID{303}, Wage{303}, board, space));
+
+        disableEntry.resign();
+
+        CHECK(roster.sumWage().value() == doctest::Approx(404));
+    }
 }
 }  // namespace abm::labor
