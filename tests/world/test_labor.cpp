@@ -14,10 +14,10 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
 
     SUBCASE("addのみの場合、sumWageが機能することのテスト") {
         nothing(roster.add(AgentID{101}, Wage{101}, board, space));
-        nothing(roster.add(AgentID{102}, Wage{102}, board, space));
-        nothing(roster.add(AgentID{103}, Wage{103}, board, space));
+        nothing(roster.add(AgentID{202}, Wage{202}, board, space));
+        nothing(roster.add(AgentID{303}, Wage{303}, board, space));
 
-        CHECK(roster.sumWage().value() == doctest::Approx(306));
+        CHECK(roster.sumWage().value() == doctest::Approx(606));
     }
 
     SUBCASE("名簿を削除する場合もsumWageが機能することのテスト") {
