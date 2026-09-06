@@ -19,7 +19,7 @@ class OfferApplicants final {
 
     void add(Entry& entry) noexcept { applicants_.emplace_back(std::ref(entry)); }
     void clear() noexcept { applicants_.clear(); }
-    auto offerAcceptedApplicants() noexcept -> std::ranges::view auto {
+    auto offerAcceptedApplicants() noexcept -> auto {
         return applicants_ | std::views::transform([](RefWrap<Entry> ref) noexcept -> Entry& {
                    return ref.get();
                }) |
