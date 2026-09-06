@@ -69,17 +69,14 @@ class WagePlanner final {
             return calcWage(salesPerWorker);
         }();
         memory_.clearLog();
-        if (not next) return cache_.cache();
-        cache_.next(*next);
+        if (not next) return cache_;
+        cache_ = *next;
 
         ASSERT(next->isZeroOrMore());
         return *next;
     }
 
-    void reset() noexcept {
-        memory_.reset();
-        cache_.reset();
-    }
+    void reset() noexcept { memory_.reset(); }
 
   private:
     [[nodiscard]] auto calcWage(const Money salesPerWorker) const noexcept -> std::optional<Wage> {
@@ -88,7 +85,7 @@ class WagePlanner final {
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
         const auto shouldRaise = *lastApplicants < *lastEmployPlan;
-        const auto plan        = cache_.cache() * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
+        const auto plan        = cache_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
         const auto guarded     = std::min(plan, static_cast<Wage>(salesPerWorker));
         return wageGuard(guarded);
     }
@@ -98,7 +95,7 @@ class WagePlanner final {
     }
 
     WagePlannerMemory       memory_;
-    Cache<Wage>             cache_;
+    Wage                    cache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };

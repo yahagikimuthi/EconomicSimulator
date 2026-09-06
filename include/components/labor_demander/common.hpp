@@ -46,23 +46,6 @@ class Memory final {
     std::optional<T> next_{std::nullopt};
 };
 
-template <typename T>
-class Cache final {
-  public:
-    explicit Cache(const T cache) noexcept : cache_{cache} {}
-    [[nodiscard]] auto cache() const noexcept -> T { return cache_; }
-
-    void next(const T next) noexcept { next_ = next; }
-    void reset() noexcept {
-        if (not next_) return;
-        cache_ = *next_, next_.reset();
-    }
-
-  private:
-    T                cache_;
-    std::optional<T> next_;
-};
-
 class CentralMemory final {
   public:
     explicit CentralMemory() noexcept = default;

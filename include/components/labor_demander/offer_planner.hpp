@@ -60,17 +60,14 @@ class OfferPlanner final {
         return ceil(guarded);
     }
 
-    void reset() noexcept {
-        memory_.reset();
-        rateCache_.reset();
-    }
+    void reset() noexcept { memory_.reset(); }
 
   private:
     [[nodiscard]] auto planOfferRate() noexcept -> OfferRate {
         const auto nextRate = calcOfferRate();
         memory_.clearLog();
-        if (not nextRate) return rateCache_.cache();
-        rateCache_.next(*nextRate);
+        if (not nextRate) return rateCache_;
+        rateCache_ = *nextRate;
 
         ASSERT(nextRate->isPositive());
         return *nextRate;
@@ -82,7 +79,7 @@ class OfferPlanner final {
         if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
         const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto shouldRaise = *lastEmployResult < *lastEmployPlan;
-        const auto next        = rateCache_.cache() + OfferRate{(shouldRaise ? alpha : -alpha)};
+        const auto next        = rateCache_ + OfferRate{(shouldRaise ? alpha : -alpha)};
         const auto guarded     = std::clamp(
             next,
             OfferRate{std::numeric_limits<double>::epsilon()},
@@ -92,7 +89,7 @@ class OfferPlanner final {
     }
 
     OfferPlannerMemory      memory_;
-    Cache<OfferRate>        rateCache_;
+    OfferRate               rateCache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };
