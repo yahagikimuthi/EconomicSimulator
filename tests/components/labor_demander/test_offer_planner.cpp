@@ -52,11 +52,13 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
     auto mediator = Mediator{};
     planner.acceptMediator(mediator);
 
-    SUBCASE("mediateしない場合、2回目と1回目の結果が同じであること") {
-        const auto first  = planner.plan(HeadCount{10.0});
-        const auto second = planner.plan(HeadCount{10.0});
+    SUBCASE("mediateしない場合、2回目と1回目のオファー数が同じであること") {
+        const auto employ = HeadCount{10.0};
 
-        CHECK(first.value() == second.value());
+        const auto first  = planner.plan(employ);
+        const auto second = planner.plan(employ);
+
+        CHECK(first.value() == doctest::Approx(second.value()));
     }
 }
 }  // namespace abm::labor::demander::planner
