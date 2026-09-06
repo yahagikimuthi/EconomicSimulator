@@ -1,5 +1,7 @@
 #include "world/labor.hpp"
 
+#include <utility>
+
 #include "doctest.h"
 #include "others/util.hpp"
 #include "values/common.hpp"
@@ -40,6 +42,16 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
         auto* const afterEntry = &roster.add(AgentID{404}, Wage{404}, board, space);
 
         CHECK(beforeEntry == afterEntry);
+    }
+
+    SUBCASE("validEntriesがすべて有効であることのテスト") {
+        nothing(roster.add(AgentID{101}, Wage{101}, board, space));
+        auto& disableEntry = roster.add(AgentID{202}, Wage{202}, board, space);
+        nothing(roster.add(AgentID{303}, Wage{303}, board, space));
+
+        disableEntry.resign();
+
+        for (const auto& entry : std::as_const(roster).validEntries()) CHECK(entry.isOccupied());
     }
 }
 }  // namespace abm::labor
