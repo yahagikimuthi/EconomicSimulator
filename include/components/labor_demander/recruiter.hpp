@@ -57,6 +57,8 @@ class Ledger final {
     }
 
     [[nodiscard]] auto publishResult() const -> RecruitResult {
+        ASSERT(applicants_.isZeroOrMore());
+        ASSERT(employ_.isZeroOrMore());
         return {.applicants = applicants_, .employ = employ_};
     }
 
