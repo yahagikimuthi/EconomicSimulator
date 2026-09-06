@@ -32,7 +32,7 @@ class OfferApplicants final {
 
 class Ledger final {
   public:
-    explicit Ledger() = default;
+    explicit Ledger() noexcept = default;
 
     void makeNewPage(const HeadCount offerPlan) noexcept {
         ASSERT(offerPlan.isZeroOrMore());
@@ -56,7 +56,7 @@ class Ledger final {
         employ_ += employ;
     }
 
-    [[nodiscard]] auto publishResult() const -> RecruitResult {
+    [[nodiscard]] auto publishResult() const noexcept -> RecruitResult {
         ASSERT(applicants_.isZeroOrMore());
         ASSERT(employ_.isZeroOrMore());
         return {.applicants = applicants_, .employ = employ_};
