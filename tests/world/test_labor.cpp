@@ -29,5 +29,17 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
 
         CHECK(roster.sumWage().value() == doctest::Approx(404));
     }
+
+    SUBCASE("名簿が再利用されていることのテスト") {
+        nothing(roster.add(AgentID{101}, Wage{101}, board, space));
+        auto* const beforeEntry = &roster.add(AgentID{202}, Wage{202}, board, space);
+        nothing(roster.add(AgentID{303}, Wage{303}, board, space));
+
+        beforeEntry->resign();
+
+        auto* const afterEntry = &roster.add(AgentID{404}, Wage{404}, board, space);
+
+        CHECK(beforeEntry == afterEntry);
+    }
 }
 }  // namespace abm::labor
