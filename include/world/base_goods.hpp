@@ -50,8 +50,8 @@ class Request final {
   public:
     using EntryT = Entry<MarketT>;
     explicit Request(const Money pay, const EntryT& e) noexcept
-        : payment_{pay}, remainPaid_{pay}, entry_{e} {
-        ASSERT(pay.isZeroOrMore());
+        : payment{pay}, remainPaid_{pay}, entry_{e} {
+        ASSERT(pay.isPositive());
     }
     // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
     // Requestorが持つ参照が無意味となる。
@@ -64,10 +64,6 @@ class Request final {
 
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity { return tradeAmount_; }
     [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
-    [[nodiscard]] auto payment() const noexcept -> Money {
-        ASSERT(payment_.isZeroOrMore());
-        return payment_;
-    }
     [[nodiscard]] auto takeOutRemainPaid() noexcept -> Money {
         const auto out = remainPaid_;
         remainPaid_    = Money{0.0};
@@ -75,8 +71,9 @@ class Request final {
         return out;
     }
 
+    const Money payment;
+
   private:
-    const Money   payment_;
     Money         remainPaid_;
     GoodsQuantity tradeAmount_{0.0};
     const EntryT& entry_;
@@ -125,7 +122,7 @@ template <EMarket MarketT>
     tradeAmount_         = tradeAmount;
     const auto actualPay = tradeAmount * entry_.price;
     remainPaid_ -= actualPay;
-    ASSERT(payment_.isZeroOrMore());
+    ASSERT(payment.isZeroOrMore());
     ASSERT(remainPaid_.isZeroOrMore());
     return actualPay;
 }

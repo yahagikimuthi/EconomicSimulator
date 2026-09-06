@@ -62,7 +62,7 @@ class Trader final {
         const auto requests = myEntry_->requests();
         return std::ranges::fold_left(
             requests | std::views::transform([&](const RequestT& req) noexcept -> GoodsQuantity {
-                return req.payment() / myEntry_->price;
+                return req.payment / myEntry_->price;
             }),
             GoodsQuantity{0.0},
             std::plus{}
@@ -76,7 +76,7 @@ class Trader final {
         auto remainAmount = ledger_.inventory();
         for (auto reqRef : requests) {
             auto&      req       = reqRef.get();
-            const auto reqAmount = req.payment() / myEntry_->price;
+            const auto reqAmount = req.payment / myEntry_->price;
             if (remainAmount <= reqAmount) {
                 const auto sales = req.trade(remainAmount);
                 depositFn(sales);
@@ -101,7 +101,7 @@ class Trader final {
 
     void performFullTrade(DepositFn auto&& depositFn) noexcept {
         for (auto& request : myEntry_->requests()) {
-            const auto tradeAmount = request.payment() / myEntry_->price;
+            const auto tradeAmount = request.payment / myEntry_->price;
             const auto sales       = request.trade(tradeAmount);
             depositFn(sales);
         }
