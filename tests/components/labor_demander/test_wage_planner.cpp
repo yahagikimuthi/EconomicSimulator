@@ -17,7 +17,7 @@ TEST_CASE("WagePlannerMemoryのテスト") {  // NOLINT
 
     SUBCASE("雇用計画が0のとき、応募者数の記録を取らないこと") {
         constexpr auto plan =
-            RecruitPlan{.wage = Wage{0.0}, .employ = HeadCount{0.0}, .offer = HeadCount{0.0}};
+            RecruitPlan{.wage = Wage{10.0}, .employ = HeadCount{0.0}, .offer = HeadCount{10.0}};
         const auto result = RecruitResult{.applicants = HeadCount{5.0}, .employ = HeadCount{1.0}};
         const auto lastEmployPlan = memory.lastEmployPlan();
         const auto lastApplicants = memory.lastApplicants();
@@ -27,6 +27,20 @@ TEST_CASE("WagePlannerMemoryのテスト") {  // NOLINT
 
         CHECK(memory.lastEmployPlan() == lastEmployPlan);
         CHECK(memory.lastApplicants() == lastApplicants);
+    }
+
+    SUBCASE("雇用計画が正のとき、正しいログを返すこと") {
+        constexpr auto employPlan = HeadCount{100.0};
+        constexpr auto applicant  = HeadCount{150.0};
+        constexpr auto plan =
+            RecruitPlan{.wage = Wage{10.0}, .employ = employPlan, .offer = HeadCount{10.0}};
+        const auto result = RecruitResult{.applicants = applicant, .employ = HeadCount{200.0}};
+
+        memory.listenRecruitPlan(plan);
+        memory.listenRecruitResult(result);
+
+        CHECK(memory.lastEmployPlan()->value() == employPlan.value());
+        CHECK(memory.lastApplicants()->value() == applicant.value());
     }
 
     SUBCASE("clearLogを呼び出した場合、logはnullを返すこと") {
