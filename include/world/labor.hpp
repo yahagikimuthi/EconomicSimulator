@@ -161,13 +161,24 @@ class Entry final {
     const AgentID entrantId;
     const double  productPower;
 
-    void offer() noexcept { isOffer_ = true; }
-    void accept() noexcept { isAccept_ = true; }
-    void setRoster(RosterEntry& rosterEntry) noexcept { rosterEntry_ = rosterEntry; }
+    void offer() noexcept {
+        ASSERT(not isOffer_);
+        isOffer_ = true;
+    }
+    void accept() noexcept {
+        ASSERT(isOffer_);
+        ASSERT(not isAccept_);
+        isAccept_ = true;
+    }
+    void setRoster(RosterEntry& rosterEntry) noexcept {
+        ASSERT(isAccept_);
+        rosterEntry_ = rosterEntry;
+    }
 
     [[nodiscard]] auto isOffer() const noexcept -> bool { return isOffer_; }
     [[nodiscard]] auto isAccept() const noexcept -> bool { return isAccept_; }
     [[nodiscard]] auto rosterEntry() const noexcept -> RosterEntry& {
+        ASSERT(isAccept_);
         ASSERT(rosterEntry_);
         return *rosterEntry_;
     }
