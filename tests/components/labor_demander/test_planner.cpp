@@ -7,6 +7,7 @@
 #include "values/labor.hpp"
 
 namespace abm::labor::demander::planner {
+namespace {
 TEST_CASE("RecruitPlannerのテスト") {  // NOLINT
     auto rng      = makeRng();
     auto planner  = RecruitPlanner{rng};
@@ -22,4 +23,5 @@ TEST_CASE("RecruitPlannerのテスト") {  // NOLINT
         CHECK(first.offer == second.offer);
     }
 }
+}  // namespace
 }  // namespace abm::labor::demander::planner

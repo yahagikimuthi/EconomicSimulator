@@ -9,6 +9,7 @@
 #include "values/labor.hpp"
 
 namespace abm::labor::demander::planner {
+namespace {
 TEST_CASE("OfferPlannerMemoryのテスト") {  // NOLINT
     auto rng    = makeRng();
     auto memory = OfferPlannerMemory{rng};
@@ -81,4 +82,5 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
         CHECK(afterPlan.value() > doctest::Approx(beforePlan.value()));
     }
 }
+}  // namespace
 }  // namespace abm::labor::demander::planner

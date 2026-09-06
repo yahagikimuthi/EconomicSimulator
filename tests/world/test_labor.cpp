@@ -15,6 +15,7 @@
 #include "world/base_goods.hpp"
 
 namespace abm::labor {
+namespace {
 TEST_CASE("Rosterのテスト") {  // NOLINT
     auto roster = Roster{};
     auto board  = CompanyBoard{AgentID{42}, Day{1}};
@@ -199,4 +200,5 @@ TEST_CASE("Requestのテスト") {  // NOLINT
         CHECK(sumIds == 606);
     }
 }
+}  // namespace
 }  // namespace abm::labor
