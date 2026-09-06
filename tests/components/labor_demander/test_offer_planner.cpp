@@ -37,5 +37,11 @@ TEST_CASE("OfferPlannerMemoryのテスト") {  // NOLINT
         CHECK(memory.lastEmployResult()->value() == employResult.value());
         CHECK(memory.lastEmployPlan()->value() == employPlan.value());
     }
+
+    SUBCASE("clearLogを呼び出した場合、logがいずれもnullであること") {
+        memory.clearLog();
+        CHECK(not memory.lastEmployPlan());
+        CHECK(not memory.lastEmployResult());
+    }
 }
 }  // namespace abm::labor::demander::planner
