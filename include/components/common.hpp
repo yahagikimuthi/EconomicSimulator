@@ -33,7 +33,6 @@ class Listener final {
     template <typename T>
         requires(std::is_same_v<T, Ts> or ...)
     void add(T& t) noexcept {
-        ASSERT(not std::get<std::optional<T&>>(listeners_));
         std::get<std::optional<T&>>(listeners_) = t;
     }
 
