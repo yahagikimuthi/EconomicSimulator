@@ -93,7 +93,10 @@ class Entry final {
     explicit Entry(
         const AgentID i, const Price p, const GoodsQuantity s, Market<MarketT>& market
     ) noexcept
-        : id{i}, price{p}, supply{s}, market_{market} {}
+        : id{i}, price{p}, supply{s}, market_{market} {
+        ASSERT(p.isPositive());
+        ASSERT(s.isPositive());
+    }
 
     [[nodiscard]] auto request(const Money payment) noexcept -> RequestT& {
         return *requests_.emplace_back(payment, *this);
