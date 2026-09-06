@@ -1,4 +1,5 @@
 #include "components/labor_demander/common.hpp"
+#include "components/labor_demander/mediator.hpp"
 #include "components/labor_demander/offer_planner.hpp"
 
 #include "doctest.h"
@@ -42,6 +43,20 @@ TEST_CASE("OfferPlannerMemoryのテスト") {  // NOLINT
         memory.clearLog();
         CHECK(not memory.lastEmployPlan());
         CHECK(not memory.lastEmployResult());
+    }
+}
+
+TEST_CASE("OfferPlannerのテスト") {  // NOLINT
+    auto rng      = makeRng();
+    auto planner  = OfferPlanner{rng};
+    auto mediator = Mediator{};
+    planner.acceptMediator(mediator);
+
+    SUBCASE("mediateしない場合、2回目と1回目の結果が同じであること") {
+        const auto first  = planner.plan(HeadCount{10.0});
+        const auto second = planner.plan(HeadCount{10.0});
+
+        CHECK(first.value() == second.value());
     }
 }
 }  // namespace abm::labor::demander::planner
