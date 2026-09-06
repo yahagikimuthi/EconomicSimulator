@@ -159,10 +159,13 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         const auto& first = market.entry(id, price, supply);
         CHECK(ptr != &first);
 
-        ++date;
-
         const auto& second = market.entry(id, price, supply);
         CHECK(ptr != &second);
+
+        ++date;
+
+        const auto& third = market.entry(id, price, supply);
+        CHECK(ptr != &third);
     }
 
     SUBCASE("pickEntryが有効なentryをpickするかのテスト") {
