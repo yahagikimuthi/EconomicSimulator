@@ -53,7 +53,11 @@ class RosterEntry final {
         if (today.day() == companyBoard_.workDay) workspace_.addInput(productPower);
     }
     void resign() noexcept;
-    void payWage(const Money payment) noexcept { paidWage_ += payment; }
+    void payWage(const Money payment) noexcept {
+        ASSERT(paidWage_.isZeroOrMore());
+        ASSERT(payment.isZeroOrMore());
+        paidWage_ += payment;
+    }
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
