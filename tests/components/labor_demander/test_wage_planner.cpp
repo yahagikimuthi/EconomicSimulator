@@ -86,6 +86,12 @@ TEST_CASE("WagePlannerのテスト") {  // NOLINT
 
         CHECK(wage.value() <= doctest::Approx(epsilon.value()));
     }
+
+    SUBCASE("1人あたり売上が0の場合、戻り値は十分に大きいこと") {
+        const auto wage = planner.plan(Money{0.0});
+
+        CHECK(wage.value() >= doctest::Approx(global_setting::epsilon));
+    }
 }
 }  // namespace
 }  // namespace abm::labor::demander::planner
