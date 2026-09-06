@@ -94,5 +94,18 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
 
         CHECK(not entry.isOccupied());
     }
+
+    SUBCASE("takeOutは何もしない場合0が戻り値") { CHECK(entry.takeOutPaidWage().isZero()); }
+
+    SUBCASE("給与を振り込んだ場合、takeOutを行うと同じものが返り、2回目は0が返る") {
+        constexpr auto payment = Money{100.0};
+        entry.payWage(payment);
+
+        const auto takeOut = entry.takeOutPaidWage();
+
+        CHECK(takeOut.value() == doctest::Approx(payment.value()));
+
+        CHECK(entry.takeOutPaidWage().isZero());
+    }
 }
 }  // namespace abm::labor
