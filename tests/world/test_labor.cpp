@@ -53,5 +53,17 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
 
         for (const auto& entry : std::as_const(roster).validEntries()) CHECK(entry.isOccupied());
     }
+
+    SUBCASE("employeeCntのテスト") {
+        nothing(roster.add(AgentID{101}, Wage{101}, board, space));
+        auto& disableEntry = roster.add(AgentID{202}, Wage{202}, board, space);
+        nothing(roster.add(AgentID{303}, Wage{303}, board, space));
+
+        CHECK(roster.employeeCnt().value() == 3);
+
+        disableEntry.resign();
+
+        CHECK(roster.employeeCnt().value() == 2);
+    }
 }
 }  // namespace abm::labor
