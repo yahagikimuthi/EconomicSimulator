@@ -29,14 +29,4 @@ class BankAccount final {
   private:
     Money deposit_{0.0};
 };
-
-class DepositAccount {
-  public:
-    explicit DepositAccount(BankAccount& account) noexcept : account_{account} {}
-
-    void deposit(const Money add) noexcept { account_.deposit(add); }
-
-  private:
-    BankAccount& account_;
-};
 }  // namespace abm
