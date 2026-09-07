@@ -23,7 +23,7 @@ class Employment final {
         if (isEmployed()) {
             ASSERT(rosterEntry_->firmId() != rosterEntry.firmId());
             ASSERT(rosterEntry_->wage <= rosterEntry.wage);
-            std::forward<F>(depositFn)(rosterEntry.takeOutPaidWage());
+            std::forward<F>(depositFn)(rosterEntry.takeoutPaidWage());
         }
         resign();
         rosterEntry_ = rosterEntry;
@@ -36,7 +36,7 @@ class Employment final {
     template <DepositFn F>
     void work(F&& depositFn, const Date& today) noexcept {
         if (not isEmployed()) return;
-        std::forward<F>(depositFn)(rosterEntry_->takeOutPaidWage());
+        std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         if (not rosterEntry_->isOccupied()) {
             rosterEntry_.reset();
             return;

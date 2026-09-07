@@ -55,8 +55,6 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
         CHECK(request.firmID == AgentID{42});
         CHECK(request.wage == Wage{10.0});
 
-        SUBCASE("Marketからサンプリングすることが可能で、IDと賃金が等しい") {}
-
         SUBCASE("誰もエントリーしない場合、結果は空") {
             recruiter.offer();
             const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));

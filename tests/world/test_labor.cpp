@@ -85,14 +85,14 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
     SUBCASE("労働日の場合、Workspaceに労働貢献を実際に行うこと") {
         entry.addInput(10.0, Date{workDay.value() - 1});
 
-        const auto input = space.takeOut();
+        const auto input = space.takeout();
         CHECK(input.value() == 10.0);
     }
 
     SUBCASE("労働日でない場合、労働貢献は事実上行わないこと") {
         entry.addInput(10.0, Date{2});
 
-        const auto input = space.takeOut();
+        const auto input = space.takeout();
         CHECK(input.isZero());
     }
 
@@ -102,17 +102,17 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
         CHECK(not entry.isOccupied());
     }
 
-    SUBCASE("takeOutは何もしない場合0が戻り値") { CHECK(entry.takeOutPaidWage().isZero()); }
+    SUBCASE("takeoutは何もしない場合0が戻り値") { CHECK(entry.takeoutPaidWage().isZero()); }
 
-    SUBCASE("給与を振り込んだ場合、takeOutを行うと同じものが返り、2回目は0が返る") {
+    SUBCASE("給与を振り込んだ場合、takeoutを行うと同じものが返り、2回目は0が返る") {
         constexpr auto payment = Money{100.0};
         entry.payWage(payment);
 
-        const auto takeOut = entry.takeOutPaidWage();
+        const auto takeout = entry.takeoutPaidWage();
 
-        CHECK(takeOut.value() == doctest::Approx(payment.value()));
+        CHECK(takeout.value() == doctest::Approx(payment.value()));
 
-        CHECK(entry.takeOutPaidWage().isZero());
+        CHECK(entry.takeoutPaidWage().isZero());
     }
 }
 

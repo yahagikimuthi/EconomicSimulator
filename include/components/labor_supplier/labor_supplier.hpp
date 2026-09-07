@@ -46,7 +46,9 @@ class LaborSupplier final {
     void recordRosterEntry(F&& depositFn) noexcept {
         const auto acceptedEntry = jobHunter_.huntedResult();
         if (acceptedEntry)
-            employment_.startWorking(acceptedEntry->rosterEntry(), std::forward<F>(depositFn));
+            employment_.startWorking(
+                acceptedEntry->takeoutRosterEntry(), std::forward<F>(depositFn)
+            );
         jobHunter_.reset();
     }
 

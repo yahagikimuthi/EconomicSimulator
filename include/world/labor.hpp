@@ -63,7 +63,7 @@ class RosterEntry final {
 
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
-    [[nodiscard]] auto takeOutPaidWage() noexcept -> Money {
+    [[nodiscard]] auto takeoutPaidWage() noexcept -> Money {
         const auto out = std::exchange(paidWage_, Money{0.0});
         ASSERT(out.isZeroOrMore());
         return out;
@@ -171,15 +171,18 @@ class Entry final {
     }
     void setRoster(RosterEntry& rosterEntry) noexcept {
         ASSERT(isAccept_);
+        ASSERT(not rosterEntry_);
         rosterEntry_ = rosterEntry;
     }
 
     [[nodiscard]] auto isOffer() const noexcept -> bool { return isOffer_; }
     [[nodiscard]] auto isAccept() const noexcept -> bool { return isAccept_; }
-    [[nodiscard]] auto rosterEntry() const noexcept -> RosterEntry& {
+    [[nodiscard]] auto takeoutRosterEntry() noexcept -> RosterEntry& {
         ASSERT(isAccept_);
         ASSERT(rosterEntry_);
-        return *rosterEntry_;
+        auto& out = *rosterEntry_;
+        rosterEntry_.reset();
+        return out;
     }
 
     const Request& request;

@@ -16,17 +16,17 @@ TEST_CASE("Workspaceのテスト") {  // NOLINT
         const auto input = 10.0;
         space.addInput(input);
 
-        [[maybe_unused]] const auto firstPicked  = space.takeOut();
-        const auto                  secondPicked = space.takeOut();
+        [[maybe_unused]] const auto firstPicked  = space.takeout();
+        const auto                  secondPicked = space.takeout();
 
         CHECK(secondPicked.isZero());
     }
 
-    SUBCASE("addInputの入力値とtakeOutの出力が同じであること") {
+    SUBCASE("addInputの入力値とtakeoutの出力が同じであること") {
         const auto input = 10.0;
         space.addInput(input);
 
-        CHECK(space.takeOut().value() == doctest::Approx(input));
+        CHECK(space.takeout().value() == doctest::Approx(input));
     }
 
     SUBCASE("コピーコンストラクタが正しく作動すること") {
@@ -34,7 +34,7 @@ TEST_CASE("Workspaceのテスト") {  // NOLINT
         space.addInput(input);
 
         auto otherSpace = space;
-        CHECK(otherSpace.takeOut().value() == doctest::Approx(input));
+        CHECK(otherSpace.takeout().value() == doctest::Approx(input));
     }
 
     SUBCASE("コピー代入演算子が正しく作動すること") {
@@ -44,7 +44,7 @@ TEST_CASE("Workspaceのテスト") {  // NOLINT
 
         space = otherSpace;
 
-        CHECK(space.takeOut().value() == doctest::Approx(input));
+        CHECK(space.takeout().value() == doctest::Approx(input));
     }
 }
 
@@ -61,14 +61,14 @@ TEST_CASE("Requestのテスト") {  // NOLINT
         CHECK(request.tradeAmount().value() == doctest::Approx(0.0));
     }
 
-    SUBCASE("takeOutRemainPaidはデフォルトでpaymentを返す") {
-        CHECK(request.takeOutRemainPaid().value() == doctest::Approx(payment.value()));
+    SUBCASE("takeoutRemainPaidはデフォルトでpaymentを返す") {
+        CHECK(request.takeoutRemainPaid().value() == doctest::Approx(payment.value()));
     }
 
-    SUBCASE("takeOutRemainPaidは2回目で0を返す") {
-        [[maybe_unused]] const auto first = request.takeOutRemainPaid();
+    SUBCASE("takeoutRemainPaidは2回目で0を返す") {
+        [[maybe_unused]] const auto first = request.takeoutRemainPaid();
 
-        CHECK(request.takeOutRemainPaid().isZero());
+        CHECK(request.takeoutRemainPaid().isZero());
     }
 
     SUBCASE("需要量分、tradeを行った場合、売上及び取引量が正しく計算され、支払い残額が0であること"
@@ -77,7 +77,7 @@ TEST_CASE("Requestのテスト") {  // NOLINT
 
         CHECK(sales.value() == doctest::Approx((price * desiredAmount).value()));
         CHECK(request.tradeAmount().value() == doctest::Approx(desiredAmount.value()));
-        CHECK(request.takeOutRemainPaid().isZero());
+        CHECK(request.takeoutRemainPaid().isZero());
     }
 
     SUBCASE(
@@ -89,7 +89,7 @@ TEST_CASE("Requestのテスト") {  // NOLINT
 
         CHECK(sales.value() == doctest::Approx((price * tradeAmount).value()));
         CHECK(request.tradeAmount().value() == doctest::Approx(tradeAmount.value()));
-        const auto remain = request.takeOutRemainPaid();
+        const auto remain = request.takeoutRemainPaid();
         CHECK(remain.value() == doctest::Approx((payment - sales).value()));
         CHECK(remain.isPositive());
     }

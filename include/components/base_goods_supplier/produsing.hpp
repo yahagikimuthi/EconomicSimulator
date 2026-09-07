@@ -21,7 +21,7 @@ class Producer final {
     }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
-        const auto workerInput = workspace_.takeOut();
+        const auto workerInput = workspace_.takeout();
         ASSERT(workerInput.isZeroOrMore());
 
         const auto capitalEquipInput = capital_ * producerGoodsEfficiency_;

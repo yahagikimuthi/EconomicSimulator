@@ -29,7 +29,7 @@ class Trader final {
     template <DepositFn F>
     void afterTrade(F&& depositFn) noexcept {
         if (not myRequest_) return;
-        const auto remain = myRequest_->takeOutRemainPaid();
+        const auto remain = myRequest_->takeoutRemainPaid();
         std::forward<F>(depositFn)(remain);
     }
 

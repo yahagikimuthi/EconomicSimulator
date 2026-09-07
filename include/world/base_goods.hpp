@@ -34,7 +34,7 @@ class Workspace final {
         ASSERT(workerProductPower > 0.0);
         totalInput_.fetch_add(workerProductPower);  // TODO 処理系が対応する場合store_addに変更
     }
-    [[nodiscard]] auto takeOut() noexcept -> GoodsQuantity {
+    [[nodiscard]] auto takeout() noexcept -> GoodsQuantity {
         const auto out = GoodsQuantity{totalInput_.load()};
         totalInput_.store(0.0);
         return out;
@@ -68,7 +68,7 @@ class Request final {
         return tradeAmount_;
     }
     [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
-    [[nodiscard]] auto takeOutRemainPaid() noexcept -> Money {
+    [[nodiscard]] auto takeoutRemainPaid() noexcept -> Money {
         const auto out = std::exchange(remainPaid_, Money{0.0});
         ASSERT(out.isZeroOrMore());
         return out;
