@@ -1,7 +1,6 @@
 #include "components/labor_demander/human_resource.hpp"
 
 #include "doctest.h"
-#include "others/util.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::labor::demander {
@@ -19,9 +18,9 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     CHECK(hr.employeeCnt().isZero());
     CHECK(hr.sumWage().isZero());
 
-    nothing(addRoster(AgentID{101}, Wage{101}));
-    nothing(addRoster(AgentID{202}, Wage{202}));
-    nothing(addRoster(AgentID{303}, Wage{303}));
+    auto& roster1 = addRoster(AgentID{101}, Wage{101});
+    auto& roster2 = addRoster(AgentID{202}, Wage{202});
+    auto& roster3 = addRoster(AgentID{303}, Wage{303});
 
     constexpr auto                  sumWage = 606;
     [[maybe_unused]] constexpr auto avgWage = 202;
@@ -29,19 +28,36 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     CHECK(hr.employeeCnt().value() == 3);
     CHECK(hr.sumWage().value() == doctest::Approx(sumWage));
 
-    SUBCASE("全員解雇の場合、概算要求はゼロ") {
+    SUBCASE("全員解雇の場合、概算要求はゼロ、解雇の場合、名簿はすべて無効化") {
         const auto reqBudget = hr.planAndRequestBudget(HeadCount{3});
         CHECK(reqBudget.isZero());
+
+        hr.layOffs();
+        CHECK(not roster1.isOccupied());
+        CHECK(not roster2.isOccupied());
+        CHECK(not roster3.isOccupied());
     }
 
-    SUBCASE("一部解雇の場合、その分の平均賃金が除かれる") {
+    SUBCASE("一部解雇の場合、総賃金から平均賃金*解雇数を除いた額を概算要求し、名簿が一部無効化") {
         const auto reqBudget = hr.planAndRequestBudget(HeadCount{2});
         CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value() - (avgWage * 2)));
+
+        hr.layOffs();
+
+        CHECK(not roster1.isOccupied());
+        CHECK(not roster2.isOccupied());
+        CHECK(roster3.isOccupied());
     }
 
-    SUBCASE("誰も解雇しない場合、総賃金を概算要求") {
+    SUBCASE("誰も解雇しない場合、総賃金を概算要求、名簿はすべて有効") {
         const auto reqBudget = hr.planAndRequestBudget(HeadCount{0});
         CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value()));
+
+        hr.layOffs();
+
+        CHECK(roster1.isOccupied());
+        CHECK(roster2.isOccupied());
+        CHECK(roster3.isOccupied());
     }
 }
 }  // namespace
