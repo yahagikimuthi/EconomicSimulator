@@ -44,7 +44,7 @@ class CapitalDemander final {
         const auto payment =
             std::min(static_cast<Budget>(*purchaseAmountPlan_ * pickedEntry->price), *budget_);
         const auto withdraw = std::forward<F>(withdrawFn)(payment);
-        myRequest_          = pickedEntry->request(withdraw);
+        if (not withdraw.isZero()) myRequest_ = pickedEntry->request(withdraw);
     }
 
     template <DepositFn F>
