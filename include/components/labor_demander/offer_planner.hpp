@@ -61,6 +61,7 @@ class OfferPlanner final {
     ) noexcept -> HeadCount {
         const auto out = employPlan * (OfferRate{1.0} + planOfferRate(laborSupplier));
         ASSERT(out >= employPlan);
+        ASSERT(employPlan.isZero() ? out.isZero() : true);
         const auto guarded = std::min(out, laborSupplier);
         return ceil(guarded);
     }

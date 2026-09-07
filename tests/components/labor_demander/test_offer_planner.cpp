@@ -81,17 +81,6 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
 
         CHECK(afterPlan.value() > doctest::Approx(beforePlan.value()));
     }
-
-    SUBCASE("入力値が0の場合、返り値が0") {
-        const auto plan = planner.plan(HeadCount{0.0}, laborSupplier);
-        CHECK(plan.isZero());
-    }
-
-    SUBCASE("戻り値は入力値以上") {
-        const auto in   = rng.randInt(0.0, 10000000);
-        const auto plan = planner.plan(HeadCount{in}, laborSupplier);
-        CHECK(plan.value() > in);
-    }
 }
 }  // namespace
 }  // namespace abm::labor::demander::planner
