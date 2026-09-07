@@ -3,11 +3,13 @@
 #include <inplace_vector>
 
 #include "components/labor_demander/common.hpp"
+#include "components/labor_demander/human_resource.hpp"
 #include "doctest.h"
 #include "others/util.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
+#include "world/base_goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::demander::recruiter {
@@ -17,15 +19,27 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
     auto market    = Market{};
     auto rng       = makeRng();
     auto out       = std::inplace_vector<RefWrap<Request>, 1UZ>{};
+    auto hr        = HumanResource{AgentID{42}, Day{1}};
+    auto space     = base_goods::Workspace{};
 
-    SUBCASE("オファー数が0の場合、Marketにポストしない") {
+    SUBCASE("オファー数が0の場合") {
         const auto plan =
             RecruitPlan{.wage = Wage{10.0}, .employ = HeadCount{0.0}, .offer = HeadCount{0.0}};
         recruiter.post(AgentID{42}, plan, market);
 
-        market.pickRequest(AgentID{101}, out, rng);
+        SUBCASE("Marketにポストしない") {
+            market.pickRequest(AgentID{101}, out, rng);
 
-        CHECK(out.empty());
+            CHECK(out.empty());
+        }
+
+        SUBCASE("リクルートの結果は空") {
+            recruiter.offer();
+            const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+            CHECK(result.applicants.isZero());
+            CHECK(result.employ.isZero());
+        }
     }
 }
 }  // namespace
