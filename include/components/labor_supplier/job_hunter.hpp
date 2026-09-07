@@ -7,6 +7,7 @@
 #include <optional>
 #include <ranges>
 #include <span>
+#include <utility>
 
 #include "components/labor_supplier/common.hpp"
 #include "others/setting.hpp"
@@ -63,7 +64,10 @@ class JobHunter final {
         acceptedEntry_ = offeredEntry;
     }
 
-    [[nodiscard]] auto huntedResult() noexcept -> std::optional<Entry&> { return acceptedEntry_; }
+    [[nodiscard]] auto takeoutResult() noexcept -> std::optional<Entry&> {
+        myEntries_.clear();
+        return std::exchange(acceptedEntry_, std::nullopt);
+    }
 
     void reset() noexcept { myEntries_.clear(), acceptedEntry_.reset(); }
 
