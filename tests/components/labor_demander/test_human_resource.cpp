@@ -34,9 +34,13 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
         CHECK(reqBudget == hr.requestedBudget());
 
         hr.layOffs();
+
         CHECK(not roster1.isOccupied());
         CHECK(not roster2.isOccupied());
         CHECK(not roster3.isOccupied());
+
+        CHECK(hr.sumWage().isZero());
+        CHECK(hr.employeeCnt().isZero());
     }
 
     SUBCASE("一部解雇の場合、総賃金から平均賃金*解雇数を除いた額を概算要求し、名簿が一部無効化") {
@@ -49,6 +53,9 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
         CHECK(not roster1.isOccupied());
         CHECK(not roster2.isOccupied());
         CHECK(roster3.isOccupied());
+
+        CHECK(hr.employeeCnt().value() == 1);
+        CHECK(hr.sumWage().value() == doctest::Approx(303));
     }
 
     SUBCASE("誰も解雇しない場合、総賃金を概算要求、名簿はすべて有効") {
@@ -61,6 +68,9 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
         CHECK(roster1.isOccupied());
         CHECK(roster2.isOccupied());
         CHECK(roster3.isOccupied());
+
+        CHECK(hr.employeeCnt().value() == 3);
+        CHECK(hr.sumWage().value() == doctest::Approx(sumWage));
     }
 }
 }  // namespace
