@@ -233,6 +233,33 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
                 CHECK(hr.employeeCnt().value() == 2);
                 CHECK(hr.sumWage().value() == 20);
             }
+
+            SUBCASE("全員受諾した場合、正しく雇用される") {
+                entry2.accept();
+                entry3.accept();
+                entry4.accept();
+
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                const auto& rosterEntry2 = entry2.takeoutRosterEntry();
+                const auto& rosterEntry3 = entry3.takeoutRosterEntry();
+                const auto& rosterEntry4 = entry4.takeoutRosterEntry();
+
+                CHECK(rosterEntry2.firmId().value() == 42);
+                CHECK(rosterEntry2.employeeId.value() == 202);
+                CHECK(rosterEntry2.wage.value() == 10);
+                CHECK(rosterEntry3.firmId().value() == 42);
+                CHECK(rosterEntry3.employeeId.value() == 303);
+                CHECK(rosterEntry3.wage.value() == 10);
+                CHECK(rosterEntry4.firmId().value() == 42);
+                CHECK(rosterEntry4.employeeId.value() == 404);
+                CHECK(rosterEntry4.wage.value() == 10);
+
+                CHECK(result.applicants.value() == 4);
+                CHECK(result.employ.value() == 3);
+                CHECK(hr.employeeCnt().value() == 3);
+                CHECK(hr.sumWage().value() == 30);
+            }
         }
     }
 }
