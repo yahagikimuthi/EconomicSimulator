@@ -18,9 +18,9 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     auto       finance     = HHoldFinance{AgentID{42}, rng};
     const auto beforeAsset = finance.asset();
 
-    auto req1 = Request{AgentID{42}, Wage{10}};
-    auto req2 = Request{AgentID{42}, Wage{15}};
-    auto req3 = Request{AgentID{42}, Wage{20}};
+    auto req1 = Request{AgentID{101}, Wage{10}};
+    auto req2 = Request{AgentID{101}, Wage{15}};
+    auto req3 = Request{AgentID{101}, Wage{20}};
     auto req4 = Request{AgentID{1}, Wage{10}};
     auto req5 = Request{AgentID{1}, Wage{15}};
     auto req6 = Request{AgentID{1}, Wage{20}};
@@ -49,6 +49,7 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
 
     SUBCASE("雇用されている場合") {
         employment.startWorking(rosterEntry, finance.makeDepositFn());
+        CHECK(employment.isEmployed());
 
         SUBCASE("賃金を支払わない場合、資産の増減はなし") {
             employment.work(finance.makeDepositFn(), Date{1});
@@ -72,6 +73,17 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
             CHECK(space.takeout().isZero());
             employment.work(finance.makeDepositFn(), Date{14});
             CHECK(space.takeout().isPositive());
+        }
+
+        SUBCASE("isAlignedはIDが同じ場合または賃金が現状以下の場合false、それ以外trueを返す") {
+            auto isAligned = employment.makeIsAlignedRequestFn();
+
+            CHECK(not isAligned(req1));
+            CHECK(not isAligned(req2));
+            CHECK(not isAligned(req3));
+            CHECK(not isAligned(req4));
+            CHECK(not isAligned(req5));
+            CHECK(isAligned(req6));
         }
     }
 }
