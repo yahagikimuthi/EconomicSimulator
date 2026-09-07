@@ -16,17 +16,16 @@ class Producer final {
   public:
     explicit Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower_{masterRng.random(setting::productPower)},
-          producerGoodsEfficiency_{masterRng.random(setting::producerGoodsEfficiency)},
-          producerGoodsDepreciationRate_{masterRng.random(setting::producerGoodsDepreciationRate)} {
-    }
+          capitalEfficiency_{masterRng.random(setting::capitalEfficiency)},
+          capitalDepreciationRate_{masterRng.random(setting::capitalDepreciationRate)} {}
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.takeout();
         ASSERT(workerInput.isZeroOrMore());
 
-        const auto capitalEquipInput = capital_ * producerGoodsEfficiency_;
+        const auto capitalEquipInput = capital_ * capitalEfficiency_;
         ASSERT(capital_.isZeroOrMore());
-        capital_ *= (1.0 - producerGoodsDepreciationRate_);
+        capital_ *= (1.0 - capitalDepreciationRate_);
 
         const auto input = baseProductPower_ * std::min(workerInput, capitalEquipInput);
         return input;
@@ -42,7 +41,7 @@ class Producer final {
     [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
         return std::max(
-            (requiresSupply / (baseProductPower_ * producerGoodsEfficiency_)) - capital_,
+            (requiresSupply / (baseProductPower_ * capitalEfficiency_)) - capital_,
             GoodsQuantity{0.0}
         );
     }
@@ -52,8 +51,8 @@ class Producer final {
   private:
     Workspace     workspace_;
     const double  baseProductPower_;
-    const double  producerGoodsEfficiency_;
-    const double  producerGoodsDepreciationRate_;
+    const double  capitalEfficiency_;
+    const double  capitalDepreciationRate_;
     GoodsQuantity capital_{0.0};
 };
 

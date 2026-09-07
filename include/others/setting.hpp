@@ -96,9 +96,9 @@ inline constexpr RandomParameter priceAdjustVol =
 inline constexpr RandomParameter targetInvRatio =
     UniformParameter<double>{.min = 0.1, .limit = 0.2};
 inline constexpr RandomParameter productPower = UniformParameter<double>{.min = 0.01, .limit = 2.0};
-inline constexpr RandomParameter producerGoodsEfficiency =
+inline constexpr RandomParameter capitalEfficiency =
     UniformParameter<double>{.min = 1.0, .limit = 10.0};
-inline constexpr RandomParameter producerGoodsDepreciationRate =
+inline constexpr RandomParameter capitalDepreciationRate =
     UniformParameter<double>{.min = 0.1, .limit = 0.2};
 inline constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
