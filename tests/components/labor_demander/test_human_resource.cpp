@@ -104,6 +104,20 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
         CHECK(hr.employeeCnt().isZero());
         CHECK(hr.sumWage().isZero());
     }
+
+    SUBCASE("与えられた予算が平均賃金分 + 微小のとき、1人だけ残す") {
+        nothing(hr.planAndRequestBudget(HeadCount{0}));
+        hr.revisePlan(Budget{avgWage + 50});
+
+        hr.layOffs();
+
+        CHECK(not roster1.isOccupied());
+        CHECK(not roster2.isOccupied());
+        CHECK(roster3.isOccupied());
+
+        CHECK(hr.employeeCnt().value() == 1);
+        CHECK(hr.sumWage().value() == doctest::Approx(303));
+    }
 }
 }  // namespace
 }  // namespace abm::labor::demander
