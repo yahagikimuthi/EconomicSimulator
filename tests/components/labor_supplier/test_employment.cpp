@@ -8,12 +8,10 @@
 
 namespace abm::labor::supplier {
 TEST_CASE("Employmentのテスト") {  // NOLINT
-    auto roster = Roster{};
-    auto board  = CompanyBoard{AgentID{101}, Day{15}};
-    auto space  = base_goods::Workspace{};
-
-    [[maybe_unused]] auto& rosterEntry = roster.add(AgentID{42}, Wage{15}, board, space);
-
+    auto       roster      = Roster{};
+    auto       board       = CompanyBoard{AgentID{101}, Day{15}};
+    auto       space       = base_goods::Workspace{};
+    auto&      rosterEntry = roster.add(AgentID{42}, Wage{15}, board, space);
     auto       rng         = makeRng();
     auto       finance     = HHoldFinance{AgentID{42}, rng};
     const auto beforeAsset = finance.asset();
@@ -84,6 +82,14 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
             CHECK(not isAligned(req4));
             CHECK(not isAligned(req5));
             CHECK(isAligned(req6));
+        }
+
+        SUBCASE("エントリーで書かれた労働生産性と同じ分だけ労働貢献をすること") {
+            const auto entry = employment.makeEntrySheetFn(AgentID{42})(req6);
+
+            employment.work(finance.makeDepositFn(), Date{14});
+
+            CHECK(space.takeout().value() == doctest::Approx(entry.productPower));
         }
     }
 }
