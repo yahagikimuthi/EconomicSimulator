@@ -39,21 +39,147 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
 
             CHECK(result.applicants.isZero());
             CHECK(result.employ.isZero());
+
+            CHECK(hr.employeeCnt().isZero());
+            CHECK(hr.sumWage().isZero());
         }
     }
 
-    SUBCASE("オファー数が0でない場合") {
+    SUBCASE("オファー数が0でない場合、サンプリングが可能でID、賃金が等しい") {
         constexpr auto plan =
-            RecruitPlan{.wage = Wage{10.0}, .employ = HeadCount{3.0}, .offer = HeadCount{5.0}};
+            RecruitPlan{.wage = Wage{10.0}, .employ = HeadCount{1.0}, .offer = HeadCount{3.0}};
         recruiter.post(AgentID{42}, plan, market);
+        market.pickRequest(AgentID{101}, out, rng);
+        CHECK(out.size() == 1UZ);
+        auto& request = out[0].get();
+        CHECK(request.firmID == AgentID{42});
+        CHECK(request.wage == Wage{10.0});
 
-        SUBCASE("Marketからサンプリングすることが可能で、IDと賃金が等しい") {
-            market.pickRequest(AgentID{101}, out, rng);
+        SUBCASE("Marketからサンプリングすることが可能で、IDと賃金が等しい") {}
 
-            CHECK(out.size() == 1UZ);
-            const auto& sample = out[0].get();
-            CHECK(sample.firmID == AgentID{42});
-            CHECK(sample.wage == Wage{10.0});
+        SUBCASE("誰もエントリーしない場合、結果は空") {
+            recruiter.offer();
+            const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+            CHECK(result.applicants.isZero());
+            CHECK(result.employ.isZero());
+            CHECK(hr.employeeCnt().isZero());
+            CHECK(hr.sumWage().isZero());
+        }
+
+        SUBCASE("エントリー数 < オファー数の場合、全員オファーされる") {
+            auto& entry1 = request.entry(AgentID{101}, 101);
+            auto& entry2 = request.entry(AgentID{202}, 202);
+
+            recruiter.offer();
+
+            CHECK(entry1.isOffer());
+            CHECK(entry2.isOffer());
+
+            SUBCASE("全員オファーを受諾しなかった場合、結果は空") {
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 2);
+                CHECK(result.employ.isZero());
+                CHECK(hr.employeeCnt().isZero());
+                CHECK(hr.sumWage().isZero());
+            }
+
+            SUBCASE("一部がオファーを受諾した場合、正しく採用が行われる") {
+                entry1.accept();
+
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 2);
+                CHECK(result.employ.value() == 1);
+                CHECK(hr.employeeCnt().value() == 1);
+                CHECK(hr.sumWage().value() == 10.0);
+            }
+
+            SUBCASE("全員が受諾した場合も正しく採用される") {
+                entry1.accept();
+                entry2.accept();
+
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 2);
+                CHECK(result.employ.value() == 2);
+                CHECK(hr.employeeCnt().value() == 2);
+                CHECK(hr.sumWage().value() == 20.0);
+            }
+        }
+
+        SUBCASE("エントリー数=オファー数の場合、全員オファーされる") {
+            auto& entry1 = request.entry(AgentID{101}, 101);
+            auto& entry2 = request.entry(AgentID{202}, 202);
+            auto& entry3 = request.entry(AgentID{303}, 303);
+
+            recruiter.offer();
+
+            CHECK(entry1.isOffer());
+            CHECK(entry2.isOffer());
+            CHECK(entry3.isOffer());
+
+            SUBCASE("誰もオファーを受諾しなかった場合、結果は空") {
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 3);
+                CHECK(result.employ.isZero());
+                CHECK(hr.employeeCnt().isZero());
+                CHECK(hr.sumWage().isZero());
+            }
+
+            SUBCASE("一部が受諾した場合、正しく雇用される") {
+                entry1.accept();
+                entry3.accept();
+
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 3);
+                CHECK(result.employ.value() == 2);
+                CHECK(hr.employeeCnt().value() == 2);
+                CHECK(hr.sumWage().value() == 20);
+            }
+
+            SUBCASE("全員が受諾した場合も全員雇用される") {
+                entry1.accept();
+                entry2.accept();
+                entry3.accept();
+
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 3);
+                CHECK(result.employ.value() == 3);
+                CHECK(hr.employeeCnt().value() == 3);
+                CHECK(hr.sumWage().value() == 30);
+            }
+        }
+
+        SUBCASE("応募者数>オファー数の場合、労働生産性が高い人がオファーされる") {
+            auto& entry1 = request.entry(AgentID{101}, 101);
+            auto& entry2 = request.entry(AgentID{202}, 202);
+            auto& entry3 = request.entry(AgentID{303}, 303);
+            auto& entry4 = request.entry(AgentID{404}, 404);
+
+            recruiter.offer();
+            CHECK(not entry1.isOffer());
+            CHECK(entry2.isOffer());
+            CHECK(entry3.isOffer());
+            CHECK(entry4.isOffer());
+
+            SUBCASE("誰も受諾しない場合、結果は空") {
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                CHECK(result.applicants.value() == 4);
+                CHECK(result.employ.value() == 0);
+                CHECK(hr.employeeCnt().isZero());
+                CHECK(hr.sumWage().isZero());
+            }
+
+            SUBCASE("一部が受諾した場合、正しく雇用される") {
+                entry3.accept();
+                entry4.accept();
+            }
         }
     }
 }
