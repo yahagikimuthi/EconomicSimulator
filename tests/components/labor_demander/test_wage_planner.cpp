@@ -66,18 +66,50 @@ TEST_CASE("WagePlannerのテスト") {  // NOLINT
 
     SUBCASE("応募者数 < 雇用計画の場合、賃金が上がること") {
         constexpr auto infMoney = Money{std::numeric_limits<double>::infinity()};
-        constexpr auto plan =
-            RecruitPlan{.wage = Wage{1.0}, .employ = HeadCount{10.0}, .offer = HeadCount{10.0}};
         constexpr auto result =
             RecruitResult{.applicants = HeadCount{5.0}, .employ = HeadCount{5.0}};
         const auto first = planner.plan(infMoney);
 
-        mediator.publishRecruitPlan(plan);
+        mediator.publishRecruitPlan(
+            RecruitPlan{.wage = first, .employ = HeadCount{10.0}, .offer = HeadCount{10.0}}
+        );
         mediator.publishRecruitResult(result);
 
         const auto second = planner.plan(infMoney);
 
         CHECK(second.value() > doctest::Approx(first.value()));
+    }
+
+    SUBCASE("応募者数 = 雇用計画の場合、賃金が変わらないこと") {
+        constexpr auto infMoney = Money{std::numeric_limits<double>::infinity()};
+        constexpr auto result =
+            RecruitResult{.applicants = HeadCount{10.0}, .employ = HeadCount{5.0}};
+        const auto first = planner.plan(infMoney);
+
+        mediator.publishRecruitPlan(
+            RecruitPlan{.wage = first, .employ = HeadCount{10.0}, .offer = HeadCount{10.0}}
+        );
+        mediator.publishRecruitResult(result);
+
+        const auto second = planner.plan(infMoney);
+
+        CHECK(second.value() == doctest::Approx(first.value()));
+    }
+
+    SUBCASE("応募者数 > 雇用計画の場合、賃金が下がること") {
+        constexpr auto infMoney = Money{std::numeric_limits<double>::infinity()};
+        constexpr auto result =
+            RecruitResult{.applicants = HeadCount{20.0}, .employ = HeadCount{5.0}};
+        const auto first = planner.plan(infMoney);
+
+        mediator.publishRecruitPlan(
+            RecruitPlan{.wage = first, .employ = HeadCount{10.0}, .offer = HeadCount{10.0}}
+        );
+        mediator.publishRecruitResult(result);
+
+        const auto second = planner.plan(infMoney);
+
+        CHECK(second.value() < doctest::Approx(first.value()));
     }
 
     SUBCASE("賃金は1人あたり売上以下であること") {
