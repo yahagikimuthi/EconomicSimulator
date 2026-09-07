@@ -128,12 +128,7 @@ class LaborDemander final {
     void offer() noexcept { recruitSystem_.offer(); }
 
     void endRecruiting(base_goods::Workspace& workspace) noexcept {
-        recruitSystem_.endRecruiting(
-            [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
-                return humanResource_.addRoster(id, wage, workspace);
-            },
-            mediator_
-        );
+        recruitSystem_.endRecruiting(humanResource_.makeAddRosterFn(workspace), mediator_);
     };
 
     void layOffs() noexcept { humanResource_.layOffs(); }

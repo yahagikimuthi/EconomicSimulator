@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "components/common.hpp"
+#include "components/labor_demander/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
@@ -63,11 +64,12 @@ class HumanResource final {
         }
     }
 
-    [[nodiscard]] auto addRoster(
-        const AgentID id, const Wage wage, base_goods::Workspace& workspace
-    ) noexcept -> RosterEntry& {
-        ASSERT(wage.isPositive());
-        return roster_.add(id, wage, companyBoard_, workspace);
+    [[nodiscard]] auto makeAddRosterFn(base_goods::Workspace& workspace) noexcept -> AddRosterFn
+        auto {
+        return [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
+            ASSERT(wage.isPositive());
+            return roster_.add(id, wage, companyBoard_, workspace);
+        };
     }
 
     [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
