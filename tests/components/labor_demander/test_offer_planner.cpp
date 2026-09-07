@@ -103,6 +103,7 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
         constexpr auto inEmploy = HeadCount{10000.0};
 
         const auto beforePlan = planner.plan(inEmploy, laborSupplier);
+        CHECK(not beforePlan.isZero());
 
         mediator.publishRecruitPlan(
             RecruitPlan{.wage = Wage{1}, .employ = inEmploy, .offer = beforePlan}
