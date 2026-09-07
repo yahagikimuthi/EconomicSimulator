@@ -46,6 +46,24 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
         CHECK(not result);
     }
+
+    SUBCASE("同じ企業のリクエストのみ存在する場合、結果は空") {
+        employment.startWorking(rosterEntry, finance.makeDepositFn());
+
+        auto& req = market.request(AgentID{101}, Wage{1000});
+
+        hunter.entry(
+            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+        );
+
+        CHECK(req.entries().empty());
+
+        hunter.accept();
+
+        const auto result = hunter.huntedResult();
+
+        CHECK(not result);
+    }
 }
 }  // namespace
 }  // namespace abm::labor::supplier
