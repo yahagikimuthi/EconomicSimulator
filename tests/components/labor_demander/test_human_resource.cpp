@@ -1,7 +1,9 @@
 #include "components/labor_demander/human_resource.hpp"
 
+#include "components/finance/firm_finance.hpp"
 #include "doctest.h"
 #include "others/util.hpp"
+#include "tests/util.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::labor::demander {
@@ -117,6 +119,42 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
 
         CHECK(hr.employeeCnt().value() == 1);
         CHECK(hr.sumWage().value() == doctest::Approx(303));
+    }
+
+    SUBCASE("payWageはいかなる場合もsumWage分だけ予算を支払う") {
+        auto rng        = makeRng();
+        auto finance    = FirmFinance{AgentID{42}, rng};
+        auto withdrawFn = finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost);
+
+        const auto beforeAsset = finance.asset();
+
+        SUBCASE("特に何もしない場合") {
+            hr.payWage(withdrawFn);
+
+            const auto afterAsset = finance.asset();
+            const auto paid       = beforeAsset - afterAsset;
+
+            CHECK(paid.value() == doctest::Approx(hr.sumWage().value()));
+
+            const auto sum =
+                roster1.takeoutPaidWage() + roster2.takeoutPaidWage() + roster3.takeoutPaidWage();
+            CHECK(sum.value() == doctest::Approx(paid.value()));
+        }
+
+        SUBCASE("全員解雇が発生した場合、支払いはゼロ") {
+            nothing(hr.planAndRequestBudget(HeadCount{3}));
+            hr.layOffs();
+
+            hr.payWage(withdrawFn);
+
+            const auto afterAsset = finance.asset();
+            const auto paid       = beforeAsset - afterAsset;
+            CHECK(paid.value() == doctest::Approx(0.0));
+
+            const auto sum =
+                roster1.takeoutPaidWage() + roster2.takeoutPaidWage() + roster3.takeoutPaidWage();
+            CHECK(sum.value() == paid.value());
+        }
     }
 }
 }  // namespace
