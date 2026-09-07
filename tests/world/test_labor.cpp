@@ -168,7 +168,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         CHECK(out.size() < 2UZ);
         CHECK(std::ranges::all_of(
             out | std::views::transform(&Request::firmID),
-            [](const AgentID firmId) -> bool { return firmId != AgentID{101}; }
+            [](const AgentID firmId) noexcept -> bool { return firmId != AgentID{101}; }
         ));
     }
 

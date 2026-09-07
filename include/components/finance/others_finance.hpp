@@ -17,7 +17,9 @@ class HHoldFinance final {
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     [[nodiscard]] auto makeWithdrawFn() noexcept -> TryWithdrawFn auto {
-        return [&](const Budget withdraw) noexcept -> Money { return tryWithdraw(withdraw); };
+        return [&] [[nodiscard]] (const Budget withdraw) noexcept -> Money {
+            return tryWithdraw(withdraw);
+        };
     }
 
     [[nodiscard]] auto makeDepositFn() noexcept -> DepositFn auto {

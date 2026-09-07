@@ -30,10 +30,10 @@ class BaseGoodsSupplier final {
           memory_{other.memory_} {
         setMediator();
     }
-    BaseGoodsSupplier(BaseGoodsSupplier&& other) noexcept          = delete;
-    auto operator=(const BaseGoodsSupplier&) -> BaseGoodsSupplier& = delete;
-    auto operator=(BaseGoodsSupplier&&) -> BaseGoodsSupplier&      = delete;
-    ~BaseGoodsSupplier() noexcept                                  = default;
+    BaseGoodsSupplier(BaseGoodsSupplier&& other) noexcept                   = delete;
+    auto operator=(const BaseGoodsSupplier&) noexcept -> BaseGoodsSupplier& = delete;
+    auto operator=(BaseGoodsSupplier&&) noexcept -> BaseGoodsSupplier&      = delete;
+    ~BaseGoodsSupplier() noexcept                                           = default;
 
     [[nodiscard]] auto planAndExpectSales(const Budget totalCost) noexcept -> Budget {
         ASSERT(totalCost.isZeroOrMore());

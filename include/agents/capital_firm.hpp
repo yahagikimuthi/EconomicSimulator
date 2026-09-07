@@ -39,7 +39,7 @@ class CapitalFirm final : public Agent {
 
   private:
     void actJanuaryOperationDay(MarketRegistry& markets) noexcept {
-        const auto laborReqBudget = [&]() -> Budget {
+        const auto laborReqBudget = [&]() noexcept -> Budget {
             const auto employee = labor_.employeeCnt();
             const auto adjust   = capitalSupplier_.calcDesiredEmploy(employee);
             const auto sales    = capitalSupplier_.salesForecast();

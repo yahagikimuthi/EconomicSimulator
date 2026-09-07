@@ -29,7 +29,7 @@ class FirmFinance final {
     enum class AccountItem : char { Sales, PersonalCost, CapitalGoodsCost, Depreciation, Taxes };
 
     [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> TryWithdrawFn auto {
-        return [&, item](const Budget withdraw) noexcept -> Money {
+        return [&, item] [[nodiscard]] (const Budget withdraw) noexcept -> Money {
             return tryWithdraw(withdraw, item);
         };
     }

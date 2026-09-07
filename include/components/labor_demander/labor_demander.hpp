@@ -94,10 +94,10 @@ class LaborDemander final {
           memory_{other.memory_} {
         setMediator();
     }
-    LaborDemander(LaborDemander&& other) noexcept          = delete;
-    auto operator=(const LaborDemander&) -> LaborDemander& = delete;
-    auto operator=(LaborDemander&&) -> LaborDemander&      = delete;
-    ~LaborDemander() noexcept                              = default;
+    LaborDemander(LaborDemander&& other) noexcept                   = delete;
+    auto operator=(const LaborDemander&) noexcept -> LaborDemander& = delete;
+    auto operator=(LaborDemander&&) noexcept -> LaborDemander&      = delete;
+    ~LaborDemander() noexcept                                       = default;
 
     [[nodiscard]] auto requestAnnualBudget(
         const HeadCount adjust, const Budget salesForecast
@@ -129,7 +129,7 @@ class LaborDemander final {
 
     void endRecruiting(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.endRecruiting(
-            [&](const AgentID id, const Wage wage) noexcept -> RosterEntry& {
+            [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
                 return humanResource_.addRoster(id, wage, workspace);
             },
             mediator_

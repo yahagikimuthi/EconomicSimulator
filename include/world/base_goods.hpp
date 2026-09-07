@@ -53,7 +53,7 @@ class Request final {
         : payment{pay}, remainPaid_{pay}, entry_{e} {
         ASSERT(pay.isPositive());
     }
-    // Entry::requests() -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
+    // Entry::requests() noexcept -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
     // Requestorが持つ参照が無意味となる。
     // よって、代入演算子を明示的削除する。
     Request(const Request&)                             = default;
@@ -123,7 +123,7 @@ template <EMarket MarketT>
     ASSERT(tradeAmount_.isZero());
     ASSERT(tradeAmount.isZeroOrMore());
     ASSERT(tradeAmount <= entry_.supply);
-    ASSERT([&]() -> bool {
+    ASSERT([&]() noexcept -> bool {
         const auto desired = payment / entry_.price;
         return tradeAmount <= desired;
     }());
