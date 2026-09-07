@@ -15,7 +15,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     constexpr auto id = AgentID{42};
 
     auto                   rng         = makeRng();
-    auto                   hunter      = JobHunter{rng};
+    auto                   hunter      = JobHunter<10000, 1000>{rng};
     auto                   employment  = Employment{rng};
     auto                   board       = CompanyBoard{AgentID{101}, Day{15}};
     auto                   space       = base_goods::Workspace{};
@@ -81,6 +81,23 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         const auto result = hunter.huntedResult();
 
         CHECK(not result);
+    }
+
+    SUBCASE("複雑な場合も正しくエントリーが行われる") {
+        employment.startWorking(rosterEntry, finance.makeDepositFn());
+
+        auto& req1 = market.request(AgentID{101}, Wage{1000});
+        auto& req2 = market.request(AgentID{202}, Wage{1});
+        auto& req3 = market.request(AgentID{303}, Wage{100});
+
+        hunter.entry(
+            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+        );
+
+        CHECK(req1.entries().empty());
+        CHECK(req2.entries().empty());
+        CHECK(req3.entries().size() == 1UZ);
+        CHECK(req3.entries().front().entrantId == id);
     }
 }
 }  // namespace
