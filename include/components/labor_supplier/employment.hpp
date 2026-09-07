@@ -56,8 +56,8 @@ class Employment final {
     [[nodiscard]] auto makeEntrySheetFn(const AgentID myId) const noexcept -> MakeEntrySheetFn
         auto {
         ASSERT(isEmployed() ? myId == rosterEntry_->employeeId : true);
-        return [productPower = this->productPower_, myId] [[nodiscard]] (Request & req) -> Entry& {
-            return req.entry(myId, productPower);
+        return [&, myId] [[nodiscard]] (Request & req) -> Entry& {
+            return req.entry(myId, productPower_);
         };
     }
 
