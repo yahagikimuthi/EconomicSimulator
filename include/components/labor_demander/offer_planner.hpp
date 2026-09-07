@@ -83,7 +83,6 @@ class OfferPlanner final {
         const auto lastEmployPlan   = memory_.lastEmployPlan();
         if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
         ASSERT(not lastEmployPlan->isZero());
-        ASSERT(not lastEmployResult->isZero());
 
         const auto alpha = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto add   = [=]() noexcept -> OfferRate {

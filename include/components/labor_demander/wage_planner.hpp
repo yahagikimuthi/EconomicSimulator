@@ -79,10 +79,16 @@ class WagePlanner final {
         const auto lastApplicants = memory_.lastApplicants();
         const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
-        const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
-        const auto shouldRaise = *lastApplicants < *lastEmployPlan;
-        const auto plan        = cache_ * (shouldRaise ? 1.0 + alpha : 1.0 - alpha);
-        const auto guarded     = std::min(plan, static_cast<Wage>(salesPerWorker));
+        ASSERT(not lastEmployPlan->isZero());
+
+        const auto alpha     = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
+        const auto raiseRate = [=]() noexcept -> double {
+            if (*lastApplicants < *lastEmployPlan) return 1.0 + alpha;
+            if (*lastApplicants == *lastEmployPlan) return 0.0;
+            return 1.0 - alpha;
+        }();
+        const auto plan    = cache_ * raiseRate;
+        const auto guarded = std::min(plan, static_cast<Wage>(salesPerWorker));
         return wageGuard(guarded);
     }
 
