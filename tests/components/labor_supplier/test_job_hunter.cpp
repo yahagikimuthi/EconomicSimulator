@@ -29,7 +29,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
             id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
         );
         hunter.accept();
-        const auto result = hunter.huntedResult();
+        const auto result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -42,7 +42,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         );
 
         hunter.accept();
-        const auto result = hunter.huntedResult();
+        const auto result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -60,7 +60,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
         hunter.accept();
 
-        const auto result = hunter.huntedResult();
+        const auto result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -78,7 +78,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
         hunter.accept();
 
-        const auto result = hunter.huntedResult();
+        const auto result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -121,7 +121,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         SUBCASE("全てにオファーされなかった場合、結果は空") {
             hunter.accept();
 
-            const auto result = hunter.huntedResult();
+            const auto result = hunter.takeoutResult();
 
             CHECK(not result);
         }
@@ -133,7 +133,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
             hunter.accept();
 
-            const auto result = hunter.huntedResult();
+            const auto result = hunter.takeoutResult();
 
             CHECK(result);
             CHECK(result->isAccept());
@@ -146,13 +146,62 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
             hunter.accept();
 
-            const auto result = hunter.huntedResult();
+            const auto result = hunter.takeoutResult();
 
             CHECK(req2.entries().front().isAccept());
 
             CHECK(result);
             CHECK(result->isAccept());
             CHECK(&req2.entries().front() == &*result);
+        }
+
+        SUBCASE("takeoutした場合、何もしなければ空を出す") {
+            req1.entries().front().offer();
+            hunter.accept();
+            nothing(hunter.takeoutResult());
+
+            CHECK(not hunter.takeoutResult());
+
+            hunter.entry(
+                id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+            );
+            hunter.accept();
+
+            const auto result = hunter.takeoutResult();
+            CHECK(not result);
+        }
+
+        SUBCASE("takeoutの場合も同様に正しく動く") {
+            req1.entries().front().offer();
+            hunter.accept();
+            nothing(hunter.takeoutResult());
+
+            CHECK(not hunter.takeoutResult());
+
+            auto& req4 = market.request(AgentID{404}, Wage{3});
+            auto& req5 = market.request(AgentID{505}, Wage{505});
+            auto& req6 = market.request(AgentID{606}, Wage{404});
+            auto& req7 = market.request(AgentID{101}, Wage{10000});
+            auto& req8 = market.request(AgentID{80}, Wage{606});
+
+            employment.startWorking(rosterEntry, finance.makeDepositFn());
+            hunter.entry(
+                id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+            );
+
+            CHECK(req4.entries().empty());
+            CHECK(req5.entries().size() == 1UZ);
+            CHECK(req6.entries().size() == 1UZ);
+            CHECK(req7.entries().empty());
+            CHECK(req8.entries().size() == 1UZ);
+
+            req5.entries().front().offer();
+            req6.entries().front().offer();
+
+            hunter.accept();
+
+            const auto result = hunter.takeoutResult();
+            CHECK(&req5.entries().front() == &*result);
         }
     }
 }

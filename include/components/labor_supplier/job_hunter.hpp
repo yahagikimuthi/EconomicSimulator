@@ -69,8 +69,6 @@ class JobHunter final {
         return std::exchange(acceptedEntry_, std::nullopt);
     }
 
-    void reset() noexcept { myEntries_.clear(), acceptedEntry_.reset(); }
-
   private:
     [[nodiscard]] auto takeOfferedEntry() noexcept -> std::optional<Entry&> {
         auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);

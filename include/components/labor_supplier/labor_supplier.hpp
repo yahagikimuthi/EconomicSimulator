@@ -9,7 +9,6 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/date.hpp"
-#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
@@ -44,12 +43,11 @@ class LaborSupplier final {
 
     template <DepositFn F>
     void recordRosterEntry(F&& depositFn) noexcept {
-        const auto acceptedEntry = jobHunter_.huntedResult();
+        const auto acceptedEntry = jobHunter_.takeoutResult();
         if (acceptedEntry)
             employment_.startWorking(
                 acceptedEntry->takeoutRosterEntry(), std::forward<F>(depositFn)
             );
-        jobHunter_.reset();
     }
 
     template <DepositFn F>
@@ -68,11 +66,6 @@ class LaborSupplier final {
         if (not employment_.isEmployed()) return true;
         if (likelihoodChangingJob_.shouldChangingJobs()) return true;
         return false;
-    }
-
-    void reset(CensusDropBox& dropBox) noexcept {
-        dropBox.wages.emplace_back(wage().value());
-        jobHunter_.reset();
     }
 
     JobHunter<>           jobHunter_;
