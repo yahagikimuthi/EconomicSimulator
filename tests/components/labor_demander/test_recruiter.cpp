@@ -88,6 +88,11 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
 
                 const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
 
+                const auto& rosterEntry1 = entry1.takeoutRosterEntry();
+                CHECK(rosterEntry1.firmId().value() == 42);
+                CHECK(rosterEntry1.employeeId.value() == 101);
+                CHECK(rosterEntry1.wage.value() == 10);
+
                 CHECK(result.applicants.value() == 2);
                 CHECK(result.employ.value() == 1);
                 CHECK(hr.employeeCnt().value() == 1);
@@ -99,6 +104,16 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
                 entry2.accept();
 
                 const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                const auto& rosterEntry1 = entry1.takeoutRosterEntry();
+                const auto& rosterEntry2 = entry2.takeoutRosterEntry();
+
+                CHECK(rosterEntry1.firmId().value() == 42);
+                CHECK(rosterEntry1.employeeId.value() == 101);
+                CHECK(rosterEntry1.wage.value() == 10);
+                CHECK(rosterEntry2.firmId().value() == 42);
+                CHECK(rosterEntry2.employeeId.value() == 202);
+                CHECK(rosterEntry2.wage.value() == 10);
 
                 CHECK(result.applicants.value() == 2);
                 CHECK(result.employ.value() == 2);
@@ -133,6 +148,15 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
 
                 const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
 
+                const auto& rosterEntry1 = entry1.takeoutRosterEntry();
+                const auto& rosterEntry3 = entry3.takeoutRosterEntry();
+                CHECK(rosterEntry1.firmId().value() == 42);
+                CHECK(rosterEntry1.employeeId.value() == 101);
+                CHECK(rosterEntry1.wage.value() == 10);
+                CHECK(rosterEntry3.firmId().value() == 42);
+                CHECK(rosterEntry3.employeeId.value() == 303);
+                CHECK(rosterEntry3.wage.value() == 10);
+
                 CHECK(result.applicants.value() == 3);
                 CHECK(result.employ.value() == 2);
                 CHECK(hr.employeeCnt().value() == 2);
@@ -145,6 +169,20 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
                 entry3.accept();
 
                 const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                const auto& rosterEntry1 = entry1.takeoutRosterEntry();
+                const auto& rosterEntry2 = entry2.takeoutRosterEntry();
+                const auto& rosterEntry3 = entry3.takeoutRosterEntry();
+
+                CHECK(rosterEntry1.firmId().value() == 42);
+                CHECK(rosterEntry1.employeeId.value() == 101);
+                CHECK(rosterEntry1.wage.value() == 10);
+                CHECK(rosterEntry2.firmId().value() == 42);
+                CHECK(rosterEntry2.employeeId.value() == 202);
+                CHECK(rosterEntry2.wage.value() == 10);
+                CHECK(rosterEntry3.firmId().value() == 42);
+                CHECK(rosterEntry3.employeeId.value() == 303);
+                CHECK(rosterEntry3.wage.value() == 10);
 
                 CHECK(result.applicants.value() == 3);
                 CHECK(result.employ.value() == 3);
@@ -177,6 +215,23 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
             SUBCASE("一部が受諾した場合、正しく雇用される") {
                 entry3.accept();
                 entry4.accept();
+
+                const auto result = recruiter.endRecruiting(hr.makeAddRosterFn(space));
+
+                const auto& rosterEntry3 = entry3.takeoutRosterEntry();
+                const auto& rosterEntry4 = entry4.takeoutRosterEntry();
+
+                CHECK(rosterEntry3.firmId().value() == 42);
+                CHECK(rosterEntry3.employeeId.value() == 303);
+                CHECK(rosterEntry3.wage.value() == 10);
+                CHECK(rosterEntry4.firmId().value() == 42);
+                CHECK(rosterEntry4.employeeId.value() == 404);
+                CHECK(rosterEntry4.wage.value() == 10);
+
+                CHECK(result.applicants.value() == 4);
+                CHECK(result.employ.value() == 2);
+                CHECK(hr.employeeCnt().value() == 2);
+                CHECK(hr.sumWage().value() == 20);
             }
         }
     }
