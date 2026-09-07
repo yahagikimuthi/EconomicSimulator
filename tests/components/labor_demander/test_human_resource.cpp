@@ -31,6 +31,7 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     SUBCASE("全員解雇の場合、概算要求はゼロ、解雇の場合、名簿はすべて無効化") {
         const auto reqBudget = hr.planAndRequestBudget(HeadCount{3});
         CHECK(reqBudget.isZero());
+        CHECK(reqBudget == hr.requestedBudget());
 
         hr.layOffs();
         CHECK(not roster1.isOccupied());
@@ -41,6 +42,7 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     SUBCASE("一部解雇の場合、総賃金から平均賃金*解雇数を除いた額を概算要求し、名簿が一部無効化") {
         const auto reqBudget = hr.planAndRequestBudget(HeadCount{2});
         CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value() - (avgWage * 2)));
+        CHECK(reqBudget == hr.requestedBudget());
 
         hr.layOffs();
 
@@ -52,6 +54,7 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     SUBCASE("誰も解雇しない場合、総賃金を概算要求、名簿はすべて有効") {
         const auto reqBudget = hr.planAndRequestBudget(HeadCount{0});
         CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value()));
+        CHECK(reqBudget == hr.requestedBudget());
 
         hr.layOffs();
 
