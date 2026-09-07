@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <ranges>
+#include <utility>
 
 #include "others/setting.hpp"
 #include "others/util.hpp"
@@ -68,8 +69,7 @@ class Request final {
     }
     [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
     [[nodiscard]] auto takeOutRemainPaid() noexcept -> Money {
-        const auto out = remainPaid_;
-        remainPaid_    = Money{0.0};
+        const auto out = std::exchange(remainPaid_, Money{0.0});
         ASSERT(out.isZeroOrMore());
         return out;
     }

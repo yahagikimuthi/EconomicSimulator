@@ -64,9 +64,8 @@ class RosterEntry final {
     [[nodiscard]] auto firmId() const noexcept -> AgentID { return companyBoard_.firmId; }
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
     [[nodiscard]] auto takeOutPaidWage() noexcept -> Money {
-        const auto out = paidWage_;
+        const auto out = std::exchange(paidWage_, Money{0.0});
         ASSERT(out.isZeroOrMore());
-        paidWage_ = Money{0.0};
         return out;
     }
 
