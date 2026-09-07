@@ -132,6 +132,22 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         CHECK(out.empty());
     }
 
+    SUBCASE("ID,Wageが恒等であることのテスト") {
+        const auto id   = rng.randInt(0, 10000);
+        const auto wage = rng.rand(0.0, 100000.0);
+
+        const auto& req = market.request(AgentID{id}, Wage{wage});
+        CHECK(req.firmID.value() == id);
+        CHECK(req.wage.value() == doctest::Approx(wage));
+
+        market.pickRequest(AgentID{-1}, out, rng);
+
+        CHECK(out.size() == 1UZ);
+        const auto& sample = out[0].get();
+        CHECK(sample.firmID.value() == id);
+        CHECK(req.wage.value() == doctest::Approx(wage));
+    }
+
     SUBCASE("requestの数が引き出す数以下の場合、すべてをピックする") {
         for (auto [id, wage] : requests) nothing(market.request(id, wage));
 
