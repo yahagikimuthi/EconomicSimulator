@@ -46,5 +46,22 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         CHECK(isAligned(req5));
         CHECK(isAligned(req6));
     }
+
+    SUBCASE("雇用されている場合") {
+        employment.startWorking(rosterEntry, finance.makeDepositFn());
+        rosterEntry.payWage(Money{10});
+
+        employment.work(finance.makeDepositFn(), Date{14});
+        const auto afterAsset = finance.asset();
+
+        CHECK(afterAsset.value() == doctest::Approx(10 + beforeAsset.value()));
+        CHECK(space.takeout().isPositive());
+
+        employment.work(finance.makeDepositFn(), Date{1});
+        const auto finalAsset = finance.asset();
+
+        CHECK(finalAsset.value() == doctest::Approx(afterAsset.value()));
+        CHECK(space.takeout().isZero());
+    }
 }
 }  // namespace abm::labor::supplier
