@@ -4,6 +4,9 @@
 #include "doctest.h"
 #include "others/util.hpp"
 #include "tests/util.hpp"
+#include "values/common.hpp"
+#include "values/date.hpp"
+#include "values/labor.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::labor::demander {

@@ -3,6 +3,9 @@
 #include "components/finance/others_finance.hpp"
 #include "doctest.h"
 #include "tests/util.hpp"
+#include "values/common.hpp"
+#include "values/date.hpp"
+#include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/labor.hpp"
 

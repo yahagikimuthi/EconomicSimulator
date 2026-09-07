@@ -1,6 +1,7 @@
 #include "world/deposit.hpp"
 
 #include "doctest.h"
+#include "values/common.hpp"
 
 namespace abm {
 namespace {
