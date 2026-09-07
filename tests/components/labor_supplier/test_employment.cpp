@@ -7,6 +7,7 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
+namespace {
 TEST_CASE("Employmentのテスト") {  // NOLINT
     auto       roster      = Roster{};
     auto       board       = CompanyBoard{AgentID{101}, Day{15}};
@@ -122,4 +123,5 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         }
     }
 }
+}  // namespace
 }  // namespace abm::labor::supplier
