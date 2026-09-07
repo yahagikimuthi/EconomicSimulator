@@ -119,7 +119,7 @@ struct SignMixin {
 
     template <typename Self>
     [[nodiscard]] constexpr auto isNegative(this Self self) noexcept -> bool {
-        return self <= Self{0};
+        return self < Self{0};
     }
 
   protected:
