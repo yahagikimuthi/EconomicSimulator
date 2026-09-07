@@ -36,12 +36,7 @@ class LaborSupplier final {
     void entry(const AgentID id, Market& market) noexcept {
         if (not shouldSearch()) return;
         jobHunter_.entry(
-            id,
-            [&] [[nodiscard]] (const Request& req) noexcept -> bool { return isAligned(req); },
-            [&] [[nodiscard]] (Request & req) noexcept -> Entry& {
-                return makeEntrySheet(id, req);
-            },
-            market
+            id, employment_.makeIsAlignedRequestFn(), employment_.makeEntrySheetFn(id), market
         );
     }
 
@@ -71,16 +66,6 @@ class LaborSupplier final {
         if (not employment_.isEmployed()) return true;
         if (likelihoodChangingJob_.shouldChangingJobs()) return true;
         return false;
-    }
-
-    [[nodiscard]] auto isAligned(const Request& request) const noexcept -> bool {
-        if (request.firmID == employment_.contractFirmId()) return false;
-        if (request.wage < employment_.wage()) return false;
-        return true;
-    }
-
-    [[nodiscard]] auto makeEntrySheet(const AgentID id, Request& request) const noexcept -> Entry& {
-        return request.entry(id, employment_.productPower());
     }
 
     void reset(CensusDropBox& dropBox) noexcept {

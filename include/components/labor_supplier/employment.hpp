@@ -3,6 +3,7 @@
 #include <optional>
 
 #include "components/common.hpp"
+#include "components/labor_supplier/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/date.hpp"
@@ -28,10 +29,6 @@ class Employment final {
         rosterEntry_ = rosterEntry;
     }
 
-    [[nodiscard]] auto contractFirmId() const noexcept -> AgentID {
-        return rosterEntry_.transform(&RosterEntry::firmId).value_or(AgentID{-1});
-    }
-
     [[nodiscard]] auto wage() const noexcept -> Wage {
         return rosterEntry_.transform(&RosterEntry::wage).value_or(Wage{0.0});
     }
@@ -47,7 +44,21 @@ class Employment final {
         rosterEntry_->addInput(productPower_, today);
     }
 
-    [[nodiscard]] auto productPower() const noexcept -> double { return productPower_; }
+    [[nodiscard]] auto makeIsAlignedRequestFn() noexcept -> IsAlignedFn auto {
+        return [&] [[nodiscard]] (const Request& req) -> bool {
+            if (not isEmployed()) return true;
+            if (req.firmID == rosterEntry_->firmId()) return false;
+            if (req.wage <= rosterEntry_->wage) return false;
+            return true;
+        };
+    }
+
+    [[nodiscard]] auto makeEntrySheetFn(const AgentID id) const noexcept -> MakeEntrySheetFn auto {
+        ASSERT(isEmployed() ? id == rosterEntry_->employeeId : true);
+        return [productPower = this->productPower_, id] [[nodiscard]] (Request & req) -> Entry& {
+            return req.entry(id, productPower);
+        };
+    }
 
   private:
     void resign() noexcept {

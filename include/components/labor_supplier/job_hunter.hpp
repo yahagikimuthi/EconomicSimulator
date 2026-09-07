@@ -8,6 +8,7 @@
 #include <ranges>
 #include <span>
 
+#include "components/labor_supplier/common.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "world/labor.hpp"
@@ -28,16 +29,6 @@ class MyEntries final {
 
   private:
     std::inplace_vector<RefWrap<Entry>, setting::jobEntryCnt> entries_;
-};
-
-template <typename F>
-concept IsAlignedFn = requires(F f, const Request& request) {
-    { f(request) } -> std::same_as<bool>;
-};
-
-template <typename F>
-concept MakeEntrySheetFn = requires(F f, Request request) {
-    { f(request) } -> std::same_as<Entry&>;
 };
 
 class JobHunter final {
