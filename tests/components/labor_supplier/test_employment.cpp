@@ -19,9 +19,9 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     auto req1 = Request{AgentID{101}, Wage{10}};
     auto req2 = Request{AgentID{101}, Wage{15}};
     auto req3 = Request{AgentID{101}, Wage{20}};
-    auto req4 = Request{AgentID{1}, Wage{10}};
-    auto req5 = Request{AgentID{1}, Wage{15}};
-    auto req6 = Request{AgentID{1}, Wage{20}};
+    auto req4 = Request{AgentID{202}, Wage{10}};
+    auto req5 = Request{AgentID{202}, Wage{15}};
+    auto req6 = Request{AgentID{202}, Wage{20}};
 
     auto employment = Employment{rng};
 
@@ -96,17 +96,28 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         SUBCASE("転職の場合") {
             auto newRoster      = Roster{};
             auto newBoard       = CompanyBoard{AgentID{202}, Day{15}};
-            auto newRosterEntry = newRoster.add(AgentID{42}, Wage{20}, newBoard, space);
-
-            CHECK(employment.isEmployed());
-            CHECK(employment.wage().value() == 20);
+            auto newRosterEntry = newRoster.add(AgentID{42}, Wage{18}, newBoard, space);
 
             SUBCASE("事前に賃金が支払われていても回収する") {
                 rosterEntry.payWage(Money{10});
 
                 employment.startWorking(newRosterEntry, finance.makeDepositFn());
 
+                CHECK(employment.isEmployed());
+                CHECK(employment.wage().value() == 18);
                 CHECK(finance.asset().value() == doctest::Approx(beforeAsset.value() + 10));
+            }
+
+            SUBCASE("isAlignedは適正に動く") {
+                employment.startWorking(newRosterEntry, finance.makeDepositFn());
+                auto isAligned = employment.makeIsAlignedRequestFn();
+
+                CHECK(not isAligned(req1));
+                CHECK(not isAligned(req2));
+                CHECK(isAligned(req3));
+                CHECK(not isAligned(req4));
+                CHECK(not isAligned(req5));
+                CHECK(not isAligned(req6));
             }
         }
     }
