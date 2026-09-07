@@ -86,9 +86,10 @@ class OfferPlanner final {
 
         const auto alpha = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto add   = [=]() noexcept -> OfferRate {
-            if (*lastEmployResult < *lastEmployPlan) return OfferRate{alpha};
-            if (*lastEmployResult == *lastEmployPlan) return OfferRate{0.0};
-            return OfferRate{-alpha};
+            const auto excess = *lastEmployResult - *lastEmployPlan;
+            if (excess.isPositive()) return OfferRate{-alpha};
+            if (excess.isZero()) return OfferRate{0.0};
+            return OfferRate{alpha};
         }();
         const auto next    = rateCache_ + add;
         const auto guarded = std::clamp(

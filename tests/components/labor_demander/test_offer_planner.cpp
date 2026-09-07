@@ -84,15 +84,15 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
 
     SUBCASE("雇用数 == 雇用計画の場合、オファー率が変わらないこと") {
         constexpr auto inEmploy = HeadCount{1000.0};
-        constexpr auto plan =
-            RecruitPlan{.wage = Wage{1.0}, .employ = HeadCount{10.0}, .offer = HeadCount{20.0}};
-        constexpr auto result =
-            RecruitResult{.applicants = HeadCount{15.0}, .employ = HeadCount{10.0}};
 
         const auto beforePlan = planner.plan(inEmploy, laborSupplier);
 
-        mediator.publishRecruitPlan(plan);
-        mediator.publishRecruitResult(result);
+        mediator.publishRecruitPlan(
+            RecruitPlan{.wage = Wage{1.0}, .employ = inEmploy, .offer = beforePlan}
+        );
+        mediator.publishRecruitResult(
+            RecruitResult{.applicants = HeadCount{15.0}, .employ = inEmploy}
+        );
 
         const auto afterPlan = planner.plan(inEmploy, laborSupplier);
 
