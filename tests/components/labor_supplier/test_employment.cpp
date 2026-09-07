@@ -12,11 +12,18 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     auto board  = CompanyBoard{AgentID{101}, Day{15}};
     auto space  = base_goods::Workspace{};
 
-    [[maybe_unused]] auto& rosterEntry = roster.add(AgentID{42}, Wage{10}, board, space);
+    [[maybe_unused]] auto& rosterEntry = roster.add(AgentID{42}, Wage{15}, board, space);
 
     auto       rng         = makeRng();
     auto       finance     = HHoldFinance{AgentID{42}, rng};
     const auto beforeAsset = finance.asset();
+
+    auto req1 = Request{AgentID{42}, Wage{10}};
+    auto req2 = Request{AgentID{42}, Wage{15}};
+    auto req3 = Request{AgentID{42}, Wage{20}};
+    auto req4 = Request{AgentID{1}, Wage{10}};
+    auto req5 = Request{AgentID{1}, Wage{15}};
+    auto req6 = Request{AgentID{1}, Wage{20}};
 
     auto employment = Employment{rng};
 
@@ -29,6 +36,15 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         CHECK(beforeAsset.value() == doctest::Approx(afterAsset.value()));
 
         CHECK(employment.wage().isZero());
+
+        auto isAligned = employment.makeIsAlignedRequestFn();
+
+        CHECK(isAligned(req1));
+        CHECK(isAligned(req2));
+        CHECK(isAligned(req3));
+        CHECK(isAligned(req4));
+        CHECK(isAligned(req5));
+        CHECK(isAligned(req6));
     }
 }
 }  // namespace abm::labor::supplier
