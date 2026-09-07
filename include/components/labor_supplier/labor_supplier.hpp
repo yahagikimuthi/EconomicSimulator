@@ -75,7 +75,7 @@ class LaborSupplier final {
         jobHunter_.reset();
     }
 
-    JobHunter             jobHunter_;
+    JobHunter<>           jobHunter_;
     Employment            employment_;
     LikelihoodChangingJob likelihoodChangingJob_;
 };

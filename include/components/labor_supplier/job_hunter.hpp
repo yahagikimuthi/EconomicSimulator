@@ -14,6 +14,8 @@
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
+
+template <std::size_t JobSampleCnt>
 class MyEntries final {
   public:
     explicit MyEntries() noexcept = default;
@@ -28,9 +30,10 @@ class MyEntries final {
     void clear() noexcept { entries_.clear(); }
 
   private:
-    std::inplace_vector<RefWrap<Entry>, setting::jobEntryCnt> entries_;
+    std::inplace_vector<RefWrap<Entry>, JobSampleCnt> entries_;
 };
 
+template <std::size_t JobSampleCnt = setting::jobSampleCnt>
 class JobHunter final {
   public:
     explicit JobHunter(RandomGenerator& masterRng) noexcept
@@ -91,8 +94,8 @@ class JobHunter final {
         );
     }
 
-    MyEntries             myEntries_;
-    RandomGenerator       rng_;
-    std::optional<Entry&> acceptedEntry_{std::nullopt};
+    MyEntries<JobSampleCnt> myEntries_;
+    RandomGenerator         rng_;
+    std::optional<Entry&>   acceptedEntry_{std::nullopt};
 };
 }  // namespace abm::labor::supplier
