@@ -82,10 +82,17 @@ class OfferPlanner final {
         const auto lastEmployResult = memory_.lastEmployResult();
         const auto lastEmployPlan   = memory_.lastEmployPlan();
         if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
-        const auto alpha       = std::abs(rng_.randNormal(0.0, adjustVol_));
-        const auto shouldRaise = *lastEmployResult < *lastEmployPlan;
-        const auto next        = rateCache_ + OfferRate{(shouldRaise ? alpha : -alpha)};
-        const auto guarded     = std::clamp(
+        ASSERT(not lastEmployPlan->isZero());
+        ASSERT(not lastEmployResult->isZero());
+
+        const auto alpha = std::abs(rng_.randNormal(0.0, adjustVol_));
+        const auto add   = [=]() noexcept -> OfferRate {
+            if (*lastEmployResult < *lastEmployPlan) return OfferRate{alpha};
+            if (*lastEmployResult == *lastEmployPlan) return OfferRate{0.0};
+            return OfferRate{-alpha};
+        }();
+        const auto next    = rateCache_ + add;
+        const auto guarded = std::clamp(
             next,
             OfferRate{std::numeric_limits<double>::epsilon()},
             OfferRate{laborSupplier.value()}
