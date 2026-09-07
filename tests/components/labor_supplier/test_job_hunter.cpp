@@ -99,6 +99,62 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         CHECK(req3.entries().size() == 1UZ);
         CHECK(req3.entries().front().entrantId == id);
     }
+
+    SUBCASE("エントリーした場合") {
+        auto& req1 = market.request(AgentID{101}, Wage{101});
+        auto& req3 = market.request(AgentID{303}, Wage{303});
+        auto& req2 = market.request(AgentID{203}, Wage{202});
+
+        hunter.entry(
+            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+        );
+
+        SUBCASE("エントリーを受けている") {
+            CHECK(req1.entries().size() == 1UZ);
+            CHECK(req2.entries().size() == 1UZ);
+            CHECK(req3.entries().size() == 1UZ);
+            CHECK(req1.entries().front().entrantId == id);
+            CHECK(req2.entries().front().entrantId == id);
+            CHECK(req3.entries().front().entrantId == id);
+        }
+
+        SUBCASE("全てにオファーされなかった場合、結果は空") {
+            hunter.accept();
+
+            const auto result = hunter.huntedResult();
+
+            CHECK(not result);
+        }
+
+        SUBCASE("全てオファーされた場合、最も賃金が高いものを受諾") {
+            req1.entries().front().offer();
+            req2.entries().front().offer();
+            req3.entries().front().offer();
+
+            hunter.accept();
+
+            const auto result = hunter.huntedResult();
+
+            CHECK(result);
+            CHECK(result->isAccept());
+            CHECK(&req3.entries().front() == &*result);
+        }
+
+        SUBCASE("一部のみオファーされた場合も同様に受諾") {
+            req1.entries().front().offer();
+            req2.entries().front().offer();
+
+            hunter.accept();
+
+            const auto result = hunter.huntedResult();
+
+            CHECK(req2.entries().front().isAccept());
+
+            CHECK(result);
+            CHECK(result->isAccept());
+            CHECK(&req2.entries().front() == &*result);
+        }
+    }
 }
 }  // namespace
 }  // namespace abm::labor::supplier
