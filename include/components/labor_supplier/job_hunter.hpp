@@ -15,7 +15,7 @@
 
 namespace abm::labor::supplier {
 
-template <std::size_t JobSampleCnt>
+template <std::size_t JobEntryCnt>
 class MyEntries final {
   public:
     explicit MyEntries() noexcept = default;
@@ -30,10 +30,12 @@ class MyEntries final {
     void clear() noexcept { entries_.clear(); }
 
   private:
-    std::inplace_vector<RefWrap<Entry>, JobSampleCnt> entries_;
+    std::inplace_vector<RefWrap<Entry>, JobEntryCnt> entries_;
 };
 
-template <std::size_t JobSampleCnt = setting::jobSampleCnt>
+template <
+    std::size_t JobSampleCnt = setting::jobSampleCnt,
+    std::size_t JobEntryCnt  = setting::jobEntryCnt>
 class JobHunter final {
   public:
     explicit JobHunter(RandomGenerator& masterRng) noexcept
@@ -43,14 +45,13 @@ class JobHunter final {
         const AgentID           id,
         IsAlignedFn auto&&      isAligned,
         MakeEntrySheetFn auto&& makeEntrySheet,
-        Market&                 market,
-        const int               entryCnt = setting::jobEntryCnt
+        Market&                 market
     ) noexcept {
-        auto alignedRequests = pickAndSortJobs(id, market, entryCnt) |
+        auto alignedRequests = pickAndSortJobs(id, market) |
                                std::views::filter([&](const Request& req) noexcept -> bool {
                                    return isAligned(req);
                                }) |
-                               std::views::take(entryCnt);
+                               std::views::take(JobEntryCnt);
         if (alignedRequests.empty()) return;
         for (auto& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
     }
@@ -73,19 +74,18 @@ class JobHunter final {
         return offered.front();
     }
 
-    [[nodiscard]] auto pickAndSortJobs(
-        const AgentID id, Market& market, const int entryCnt
-    ) noexcept -> std::span<RefWrap<Request>> {
+    [[nodiscard]] auto pickAndSortJobs(const AgentID id, Market& market) noexcept
+        -> std::span<RefWrap<Request>> {
         static thread_local auto sampleRequest =
-            std::inplace_vector<RefWrap<Request>, setting::jobSampleCnt>{};
+            std::inplace_vector<RefWrap<Request>, JobSampleCnt>{};
         sampleRequest.clear();
         market.pickRequest(id, sampleRequest, rng_);
-        sortSample(sampleRequest, entryCnt);
+        sortSample(sampleRequest);
         return sampleRequest;
     }
 
-    static void sortSample(std::span<RefWrap<Request>> sortRequests, const int entryCnt) noexcept {
-        const auto k = std::min(static_cast<std::size_t>(entryCnt), sortRequests.size());
+    static void sortSample(std::span<RefWrap<Request>> sortRequests) noexcept {
+        const auto k = std::min(JobEntryCnt, sortRequests.size());
         std::ranges::partial_sort(
             sortRequests,
             sortRequests.begin() + static_cast<int>(k),
