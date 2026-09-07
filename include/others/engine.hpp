@@ -53,6 +53,18 @@ class AgentRegistry final {
 };
 
 class Engine final {
+    [[nodiscard]] static auto makeCalcAssetFn() noexcept -> auto {
+        return [] [[nodiscard]] (const auto& agents) noexcept -> double {
+            return std::ranges::fold_left(
+                agents | std::views::transform([](const auto& agent) noexcept -> double {
+                    return agent.asset().value();
+                }),
+                0.0,
+                std::plus{}
+            );
+        };
+    }
+
   public:
     [[nodiscard]] explicit Engine(const Date endingDay)
         : seed_{generateSeed()},
@@ -79,6 +91,7 @@ class Engine final {
     }
 
     void run() noexcept {
+        const auto assetCalculator = makeCalcAssetFn();
         for (; today_ < endingDay_; ++today_) {
             for (auto& firm : capitalFirms_) {
                 firm.act(today_, markets_);
@@ -91,7 +104,7 @@ class Engine final {
             }
             if (labor::toMarketPhase(today_.month()) == LaborMarketPhase::RecordRosterEntry)
                 markets_.laborMarket.clear();
-            std::println("{}", calcSumAsset());
+            std::println("{}", assetCalculator(goodsFirms_));
         }
     }
 
