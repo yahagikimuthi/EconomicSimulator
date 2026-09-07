@@ -31,6 +31,7 @@ class HumanResource final {
     void revisePlan(const Budget budget) noexcept {
         ASSERT(requestedBudget_);
         ASSERT(budget <= requestedBudget_);
+        ASSERT(budget.isZeroOrMore());
         const auto reqBudget = *requestedBudget_;
         requestedBudget_.reset();
 
