@@ -155,6 +155,21 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
                 roster1.takeoutPaidWage() + roster2.takeoutPaidWage() + roster3.takeoutPaidWage();
             CHECK(sum.value() == paid.value());
         }
+
+        SUBCASE("一部解雇が発生した場合も正しく支払われる") {
+            nothing(hr.planAndRequestBudget(HeadCount{2}));
+            hr.layOffs();
+
+            hr.payWage(withdrawFn);
+
+            const auto afterAsset = finance.asset();
+            const auto paid       = beforeAsset - afterAsset;
+            CHECK(paid.value() == doctest::Approx(303));
+
+            const auto sum =
+                roster1.takeoutPaidWage() + roster2.takeoutPaidWage() + roster3.takeoutPaidWage();
+            CHECK(sum.value() == paid.value());
+        }
     }
 }
 }  // namespace
