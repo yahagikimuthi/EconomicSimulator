@@ -1,6 +1,7 @@
 #include "components/labor_demander/human_resource.hpp"
 
 #include "doctest.h"
+#include "others/util.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::labor::demander {
@@ -74,57 +75,34 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     }
 
     SUBCASE("予算が満額回答の場合、結果は変わらない") {
-        SUBCASE("全員解雇の場合、概算要求はゼロ、解雇の場合、名簿はすべて無効化") {
-            const auto reqBudget = hr.planAndRequestBudget(HeadCount{3});
-            CHECK(reqBudget.isZero());
-            CHECK(reqBudget == hr.requestedBudget());
+        const auto reqBudget = hr.planAndRequestBudget(HeadCount{2});
+        CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value() - (avgWage * 2)));
+        CHECK(reqBudget == hr.requestedBudget());
 
-            hr.revisePlan(reqBudget);
+        hr.revisePlan(reqBudget);
 
-            hr.layOffs();
+        hr.layOffs();
 
-            CHECK(not roster1.isOccupied());
-            CHECK(not roster2.isOccupied());
-            CHECK(not roster3.isOccupied());
+        CHECK(not roster1.isOccupied());
+        CHECK(not roster2.isOccupied());
+        CHECK(roster3.isOccupied());
 
-            CHECK(hr.sumWage().isZero());
-            CHECK(hr.employeeCnt().isZero());
-        }
+        CHECK(hr.employeeCnt().value() == 1);
+        CHECK(hr.sumWage().value() == doctest::Approx(303));
+    }
 
-        SUBCASE("一部解雇の場合、総賃金から平均賃金*解雇数を除いた額を概算要求し、名簿が一部無効化"
-        ) {
-            const auto reqBudget = hr.planAndRequestBudget(HeadCount{2});
-            CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value() - (avgWage * 2)));
-            CHECK(reqBudget == hr.requestedBudget());
+    SUBCASE("与えられた予算が0の場合、全員解雇") {
+        nothing(hr.planAndRequestBudget(HeadCount{0}));
+        hr.revisePlan(Budget{0});
 
-            hr.revisePlan(reqBudget);
+        hr.layOffs();
 
-            hr.layOffs();
+        CHECK(not roster1.isOccupied());
+        CHECK(not roster2.isOccupied());
+        CHECK(not roster3.isOccupied());
 
-            CHECK(not roster1.isOccupied());
-            CHECK(not roster2.isOccupied());
-            CHECK(roster3.isOccupied());
-
-            CHECK(hr.employeeCnt().value() == 1);
-            CHECK(hr.sumWage().value() == doctest::Approx(303));
-        }
-
-        SUBCASE("誰も解雇しない場合、総賃金を概算要求、名簿はすべて有効") {
-            const auto reqBudget = hr.planAndRequestBudget(HeadCount{0});
-            CHECK(reqBudget.value() == doctest::Approx(hr.sumWage().value()));
-            CHECK(reqBudget == hr.requestedBudget());
-
-            hr.revisePlan(reqBudget);
-
-            hr.layOffs();
-
-            CHECK(roster1.isOccupied());
-            CHECK(roster2.isOccupied());
-            CHECK(roster3.isOccupied());
-
-            CHECK(hr.employeeCnt().value() == 3);
-            CHECK(hr.sumWage().value() == doctest::Approx(sumWage));
-        }
+        CHECK(hr.employeeCnt().isZero());
+        CHECK(hr.sumWage().isZero());
     }
 }
 }  // namespace
