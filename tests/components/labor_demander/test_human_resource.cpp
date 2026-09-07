@@ -170,6 +170,31 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
                 roster1.takeoutPaidWage() + roster2.takeoutPaidWage() + roster3.takeoutPaidWage();
             CHECK(sum.value() == paid.value());
         }
+
+        SUBCASE("解雇後、追加が起きた場合、ゲッターは正しく動作する") {
+            nothing(hr.planAndRequestBudget(HeadCount{2}));
+            hr.layOffs();
+
+            [[maybe_unused]] auto& roster4 = addRoster(AgentID{404}, Wage{404});
+
+            CHECK(hr.employeeCnt().value() == 2);
+            CHECK(hr.sumWage().value() == 707);
+
+            SUBCASE("この場合は名簿再利用が起きているため、最も最初に解雇される") {
+                nothing(hr.planAndRequestBudget(HeadCount{1}));
+                hr.layOffs();
+
+                CHECK(not roster4.isOccupied());
+                CHECK(hr.employeeCnt().value() == 1);
+                CHECK(hr.sumWage().value() == 303);
+            }
+
+            SUBCASE("賃金支払いも正しく行われる") {
+                hr.payWage(withdrawFn);
+
+                CHECK(roster4.takeoutPaidWage().value() == doctest::Approx(roster4.wage.value()));
+            }
+        }
     }
 }
 }  // namespace
