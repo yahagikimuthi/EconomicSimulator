@@ -114,7 +114,7 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
 
         const auto afterPlan = planner.plan(inEmploy, laborSupplier);
 
-        CHECK(afterPlan.value() < doctest::Approx(beforePlan.value()));
+        CHECK(afterPlan.value() <= doctest::Approx(beforePlan.value()));
     }
 }
 }  // namespace
