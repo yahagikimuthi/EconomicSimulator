@@ -48,6 +48,7 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     SUBCASE("雇用されている場合") {
         employment.startWorking(rosterEntry, finance.makeDepositFn());
         CHECK(employment.isEmployed());
+        CHECK(employment.wage().value() == doctest::Approx(15));
 
         SUBCASE("賃金を支払わない場合、資産の増減はなし") {
             employment.work(finance.makeDepositFn(), Date{1});
@@ -90,6 +91,23 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
             employment.work(finance.makeDepositFn(), Date{14});
 
             CHECK(space.takeout().value() == doctest::Approx(entry.productPower));
+        }
+
+        SUBCASE("転職の場合") {
+            auto newRoster      = Roster{};
+            auto newBoard       = CompanyBoard{AgentID{202}, Day{15}};
+            auto newRosterEntry = newRoster.add(AgentID{42}, Wage{20}, newBoard, space);
+
+            CHECK(employment.isEmployed());
+            CHECK(employment.wage().value() == 20);
+
+            SUBCASE("事前に賃金が支払われていても回収する") {
+                rosterEntry.payWage(Money{10});
+
+                employment.startWorking(newRosterEntry, finance.makeDepositFn());
+
+                CHECK(finance.asset().value() == doctest::Approx(beforeAsset.value() + 10));
+            }
         }
     }
 }

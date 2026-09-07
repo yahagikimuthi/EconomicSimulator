@@ -23,7 +23,7 @@ class Employment final {
         if (isEmployed()) {
             ASSERT(rosterEntry_->firmId() != rosterEntry.firmId());
             ASSERT(rosterEntry_->wage <= rosterEntry.wage);
-            std::forward<F>(depositFn)(rosterEntry.takeoutPaidWage());
+            std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         }
         resign();
         rosterEntry_ = rosterEntry;
