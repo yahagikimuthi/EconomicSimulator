@@ -26,12 +26,37 @@ using RandomParameter =
 }  // namespace abm
 
 namespace abm::global_setting {
-inline constexpr auto useRuntimeRandomSeed       = false;
-inline constexpr auto fixedSeedState             = std::uint64_t{0x853c49e6748fea9bULL};
-inline constexpr auto fixedSeedStream            = std::uint64_t{0xda3e39cb94b95bdbULL};
+inline constexpr auto useRuntimeRandomSeed = false;
+inline constexpr auto fixedSeedState       = std::uint64_t{0x853c49e6748fea9bULL};
+inline constexpr auto fixedSeedStream      = std::uint64_t{0xda3e39cb94b95bdbULL};
+
+inline constexpr auto dayInMonth  = 30;
+inline constexpr auto monthInYear = 12;
+inline constexpr auto epsilon     = 1e-9;
+
 inline constexpr auto simulationResultOutputPath = "../outputs/result.h5"sv;
 inline constexpr auto metricDataOutputPath       = "../outputs/metrics.h5"sv;
 }  // namespace abm::global_setting
+
+namespace abm::global_setting::agent_count {
+inline constexpr auto goodsFirm   = 2;
+inline constexpr auto capitalFirm = 0;
+inline constexpr auto hhold       = 300;
+}  // namespace abm::global_setting::agent_count
+
+namespace abm::global_setting::save_name {
+inline constexpr auto firmAssets        = "firmAssets"sv;
+inline constexpr auto postedEmployments = "postedEmployments"sv;
+inline constexpr auto postedWages       = "postedWages"sv;
+inline constexpr auto employments       = "employments"sv;
+inline constexpr auto sumWages          = "sumWages"sv;
+inline constexpr auto prices            = "prices"sv;
+inline constexpr auto supplies          = "supplies"sv;
+inline constexpr auto markups           = "markups"sv;
+inline constexpr auto inventories       = "inventories"sv;
+inline constexpr auto householdAssets   = "householdAssets"sv;
+inline constexpr auto wages             = "wages"sv;
+}  // namespace abm::global_setting::save_name
 
 namespace abm::labor::demander::setting {
 inline constexpr RandomParameter lastApplicants = UniformParameter<int>{.min = 10, .limit = 20};
@@ -87,27 +112,11 @@ namespace abm::capital::demander::setting {
 inline constexpr auto goodsSampleCnt = 2;
 }  // namespace abm::capital::demander::setting
 
-namespace abm::deposit::supplier::setting {
-inline constexpr auto maxSampleCnt = 2;
-}
-
 namespace abm::government::setting {
 inline constexpr auto incomeTaxRate    = 0.1;
 inline constexpr auto salesTaxRate     = 0.1;
 inline constexpr auto corporateTaxRate = 0.1;
 }  // namespace abm::government::setting
-
-namespace abm::global_setting::agent_count {
-inline constexpr auto goodsFirm   = 2;
-inline constexpr auto capitalFirm = 5;
-inline constexpr auto hhold       = 300;
-}  // namespace abm::global_setting::agent_count
-
-namespace abm::global_setting {
-inline constexpr auto dayInMonth  = 30;
-inline constexpr auto monthInYear = 12;
-inline constexpr auto epsilon     = 1e-9;
-}  // namespace abm::global_setting
 
 namespace abm::finance::setting {
 inline constexpr RandomParameter firmInitialAsset =
@@ -116,17 +125,3 @@ inline constexpr RandomParameter hholdInitialAsset =
     UniformParameter<double>{.min = 10.0, .limit = 100.0};
 inline constexpr RandomParameter cashRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
-
-namespace abm::global_setting::save_name {
-inline constexpr auto firmAssets        = "firmAssets"sv;
-inline constexpr auto postedEmployments = "postedEmployments"sv;
-inline constexpr auto postedWages       = "postedWages"sv;
-inline constexpr auto employments       = "employments"sv;
-inline constexpr auto sumWages          = "sumWages"sv;
-inline constexpr auto prices            = "prices"sv;
-inline constexpr auto supplies          = "supplies"sv;
-inline constexpr auto markups           = "markups"sv;
-inline constexpr auto inventories       = "inventories"sv;
-inline constexpr auto householdAssets   = "householdAssets"sv;
-inline constexpr auto wages             = "wages"sv;
-}  // namespace abm::global_setting::save_name
