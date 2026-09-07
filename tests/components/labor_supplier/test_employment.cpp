@@ -49,19 +49,30 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
 
     SUBCASE("雇用されている場合") {
         employment.startWorking(rosterEntry, finance.makeDepositFn());
-        rosterEntry.payWage(Money{10});
 
-        employment.work(finance.makeDepositFn(), Date{14});
-        const auto afterAsset = finance.asset();
+        SUBCASE("賃金を支払わない場合、資産の増減はなし") {
+            employment.work(finance.makeDepositFn(), Date{1});
+            const auto afterAsset = finance.asset();
+            CHECK(afterAsset.value() == doctest::Approx(beforeAsset.value()));
+        }
 
-        CHECK(afterAsset.value() == doctest::Approx(10 + beforeAsset.value()));
-        CHECK(space.takeout().isPositive());
+        SUBCASE("賃金が支払われた場合、資産が増加する、その後支払わなかった場合は増加しない") {
+            rosterEntry.payWage(Money{10});
 
-        employment.work(finance.makeDepositFn(), Date{1});
-        const auto finalAsset = finance.asset();
+            employment.work(finance.makeDepositFn(), Date{1});
+            const auto afterAsset = finance.asset();
+            CHECK(afterAsset.value() == doctest::Approx(beforeAsset.value() + 10));
 
-        CHECK(finalAsset.value() == doctest::Approx(afterAsset.value()));
-        CHECK(space.takeout().isZero());
+            employment.work(finance.makeDepositFn(), Date{1});
+            const auto finalAsset = finance.asset();
+            CHECK(finalAsset.value() == doctest::Approx(afterAsset.value()));
+        }
+
+        SUBCASE("労働日の場合、労働貢献が行われる") {
+            CHECK(space.takeout().isZero());
+            employment.work(finance.makeDepositFn(), Date{14});
+            CHECK(space.takeout().isPositive());
+        }
     }
 }
 }  // namespace abm::labor::supplier
