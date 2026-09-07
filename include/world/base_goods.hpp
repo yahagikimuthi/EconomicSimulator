@@ -2,6 +2,7 @@
 
 #include <tbb/concurrent_queue.h>
 #include <tbb/concurrent_vector.h>
+#include <algorithm>
 #include <atomic>
 #include <memory>
 #include <optional>
@@ -207,6 +208,10 @@ template <EMarket MarketT>
 inline void Entry<MarketT>::disable() noexcept {
     isValid_ = false;
     market_.disable(*this);
+    ASSERT(std::ranges::all_of(
+        requests_ | std::views::transform(&RequestT::takeoutRemainPaid),
+        [](const Money remain) noexcept -> bool { return remain.isZero(); }
+    ));
 }
 }  // namespace abm::base_goods
 
