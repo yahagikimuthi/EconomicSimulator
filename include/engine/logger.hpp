@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "others/setting.hpp"
-#include "values/date.hpp"
 #include "world/drop_box.hpp"
 
 namespace abm {
