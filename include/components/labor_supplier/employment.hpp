@@ -6,6 +6,7 @@
 #include "components/labor_supplier/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/labor.hpp"
 
@@ -33,14 +34,14 @@ class Employment final {
     }
 
     template <DepositFn F>
-    void work(F&& depositFn) noexcept {
+    void work(F&& depositFn, const Date today) noexcept {
         if (not isEmployed()) return;
         std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         if (not rosterEntry_->isOccupied()) {
             rosterEntry_.reset();
             return;
         }
-        rosterEntry_->addInput(productPower_);
+        rosterEntry_->addInput(productPower_, today.day());
     }
 
     [[nodiscard]] auto makeIsAlignedRequestFn() noexcept -> IsAlignedFn auto {

@@ -6,6 +6,7 @@
 #include "components/common.hpp"
 #include "components/labor_demander/common.hpp"
 #include "values/common.hpp"
+#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/labor.hpp"
@@ -13,7 +14,8 @@
 namespace abm::labor::demander {
 class HumanResource final {
   public:
-    explicit HumanResource(const AgentID id) noexcept : companyBoard_{id} {}
+    explicit HumanResource(const AgentID id, const Day operationDay) noexcept
+        : companyBoard_{id, operationDay - Day{1}} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Budget {
         const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
