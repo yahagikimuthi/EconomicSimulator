@@ -72,22 +72,15 @@ class Engine final {
           endingDay_{endingDay},
           markets_{today_} {
         namespace cnt = global_setting::agent_count;
-        auto count    = 0;
 
         capitalFirms_.reserve(cnt::capitalFirm);
-        for (; count < cnt::capitalFirm; ++count) {
-            capitalFirms_.emplace_back(rng_);
-        }
+        for (const auto _ : std::views::indices(cnt::capitalFirm)) capitalFirms_.emplace_back(rng_);
 
         goodsFirms_.reserve(cnt::goodsFirm);
-        for (; count < cnt::capitalFirm + cnt::goodsFirm; ++count) {
-            goodsFirms_.emplace_back(rng_);
-        }
+        for (const auto _ : std::views::indices(cnt::goodsFirm)) goodsFirms_.emplace_back(rng_);
 
         hholds_.reserve(cnt::hhold);
-        for (; count < cnt::capitalFirm + cnt::goodsFirm + cnt::hhold; ++count) {
-            hholds_.emplace_back(rng_);
-        }
+        for (const auto _ : std::views::indices(cnt::hhold)) hholds_.emplace_back(rng_);
     }
 
     void run() noexcept {
