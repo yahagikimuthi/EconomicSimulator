@@ -14,7 +14,7 @@
 namespace abm {
 class Logger final {
   public:
-    explicit Logger()
+    [[nodiscard]] explicit Logger()
         : file_{[]() noexcept -> HighFive::File {
               namespace fs = std::filesystem;
               const auto filepath =
