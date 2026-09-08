@@ -25,7 +25,7 @@ class Trader final {
 
   public:
     explicit Trader(RandomGenerator& masterRng) noexcept
-        : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void post(const AgentID id, const TradePlan& plan, MarketT& market) noexcept {
         assert(plan.supply.isZeroOrMore());
@@ -52,7 +52,6 @@ class Trader final {
     }
 
     void reset() noexcept {
-        if (myEntry_) myEntry_->disable();
         myEntry_.reset();
         ledger_.reset();
     }

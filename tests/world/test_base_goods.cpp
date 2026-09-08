@@ -2,7 +2,6 @@
 
 #include "doctest.h"
 #include "others/util.hpp"
-#include "tests/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "world/common.hpp"
@@ -49,12 +48,12 @@ TEST_CASE("Workspaceのテスト") {  // NOLINT
 }
 
 TEST_CASE("Requestのテスト") {  // NOLINT
-    auto           market        = Market<EMarket::Goods>{Date{1}};
+    auto           market        = Market<EMarket::Goods>{};
     constexpr auto price         = Price{10.0};
     constexpr auto supply        = GoodsQuantity{100.0};
     constexpr auto payment       = Money{100.0};
     constexpr auto desiredAmount = payment / price;
-    auto           entry         = Entry<EMarket::Goods>{AgentID{42}, price, supply, market};
+    auto           entry         = Entry<EMarket::Goods>{AgentID{42}, price, supply};
     auto           request       = Request<EMarket::Goods>{payment, entry};
 
     SUBCASE("tradeAmountはデフォルトで0を返す") {
@@ -96,12 +95,11 @@ TEST_CASE("Requestのテスト") {  // NOLINT
 }
 
 TEST_CASE("Entryのテスト") {  // NOLINT
-    constexpr auto date   = Date{1};
     constexpr auto id     = AgentID{42};
     constexpr auto price  = Price{10.0};
     constexpr auto supply = GoodsQuantity{100.0};
-    auto           market = Market<EMarket::Goods>{date};
-    auto           entry  = Entry<EMarket::Goods>{id, price, supply, market};
+    auto           market = Market<EMarket::Goods>{};
+    auto           entry  = Entry<EMarket::Goods>{id, price, supply};
 
     SUBCASE("requestsはデフォルトで空") { CHECK(entry.requests().empty()); }
 
@@ -116,66 +114,15 @@ TEST_CASE("Entryのテスト") {  // NOLINT
         CHECK(requests[1].payment == Money{102.0});
         CHECK(requests[2].payment == Money{103.0});
     }
-
-    SUBCASE("デフォルトで有効") { CHECK(entry.isValid()); }
-
-    SUBCASE("disableを行った場合、無効になること") {
-        entry.disable();
-        CHECK(not entry.isValid());
-    }
 }
 
 TEST_CASE("Marketのテスト") {  // NOLINT
-    auto date   = Date{1};
-    auto market = Market<EMarket::Goods>{date};
+    auto market = Market<EMarket::Goods>{};
 
     SUBCASE("pickしてもデフォルトはnull") {
         auto       rng  = RandomGenerator{{}};
         const auto pick = market.pickEntry(AgentID{42}, 100, rng);
         CHECK(not pick.has_value());
-    }
-
-    SUBCASE("disableしたentryについて2日目以降は再利用を行う") {
-        auto&       entry = market.entry(AgentID{42}, Price{10.0}, GoodsQuantity{100.0});
-        auto* const ptr   = &entry;
-
-        entry.disable();
-        ++ ++date;
-
-        auto& newEntry = market.entry(AgentID{-1}, Price{1.0}, GoodsQuantity{1.0});
-
-        CHECK(ptr == &newEntry);
-    }
-
-    SUBCASE("disableしたentryについて2日目より前は再利用を行わない") {
-        constexpr auto id     = AgentID{-1};
-        constexpr auto price  = Price{1.0};
-        constexpr auto supply = GoodsQuantity{1.0};
-
-        auto&             entry = market.entry(id, price, supply);
-        const auto* const ptr   = &entry;
-        entry.disable();
-
-        const auto& first = market.entry(id, price, supply);
-        CHECK(ptr != &first);
-
-        const auto& second = market.entry(id, price, supply);
-        CHECK(ptr != &second);
-
-        ++date;
-
-        const auto& third = market.entry(id, price, supply);
-        CHECK(ptr != &third);
-    }
-
-    SUBCASE("pickEntryが有効なentryをpickするかのテスト") {
-        auto& entry  = market.entry(AgentID{101}, Price{101}, GoodsQuantity{101});
-        auto  rng    = makeRng();
-        auto  picked = market.pickEntry(AgentID{-1}, 1, rng);
-
-        CHECK(picked);
-        CHECK(picked->isValid());
-        CHECK(&*picked == &entry);
     }
 }
 }  // namespace
