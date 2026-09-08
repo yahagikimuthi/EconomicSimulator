@@ -13,7 +13,6 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 
@@ -82,10 +81,8 @@ class RecruitSystem final {
 
 class LaborDemander final {
   public:
-    explicit LaborDemander(
-        const AgentID id, RandomGenerator& masterRng, const Day operationDay
-    ) noexcept
-        : recruitSystem_{masterRng}, humanResource_{id, operationDay} {
+    explicit LaborDemander(const AgentID id, RandomGenerator& masterRng) noexcept
+        : recruitSystem_{masterRng}, humanResource_{id} {
         setMediator();
     }
     LaborDemander(const LaborDemander& other) noexcept

@@ -3,15 +3,12 @@
 #include <tbb/concurrent_queue.h>
 #include <tbb/concurrent_vector.h>
 #include <atomic>
-#include <memory>
 #include <optional>
 #include <ranges>
 #include <utility>
 
-#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/goods.hpp"
 #include "world/common.hpp"
 
@@ -90,10 +87,8 @@ class Entry final {
     using RequestT = Request<MarketT>;
 
   public:
-    explicit Entry(
-        const AgentID i, const Price p, const GoodsQuantity s, Market<MarketT>& market
-    ) noexcept
-        : id{i}, price{p}, supply{s}, market_{market} {
+    explicit Entry(const AgentID i, const Price p, const GoodsQuantity s) noexcept
+        : id{i}, price{p}, supply{s} {
         assert(p.isPositive());
         assert(s.isPositive());
     }
@@ -103,9 +98,6 @@ class Entry final {
     }
 
     [[nodiscard]] auto requests() noexcept -> auto { return std::ranges::subrange{requests_}; }
-    [[nodiscard]] auto isValid() const noexcept -> bool { return isValid_; }
-
-    void disable() noexcept;
 
     const AgentID       id;
     const Price         price;
@@ -113,8 +105,6 @@ class Entry final {
 
   private:
     tbb::concurrent_vector<RequestT> requests_;
-    Market<MarketT>&                 market_;
-    bool                             isValid_{true};
 };
 
 template <EMarket MarketT>
@@ -140,30 +130,14 @@ template <EMarket MarketT>
 class Market final {
     using EntryT = Entry<MarketT>;
 
-    struct EmptyEntry final {
-        explicit EmptyEntry(EntryT& Entry, const Day DisableDay) noexcept
-            : entry{&Entry}, disableDay{DisableDay} {}
-        explicit EmptyEntry() noexcept = default;
-        EntryT* entry{nullptr};
-        Day     disableDay{1};
-    };
-
   public:
-    explicit Market(const Date& today) noexcept : today_{today} {}
+    explicit Market() noexcept = default;
 
     [[nodiscard]] auto entry(
         const AgentID id, const Price price, const GoodsQuantity supply
     ) noexcept -> EntryT& {
         totalSupply_.fetch_add(supply.value());  // TODO 処理系が対応する場合store_addに変更
-        auto       newEntry = EmptyEntry{};
-        const auto result   = emptyEntries_.try_pop(newEntry);
-        if (not result or not canReuse(newEntry.disableDay))
-            return *entries_.emplace_back(id, price, supply, *this);
-
-        assert(newEntry.entry);
-        assert(not newEntry.entry->isValid());
-        std::destroy_at(newEntry.entry);
-        return *std::construct_at(newEntry.entry, id, price, supply, *this);
+        return *entries_.emplace_back(id, price, supply);
     }
 
     auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
@@ -174,7 +148,7 @@ class Market final {
         auto betterEntry = std::optional<EntryT&>{std::nullopt};
         for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
-                entries_ | std::views::filter(&EntryT::isValid),
+                entries_,
                 totalSupply_.load(),
                 [](const EntryT& e) noexcept -> double { return e.supply.value(); }
             );
@@ -184,35 +158,15 @@ class Market final {
         return betterEntry;
     }
 
-    void disable(EntryT& entry) noexcept {
-        emptyEntries_.emplace(entry, today_.day());
-        totalSupply_.fetch_sub(entry.supply.value());
-    }
-
-    [[nodiscard]] auto canReuse(const Day disableDay) const noexcept -> bool {
-        assert(disableDay < Day{global_setting::dayInMonth});
-        if (disableDay == today_.day()) return false;
-        if (disableDay + Day{1} == today_.day()) return false;
-        return true;
+    void clear() noexcept {
+        entries_.clear();
+        totalSupply_.store(0.0);
     }
 
   private:
-    tbb::concurrent_vector<EntryT>    entries_;
-    tbb::concurrent_queue<EmptyEntry> emptyEntries_;
-    std::atomic<double>               totalSupply_;
-    const Date&                       today_;
+    tbb::concurrent_vector<EntryT> entries_;
+    std::atomic<double>            totalSupply_;
 };
-
-template <EMarket MarketT>
-inline void Entry<MarketT>::disable() noexcept {
-    isValid_ = false;
-    market_.disable(*this);
-    assert([&]() noexcept -> bool {
-        for (auto& req : requests_)
-            if (not req.takeoutRemainPaid().isZero()) return false;
-        return true;
-    }());
-}
 }  // namespace abm::base_goods
 
 namespace abm::goods {

@@ -4,7 +4,6 @@
 #include "doctest.h"
 #include "tests/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 #include "world/labor.hpp"
@@ -13,7 +12,7 @@ namespace abm::labor::supplier {
 namespace {
 TEST_CASE("Employmentのテスト") {  // NOLINT
     auto       roster      = Roster{};
-    auto       board       = CompanyBoard{AgentID{101}, Day{15}};
+    auto       board       = CompanyBoard{AgentID{101}};
     auto       space       = base_goods::Workspace{};
     auto&      rosterEntry = roster.add(AgentID{42}, Wage{15}, board, space);
     auto       rng         = makeRng();
@@ -32,7 +31,7 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     SUBCASE("デフォルトの場合の挙動テスト") {
         CHECK(not employment.isEmployed());
 
-        employment.work(finance.makeDepositFn(), Date{9});
+        employment.work(finance.makeDepositFn());
         const auto afterAsset = finance.asset();
 
         CHECK(beforeAsset.value() == doctest::Approx(afterAsset.value()));
@@ -55,7 +54,7 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         CHECK(employment.wage().value() == doctest::Approx(15));
 
         SUBCASE("賃金を支払わない場合、資産の増減はなし") {
-            employment.work(finance.makeDepositFn(), Date{1});
+            employment.work(finance.makeDepositFn());
             const auto afterAsset = finance.asset();
             CHECK(afterAsset.value() == doctest::Approx(beforeAsset.value()));
         }
@@ -63,18 +62,18 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         SUBCASE("賃金が支払われた場合、資産が増加する、その後支払わなかった場合は増加しない") {
             rosterEntry.payWage(Money{10});
 
-            employment.work(finance.makeDepositFn(), Date{1});
+            employment.work(finance.makeDepositFn());
             const auto afterAsset = finance.asset();
             CHECK(afterAsset.value() == doctest::Approx(beforeAsset.value() + 10));
 
-            employment.work(finance.makeDepositFn(), Date{1});
+            employment.work(finance.makeDepositFn());
             const auto finalAsset = finance.asset();
             CHECK(finalAsset.value() == doctest::Approx(afterAsset.value()));
         }
 
-        SUBCASE("労働日の場合、労働貢献が行われる") {
+        SUBCASE("労働貢献が行われる") {
             CHECK(space.takeout().isZero());
-            employment.work(finance.makeDepositFn(), Date{15});
+            employment.work(finance.makeDepositFn());
             CHECK(space.takeout().isPositive());
         }
 
@@ -92,14 +91,14 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         SUBCASE("エントリーで書かれた労働生産性と同じ分だけ労働貢献をすること") {
             const auto entry = employment.makeEntrySheetFn(AgentID{42})(req6);
 
-            employment.work(finance.makeDepositFn(), Date{15});
+            employment.work(finance.makeDepositFn());
 
             CHECK(space.takeout().value() == doctest::Approx(entry.productPower));
         }
 
         SUBCASE("転職の場合") {
             auto newRoster      = Roster{};
-            auto newBoard       = CompanyBoard{AgentID{202}, Day{15}};
+            auto newBoard       = CompanyBoard{AgentID{202}};
             auto newRosterEntry = newRoster.add(AgentID{42}, Wage{18}, newBoard, space);
 
             SUBCASE("事前に賃金が支払われていても回収する") {

@@ -5,14 +5,13 @@
 #include "others/util.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::labor::demander {
 namespace {
 TEST_CASE("HumanResourceのテスト") {  // NOLINT
-    auto hr        = HumanResource{AgentID{42}, Day{15}};
+    auto hr        = HumanResource{AgentID{42}};
     auto space     = base_goods::Workspace{};
     auto addRoster = hr.makeAddRosterFn(space);
 

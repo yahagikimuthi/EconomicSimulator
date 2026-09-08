@@ -1,32 +1,20 @@
 #pragma once
 
-#include "others/setting.hpp"
-#include "values/date.hpp"
+#include "values/common.hpp"
 #include "world/base_goods.hpp"
 #include "world/labor.hpp"
 
 namespace abm {
 struct MarketRegistry final {
-    explicit MarketRegistry(const Date& date) noexcept : capitalMarket{date}, goodsMarket{date} {}
-    CapitalMarket capitalMarket;
-    GoodsMarket   goodsMarket;
-    LaborMarket   laborMarket;
+    LaborMarket   labor;
+    CapitalMarket capital;
+    GoodsMarket   goods;
 };
 
-template <typename T>
-concept IAgent = requires(T t, const Date& date, MarketRegistry& markets) { t.act(date, markets); };
-
 class Agent {
-    static inline constinit int agentCnt{};
+    static inline constinit int nextId{};
 
   protected:
-    explicit Agent() noexcept {
-        assert(Day{2} <= operationDay_ and operationDay_ <= Day{global_setting::dayInMonth - 1});
-    }
-
-    const AgentID id_{agentCnt++};
-    //    const AgentID         id_{agentCnt};
-    static constexpr auto operationDay_ = Day{2};
-    //    const Day     operationDay_{(agentCnt++ % (global_setting::dayInMonth - 2)) + 2};
+    const AgentID id_{nextId++};
 };
 }  // namespace abm
