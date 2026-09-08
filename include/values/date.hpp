@@ -1,6 +1,9 @@
 #pragma once
 
+#include <compare>
+
 #include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/mixin.hpp"
 
 namespace abm {
@@ -10,9 +13,11 @@ class Day final : public value_object::BaseValueObject<int>,
     friend struct AddMixin<Day>;
 
   public:
-    explicit constexpr Day(const int value) noexcept : BaseValueObject<int>(value) {}
+    explicit constexpr Day(const int value) noexcept : BaseValueObject<int>(value) {
+        ASSERT(value > 0);
+    }
 
-    auto operator++() noexcept -> Day& {
+    constexpr auto operator++() noexcept -> Day& {
         ++value_;
         return *this;
     }
@@ -24,9 +29,11 @@ class Month final : public value_object::BaseValueObject<int>,
     friend struct AddMixin<Month>;
 
   public:
-    explicit constexpr Month(const int value) noexcept : BaseValueObject<int>(value) {}
+    explicit constexpr Month(const int value) noexcept : BaseValueObject<int>(value) {
+        ASSERT(value > 0);
+    }
 
-    auto operator++() noexcept -> Month& {
+    constexpr auto operator++() noexcept -> Month& {
         ++value_;
         return *this;
     }
@@ -38,9 +45,11 @@ class Year final : public value_object::BaseValueObject<int>,
     friend struct AddMixin<Year>;
 
   public:
-    explicit constexpr Year(const int value) noexcept : BaseValueObject<int>(value) {}
+    explicit constexpr Year(const int value) noexcept : BaseValueObject<int>(value) {
+        ASSERT(value > 0);
+    }
 
-    auto operator++() noexcept -> Year& {
+    constexpr auto operator++() noexcept -> Year& {
         ++value_;
         return *this;
     }
@@ -56,6 +65,8 @@ class Date final {
   public:
     explicit constexpr Date(const int day) noexcept
         : Date([day]() constexpr noexcept -> Normalized {
+              ASSERT(day > 0);
+
               using namespace global_setting;
               constexpr auto dayInYear = dayInMonth * monthInYear;
 
@@ -72,7 +83,10 @@ class Date final {
     [[nodiscard]] constexpr auto month() const noexcept -> Month { return month_; }
     [[nodiscard]] constexpr auto day() const noexcept -> Day { return day_; }
 
-    auto operator++() noexcept -> Date& {
+    [[nodiscard]] constexpr auto operator<=>(const Date&) const noexcept -> auto = default;
+    [[nodiscard]] constexpr auto operator==(const Date&) const noexcept -> bool  = default;
+
+    constexpr auto operator++() noexcept -> Date& {
         if (day_ == Day{global_setting::dayInMonth}) {           // 月末で
             if (month_ == Month{global_setting::monthInYear}) {  // 年末のとき
                 day_   = Day{1};
