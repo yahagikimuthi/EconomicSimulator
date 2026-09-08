@@ -12,10 +12,10 @@
 namespace abm {
 struct Agent {
   private:
-    static inline constinit int agentCnt{};
+    static inline constinit int agentCnt_{};
 
   public:
-    const AgentID id{agentCnt++};
+    const AgentID id{agentCnt_++};
 };
 
 struct CapitalFirm : Agent {
