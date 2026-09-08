@@ -93,6 +93,8 @@ class Engine final {
             recordRosterEntry(hhold.finance, hhold.labor);
         }
 
+        laborMarket_.clear();
+
         for (auto& firm : capitalFirms_) {
             payWage(firm.finance, firm.laborDemander);
         }
@@ -128,6 +130,8 @@ class Engine final {
         for (auto& firm : goodsFirms_) {
             afterTrade(firm.finance, firm.capitalDemander);
         }
+
+        capitalMarket_.clear();
     }
 
     void runGoods() noexcept {
@@ -147,6 +151,8 @@ class Engine final {
         for (auto& hhold : hholds_) {
             afterTrade(hhold.finance, hhold.goods);
         }
+
+        goodsMarket_.clear();
     }
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
