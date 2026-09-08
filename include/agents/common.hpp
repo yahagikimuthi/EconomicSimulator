@@ -1,7 +1,6 @@
 #pragma once
 
 #include "others/setting.hpp"
-#include "others/util.hpp"
 #include "values/date.hpp"
 #include "world/base_goods.hpp"
 #include "world/labor.hpp"
@@ -25,7 +24,9 @@ class Agent {
         assert(Day{2} <= operationDay_ and operationDay_ <= Day{global_setting::dayInMonth - 1});
     }
 
-    const AgentID id_{agentCnt};
-    const Day     operationDay_{(agentCnt++ % (global_setting::dayInMonth - 2)) + 2};
+    const AgentID id_{agentCnt++};
+    //    const AgentID         id_{agentCnt};
+    static constexpr auto operationDay_ = Day{2};
+    //    const Day     operationDay_{(agentCnt++ % (global_setting::dayInMonth - 2)) + 2};
 };
 }  // namespace abm

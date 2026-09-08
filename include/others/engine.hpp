@@ -97,7 +97,7 @@ class Engine final {
             }
             if (labor::toMarketPhase(today_.month()) == LaborMarketPhase::RecordRosterEntry)
                 markets_.laborMarket.clear();
-            std::println("{}", assetCalculator(goodsFirms_));
+            std::println("{}", assetCalculator(hholds_));
         }
     }
 
