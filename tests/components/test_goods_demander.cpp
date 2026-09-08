@@ -7,11 +7,11 @@
 namespace abm::goods::demander {
 namespace {
 TEST_CASE("Traderのテスト") {  // NOLINT
-    auto rng     = makeRng();
-    auto trader  = Trader{rng};
-    auto finance = HHoldFinance{AgentID{42}, rng};
-    auto date    = Date{1};
-    auto market  = Market{date};
+    [[maybe_unused]] auto rng     = makeRng();
+    [[maybe_unused]] auto trader  = Trader{rng};
+    [[maybe_unused]] auto finance = HHoldFinance{AgentID{42}, rng};
+    [[maybe_unused]] auto date    = Date{1};
+    [[maybe_unused]] auto market  = Market{date};
 }
 }  // namespace
 }  // namespace abm::goods::demander

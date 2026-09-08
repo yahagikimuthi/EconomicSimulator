@@ -19,7 +19,7 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
     auto market    = Market{};
     auto rng       = makeRng();
     auto out       = std::inplace_vector<Ref<Request>, 1UZ>{};
-    auto hr        = HumanResource{AgentID{42}, Day{1}};
+    auto hr        = HumanResource{AgentID{42}};
     auto space     = base_goods::Workspace{};
 
     SUBCASE("オファー数が0の場合") {

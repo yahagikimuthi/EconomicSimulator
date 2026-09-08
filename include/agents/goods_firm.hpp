@@ -16,7 +16,7 @@ class GoodsFirm final : public Agent {
   public:
     explicit GoodsFirm(RandomGenerator& masterRng) noexcept
         : finance_{id_, masterRng},
-          labor_{id_, masterRng, operationDay_},
+          labor_{id_, masterRng},
           capital_{masterRng},
           goods_{masterRng} {}
 

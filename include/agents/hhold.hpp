@@ -16,7 +16,7 @@ class HHold final : public Agent {
         : finance_{id_, masterRng}, labor_{masterRng}, goods_{masterRng} {}
 
     void act(const Date& date, MarketRegistry& markets) noexcept {
-        labor_.work(finance_.makeDepositFn(), date);
+        labor_.work(finance_.makeDepositFn());
         const auto day = date.day();
         if (day == operationDay_)
             actOperationDay(labor::toMarketPhase(date.month()), markets);

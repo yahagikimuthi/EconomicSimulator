@@ -17,7 +17,7 @@ class CapitalFirm final : public Agent {
   public:
     explicit CapitalFirm(RandomGenerator& masterRng) noexcept
         : finance_{id_, masterRng},
-          labor_{id_, masterRng, operationDay_},
+          labor_{id_, masterRng},
           capitalDemander_{masterRng},
           capitalSupplier_{masterRng} {}
 

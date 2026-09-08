@@ -17,7 +17,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     auto                   rng         = makeRng();
     auto                   hunter      = JobHunter<10000, 1000>{rng};
     auto                   employment  = Employment{rng};
-    auto                   board       = CompanyBoard{AgentID{101}, Day{15}};
+    auto                   board       = CompanyBoard{AgentID{101}};
     auto                   space       = base_goods::Workspace{};
     auto                   roster      = Roster{};
     [[maybe_unused]] auto& rosterEntry = roster.add(id, Wage{10}, board, space);

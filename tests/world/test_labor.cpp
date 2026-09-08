@@ -18,7 +18,7 @@ namespace abm::labor {
 namespace {
 TEST_CASE("Rosterのテスト") {  // NOLINT
     auto roster = Roster{};
-    auto board  = CompanyBoard{AgentID{42}, Day{1}};
+    auto board  = CompanyBoard{AgentID{42}};
     auto space  = base_goods::Workspace{};
 
     SUBCASE("addのみの場合、sumWageが機能することのテスト") {
@@ -75,22 +75,20 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
 }
 
 TEST_CASE("RosterEntryのテスト") {  // NOLINT
-    constexpr auto workDay = Day{15};
-
     auto  roster = Roster{};
-    auto  board  = CompanyBoard{AgentID{42}, workDay};
+    auto  board  = CompanyBoard{AgentID{42}};
     auto  space  = base_goods::Workspace{};
     auto& entry  = roster.add(AgentID{101}, Wage{101}, board, space);
 
     SUBCASE("労働日の場合、Workspaceに労働貢献を実際に行うこと") {
-        entry.addInput(10.0, Date{workDay.value()});
+        entry.addInput(10.0);
 
         const auto input = space.takeout();
         CHECK(input.value() == 10.0);
     }
 
     SUBCASE("労働日でない場合、労働貢献は事実上行わないこと") {
-        entry.addInput(10.0, Date{2});
+        entry.addInput(10.0);
 
         const auto input = space.takeout();
         CHECK(input.isZero());
