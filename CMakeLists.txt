@@ -50,10 +50,14 @@ target_compile_options(project_warnings INTERFACE
     -Wimplicit-fallthrough
     -Wnoexcept
     -D_GLIBCXX_DEBUG
+    -D_GLIBCXX_ASSERTIONS
+    -D_FORTIFY_SOURCE=2
+    -fstack-protector-strong
+    -fstack-clash-protection
+    -fcf-protection
     -fsanitize=address,undefined,float-divide-by-zero,float-cast-overflow
     -fno-omit-frame-pointer
     -fcontracts
-    -D_GLIBCXX_ASSERTIONS
     -mtune=native
     -march=native
     -flto
