@@ -102,7 +102,49 @@ class Engine final {
         }
     }
 
-    void runCapital() noexcept {}
+    void runCapital() noexcept {
+        using namespace capital;
+        for (auto& firm : capitalFirms_) {
+            entry(firm.id, firm.capitalSupplier, capitalMarket_);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
+        }
+        for (auto& firm : goodsFirms_) {
+            request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            trade(firm.finance, firm.capitalSupplier);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            afterTrade(firm.finance, firm.capitalDemander);
+        }
+        for (auto& firm : goodsFirms_) {
+            afterTrade(firm.finance, firm.capitalDemander);
+        }
+    }
+
+    void runGoods() noexcept {
+        using namespace goods;
+        for (auto& firm : goodsFirms_) {
+            entry(firm.id, firm.goodsSupplier, goodsMarket_);
+        }
+
+        for (auto& hhold : hholds_) {
+            request(hhold.id, hhold.finance, hhold.goods, goodsMarket_);
+        }
+
+        for (auto& firm : goodsFirms_) {
+            trade(firm.finance, firm.goodsSupplier);
+        }
+
+        for (auto& hhold : hholds_) {
+            afterTrade(hhold.finance, hhold.goods);
+        }
+    }
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not global_setting::useRuntimeRandomSeed) {
