@@ -18,7 +18,7 @@ struct Agent {
     const AgentID id{agentCnt_++};
 };
 
-struct CapitalFirm : Agent {
+struct CapitalFirm final : Agent {
     explicit CapitalFirm(RandomGenerator& masterRng) noexcept
         : finance{id, masterRng},
           laborDemander{id, masterRng},
@@ -31,7 +31,7 @@ struct CapitalFirm : Agent {
     CapitalSupplier capitalSupplier;
 };
 
-struct GoodsFirm : Agent {
+struct GoodsFirm final : Agent {
     explicit GoodsFirm(RandomGenerator& masterRng) noexcept
         : finance{id, masterRng},
           laborDemander{id, masterRng},
@@ -44,7 +44,7 @@ struct GoodsFirm : Agent {
     GoodsSupplier   goodsSupplier;
 };
 
-struct HHold : Agent {
+struct HHold final : Agent {
     explicit HHold(RandomGenerator& masterRng) noexcept
         : finance{id, masterRng}, labor{masterRng}, goods{masterRng} {}
 
