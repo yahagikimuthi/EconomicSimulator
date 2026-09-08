@@ -8,6 +8,10 @@
 #include "engine/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
+#include "system/capital.hpp"
+#include "system/goods.hpp"
+#include "system/labor.hpp"
+#include "system/planning.hpp"
 #include "values/date.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
@@ -36,7 +40,69 @@ class Engine final {
     }
 
   private:
-    void runLabor() noexcept {}
+    void runPlanning() noexcept {
+        using namespace planning;
+
+        for (auto& firm : capitalFirms_) {
+            plan(firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier);
+        }
+        for (auto& firm : goodsFirms_) {
+            plan(firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier);
+        }
+        for (auto& hhold : hholds_) {
+            plan(hhold.finance, hhold.goods);
+        }
+    }
+
+    void runLabor() noexcept {
+        using namespace labor;
+
+        for (auto& firm : capitalFirms_) {
+            request(firm.id, firm.laborDemander, laborMarket_);
+        }
+        for (auto& firm : goodsFirms_) {
+            request(firm.id, firm.laborDemander, laborMarket_);
+        }
+
+        for (auto& hhold : hholds_) {
+            entry(hhold.id, hhold.labor, laborMarket_);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            offer(firm.laborDemander);
+        }
+        for (auto& firm : goodsFirms_) {
+            offer(firm.laborDemander);
+        }
+
+        for (auto& hhold : hholds_) {
+            accept(hhold.labor);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            endRecruiting(firm.laborDemander, firm.capitalSupplier);
+        }
+        for (auto& firm : goodsFirms_) {
+            endRecruiting(firm.laborDemander, firm.goodsSupplier);
+        }
+
+        for (auto& hhold : hholds_) {
+            recordRosterEntry(hhold.finance, hhold.labor);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            payWage(firm.finance, firm.laborDemander);
+        }
+        for (auto& firm : goodsFirms_) {
+            payWage(firm.finance, firm.laborDemander);
+        }
+
+        for (auto& hhold : hholds_) {
+            work(hhold.finance, hhold.labor);
+        }
+    }
+
+    void runCapital() noexcept {}
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not global_setting::useRuntimeRandomSeed) {

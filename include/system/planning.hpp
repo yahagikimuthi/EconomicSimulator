@@ -42,8 +42,8 @@ inline void plan(
 inline void plan(
     FirmFinance&     finance,
     LaborDemander&   labor,
-    CapitalSupplier& capitalSupplier,
-    CapitalDemander& capitalDemander
+    CapitalDemander& capitalDemander,
+    CapitalSupplier& capitalSupplier
 ) noexcept {
     const auto laborReq = [&]() noexcept -> Budget {
         const auto employee = labor.employeeCnt();

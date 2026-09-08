@@ -6,7 +6,6 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor {
@@ -38,7 +37,7 @@ inline void payWage(FirmFinance& finance, LaborDemander& demander) noexcept {
     demander.payWage(finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
 }
 
-inline void work(HHoldFinance& finance, LaborSupplier& supplier, const Date& date) noexcept {
-    supplier.work(finance.makeDepositFn(), date);
+inline void work(HHoldFinance& finance, LaborSupplier& supplier) noexcept {
+    supplier.work(finance.makeDepositFn());
 }
 }  // namespace abm::labor
