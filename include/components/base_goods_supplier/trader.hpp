@@ -90,8 +90,8 @@ class Trader final {
 
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
 
-    [[nodiscard]] auto packRequest() noexcept -> std::span<RefWrap<RequestT>> {
-        static thread_local auto refs = std::vector<RefWrap<RequestT>>{};
+    [[nodiscard]] auto packRequest() noexcept -> std::span<Ref<RequestT>> {
+        static thread_local auto refs = std::vector<Ref<RequestT>>{};
         refs.clear();
         auto requests = myEntry_->requests();
         refs.reserve(requests.size());

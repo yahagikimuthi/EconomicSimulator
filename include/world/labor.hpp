@@ -129,9 +129,9 @@ class Roster final {
     [[nodiscard]] auto sumWage() const noexcept -> Wage { return sumWage_; }
 
   private:
-    std::deque<RosterEntry>                      entries_;
-    tbb::concurrent_vector<RefWrap<RosterEntry>> empties_;
-    Wage                                         sumWage_{0.0};
+    std::deque<RosterEntry>                  entries_;
+    tbb::concurrent_vector<Ref<RosterEntry>> empties_;
+    Wage                                     sumWage_{0.0};
 };
 
 inline void RosterEntry::resign() noexcept {
@@ -224,9 +224,7 @@ class Market final {
 
     template <std::size_t N>
     void pickRequest(
-        const AgentID                             requestorId,
-        std::inplace_vector<RefWrap<Request>, N>& out,
-        RandomGenerator&                          rng
+        const AgentID requestorId, std::inplace_vector<Ref<Request>, N>& out, RandomGenerator& rng
     ) noexcept {
         assert(out.empty());
         if (out.max_size() >= requests_.size())
@@ -239,7 +237,7 @@ class Market final {
 
   private:
     template <std::size_t N>
-    void packAllRequest(const AgentID id, std::inplace_vector<RefWrap<Request>, N>& out) {
+    void packAllRequest(const AgentID id, std::inplace_vector<Ref<Request>, N>& out) {
         for (auto& req : requests_) {
             if (req.firmID != id) out.unchecked_emplace_back(std::ref(req));
         }
@@ -247,12 +245,12 @@ class Market final {
 
     template <std::size_t N>
     void packPartRequest(
-        const AgentID id, std::inplace_vector<RefWrap<Request>, N>& out, RandomGenerator& rng
+        const AgentID id, std::inplace_vector<Ref<Request>, N>& out, RandomGenerator& rng
     ) noexcept {
         rng.sample(
             requests_ | std::views::filter([id](const Request& req) noexcept -> bool {
                 return req.firmID == id;
-            }) | std::views::transform([](Request& req) noexcept -> RefWrap<Request> {
+            }) | std::views::transform([](Request& req) noexcept -> Ref<Request> {
                 return std::ref(req);
             }),
             std::back_inserter(out),

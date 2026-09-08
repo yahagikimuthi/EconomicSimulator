@@ -20,14 +20,13 @@ class OfferApplicants final {
     void add(Entry& entry) noexcept { applicants_.emplace_back(std::ref(entry)); }
     void clear() noexcept { applicants_.clear(); }
     auto offerAcceptedApplicants() noexcept -> auto {
-        return applicants_ | std::views::transform([](RefWrap<Entry> ref) noexcept -> Entry& {
-                   return ref.get();
-               }) |
+        return applicants_ |
+               std::views::transform([](Ref<Entry> ref) noexcept -> Entry& { return ref.get(); }) |
                std::views::filter(&Entry::isAccept);
     }
 
   private:
-    std::vector<RefWrap<Entry>> applicants_;
+    std::vector<Ref<Entry>> applicants_;
 };
 
 class Ledger final {
@@ -140,9 +139,9 @@ class Recruiter final {
         ledger_.addApplicantsCnt(HeadCount{entries.size()});
     }
 
-    [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {
+    [[nodiscard]] auto packEntry() noexcept -> std::span<Ref<Entry>> {
         assert(myRequest_);
-        static thread_local auto refs = std::vector<RefWrap<Entry>>{};
+        static thread_local auto refs = std::vector<Ref<Entry>>{};
         refs.clear();
         auto entries = myRequest_->entries();
         refs.reserve(entries.size());
@@ -155,8 +154,8 @@ class Recruiter final {
     }
 
     [[nodiscard]] static auto sortApplicants(
-        const HeadCount offer, const std::span<RefWrap<Entry>> entryBox
-    ) noexcept -> std::span<RefWrap<Entry>> {
+        const HeadCount offer, const std::span<Ref<Entry>> entryBox
+    ) noexcept -> std::span<Ref<Entry>> {
         assert(offer.isZeroOrMore());
 
         const auto k      = std::min(entryBox.size(), static_cast<std::size_t>(offer.value()));
@@ -168,9 +167,7 @@ class Recruiter final {
             entryBox,
             entryBox.begin() + static_cast<int>(k),
             std::ranges::greater{},
-            [](const RefWrap<Entry> entryRef) noexcept -> double {
-                return entryRef.get().productPower;
-            }
+            [](const Ref<Entry> entryRef) noexcept -> double { return entryRef.get().productPower; }
         );
         return entryBox;
     }

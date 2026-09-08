@@ -21,9 +21,8 @@ class MyEntries final {
   public:
     explicit MyEntries() noexcept = default;
     [[nodiscard]] auto takeOfferedEntry() noexcept -> auto {
-        return entries_ | std::views::transform([](RefWrap<Entry> ref) noexcept -> Entry& {
-                   return ref.get();
-               }) |
+        return entries_ |
+               std::views::transform([](Ref<Entry> ref) noexcept -> Entry& { return ref.get(); }) |
                std::views::filter([](Entry& e) noexcept -> bool { return e.isOffer(); });
     }
 
@@ -31,7 +30,7 @@ class MyEntries final {
     void clear() noexcept { entries_.clear(); }
 
   private:
-    std::inplace_vector<RefWrap<Entry>, JobEntryCnt> entries_;
+    std::inplace_vector<Ref<Entry>, JobEntryCnt> entries_;
 };
 
 template <
@@ -77,22 +76,21 @@ class JobHunter final {
     }
 
     [[nodiscard]] auto pickAndSortJobs(const AgentID id, Market& market) noexcept
-        -> std::span<RefWrap<Request>> {
-        static thread_local auto sampleRequest =
-            std::inplace_vector<RefWrap<Request>, JobSampleCnt>{};
+        -> std::span<Ref<Request>> {
+        static thread_local auto sampleRequest = std::inplace_vector<Ref<Request>, JobSampleCnt>{};
         sampleRequest.clear();
         market.pickRequest(id, sampleRequest, rng_);
         sortSample(sampleRequest);
         return sampleRequest;
     }
 
-    static void sortSample(std::span<RefWrap<Request>> sortRequests) noexcept {
+    static void sortSample(std::span<Ref<Request>> sortRequests) noexcept {
         const auto k = std::min(JobEntryCnt, sortRequests.size());
         std::ranges::partial_sort(
             sortRequests,
             sortRequests.begin() + static_cast<int>(k),
             std::ranges::greater{},
-            [](const RefWrap<Request> requestRef) noexcept -> Wage { return requestRef.get().wage; }
+            [](const Ref<Request> requestRef) noexcept -> Wage { return requestRef.get().wage; }
         );
     }
 

@@ -21,7 +21,7 @@ struct Overloaded final : Ts... {
 };
 
 template <typename T>
-using RefWrap = std::reference_wrapper<T>;
+using Ref = std::reference_wrapper<T>;
 
 constexpr void nothing([[maybe_unused]] auto&&... _) noexcept {}
 
