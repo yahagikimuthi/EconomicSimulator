@@ -12,6 +12,7 @@
 #include "system/goods.hpp"
 #include "system/labor.hpp"
 #include "system/planning.hpp"
+#include "values/date.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
 #include "world/labor.hpp"
@@ -20,7 +21,7 @@ namespace abm {
 class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int endStep)
-        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endStep_{endStep} {
+        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endingDay_{endStep} {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
@@ -34,7 +35,7 @@ class Engine final {
     }
 
     void run() noexcept {
-        for (; step_ < endStep_; ++step_) {
+        for (; today_ < endingDay_; ++today_) {
             runPlanning();
             runLabor();
             runCapital();
@@ -103,7 +104,7 @@ class Engine final {
         }
 
         for (auto& hhold : hholds_) {
-            work(hhold.finance, hhold.labor);
+            work(hhold.finance, hhold.labor, today_);
         }
     }
 
@@ -174,8 +175,8 @@ class Engine final {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    const int endStep_;
-    int       step_{};
+    const Date endingDay_;
+    Date       today_{1};
 
     Logger logger_;
 
