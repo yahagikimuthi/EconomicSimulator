@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cstdint>
 
 #include "components/common.hpp"
 #include "others/setting.hpp"
@@ -26,7 +27,13 @@ class FirmFinance final {
           cash_{Money{masterRng.random(setting::firmInitialAsset)}},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    enum class AccountItem : char { Sales, PersonalCost, CapitalGoodsCost, Depreciation, Taxes };
+    enum class AccountItem : std::uint8_t {
+        Sales,
+        PersonalCost,
+        CapitalGoodsCost,
+        Depreciation,
+        Taxes
+    };
 
     [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> TryWithdrawFn auto {
         return [&, item] [[nodiscard]] (const Budget withdraw) noexcept -> Money {

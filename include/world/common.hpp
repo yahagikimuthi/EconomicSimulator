@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 namespace abm {
-enum class EMarket : char { Labor, Goods, Capital };
+enum class EMarket : std::uint8_t { Labor, Goods, Capital };
 }
