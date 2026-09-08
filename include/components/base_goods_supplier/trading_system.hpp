@@ -27,13 +27,13 @@ class TradingSystem final {
     void plan(
         const GoodsQuantity supply, const Budget totalCost, IMediator auto& mediator
     ) noexcept {
-        ASSERT(supply.isZeroOrMore());
+        assert(supply.isZeroOrMore());
         const auto plan = planner_.planTrading(supply, totalCost, mediator);
         plan_.emplace(plan);
     }
 
     void post(const AgentID id, MarketT& market) noexcept {
-        ASSERT(plan_);
+        assert(plan_);
         trader_.post(id, *plan_, market);
     }
 

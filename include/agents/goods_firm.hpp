@@ -52,7 +52,7 @@ class GoodsFirm final : public Agent {
             capital_.revisePlan(capitalBudgetReq);
         } else {
             const auto budget = finance_.claimBudget(total) + salesPlan;
-            ASSERT(budget <= laborBudgetReq + capitalBudgetReq);
+            assert(budget <= laborBudgetReq + capitalBudgetReq);
 
             const auto laborBudget   = std::min(budget, laborBudgetReq);
             const auto capitalBudget = std::max(budget - laborBudget, Budget{0.0});
@@ -82,7 +82,7 @@ class GoodsFirm final : public Agent {
             capital_.revisePlan(capitalBudgetReq);
         } else {
             const auto budget = finance_.claimBudget(total) + salesPlan;
-            ASSERT(budget <= laborCost + capitalBudgetReq);
+            assert(budget <= laborCost + capitalBudgetReq);
             capital_.revisePlan(std::min(budget - laborCost, Budget{0.0}));
         }
 

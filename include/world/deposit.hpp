@@ -13,12 +13,12 @@ class BankAccount final {
     const AgentID depositorId;
 
     void deposit(const Money add) noexcept {
-        ASSERT(add.isZeroOrMore());
+        assert(add.isZeroOrMore());
         deposit_ += add;
     }
 
     [[nodiscard]] auto withdraw(const Money sub) noexcept -> Money {
-        ASSERT(sub.isZeroOrMore());
+        assert(sub.isZeroOrMore());
         const auto out = std::min(sub, deposit_);
         deposit_ -= out;
         return out;

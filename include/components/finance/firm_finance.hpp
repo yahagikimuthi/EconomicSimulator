@@ -40,7 +40,7 @@ class FirmFinance final {
     }
 
     [[nodiscard]] static auto claimBudget(const Budget claim) noexcept -> Budget {
-        ASSERT(claim.isZeroOrMore());
+        assert(claim.isZeroOrMore());
         return claim;
     }
 
@@ -51,13 +51,13 @@ class FirmFinance final {
   private:
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw, const AccountItem item) noexcept
         -> Money {
-        ASSERT(tryingWithdraw.isZeroOrMore());
-        ASSERT(item != AccountItem::Sales);
+        assert(tryingWithdraw.isZeroOrMore());
+        assert(item != AccountItem::Sales);
 
         const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
             const auto withdraw = bankAccount_.withdraw(sub);
-            ASSERT(withdraw <= sub);
+            assert(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
             postToPlFromMinus(withdraw + cashOut, item);
@@ -74,7 +74,7 @@ class FirmFinance final {
     }
 
     void deposit(const Money add, const AccountItem item) noexcept {
-        ASSERT(add.isZeroOrMore());
+        assert(add.isZeroOrMore());
 
         postToPlFromPlus(add, item);
         if (currentCashRatio() > cashRatio_)
@@ -89,7 +89,7 @@ class FirmFinance final {
     }
 
     void postToPlFromPlus(const Money money, const AccountItem item) noexcept {
-        ASSERT(money.isZeroOrMore());
+        assert(money.isZeroOrMore());
         switch (item) {
             case AccountItem::Sales:
                 pl_.sales += money;
@@ -110,7 +110,7 @@ class FirmFinance final {
     }
 
     void postToPlFromMinus(const Money money, const AccountItem item) noexcept {
-        ASSERT(money.isZeroOrMore());
+        assert(money.isZeroOrMore());
         switch (item) {
             case AccountItem::Sales:
                 pl_.sales -= money;

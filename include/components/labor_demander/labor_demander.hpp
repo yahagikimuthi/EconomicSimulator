@@ -34,8 +34,8 @@ class RecruitSystem final {
     }
 
     void revisePlan(const Budget budget, IMediator auto& mediator) noexcept {
-        ASSERT(requestedBudget_);
-        ASSERT(budget <= *requestedBudget_ + Budget{global_setting::epsilon});
+        assert(requestedBudget_);
+        assert(budget <= *requestedBudget_ + Budget{global_setting::epsilon});
         requestedBudget_.reset();
         if (plan_->employ.isZero()) {
             mediator.publishRecruitPlan(*plan_);
@@ -47,12 +47,12 @@ class RecruitSystem final {
     }
 
     [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
-        ASSERT(requestedBudget_);
+        assert(requestedBudget_);
         return *requestedBudget_;
     }
 
     void post(const AgentID id, Market& market) noexcept {
-        ASSERT(plan_);
+        assert(plan_);
         recruiter_.post(id, *plan_, market);
     }
 
@@ -69,7 +69,7 @@ class RecruitSystem final {
     [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
         if (not plan_) return Budget{0.0};
         const auto out = plan_->employ * plan_->wage / 6.0;
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return static_cast<Budget>(out);
     }
 
@@ -116,7 +116,7 @@ class LaborDemander final {
     void reviseAnnualPlan(const Budget budget) noexcept {
         const auto recruitRequested = recruitSystem_.requestedBudget();
         const auto hrRequested      = humanResource_.requestedBudget();
-        ASSERT(budget <= recruitRequested + hrRequested);
+        assert(budget <= recruitRequested + hrRequested);
         const auto hrBudget      = std::min(hrRequested, budget);
         const auto recruitBudget = std::max(Budget{0.0}, budget - hrBudget);
         humanResource_.revisePlan(hrBudget);
@@ -145,7 +145,7 @@ class LaborDemander final {
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         const auto out = humanResource_.employeeCnt();
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return out;
     }
 

@@ -21,8 +21,8 @@ class Employment final {
     template <DepositFn F>
     void startWorking(RosterEntry& rosterEntry, F&& depositFn) noexcept {
         if (isEmployed()) {
-            ASSERT(rosterEntry_->firmId() != rosterEntry.firmId());
-            ASSERT(rosterEntry_->wage <= rosterEntry.wage);
+            assert(rosterEntry_->firmId() != rosterEntry.firmId());
+            assert(rosterEntry_->wage <= rosterEntry.wage);
             std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         }
         resign();
@@ -55,7 +55,7 @@ class Employment final {
 
     [[nodiscard]] auto makeEntrySheetFn(const AgentID myId) const noexcept -> MakeEntrySheetFn
         auto {
-        ASSERT(isEmployed() ? myId == rosterEntry_->employeeId : true);
+        assert(isEmployed() ? myId == rosterEntry_->employeeId : true);
         return [&, myId] [[nodiscard]] (Request & req) -> Entry& {
             return req.entry(myId, productPower_);
         };

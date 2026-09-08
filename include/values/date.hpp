@@ -13,7 +13,7 @@ class Day final : public value_object::BaseValueObject<int>,
     friend struct AddMixin<Day>;
 
   public:
-    explicit constexpr Day(const int day) noexcept : BaseValueObject<int>(day) { ASSERT(day > 0); }
+    explicit constexpr Day(const int day) noexcept : BaseValueObject<int>(day) { assert(day > 0); }
     constexpr auto operator++() noexcept -> Day& {
         ++value_;
         return *this;
@@ -27,7 +27,7 @@ class Month final : public value_object::BaseValueObject<int>,
 
   public:
     explicit constexpr Month(const int month) noexcept : BaseValueObject<int>(month) {
-        ASSERT(month > 0);
+        assert(month > 0);
     }
     constexpr auto operator++() noexcept -> Month& {
         ++value_;
@@ -42,7 +42,7 @@ class Year final : public value_object::BaseValueObject<int>,
 
   public:
     explicit constexpr Year(const int year) noexcept : BaseValueObject<int>(year) {
-        ASSERT(year > 0);
+        assert(year > 0);
     }
 
     constexpr auto operator++() noexcept -> Year& {

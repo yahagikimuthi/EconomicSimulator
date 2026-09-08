@@ -37,8 +37,8 @@ class RosterEntry final {
         Roster&                roster
     ) noexcept
         : employeeId{Id}, wage{Wage}, companyBoard_{board}, workspace_{space}, roster_{roster} {
-        ASSERT(Wage.isPositive());
-        ASSERT(Id != companyBoard_.firmId);
+        assert(Wage.isPositive());
+        assert(Id != companyBoard_.firmId);
     }
     // std::deque<RosterEntry>に対しstd::swapを施すと
     // entrantが持つ参照が無意味となる。
@@ -50,14 +50,14 @@ class RosterEntry final {
     ~RosterEntry() noexcept                                     = default;
 
     void addInput(const double productPower, const Date& today) noexcept {
-        ASSERT(isOccupied_);
+        assert(isOccupied_);
         if (today.day() == companyBoard_.workDay) workspace_.addInput(productPower);
     }
     void resign() noexcept;
     void payWage(const Money payment) noexcept {
-        ASSERT(paidWage_.isZeroOrMore());
-        ASSERT(payment.isZeroOrMore());
-        ASSERT(isOccupied_);
+        assert(paidWage_.isZeroOrMore());
+        assert(payment.isZeroOrMore());
+        assert(isOccupied_);
         paidWage_ += payment;
     }
 
@@ -65,7 +65,7 @@ class RosterEntry final {
     [[nodiscard]] auto isOccupied() const noexcept -> bool { return isOccupied_; }
     [[nodiscard]] auto takeoutPaidWage() noexcept -> Money {
         const auto out = std::exchange(paidWage_, Money{0.0});
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return out;
     }
 
@@ -87,8 +87,8 @@ class Roster final {
     [[nodiscard]] auto add(
         const AgentID id, const Wage wage, CompanyBoard& board, base_goods::Workspace& space
     ) noexcept -> RosterEntry& {
-        ASSERT(wage.isPositive());
-        ASSERT(id != board.firmId);
+        assert(wage.isPositive());
+        assert(id != board.firmId);
 
         sumWage_ += wage;
 
@@ -122,7 +122,7 @@ class Roster final {
     [[nodiscard]] auto rawEntries() noexcept -> auto { return std::ranges::subrange{entries_}; }
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
-        ASSERT(entries_.size() >= empties_.size());
+        assert(entries_.size() >= empties_.size());
         return HeadCount{entries_.size() - empties_.size()};
     }
 
@@ -135,7 +135,7 @@ class Roster final {
 };
 
 inline void RosterEntry::resign() noexcept {
-    ASSERT(paidWage_.isZero());
+    assert(paidWage_.isZero());
     isOccupied_ = false;
     roster_.resign(*this);
 }
@@ -145,7 +145,7 @@ class Entry final {
   public:
     explicit Entry(const AgentID Id, const double power, const Request& req) noexcept
         : entrantId{Id}, productPower{power}, request{req} {
-        ASSERT(power > 0.0);
+        assert(power > 0.0);
     }
     // Request::entries() noexcept -> std::ranges::subrangeを呼び、それに対しstd::sortを施すと
     // entrantが持つ参照が無効化してしまう。
@@ -161,25 +161,25 @@ class Entry final {
     const double  productPower;
 
     void offer() noexcept {
-        ASSERT(not isOffer_);
+        assert(not isOffer_);
         isOffer_ = true;
     }
     void accept() noexcept {
-        ASSERT(isOffer_);
-        ASSERT(not isAccept_);
+        assert(isOffer_);
+        assert(not isAccept_);
         isAccept_ = true;
     }
     void setRoster(RosterEntry& rosterEntry) noexcept {
-        ASSERT(isAccept_);
-        ASSERT(not rosterEntry_);
+        assert(isAccept_);
+        assert(not rosterEntry_);
         rosterEntry_ = rosterEntry;
     }
 
     [[nodiscard]] auto isOffer() const noexcept -> bool { return isOffer_; }
     [[nodiscard]] auto isAccept() const noexcept -> bool { return isAccept_; }
     [[nodiscard]] auto takeoutRosterEntry() noexcept -> RosterEntry& {
-        ASSERT(isAccept_);
-        ASSERT(rosterEntry_);
+        assert(isAccept_);
+        assert(rosterEntry_);
         auto& out = *rosterEntry_;
         rosterEntry_.reset();
         return out;
@@ -196,11 +196,11 @@ class Entry final {
 class Request final {
   public:
     explicit Request(const AgentID Id, const Wage Wage) noexcept : firmID{Id}, wage{Wage} {
-        ASSERT(Wage.isPositive());
+        assert(Wage.isPositive());
     }
     [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
-        ASSERT(productPower > 0.0);
-        ASSERT(id != firmID);
+        assert(productPower > 0.0);
+        assert(id != firmID);
         return *entries_.emplace_back(id, productPower, *this);
     }
 
@@ -218,7 +218,7 @@ class Market final {
     explicit Market() noexcept = default;
 
     [[nodiscard]] auto request(const AgentID id, const Wage wage) noexcept -> Request& {
-        ASSERT(wage.isPositive());
+        assert(wage.isPositive());
         return *requests_.emplace_back(id, wage);
     }
 
@@ -228,7 +228,7 @@ class Market final {
         std::inplace_vector<RefWrap<Request>, N>& out,
         RandomGenerator&                          rng
     ) noexcept {
-        ASSERT(out.empty());
+        assert(out.empty());
         if (out.max_size() >= requests_.size())
             packAllRequest(requestorId, out);
         else
@@ -273,7 +273,7 @@ enum class MarketPhase : char {
 };
 
 [[nodiscard]] constexpr auto toMarketPhase(const Month month) noexcept -> MarketPhase {
-    ASSERT(month.value() >= 1);
+    assert(month.value() >= 1);
     return static_cast<MarketPhase>(month.value() - 1);
 }
 }  // namespace abm::labor

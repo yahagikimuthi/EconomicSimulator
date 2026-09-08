@@ -27,11 +27,11 @@ class HHoldFinance final {
     }
 
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw) noexcept -> Money {
-        ASSERT(tryingWithdraw.isZeroOrMore());
+        assert(tryingWithdraw.isZeroOrMore());
         const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
             const auto withdraw = bankAccount_.withdraw(sub);
-            ASSERT(withdraw <= sub);
+            assert(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
             return withdraw + cashOut;
@@ -46,7 +46,7 @@ class HHoldFinance final {
     }
 
     void deposit(const Money add) noexcept {
-        ASSERT(add.isZeroOrMore());
+        assert(add.isZeroOrMore());
         if (currentCashRatio() > cashRatio_) {
             bankAccount_.deposit(add);
             return;
@@ -55,7 +55,7 @@ class HHoldFinance final {
     }
 
     [[nodiscard]] static auto claimBudget(const Budget claim) noexcept -> Budget {
-        ASSERT(claim.isZeroOrMore());
+        assert(claim.isZeroOrMore());
         return claim;
     }
 

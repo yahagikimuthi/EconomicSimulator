@@ -22,7 +22,7 @@ class Agent {
 
   protected:
     explicit Agent() noexcept {
-        ASSERT(Day{2} <= operationDay_ and operationDay_ <= Day{global_setting::dayInMonth - 1});
+        assert(Day{2} <= operationDay_ and operationDay_ <= Day{global_setting::dayInMonth - 1});
     }
 
     const AgentID id_{agentCnt};

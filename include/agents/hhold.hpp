@@ -36,7 +36,7 @@ class HHold final : public Agent {
             goods_.revisePlan(purchasePlan);
         } else {
             const auto budget = finance_.claimBudget(total) + wage;
-            ASSERT(budget <= total + wage);
+            assert(budget <= total + wage);
             goods_.revisePlan(budget);
         }
         if (phase == LaborMarketPhase::Entry)

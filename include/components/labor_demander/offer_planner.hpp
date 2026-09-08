@@ -27,11 +27,11 @@ class OfferPlannerMemory final {
     }
     void clearLog() noexcept { employResult_.clearLog(), employPlan_.clearLog(); }
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
-        ASSERT(plan.employ.isZeroOrMore());
+        assert(plan.employ.isZeroOrMore());
         if (plan.employ.isPositive()) employPlan_.next(plan.employ);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
-        ASSERT(result.employ.isZeroOrMore());
+        assert(result.employ.isZeroOrMore());
         if (employPlan_.wasSetNext()) employResult_.next(result.employ);
         employResult_.reset();
         employPlan_.reset();
@@ -60,8 +60,8 @@ class OfferPlanner final {
         const HeadCount laborSupplier = HeadCount{global_setting::agent_count::hhold}
     ) noexcept -> HeadCount {
         const auto out = employPlan * (OfferRate{1.0} + planOfferRate(laborSupplier));
-        ASSERT(out >= employPlan);
-        ASSERT(employPlan.isZero() ? out.isZero() : true);
+        assert(out >= employPlan);
+        assert(employPlan.isZero() ? out.isZero() : true);
         const auto guarded = std::min(out, laborSupplier);
         return ceil(guarded);
     }
@@ -73,7 +73,7 @@ class OfferPlanner final {
         if (not nextRate) return rateCache_;
         rateCache_ = *nextRate;
 
-        ASSERT(nextRate->isPositive());
+        assert(nextRate->isPositive());
         return *nextRate;
     }
 
@@ -82,7 +82,7 @@ class OfferPlanner final {
         const auto lastEmployResult = memory_.lastEmployResult();
         const auto lastEmployPlan   = memory_.lastEmployPlan();
         if (not lastEmployResult or not lastEmployPlan) return std::nullopt;
-        ASSERT(not lastEmployPlan->isZero());
+        assert(not lastEmployPlan->isZero());
 
         const auto alpha = std::abs(rng_.randNormal(0.0, adjustVol_));
         const auto add   = [=]() noexcept -> OfferRate {

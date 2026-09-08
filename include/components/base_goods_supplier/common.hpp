@@ -64,14 +64,14 @@ class CentralMemory final {
     explicit CentralMemory() noexcept = default;
 
     void listenTradePlan(const TradePlan& plan) noexcept {
-        ASSERT(plan.price.isZeroOrMore());
-        ASSERT(plan.supply.isZeroOrMore());
+        assert(plan.price.isZeroOrMore());
+        assert(plan.supply.isZeroOrMore());
         pricePlan_  = plan.price;
         supplyPlan_ = plan.supply;
     }
 
     void listenMarkupPlan(const MarkupRate markup) noexcept {
-        ASSERT(markup.isPositive());
+        assert(markup.isPositive());
         markupPlan_ = markup;
     }
 

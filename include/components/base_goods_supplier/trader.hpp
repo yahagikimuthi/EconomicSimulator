@@ -28,7 +28,7 @@ class Trader final {
         : rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
     void post(const AgentID id, const TradePlan& plan, MarketT& market) noexcept {
-        ASSERT(plan.supply.isZeroOrMore());
+        assert(plan.supply.isZeroOrMore());
         if (plan.supply.isZero()) return;
         myEntry_ = market.entry(id, plan.price, plan.supply);
         ledger_.makeNewPage(plan.supply);

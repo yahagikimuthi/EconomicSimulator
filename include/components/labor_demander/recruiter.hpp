@@ -35,37 +35,37 @@ class Ledger final {
     explicit Ledger() noexcept = default;
 
     void makeNewPage(const HeadCount offerPlan) noexcept {
-        ASSERT(offerPlan.isZeroOrMore());
+        assert(offerPlan.isZeroOrMore());
         offerPlan_ = offerPlan;
     }
 
     [[nodiscard]] auto offerPlan() const noexcept -> HeadCount {
-        ASSERT(offerPlan_.isZeroOrMore());
+        assert(offerPlan_.isZeroOrMore());
         return offerPlan_;
     }
 
     void addApplicantsCnt(const HeadCount applicant) noexcept {
-        ASSERT(applicant.isZeroOrMore());
-        ASSERT(applicants_.isZero());
+        assert(applicant.isZeroOrMore());
+        assert(applicants_.isZero());
         applicants_ += applicant;
     }
 
     void addEmployCnt(const HeadCount employ) noexcept {
-        ASSERT(employ.isZeroOrMore());
-        ASSERT(employ_.isZero());
+        assert(employ.isZeroOrMore());
+        assert(employ_.isZero());
         employ_ += employ;
     }
 
     [[nodiscard]] auto publishResult() const noexcept -> RecruitResult {
-        ASSERT(applicants_.isZeroOrMore());
-        ASSERT(employ_.isZeroOrMore());
+        assert(applicants_.isZeroOrMore());
+        assert(employ_.isZeroOrMore());
         return {.applicants = applicants_, .employ = employ_};
     }
 
     void reset() noexcept {
-        ASSERT(offerPlan_.isZeroOrMore());
-        ASSERT(applicants_.isZeroOrMore());
-        ASSERT(employ_.isZeroOrMore());
+        assert(offerPlan_.isZeroOrMore());
+        assert(applicants_.isZeroOrMore());
+        assert(employ_.isZeroOrMore());
 
         offerPlan_ = applicants_ = employ_ = HeadCount{0.0};
     }
@@ -81,7 +81,7 @@ class Recruiter final {
     explicit Recruiter() noexcept = default;
 
     void post(const AgentID id, const RecruitPlan& plan, Market& laborMarket) noexcept {
-        ASSERT(plan.wage.isZeroOrMore());
+        assert(plan.wage.isZeroOrMore());
         if (not shouldPost(plan)) return;
         ledger_.makeNewPage(plan.offer);
         myRequest_ = laborMarket.request(id, plan.wage);
@@ -141,7 +141,7 @@ class Recruiter final {
     }
 
     [[nodiscard]] auto packEntry() noexcept -> std::span<RefWrap<Entry>> {
-        ASSERT(myRequest_);
+        assert(myRequest_);
         static thread_local auto refs = std::vector<RefWrap<Entry>>{};
         refs.clear();
         auto entries = myRequest_->entries();
@@ -157,7 +157,7 @@ class Recruiter final {
     [[nodiscard]] static auto sortApplicants(
         const HeadCount offer, const std::span<RefWrap<Entry>> entryBox
     ) noexcept -> std::span<RefWrap<Entry>> {
-        ASSERT(offer.isZeroOrMore());
+        assert(offer.isZeroOrMore());
 
         const auto k      = std::min(entryBox.size(), static_cast<std::size_t>(offer.value()));
         const auto isOver = entryBox.size() > static_cast<std::size_t>(offer.value());

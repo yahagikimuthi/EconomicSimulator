@@ -20,9 +20,9 @@ class PricePlanner final {
     [[nodiscard]] auto plan(
         const GoodsQuantity supply, const MarkupRate markup, const Budget totalCost
     ) const noexcept -> Price {
-        ASSERT(supply.isZeroOrMore());
-        ASSERT(markup.isPositive());
-        ASSERT(totalCost.isZeroOrMore());
+        assert(supply.isZeroOrMore());
+        assert(markup.isPositive());
+        assert(totalCost.isZeroOrMore());
 
         const auto price = calcPrice(supply, markup, totalCost);
         const auto alpha = rng_.randNormal(0.0, adjustVol_, -1.0, 1.0);
@@ -58,7 +58,7 @@ class DemandForecastManagerMemory final {
     void clearLog() noexcept { totalDemand_.clearLog(); }
     void reset() noexcept { totalDemand_.reset(); }
     void listenTradeResult(const TradeResult& result) noexcept {
-        ASSERT(result.totalDemand.isZeroOrMore());
+        assert(result.totalDemand.isZeroOrMore());
         totalDemand_.next(result.totalDemand);
     }
 
@@ -82,7 +82,7 @@ class DemandForecastManager final {
         if (not next) return cache_.cache();
         cache_.next(*next);
 
-        ASSERT(next->isZeroOrMore());
+        assert(next->isZeroOrMore());
         return *next;
     }
 

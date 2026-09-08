@@ -24,11 +24,11 @@ class WagePlannerMemory final {
         : employPlan_{employPlan}, applicants_{applicants} {}
 
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
-        ASSERT(plan.employ.isZeroOrMore());
+        assert(plan.employ.isZeroOrMore());
         if (plan.employ.isPositive()) employPlan_.next(plan.employ);
     }
     void listenRecruitResult(const RecruitResult& result) noexcept {
-        ASSERT(result.applicants.isZeroOrMore());
+        assert(result.applicants.isZeroOrMore());
         if (employPlan_.wasSetNext()) applicants_.next(result.applicants);
         employPlan_.reset();
         applicants_.reset();
@@ -60,7 +60,7 @@ class WagePlanner final {
     }
 
     [[nodiscard]] auto plan(const Money salesPerWorker) noexcept -> Wage {
-        ASSERT(salesPerWorker.isZeroOrMore());
+        assert(salesPerWorker.isZeroOrMore());
         const auto next = [&]() noexcept -> std::optional<Wage> {
             if (salesPerWorker <= Money{global_setting::epsilon})
                 return calcWage(Money{std::numeric_limits<double>::infinity()});
@@ -70,7 +70,7 @@ class WagePlanner final {
         if (not next) return cache_;
         cache_ = *next;
 
-        ASSERT(next->isZeroOrMore());
+        assert(next->isZeroOrMore());
         return *next;
     }
 
@@ -79,7 +79,7 @@ class WagePlanner final {
         const auto lastApplicants = memory_.lastApplicants();
         const auto lastEmployPlan = memory_.lastEmployPlan();
         if (not lastApplicants or not lastEmployPlan) return std::nullopt;
-        ASSERT(not lastEmployPlan->isZero());
+        assert(not lastEmployPlan->isZero());
 
         const auto alpha     = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
         const auto raiseRate = [=]() noexcept -> double {

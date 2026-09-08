@@ -18,33 +18,33 @@ class Ledger final {
     explicit Ledger() noexcept = default;
 
     void makeNewPage(const GoodsQuantity supply) noexcept {
-        ASSERT(supply.isZeroOrMore());
+        assert(supply.isZeroOrMore());
         supply_    = supply;
         inventory_ = supply;
     }
 
     [[nodiscard]] auto inventory() const noexcept -> GoodsQuantity {
-        ASSERT(inventory_.isZeroOrMore());
+        assert(inventory_.isZeroOrMore());
         return inventory_;
     }
 
     [[nodiscard]] auto tradableAmount(const GoodsQuantity demand) const noexcept -> GoodsQuantity {
-        ASSERT(demand.isZeroOrMore());
+        assert(demand.isZeroOrMore());
 
         const auto out = std::min(inventory_, demand);
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return out;
     }
 
     [[nodiscard]] auto isExcessDemand(const GoodsQuantity demand) const noexcept -> bool {
-        ASSERT(demand.isZeroOrMore());
+        assert(demand.isZeroOrMore());
         return demand > inventory_;
     }
 
     void readResult(const ATradeResult& result) noexcept {
-        ASSERT(result.salesAmount.isZeroOrMore());
-        ASSERT(result.price.isZeroOrMore());
-        ASSERT(result.demand.isZeroOrMore());
+        assert(result.salesAmount.isZeroOrMore());
+        assert(result.price.isZeroOrMore());
+        assert(result.demand.isZeroOrMore());
 
         inventory_ -= result.salesAmount;
         currentSales_ += result.price * result.salesAmount;
@@ -59,10 +59,10 @@ class Ledger final {
             .sales        = currentSales_
         };
 
-        ASSERT(out.soldAmount.isZeroOrMore());
-        ASSERT(out.unsoldAmount.isZeroOrMore());
-        ASSERT(out.totalDemand.isZeroOrMore());
-        ASSERT(out.sales >= Money{0.0});
+        assert(out.soldAmount.isZeroOrMore());
+        assert(out.unsoldAmount.isZeroOrMore());
+        assert(out.totalDemand.isZeroOrMore());
+        assert(out.sales >= Money{0.0});
         return out;
     }
 

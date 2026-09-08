@@ -20,12 +20,6 @@ struct Overloaded final : Ts... {
     using Ts::operator()...;
 };
 
-#ifdef __clang__
-#define ASSERT(...) assert(__VA_ARGS__)  // NOLINT
-#else
-#define ASSERT(...) contract_assert(__VA_ARGS__)
-#endif
-
 template <typename T>
 using RefWrap = std::reference_wrapper<T>;
 
@@ -74,14 +68,14 @@ class RandomGenerator final {
     [[nodiscard]] auto discreteDistribution(
         Container&& container, const double total, Proj&& proj = {}
     ) noexcept -> decltype(auto) {
-        ASSERT(total > 0.0);
+        assert(total > 0.0);
         const auto target     = rand(0.0, total);
         auto       currentCnt = 0.0;
         for (auto& elem : std::forward<Container>(container)) {
             currentCnt += std::invoke(proj, elem);
             if (currentCnt >= target) return elem;
         }
-        ASSERT(false);
+        assert(false);
         std::unreachable();
     }
 

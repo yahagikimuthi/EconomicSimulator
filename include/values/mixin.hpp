@@ -63,7 +63,7 @@ struct ScholarMixin {
     friend Derived;
 
     [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> double {
-        ASSERT(rhs.value_ != 0.0);
+        assert(rhs.value_ != 0.0);
         return lhs.value_ / rhs.value_;
     }
     friend constexpr auto operator*=(Derived& lhs, double rhs) noexcept -> Derived& {
@@ -78,12 +78,12 @@ struct ScholarMixin {
         return rhs * lhs;
     }
     friend constexpr auto operator/=(Derived& lhs, double rhs) noexcept -> Derived& {
-        ASSERT(rhs != 0.0);
+        assert(rhs != 0.0);
         lhs.value_ /= rhs;
         return lhs;
     }
     [[nodiscard]] friend constexpr auto operator/(Derived lhs, double rhs) noexcept -> Derived {
-        ASSERT(rhs != 0.0);
+        assert(rhs != 0.0);
         lhs /= rhs;
         return lhs;
     }

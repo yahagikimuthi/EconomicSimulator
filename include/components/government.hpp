@@ -48,7 +48,7 @@ class Government final {
     [[nodiscard]] auto collectIncomeTax(const Money income) noexcept -> Money {
         if (income <= Money{0.0}) return income;
         const auto tax = incomeTaxStrategy_.calculate(income);
-        ASSERT(tax <= income);
+        assert(tax <= income);
         finance_.assetPlus(tax);
         return income - tax;
     }
@@ -56,7 +56,7 @@ class Government final {
     [[nodiscard]] auto collectSalesTax(const Money sales) noexcept -> Money {
         if (sales <= Money{0.0}) return sales;
         const auto tax = salesTaxStrategy_.calculate(sales);
-        ASSERT(tax <= sales);
+        assert(tax <= sales);
         finance_.assetPlus(tax);
         return sales - tax;
     }
@@ -64,7 +64,7 @@ class Government final {
     [[nodiscard]] auto collectCorporateTax(const Money profit) noexcept -> Money {
         if (profit <= Money{0.0}) return profit;
         const auto tax = corporateTaxStrategy_.calculate(profit);
-        ASSERT(tax <= profit);
+        assert(tax <= profit);
         finance_.assetPlus(tax);
         return profit - tax;
     }

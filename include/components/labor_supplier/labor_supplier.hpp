@@ -57,7 +57,7 @@ class LaborSupplier final {
 
     [[nodiscard]] auto wage() const noexcept -> Budget {
         const auto out = employment_.wage();
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return static_cast<Budget>(out);
     }
 

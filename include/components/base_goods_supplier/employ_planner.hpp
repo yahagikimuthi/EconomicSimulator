@@ -22,7 +22,7 @@ class EmployPlannerMemory final {
     void clearLog() noexcept { supply_.clearLog(); }
     void reset() noexcept { supply_.reset(); }
     void listenTradePlan(const TradePlan& plan) noexcept {
-        ASSERT(plan.supply.isZeroOrMore());
+        assert(plan.supply.isZeroOrMore());
         if (plan.supply.isPositive()) supply_.next(plan.supply);
     }
 
@@ -40,8 +40,8 @@ class EmployPlanner final {
     [[nodiscard]] auto plan(
         const double firmProductPower, const HeadCount employee, const GoodsQuantity targetCapital
     ) noexcept -> HeadCount {
-        ASSERT(firmProductPower >= 0.0);
-        ASSERT(employee.isZeroOrMore());
+        assert(firmProductPower >= 0.0);
+        assert(employee.isZeroOrMore());
 
         const auto out = calc(firmProductPower, employee, targetCapital);
         memory_.clearLog();
@@ -59,12 +59,12 @@ class EmployPlanner final {
     [[nodiscard]] auto calc(
         const double firmProductPower, const HeadCount employee, const GoodsQuantity targetCapital
     ) noexcept -> std::optional<HeadCount> {
-        ASSERT(firmProductPower >= 0.0);
-        ASSERT(employee.isZeroOrMore());
+        assert(firmProductPower >= 0.0);
+        assert(employee.isZeroOrMore());
 
         const auto lastSupply = memory_.lastSupply();
         if (not lastSupply) return std::nullopt;
-        ASSERT(lastSupply->isZeroOrMore());
+        assert(lastSupply->isZeroOrMore());
         const auto isEmploying = employee != HeadCount{0.0};
         const auto avgPower =
             isEmploying ? lastSupply->value() / employee.value() : firmProductPower;

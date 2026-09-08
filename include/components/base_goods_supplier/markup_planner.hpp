@@ -26,12 +26,12 @@ class MarkupPlannerMemory final {
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
-        ASSERT(result.soldAmount.isZeroOrMore());
+        assert(result.soldAmount.isZeroOrMore());
         if (result.soldAmount.isPositive()) salesAmount_.next(result.soldAmount);
     }
 
     void listenTradePlan(const TradePlan& plan) noexcept {
-        ASSERT(plan.supply.isZeroOrMore());
+        assert(plan.supply.isZeroOrMore());
         if (salesAmount_.wasSetNext()) supply_.next(plan.supply);
     }
 
@@ -57,7 +57,7 @@ class MarkupPlanner final {
     }
 
     [[nodiscard]] auto plan(const double targetIvRatio) noexcept -> MarkupRate {
-        ASSERT(0.0 < targetIvRatio and targetIvRatio < 1.0);
+        assert(0.0 < targetIvRatio and targetIvRatio < 1.0);
 
         const auto next = calcNextMarkup(targetIvRatio);
         memory_.clearLog();
@@ -78,7 +78,7 @@ class MarkupPlanner final {
         const auto lastSupply      = memory_.lastSupply();
         const auto lastSalesAmount = memory_.lastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
-        ASSERT(lastSupply->isZeroOrMore());
+        assert(lastSupply->isZeroOrMore());
         const auto inventory  = *lastSupply - *lastSalesAmount;
         const auto isSupplied = *lastSupply != GoodsQuantity{0.0};
         const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio : true;

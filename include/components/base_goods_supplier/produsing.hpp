@@ -21,10 +21,10 @@ class Producer final {
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.takeout();
-        ASSERT(workerInput.isZeroOrMore());
+        assert(workerInput.isZeroOrMore());
 
         const auto capitalEquipInput = capital_ * capitalEfficiency_;
-        ASSERT(capital_.isZeroOrMore());
+        assert(capital_.isZeroOrMore());
         capital_ *= (1.0 - capitalDepreciationRate_);
 
         const auto input = baseProductPower_ * std::min(workerInput, capitalEquipInput);
@@ -32,7 +32,7 @@ class Producer final {
     }
 
     void addProducingEquip(const GoodsQuantity capital) noexcept {
-        ASSERT(capital.isZeroOrMore());
+        assert(capital.isZeroOrMore());
         capital_ += capital;
     }
 
@@ -88,9 +88,9 @@ class ProducingSystem final {
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto out = producer_.produce() + inventory_;
-        ASSERT(inventory_.isZeroOrMore());
+        assert(inventory_.isZeroOrMore());
         inventory_ = GoodsQuantity{0.0};
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return out;
     }
 

@@ -31,7 +31,7 @@ class Workspace final {
     auto operator=(Workspace&&) noexcept -> Workspace& = delete;
 
     void addInput(const double workerProductPower) noexcept {
-        ASSERT(workerProductPower > 0.0);
+        assert(workerProductPower > 0.0);
         totalInput_.fetch_add(workerProductPower);  // TODO 処理系が対応する場合store_addに変更
     }
     [[nodiscard]] auto takeout() noexcept -> GoodsQuantity {
@@ -52,7 +52,7 @@ class Request final {
     using EntryT = Entry<MarketT>;
     explicit Request(const Money pay, const EntryT& e) noexcept
         : payment{pay}, remainPaid_{pay}, entry_{e} {
-        ASSERT(pay.isPositive());
+        assert(pay.isPositive());
     }
     // Entry::requests() noexcept -> std::ranges::subrangeを呼び、それに対しstd::swapを施すと
     // Requestorが持つ参照が無意味となる。
@@ -64,13 +64,13 @@ class Request final {
     ~Request() noexcept                                 = default;
 
     [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity {
-        ASSERT(tradeAmount_.isZeroOrMore());
+        assert(tradeAmount_.isZeroOrMore());
         return tradeAmount_;
     }
     [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
     [[nodiscard]] auto takeoutRemainPaid() noexcept -> Money {
         const auto out = std::exchange(remainPaid_, Money{0.0});
-        ASSERT(out.isZeroOrMore());
+        assert(out.isZeroOrMore());
         return out;
     }
 
@@ -94,8 +94,8 @@ class Entry final {
         const AgentID i, const Price p, const GoodsQuantity s, Market<MarketT>& market
     ) noexcept
         : id{i}, price{p}, supply{s}, market_{market} {
-        ASSERT(p.isPositive());
-        ASSERT(s.isPositive());
+        assert(p.isPositive());
+        assert(s.isPositive());
     }
 
     [[nodiscard]] auto request(const Money payment) noexcept -> RequestT& {
@@ -120,18 +120,18 @@ class Entry final {
 template <EMarket MarketT>
 [[nodiscard]] inline auto Request<MarketT>::trade(const GoodsQuantity tradeAmount
 ) noexcept -> Money {
-    ASSERT(tradeAmount_.isZero());
-    ASSERT(tradeAmount.isZeroOrMore());
-    ASSERT(tradeAmount <= entry_.supply);
-    ASSERT([&]() noexcept -> bool {
+    assert(tradeAmount_.isZero());
+    assert(tradeAmount.isZeroOrMore());
+    assert(tradeAmount <= entry_.supply);
+    assert([&]() noexcept -> bool {
         const auto desired = payment / entry_.price;
         return tradeAmount <= desired;
     }());
     tradeAmount_         = tradeAmount;
     const auto actualPay = tradeAmount * entry_.price;
     remainPaid_ -= actualPay;
-    ASSERT(payment.isZeroOrMore());
-    ASSERT(remainPaid_.isZeroOrMore());
+    assert(payment.isZeroOrMore());
+    assert(remainPaid_.isZeroOrMore());
     return actualPay;
 }
 
@@ -160,8 +160,8 @@ class Market final {
         if (not result or not canReuse(newEntry.disableDay))
             return *entries_.emplace_back(id, price, supply, *this);
 
-        ASSERT(newEntry.entry);
-        ASSERT(not newEntry.entry->isValid());
+        assert(newEntry.entry);
+        assert(not newEntry.entry->isValid());
         std::destroy_at(newEntry.entry);
         return *std::construct_at(newEntry.entry, id, price, supply, *this);
     }
@@ -190,7 +190,7 @@ class Market final {
     }
 
     [[nodiscard]] auto canReuse(const Day disableDay) const noexcept -> bool {
-        ASSERT(disableDay < Day{global_setting::dayInMonth});
+        assert(disableDay < Day{global_setting::dayInMonth});
         if (disableDay == today_.day()) return false;
         if (disableDay + Day{1} == today_.day()) return false;
         return true;
@@ -207,7 +207,7 @@ template <EMarket MarketT>
 inline void Entry<MarketT>::disable() noexcept {
     isValid_ = false;
     market_.disable(*this);
-    ASSERT([&]() noexcept -> bool {
+    assert([&]() noexcept -> bool {
         for (auto& req : requests_)
             if (not req.takeoutRemainPaid().isZero()) return false;
         return true;

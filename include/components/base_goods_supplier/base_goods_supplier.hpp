@@ -36,7 +36,7 @@ class BaseGoodsSupplier final {
     ~BaseGoodsSupplier() noexcept                                           = default;
 
     [[nodiscard]] auto planAndExpectSales(const Budget totalCost) noexcept -> Budget {
-        ASSERT(totalCost.isZeroOrMore());
+        assert(totalCost.isZeroOrMore());
         const auto supply = producingSystem_.produce();
         tradingSystem_.plan(supply, totalCost, mediator_);
         return salesForecast();
@@ -55,7 +55,7 @@ class BaseGoodsSupplier final {
     }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
-        ASSERT(employee.isZeroOrMore());
+        assert(employee.isZeroOrMore());
 
         const auto targetSupply = tradingSystem_.requiresSupply();
         return producingSystem_.calcDesiredEmploy(targetSupply, employee);

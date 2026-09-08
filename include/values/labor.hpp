@@ -52,11 +52,11 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
     return rhs * lhs;
 }
 [[nodiscard]] constexpr auto operator/(Money lhs, Wage rhs) noexcept -> HeadCount {
-    ASSERT(rhs != Wage{0.0});
+    assert(rhs != Wage{0.0});
     return HeadCount{lhs.value() / rhs.value()};
 }
 [[nodiscard]] constexpr auto operator/(Money lhs, HeadCount rhs) noexcept -> Wage {
-    ASSERT(rhs != HeadCount{0.0});
+    assert(rhs != HeadCount{0.0});
     return Wage{lhs.value() / rhs.value()};
 }
 

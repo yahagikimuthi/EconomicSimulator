@@ -29,9 +29,9 @@ class HumanResource final {
     }
 
     void revisePlan(const Budget budget) noexcept {
-        ASSERT(requestedBudget_);
-        ASSERT(budget <= requestedBudget_);
-        ASSERT(budget.isZeroOrMore());
+        assert(requestedBudget_);
+        assert(budget <= requestedBudget_);
+        assert(budget.isZeroOrMore());
         const auto reqBudget = *requestedBudget_;
         requestedBudget_.reset();
 
@@ -44,9 +44,9 @@ class HumanResource final {
     }
 
     void layOffs() noexcept {
-        ASSERT(layOffsPlan_);
+        assert(layOffsPlan_);
         const auto layOffsCnt = layOffsPlan_;
-        ASSERT(layOffsCnt->isZeroOrMore());
+        assert(layOffsCnt->isZeroOrMore());
 
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : roster_.rawEntries()) {
@@ -68,13 +68,13 @@ class HumanResource final {
     [[nodiscard]] auto makeAddRosterFn(base_goods::Workspace& workspace) noexcept -> AddRosterFn
         auto {
         return [&] [[nodiscard]] (const AgentID id, const Wage wage) noexcept -> RosterEntry& {
-            ASSERT(wage.isPositive());
+            assert(wage.isPositive());
             return roster_.add(id, wage, companyBoard_, workspace);
         };
     }
 
     [[nodiscard]] auto requestedBudget() const noexcept -> Budget {
-        ASSERT(requestedBudget_);
+        assert(requestedBudget_);
         return *requestedBudget_;
     }
 
@@ -82,7 +82,7 @@ class HumanResource final {
 
     [[nodiscard]] auto sumWage() const noexcept -> Wage {
         const auto out = roster_.sumWage();
-        ASSERT(out >= Wage{0.0});
+        assert(out >= Wage{0.0});
         return out;
     }
 

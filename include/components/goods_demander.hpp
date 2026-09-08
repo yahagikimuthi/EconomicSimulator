@@ -52,14 +52,14 @@ class GoodsDemander final {
     }
 
     void revisePlan(const Budget budget) noexcept {
-        ASSERT(budget_);
-        ASSERT(budget <= budget_);
+        assert(budget_);
+        assert(budget <= budget_);
         budget_ = budget;
     }
 
     template <TryWithdrawFn F>
     void request(const AgentID id, F&& withdrawFn, Market& market) noexcept {
-        ASSERT(budget_);
+        assert(budget_);
         if (budget_->isZeroOrLess()) return;
         const auto availableCash = std::forward<F>(withdrawFn)(*budget_);
         trader_.request(id, availableCash, market);

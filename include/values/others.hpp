@@ -15,7 +15,7 @@ class TaxRate final : public value_object::BaseValueObject<double>,
 
   public:
     explicit constexpr TaxRate(const double value) noexcept : BaseValueObject<double>(value) {
-        ASSERT(0.0 <= value and value <= 1.0);
+        assert(0.0 <= value and value <= 1.0);
     }
 };
 
