@@ -31,9 +31,9 @@ class Logger final {
 
     [[nodiscard]] auto isValid() const noexcept -> bool { return file_.isValid(); }
 
-    void save(const CensusDropBox& dropBox, const Date date) noexcept {
+    void save(const CensusDropBox& dropBox, const int step) noexcept {
         namespace name = global_setting::save_name;
-        auto groupPath = std::string{"/step_" + std::to_string(date.toFlatTime().value())};
+        auto groupPath = std::string{"/step_" + std::to_string(step)};
         auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
         auto create =

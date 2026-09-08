@@ -13,7 +13,6 @@
 
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 
@@ -258,23 +257,8 @@ class Market final {
 
     tbb::concurrent_vector<Request> requests_;
 };
-
-enum class MarketPhase : char {
-    RequestAndLayOffs,
-    Entry,
-    Offer,
-    Accept,
-    EndRecruiting,
-    RecordRosterEntry
-};
-
-[[nodiscard]] constexpr auto toMarketPhase(const Month month) noexcept -> MarketPhase {
-    assert(month.value() >= 1);
-    return static_cast<MarketPhase>(month.value() - 1);
-}
 }  // namespace abm::labor
 
 namespace abm {
-using LaborMarket      = labor::Market;
-using LaborMarketPhase = labor::MarketPhase;
+using LaborMarket = labor::Market;
 }  // namespace abm

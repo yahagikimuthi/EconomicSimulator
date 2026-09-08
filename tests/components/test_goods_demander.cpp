@@ -3,7 +3,6 @@
 #include "components/finance/others_finance.hpp"
 #include "doctest.h"
 #include "tests/util.hpp"
-#include "values/date.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::goods::demander {
@@ -12,7 +11,6 @@ TEST_CASE("Traderのテスト") {  // NOLINT
     [[maybe_unused]] auto rng     = makeRng();
     [[maybe_unused]] auto trader  = Trader{rng};
     [[maybe_unused]] auto finance = HHoldFinance{AgentID{42}, rng};
-    [[maybe_unused]] auto date    = Date{1};
     [[maybe_unused]] auto market  = Market{};
 }
 }  // namespace
