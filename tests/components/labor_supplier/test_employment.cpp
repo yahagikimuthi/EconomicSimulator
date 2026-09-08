@@ -74,7 +74,7 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
 
         SUBCASE("労働日の場合、労働貢献が行われる") {
             CHECK(space.takeout().isZero());
-            employment.work(finance.makeDepositFn(), Date{14});
+            employment.work(finance.makeDepositFn(), Date{15});
             CHECK(space.takeout().isPositive());
         }
 
@@ -92,7 +92,7 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
         SUBCASE("エントリーで書かれた労働生産性と同じ分だけ労働貢献をすること") {
             const auto entry = employment.makeEntrySheetFn(AgentID{42})(req6);
 
-            employment.work(finance.makeDepositFn(), Date{14});
+            employment.work(finance.makeDepositFn(), Date{15});
 
             CHECK(space.takeout().value() == doctest::Approx(entry.productPower));
         }

@@ -83,7 +83,7 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
     auto& entry  = roster.add(AgentID{101}, Wage{101}, board, space);
 
     SUBCASE("労働日の場合、Workspaceに労働貢献を実際に行うこと") {
-        entry.addInput(10.0, Date{workDay.value() - 1});
+        entry.addInput(10.0, Date{workDay.value()});
 
         const auto input = space.takeout();
         CHECK(input.value() == 10.0);
