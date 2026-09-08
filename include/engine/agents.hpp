@@ -19,7 +19,11 @@ struct Agent {
 };
 
 struct CapitalFirm : Agent {
-    explicit CapitalFirm(RandomGenerator& masterRng) noexcept;
+    explicit CapitalFirm(RandomGenerator& masterRng) noexcept
+        : finance{id, masterRng},
+          laborDemander{id, masterRng},
+          capitalDemander{masterRng},
+          capitalSupplier{masterRng} {}
 
     FirmFinance     finance;
     LaborDemander   laborDemander;
@@ -28,7 +32,11 @@ struct CapitalFirm : Agent {
 };
 
 struct GoodsFirm : Agent {
-    explicit GoodsFirm(RandomGenerator& masterRg) noexcept;
+    explicit GoodsFirm(RandomGenerator& masterRng) noexcept
+        : finance{id, masterRng},
+          laborDemander{id, masterRng},
+          capitalDemander{masterRng},
+          goodsSupplier{masterRng} {}
 
     FirmFinance     finance;
     LaborDemander   laborDemander;
@@ -37,7 +45,8 @@ struct GoodsFirm : Agent {
 };
 
 struct HHold : Agent {
-    explicit HHold(RandomGenerator& masterRng) noexcept;
+    explicit HHold(RandomGenerator& masterRng) noexcept
+        : finance{id, masterRng}, labor{masterRng}, goods{masterRng} {}
 
     HHoldFinance  finance;
     LaborSupplier labor;
