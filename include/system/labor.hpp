@@ -30,9 +30,7 @@ inline void endRecruiting(LaborDemander& demander, GoodsSupplier& goodsSupplier)
     demander.endRecruiting(goodsSupplier.workspace());
 }
 
-inline void recordRosterEntry(HHoldFinance& finance, LaborSupplier& supplier) noexcept {
-    supplier.recordRosterEntry(finance.makeDepositFn());
-}
+inline void recordRosterEntry(LaborSupplier& supplier) noexcept { supplier.recordRosterEntry(); }
 
 inline void payWage(FirmFinance& finance, LaborDemander& demander) noexcept {
     demander.payWage(finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));

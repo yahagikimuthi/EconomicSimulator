@@ -41,13 +41,9 @@ class LaborSupplier final {
 
     void accept() noexcept { jobHunter_.accept(); }
 
-    template <DepositFn F>
-    void recordRosterEntry(F&& depositFn) noexcept {
+    void recordRosterEntry() noexcept {
         const auto acceptedEntry = jobHunter_.takeoutResult();
-        if (acceptedEntry)
-            employment_.startWorking(
-                acceptedEntry->takeoutRosterEntry(), std::forward<F>(depositFn)
-            );
+        if (acceptedEntry) employment_.startWorking(acceptedEntry->takeoutRosterEntry());
     }
 
     template <DepositFn F>

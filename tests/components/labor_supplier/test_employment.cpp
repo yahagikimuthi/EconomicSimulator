@@ -49,7 +49,6 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     }
 
     SUBCASE("雇用されている場合") {
-        employment.startWorking(rosterEntry, finance.makeDepositFn());
         CHECK(employment.isEmployed());
         CHECK(employment.wage().value() == doctest::Approx(15));
 
@@ -101,18 +100,8 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
             auto newBoard       = CompanyBoard{AgentID{202}};
             auto newRosterEntry = newRoster.add(AgentID{42}, Wage{18}, newBoard, space);
 
-            SUBCASE("事前に賃金が支払われていても回収する") {
-                rosterEntry.payWage(Money{10});
-
-                employment.startWorking(newRosterEntry, finance.makeDepositFn());
-
-                CHECK(employment.isEmployed());
-                CHECK(employment.wage().value() == 18);
-                CHECK(finance.asset().value() == doctest::Approx(beforeAsset.value() + 10));
-            }
-
             SUBCASE("isAlignedは適正に動く") {
-                employment.startWorking(newRosterEntry, finance.makeDepositFn());
+                employment.startWorking(newRosterEntry);
                 auto isAligned = employment.makeIsAlignedRequestFn();
 
                 CHECK(not isAligned(req1));

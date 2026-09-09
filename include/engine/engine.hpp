@@ -20,7 +20,7 @@ namespace abm {
 class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int endStep)
-        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endStep_{endStep} {
+        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endMonth_{endStep} {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
@@ -34,11 +34,15 @@ class Engine final {
     }
 
     void run() noexcept {
-        for (const auto _ : std::views::indices(endStep_)) {
-            runJanuaryPlanning();
-            runLabor();
+        for (const auto month : std::views::indices(endMonth_)) {
+            if (month % global_setting::monthInYear == 0) {
+                runJanuaryPlanning();
+                runLabor();
+            } else
+                runStandardPlanning();
             runCapital();
             runGoods();
+            runEndMonth();
         }
     }
 
@@ -114,21 +118,10 @@ class Engine final {
         }
 
         for (auto& hhold : hholds_) {
-            recordRosterEntry(hhold.finance, hhold.labor);
+            recordRosterEntry(hhold.labor);
         }
 
         laborMarket_.clear();
-
-        for (auto& firm : capitalFirms_) {
-            payWage(firm.finance, firm.laborDemander);
-        }
-        for (auto& firm : goodsFirms_) {
-            payWage(firm.finance, firm.laborDemander);
-        }
-
-        for (auto& hhold : hholds_) {
-            work(hhold.finance, hhold.labor);
-        }
     }
 
     void runCapital() noexcept {
@@ -191,6 +184,19 @@ class Engine final {
         goodsMarket_.clear();
     }
 
+    void runEndMonth() noexcept {
+        for (auto& firm : capitalFirms_) {
+            labor::payWage(firm.finance, firm.laborDemander);
+        }
+        for (auto& firm : goodsFirms_) {
+            labor::payWage(firm.finance, firm.laborDemander);
+        }
+
+        for (auto& hhold : hholds_) {
+            labor::work(hhold.finance, hhold.labor);
+        }
+    }
+
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
         if constexpr (not global_setting::useRuntimeRandomSeed) {
             return {
@@ -206,7 +212,7 @@ class Engine final {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    const int endStep_;
+    const int endMonth_;
 
     Logger logger_;
 

@@ -6,7 +6,6 @@
 #include "components/labor_supplier/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/labor.hpp"
 
@@ -18,12 +17,10 @@ class Employment final {
 
     [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_.has_value(); }
 
-    template <DepositFn F>
-    void startWorking(RosterEntry& rosterEntry, F&& depositFn) noexcept {
+    void startWorking(RosterEntry& rosterEntry) noexcept {
         if (isEmployed()) {
             assert(rosterEntry_->firmId() != rosterEntry.firmId());
             assert(rosterEntry_->wage <= rosterEntry.wage);
-            std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         }
         resign();
         rosterEntry_ = rosterEntry;
