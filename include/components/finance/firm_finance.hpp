@@ -56,7 +56,6 @@ class FirmFinance final {
         return static_cast<Budget>(cash_) + bankAccount_.balance();
     }
 
-  private:
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw, const AccountItem item) noexcept
         -> Money {
         assert(tryingWithdraw.isZeroOrMore());
@@ -91,6 +90,7 @@ class FirmFinance final {
             cash_ += add;
     }
 
+  private:
     [[nodiscard]] auto currentCashRatio() const noexcept -> double {
         if (asset().isZero()) return 0.0;
         return static_cast<Budget>(cash_) / asset();
