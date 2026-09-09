@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {

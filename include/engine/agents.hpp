@@ -8,6 +8,7 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "others/util.hpp"
+#include "values/common.hpp"
 
 namespace abm {
 struct Agent {

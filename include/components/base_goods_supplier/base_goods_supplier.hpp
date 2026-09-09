@@ -68,8 +68,10 @@ class BaseGoodsSupplier final {
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
-    void addCapitalEquip(const GoodsQuantity capital) noexcept {
-        producingSystem_.addProducingEquip(capital);
+    [[nodiscard]] auto makeAddCapitalFn() noexcept -> AddGoodsFn auto {
+        return [&](const GoodsQuantity capital) noexcept -> void {
+            producingSystem_.addProducingEquip(capital);
+        };
     }
 
     [[nodiscard]] auto salesForecast() const noexcept -> Budget {

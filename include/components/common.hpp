@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "values/common.hpp"
+#include "values/goods.hpp"
 
 namespace abm {
 
@@ -22,6 +23,11 @@ concept TryWithdrawFn = requires(F f, Budget budget) {
 template <typename F>
 concept DepositFn = requires(F f, Money deposit) {
     { f(deposit) } -> std::same_as<void>;
+};
+
+template <typename F>
+concept AddGoodsFn = requires(F f, GoodsQuantity goods) {
+    { f(goods) } -> std::same_as<void>;
 };
 
 template <typename... Ts>

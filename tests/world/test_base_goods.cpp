@@ -57,7 +57,7 @@ TEST_CASE("Requestのテスト") {  // NOLINT
     auto           request       = Request<EMarket::Goods>{payment, entry};
 
     SUBCASE("tradeAmountはデフォルトで0を返す") {
-        CHECK(request.tradeAmount().value() == doctest::Approx(0.0));
+        CHECK(request.takeoutTradeAmount().value() == doctest::Approx(0.0));
     }
 
     SUBCASE("takeoutRemainPaidはデフォルトでpaymentを返す") {
@@ -75,7 +75,7 @@ TEST_CASE("Requestのテスト") {  // NOLINT
         const auto sales = request.trade(desiredAmount);
 
         CHECK(sales.value() == doctest::Approx((price * desiredAmount).value()));
-        CHECK(request.tradeAmount().value() == doctest::Approx(desiredAmount.value()));
+        CHECK(request.takeoutTradeAmount().value() == doctest::Approx(desiredAmount.value()));
         CHECK(request.takeoutRemainPaid().isZero());
     }
 
@@ -87,7 +87,7 @@ TEST_CASE("Requestのテスト") {  // NOLINT
         const auto sales       = request.trade(tradeAmount);
 
         CHECK(sales.value() == doctest::Approx((price * tradeAmount).value()));
-        CHECK(request.tradeAmount().value() == doctest::Approx(tradeAmount.value()));
+        CHECK(request.takeoutTradeAmount().value() == doctest::Approx(tradeAmount.value()));
         const auto remain = request.takeoutRemainPaid();
         CHECK(remain.value() == doctest::Approx((payment - sales).value()));
         CHECK(remain.isPositive());

@@ -143,10 +143,10 @@ class Engine final {
             }
 
             for (auto& firm : capitalFirms_) {
-                afterTrade(firm.finance, firm.capitalDemander);
+                afterTrade(firm.finance, firm.capitalDemander, firm.capitalSupplier);
             }
             for (auto& firm : goodsFirms_) {
-                afterTrade(firm.finance, firm.capitalDemander);
+                afterTrade(firm.finance, firm.capitalDemander, firm.goodsSupplier);
             }
         }
 

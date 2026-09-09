@@ -39,24 +39,35 @@ class CapitalDemander final {
         Market&       market,
         const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
+        assert(budget_);
+        assert(purchaseAmountPlan_);
+
+        const auto budget       = *budget_;
+        const auto purchasePlan = *purchaseAmountPlan_;
+
+        budget_.reset();
+        purchaseAmountPlan_.reset();
+
         const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto payment =
-            std::min(static_cast<Budget>(*purchaseAmountPlan_ * pickedEntry->price), *budget_);
+            std::min(static_cast<Budget>(purchasePlan * pickedEntry->price), budget);
         const auto withdraw = std::forward<F>(withdrawFn)(payment);
-        if (not withdraw.isZero()) myRequest_ = pickedEntry->request(withdraw);
+        if (withdraw.isPositive()) myRequest_ = pickedEntry->request(withdraw);
     }
 
-    template <DepositFn F>
-    void afterTrade(F&& depositFn) noexcept {
+    template <DepositFn F1, AddGoodsFn F2>
+    void afterTrade(F1&& depositFn, F2&& addCapitalFn) noexcept {
         if (not myRequest_) return;
         const auto remain = myRequest_->takeoutRemainPaid();
-        std::forward<F>(depositFn)(remain);
+        std::forward<F1>(depositFn)(remain);
+        const auto capital = myRequest_->takeoutTradeAmount();
+        std::forward<F2>(addCapitalFn)(capital);
     }
 
   private:
     RandomGenerator              rng_;
-    Log                          log_;
+    Log                          log_;  // TODO ログ更新処理追加
     std::optional<GoodsQuantity> purchaseAmountPlan_{std::nullopt};
     std::optional<Budget>        budget_{std::nullopt};
     std::optional<Request&>      myRequest_{std::nullopt};

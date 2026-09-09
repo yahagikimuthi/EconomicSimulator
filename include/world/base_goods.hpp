@@ -60,9 +60,9 @@ class Request final {
     auto operator=(Request&&) noexcept -> Request&      = delete;
     ~Request() noexcept                                 = default;
 
-    [[nodiscard]] auto tradeAmount() const noexcept -> GoodsQuantity {
+    [[nodiscard]] auto takeoutTradeAmount() noexcept -> GoodsQuantity {
         assert(tradeAmount_.isZeroOrMore());
-        return tradeAmount_;
+        return std::exchange(tradeAmount_, GoodsQuantity{0.0});
     }
     [[nodiscard]] auto trade(const GoodsQuantity tradeAmount) noexcept -> Money;
     [[nodiscard]] auto takeoutRemainPaid() noexcept -> Money {

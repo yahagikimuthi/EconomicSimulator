@@ -1,6 +1,5 @@
 #include "components/labor_supplier/job_hunter.hpp"
 
-#include "components/finance/others_finance.hpp"
 #include "components/labor_supplier/employment.hpp"
 #include "doctest.h"
 #include "tests/util.hpp"
@@ -22,7 +21,6 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     auto                   roster      = Roster{};
     [[maybe_unused]] auto& rosterEntry = roster.add(id, Wage{10}, board, space);
     auto                   market      = Market{};
-    auto                   finance     = HHoldFinance{id, rng};
 
     SUBCASE("何もポストされていない場合、resultは空") {
         hunter.entry(
@@ -35,7 +33,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     }
 
     SUBCASE("就職している場合でも、何もポストされていない場合は空") {
-        employment.startWorking(rosterEntry, finance.makeDepositFn());
+        employment.startWorking(rosterEntry);
 
         hunter.entry(
             id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
@@ -48,7 +46,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     }
 
     SUBCASE("同じ企業のリクエストのみ存在する場合、結果は空") {
-        employment.startWorking(rosterEntry, finance.makeDepositFn());
+        employment.startWorking(rosterEntry);
 
         auto& req = market.request(AgentID{101}, Wage{1000});
 
@@ -66,7 +64,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     }
 
     SUBCASE("賃金が低いリクエストのみ存在する場合、結果は空") {
-        employment.startWorking(rosterEntry, finance.makeDepositFn());
+        employment.startWorking(rosterEntry);
 
         auto& req = market.request(AgentID{202}, Wage{1});
 
@@ -84,7 +82,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     }
 
     SUBCASE("複雑な場合も正しくエントリーが行われる") {
-        employment.startWorking(rosterEntry, finance.makeDepositFn());
+        employment.startWorking(rosterEntry);
 
         auto& req1 = market.request(AgentID{101}, Wage{1000});
         auto& req2 = market.request(AgentID{202}, Wage{1});
@@ -184,7 +182,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
             auto& req7 = market.request(AgentID{101}, Wage{10000});
             auto& req8 = market.request(AgentID{80}, Wage{606});
 
-            employment.startWorking(rosterEntry, finance.makeDepositFn());
+            employment.startWorking(rosterEntry);
             hunter.entry(
                 id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
             );

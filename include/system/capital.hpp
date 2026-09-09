@@ -23,8 +23,22 @@ inline void trade(FirmFinance& finance, CapitalSupplier& supplier) noexcept {
     supplier.trade(finance.makeDepositFn(FirmFinance::AccountItem::Sales));
 }
 
-inline void afterTrade(FirmFinance& finance, CapitalDemander& demander) noexcept {
-    demander.afterTrade(finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost));
+inline void afterTrade(
+    FirmFinance& finance, CapitalDemander& demander, CapitalSupplier& capitalSupplier
+) noexcept {
+    demander.afterTrade(
+        finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost),
+        capitalSupplier.makeAddCapitalFn()
+    );
+}
+
+inline void afterTrade(
+    FirmFinance& finance, CapitalDemander& demander, GoodsSupplier& goodsSupplier
+) noexcept {
+    demander.afterTrade(
+        finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost),
+        goodsSupplier.makeAddCapitalFn()
+    );
 }
 
 inline void endTrading(CapitalSupplier& supplier) noexcept { supplier.endTrading(); }
