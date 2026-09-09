@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+#include <cmath>
 #include <concepts>
 #include <cstddef>
 #include <vector>
@@ -17,13 +19,17 @@ class Vec final {
 
     void clear() noexcept { vec_.clear(); }
 
-    void add(const double add) noexcept { vec_.emplace_back(add); }
+    void add(const double add) noexcept {
+        assert(not std::isnan(add));
+        vec_.emplace_back(add);
+    }
 
     template <typename T>
         requires requires(T t) {
             { t.value() } -> std::same_as<double>;
         }
     void add(const T add) noexcept {
+        assert(not std::isnan(add.value()));
         vec_.emplace_back(add.value());
     }
 
