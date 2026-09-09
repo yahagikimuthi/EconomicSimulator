@@ -106,12 +106,11 @@ class Roster final {
         sumWage_ -= resignation.wage;
     }
 
-    [[nodiscard]] auto validEntries() noexcept
-        -> auto = delete(
-               "&RosterEntry::isOccupied = "
-               "falseと途中でされると、rangesは遅延評価であるから、filterを施すことにより意図通りに"
-               "動かなくなるため"
-           );
+    //! isOccupiedに触らないこと！
+    //! 未定義動作を引き起こす可能性がある！
+    [[nodiscard]] auto validEntries() noexcept -> auto {
+        return entries_ | std::views::filter(&RosterEntry::isOccupied);
+    }
 
     [[nodiscard]] auto validEntries() const noexcept -> auto {
         return std::as_const(entries_) | std::views::filter(&RosterEntry::isOccupied);
