@@ -42,6 +42,11 @@ struct FinanceDropBox final {
         hholdAssets.reserve(cnt::hhold);
     }
 
+    void clear() noexcept {
+        firmAssets.clear();
+        hholdAssets.clear();
+    }
+
     Vec firmAssets;
     Vec hholdAssets;
 };
@@ -54,6 +59,14 @@ struct LaborDropBox final {
         postedWages.reserve(firm);
         personalCosts.reserve(firm);
         wages.reserve(cnt::hhold);
+    }
+
+    void clear() noexcept {
+        postedEmployments.clear();
+        postedWages.clear();
+        employments.clear();
+        personalCosts.clear();
+        wages.clear();
     }
 
     Vec postedEmployments;
@@ -69,6 +82,13 @@ struct BaseGoodsDropBox {
         supplies.reserve(firm);
         markups.reserve(firm);
         inventories.reserve(firm);
+    }
+
+    void clear() noexcept {
+        prices.clear();
+        supplies.clear();
+        markups.clear();
+        inventories.clear();
     }
 
     Vec prices;
@@ -87,6 +107,15 @@ struct GoodsDropBox final : BaseGoodsDropBox {
 };
 
 struct CensusDropBox final {
+    explicit CensusDropBox() noexcept = default;
+
+    void clear() noexcept {
+        finance.clear();
+        labor.clear();
+        capital.clear();
+        goods.clear();
+    }
+
     FinanceDropBox finance;
     LaborDropBox   labor;
     CapitalDropBox capital;

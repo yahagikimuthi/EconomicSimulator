@@ -57,6 +57,7 @@ class Engine final {
             runGoods();
             runEndMonth();
             logger_.save(dropBox_, month);
+            dropBox_.clear();
 
             std::println("{}", calcSumAsset());
         }
