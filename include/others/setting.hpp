@@ -59,53 +59,44 @@ inline constexpr auto wages             = "wages"sv;
 }  // namespace abm::global_setting::save_name
 
 namespace abm::labor::demander::setting {
-inline constexpr RandomParameter lastApplicants = UniformParameter<int>{.min = 10, .limit = 20};
-inline constexpr RandomParameter lastEmployPlan = UniformParameter<int>{.min = 10, .limit = 20};
-inline constexpr RandomParameter offerRate = UniformParameter<double>{.min = 0.0, .limit = 1.0};
-inline constexpr RandomParameter offerRateAdjustVol =
-    UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter lastWage = UniformParameter<double>{.min = 10.0, .limit = 100.0};
-inline constexpr RandomParameter wageAdjustVol =
-    UniformParameter<double>{.min = 0.001, .limit = 0.005};
+inline constexpr RandomParameter lastApplicants     = UniformParameter{.min = 10, .limit = 20};
+inline constexpr RandomParameter lastEmployPlan     = UniformParameter{.min = 10, .limit = 20};
+inline constexpr RandomParameter offerRate          = UniformParameter{.min = 0.0, .limit = 1.0};
+inline constexpr RandomParameter offerRateAdjustVol = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter lastWage           = UniformParameter{.min = 10.0, .limit = 100.0};
+inline constexpr RandomParameter wageAdjustVol = UniformParameter{.min = 0.001, .limit = 0.005};
 }  // namespace abm::labor::demander::setting
 
 namespace abm::labor::supplier::setting {
 inline constexpr RandomParameter productPower =
     NormalParameter{.mean = 1.0, .dev = 1.0 / 3.0, .min = 0.01, .max = 2.0};
-inline constexpr auto            jobSampleCnt = 2;
-inline constexpr auto            jobEntryCnt  = 2;
-inline constexpr RandomParameter changingJobThreshold =
-    UniformParameter<double>{.min = 0.01, .limit = 0.1};
+inline constexpr auto            jobSampleCnt         = 2;
+inline constexpr auto            jobEntryCnt          = 2;
+inline constexpr RandomParameter changingJobThreshold = UniformParameter{.min = 0.01, .limit = 0.1};
 }  // namespace abm::labor::supplier::setting
 
 namespace abm::base_goods::supplier::setting {
-inline constexpr RandomParameter lastDemand = UniformParameter<double>{.min = 10.0, .limit = 100.0};
-inline constexpr RandomParameter demandForecast =
-    UniformParameter<double>{.min = 10.0, .limit = 100.0};
+inline constexpr RandomParameter lastDemand     = UniformParameter{.min = 10.0, .limit = 100.0};
+inline constexpr RandomParameter demandForecast = UniformParameter{.min = 10.0, .limit = 100.0};
 inline constexpr RandomParameter demandForecastAdjustVol =
-    UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter lastSupply = UniformParameter<double>{.min = 10.0, .limit = 20.0};
-inline constexpr RandomParameter lastSalesAmount =
-    UniformParameter<double>{.min = 10.0, .limit = 20.0};
-inline constexpr RandomParameter desiredEmploy = UniformParameter<int>{.min = 10, .limit = 20};
-inline constexpr RandomParameter lastMarkup    = UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter markupAdjustVol =
-    UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter priceAdjustVol =
-    UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter targetInvRatio =
-    UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter productPower = UniformParameter<double>{.min = 0.01, .limit = 2.0};
-inline constexpr RandomParameter capitalEfficiency =
-    UniformParameter<double>{.min = 1.0, .limit = 10.0};
+    UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter lastSupply        = UniformParameter{.min = 10.0, .limit = 20.0};
+inline constexpr RandomParameter lastSalesAmount   = UniformParameter{.min = 10.0, .limit = 20.0};
+inline constexpr RandomParameter desiredEmploy     = UniformParameter{.min = 10, .limit = 20};
+inline constexpr RandomParameter lastMarkup        = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter markupAdjustVol   = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter priceAdjustVol    = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter targetInvRatio    = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter productPower      = UniformParameter{.min = 0.01, .limit = 2.0};
+inline constexpr RandomParameter capitalEfficiency = UniformParameter{.min = 1.0, .limit = 10.0};
 inline constexpr RandomParameter capitalDepreciationRate =
-    UniformParameter<double>{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter inventory = UniformParameter<double>{.min = 10.0, .limit = 100.0};
+    UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter inventory = UniformParameter{.min = 10.0, .limit = 100.0};
 }  // namespace abm::base_goods::supplier::setting
 
 namespace abm::goods::demander::setting {
 inline constexpr auto            goodsSampleCnt = 2;
-inline constexpr RandomParameter mpc = UniformParameter<double>{.min = 0.5, .limit = 0.8};
+inline constexpr RandomParameter mpc            = UniformParameter{.min = 0.5, .limit = 0.8};
 }  // namespace abm::goods::demander::setting
 
 namespace abm::goods::setting {
@@ -127,9 +118,7 @@ inline constexpr auto corporateTaxRate = 0.1;
 }  // namespace abm::government::setting
 
 namespace abm::finance::setting {
-inline constexpr RandomParameter firmInitialAsset =
-    UniformParameter<double>{.min = 100.0, .limit = 1000.0};
-inline constexpr RandomParameter hholdInitialAsset =
-    UniformParameter<double>{.min = 10.0, .limit = 100.0};
-inline constexpr RandomParameter cashRatio = UniformParameter<double>{.min = 0.1, .limit = 1.0};
+inline constexpr RandomParameter firmInitialAsset = UniformParameter{.min = 100.0, .limit = 1000.0};
+inline constexpr RandomParameter hholdInitialAsset = UniformParameter{.min = 10.0, .limit = 100.0};
+inline constexpr RandomParameter cashRatio         = UniformParameter{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
