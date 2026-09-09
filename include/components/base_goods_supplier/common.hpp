@@ -76,7 +76,9 @@ class CentralMemory final {
         markupPlan_ = markup;
     }
 
-    void listenTradeResult(const TradeResult& result) noexcept { lastSales_ = result.sales; }
+    void listenTradeResult(const TradeResult& result) noexcept {
+        if (result.sales.isPositive()) lastSales_ = result.sales;
+    }
 
     void logging(CensusDropBox& dropBox) noexcept {
         if (pricePlan_) dropBox.prices.emplace_back(pricePlan_->value());
