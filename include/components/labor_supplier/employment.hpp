@@ -7,6 +7,7 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
+#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
@@ -56,6 +57,10 @@ class Employment final {
         return [&, myId] [[nodiscard]] (Request & req) -> Entry& {
             return req.entry(myId, productPower_);
         };
+    }
+
+    void logging(LaborDropBox& dropBox) noexcept {
+        if (isEmployed()) dropBox.wages.add(rosterEntry_->wage);
     }
 
   private:

@@ -8,7 +8,7 @@
 #include "components/labor_supplier/job_hunter.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "values/date.hpp"
+#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor::supplier {
@@ -51,11 +51,7 @@ class LaborSupplier final {
         employment_.work(std::forward<F>(depositFn));
     }
 
-    [[nodiscard]] auto wage() const noexcept -> Budget {
-        const auto out = employment_.wage();
-        assert(out.isZeroOrMore());
-        return static_cast<Budget>(out);
-    }
+    void logging(LaborDropBox& dropBox) noexcept { employment_.logging(dropBox); }
 
   private:
     [[nodiscard]] auto shouldSearch() const noexcept -> bool {
