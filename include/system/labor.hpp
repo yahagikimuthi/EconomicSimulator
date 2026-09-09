@@ -3,6 +3,7 @@
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/finance/firm_finance.hpp"
 #include "components/finance/others_finance.hpp"
+#include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "values/common.hpp"
@@ -40,8 +41,17 @@ inline void logging(LaborDropBox& dropBox, LaborSupplier& supplier) noexcept {
     supplier.logging(dropBox);
 }
 
-inline void payWage(FirmFinance& finance, LaborDemander& demander) noexcept {
-    demander.payWage(finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
+inline void payWage(
+    FirmFinance& finance, LaborDemander& demander, Government& government
+) noexcept {
+    demander.payWage([&](const Wage wage) -> Money {
+        const auto afterTax = government.payIncomeTax(static_cast<Money>(wage));
+        const auto withdraw = finance.tryWithdraw(
+            static_cast<Budget>(afterTax), FirmFinance::AccountItem::PersonalCost
+        );
+        assert(withdraw.isZeroOrMore());
+        return withdraw;
+    });
 }
 
 inline void work(HHoldFinance& finance, LaborSupplier& supplier) noexcept {

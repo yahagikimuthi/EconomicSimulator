@@ -211,10 +211,10 @@ class Engine final {
 
     void runEndMonth() noexcept {
         for (auto& firm : capitalFirms_) {
-            labor::payWage(firm.finance, firm.laborDemander);
+            labor::payWage(firm.finance, firm.laborDemander, government_);
         }
         for (auto& firm : goodsFirms_) {
-            labor::payWage(firm.finance, firm.laborDemander);
+            labor::payWage(firm.finance, firm.laborDemander, government_);
         }
 
         for (auto& hhold : hholds_) {
