@@ -15,6 +15,7 @@
 #include "values/common.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::labor::demander {
 class RecruitSystem final {
@@ -63,13 +64,6 @@ class RecruitSystem final {
         const auto result = recruiter_.endRecruiting(std::forward<F>(addRoster));
         mediator.publishRecruitResult(result);
         recruiter_.reset();
-    }
-
-    [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
-        if (not plan_) return Budget{0.0};
-        const auto out = plan_->employ * plan_->wage / 6.0;
-        assert(out.isZeroOrMore());
-        return static_cast<Budget>(out);
     }
 
   private:
@@ -137,14 +131,19 @@ class LaborDemander final {
     }
 
     [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
-        const auto recruitCost = recruitSystem_.calcMonthlyCost();
-        return static_cast<Budget>(humanResource_.sumWage()) + recruitCost;
+        return static_cast<Budget>(humanResource_.sumWage());
     }
 
     [[nodiscard]] auto employeeCnt() const noexcept -> HeadCount {
         const auto out = humanResource_.employeeCnt();
         assert(out.isZeroOrMore());
         return out;
+    }
+
+    void logging(LaborDropBox& dropBox) noexcept {
+        memory_.logging(dropBox);
+        dropBox.employments.add(employeeCnt());
+        dropBox.personalCosts.add(calcMonthlyCost());
     }
 
   private:
