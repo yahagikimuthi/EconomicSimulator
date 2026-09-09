@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <atomic>
 #include <cassert>
 
 #include "components/common.hpp"
@@ -82,23 +83,25 @@ class GovernmentFinance final {
     [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw) noexcept -> Money {
         assert(tryingWithdraw.isZeroOrMore());
         const auto sub = Money{tryingWithdraw.value()};
-        const auto out = std::min(sub, cash_);
-        cash_ -= out;
+        const auto out = Money{std::min(sub.value(), cash_.load())};
+        cash_.fetch_sub(out.value());  // TODO 処理系が対応する場合store_subに
 
         const auto moreOut = sub - out;
-        cash_ -= moreOut;
+        cash_.fetch_sub(moreOut.value());
         return sub;
     }
 
     void deposit(const Money add) noexcept {
         assert(add.isZeroOrMore());
-        cash_ += add;
+        cash_.fetch_add(add.value());  // TODO 処理系が対応する場合store_addに
     }
 
-    [[nodiscard]] auto asset() const noexcept -> Budget { return static_cast<Budget>(cash_); }
+    [[nodiscard]] auto asset() const noexcept -> Budget {
+        return static_cast<Budget>(cash_.load());
+    }
 
   private:
-    Money cash_{0.0};
+    std::atomic<double> cash_{0.0};
 };
 }  // namespace abm::finance
 
