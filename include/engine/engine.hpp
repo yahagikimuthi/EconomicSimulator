@@ -167,7 +167,7 @@ class Engine final {
         }
 
         for (auto& firm : capitalFirms_) {
-            trade(firm.finance, firm.capitalSupplier);
+            trade(firm.finance, firm.capitalSupplier, government_);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -195,7 +195,7 @@ class Engine final {
         }
 
         for (auto& firm : goodsFirms_) {
-            trade(firm.finance, firm.goodsSupplier);
+            trade(firm.finance, firm.goodsSupplier, government_);
         }
 
         for (auto& hhold : hholds_) {

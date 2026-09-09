@@ -3,6 +3,7 @@
 #include "components/base_goods_supplier/base_goods_supplier.hpp"
 #include "components/capital_demander.hpp"
 #include "components/finance/firm_finance.hpp"
+#include "components/government.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
@@ -20,8 +21,13 @@ inline void request(
     );
 }
 
-inline void trade(FirmFinance& finance, CapitalSupplier& supplier) noexcept {
-    supplier.trade(finance.makeDepositFn(FirmFinance::AccountItem::Sales));
+inline void trade(
+    FirmFinance& finance, CapitalSupplier& supplier, Government& government
+) noexcept {
+    supplier.trade([&](const Money sales) noexcept -> void {
+        const auto afterTax = government.paySalesTax(sales);
+        finance.deposit(afterTax, FirmFinance::AccountItem::Sales);
+    });
 }
 
 inline void afterTrade(

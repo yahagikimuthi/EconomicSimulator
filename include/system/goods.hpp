@@ -4,6 +4,7 @@
 #include "components/finance/firm_finance.hpp"
 #include "components/finance/others_finance.hpp"
 #include "components/goods_demander.hpp"
+#include "components/government.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
@@ -19,8 +20,11 @@ inline void request(
     demander.request(id, finance.makeWithdrawFn(), market);
 }
 
-inline void trade(FirmFinance& finance, GoodsSupplier& supplier) noexcept {
-    supplier.trade(finance.makeDepositFn(FirmFinance::AccountItem::Sales));
+inline void trade(FirmFinance& finance, GoodsSupplier& supplier, Government& government) noexcept {
+    supplier.trade([&](const Money sales) noexcept -> void {
+        const auto afterTax = government.paySalesTax(sales);
+        finance.deposit(afterTax, FirmFinance::AccountItem::Sales);
+    });
 }
 
 inline void afterTrade(HHoldFinance& finance, GoodsDemander& demander) noexcept {
