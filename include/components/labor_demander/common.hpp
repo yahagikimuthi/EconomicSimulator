@@ -16,6 +16,11 @@ concept AddRosterFn = requires(F f, AgentID id, Wage wage) {
     { f(id, wage) } -> std::same_as<RosterEntry&>;
 };
 
+template <typename F>
+concept TryPayWageFn = requires(F f, Wage wage) {
+    { f(wage) } -> std::same_as<Money>;
+};
+
 struct RecruitPlan final {
     const Wage      wage;
     const HeadCount employ;
