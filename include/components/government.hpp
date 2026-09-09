@@ -4,6 +4,7 @@
 
 #include "components/finance/others_finance.hpp"
 #include "others/setting.hpp"
+#include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
 #include "values/others.hpp"
@@ -42,8 +43,9 @@ class CorporateTaxStrategy final : public FlatTaxStrategy {
 
 class Government final {
   public:
-    explicit Government() noexcept
-        : incomeTaxStrategy_{TaxRate{setting::incomeTaxRate}},
+    explicit Government(RandomGenerator& masterRng) noexcept
+        : finance_{masterRng},
+          incomeTaxStrategy_{TaxRate{setting::incomeTaxRate}},
           salesTaxStrategy_{TaxRate{setting::salesTaxRate}},
           corporateTaxStrategy_{TaxRate{setting::corporateTaxRate}} {}
 
@@ -51,7 +53,7 @@ class Government final {
         if (income <= Money{0.0}) return income;
         const auto tax = incomeTaxStrategy_.calculate(income);
         assert(tax <= income);
-        finance_.assetPlus(tax);
+        finance_.deposit(tax);
         return income - tax;
     }
 
@@ -59,7 +61,7 @@ class Government final {
         if (sales <= Money{0.0}) return sales;
         const auto tax = salesTaxStrategy_.calculate(sales);
         assert(tax <= sales);
-        finance_.assetPlus(tax);
+        finance_.deposit(tax);
         return sales - tax;
     }
 
@@ -67,18 +69,18 @@ class Government final {
         if (profit <= Money{0.0}) return profit;
         const auto tax = corporateTaxStrategy_.calculate(profit);
         assert(tax <= profit);
-        finance_.assetPlus(tax);
+        finance_.deposit(tax);
         return profit - tax;
     }
 
     [[nodiscard]] auto provideUnemploymentBenefit(const Wage wage) noexcept -> Money {
         if (wage.isPositive()) return Money{0.0};
-        if (finance_.asset() <= Money{0.0}) return Money{0.0};
+        if (finance_.asset().isZeroOrLess()) return Money{0.0};
         ++nextUnemploymentHHoldCnt_;
         const auto cnt     = (lastUnemploymentHHoldCnt_ != 0) ? lastUnemploymentHHoldCnt_ : 1;
         const auto provide = finance_.asset() / cnt;
-        finance_.assetPlus(-provide);
-        return provide;
+        const auto out     = finance_.tryWithdraw(provide);
+        return out;
     }
 
     void reset() noexcept {
@@ -86,7 +88,7 @@ class Government final {
         nextUnemploymentHHoldCnt_ = 0;
     }
 
-    [[nodiscard]] auto asset() const noexcept -> Money { return finance_.asset(); }
+    [[nodiscard]] auto asset() const noexcept -> Budget { return finance_.asset(); }
 
   private:
     GovernmentFinance    finance_;

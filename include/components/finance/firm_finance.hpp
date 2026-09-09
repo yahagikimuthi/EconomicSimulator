@@ -25,7 +25,7 @@ class FirmFinance final {
   public:
     explicit FirmFinance(const AgentID id, RandomGenerator& masterRng) noexcept
         : bankAccount_{id},
-          cash_{Money{masterRng.random(setting::firmInitialAsset)}},
+          cash_{masterRng.random(setting::firmInitialAsset)},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
     enum class AccountItem : std::uint8_t {
