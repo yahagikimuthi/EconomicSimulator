@@ -48,13 +48,13 @@ TEST_CASE("Workspaceのテスト") {  // NOLINT
 }
 
 TEST_CASE("Requestのテスト") {  // NOLINT
-    auto           market        = Market<EMarket::Goods>{};
+    auto           market        = Market{};
     constexpr auto price         = Price{10.0};
     constexpr auto supply        = GoodsQuantity{100.0};
     constexpr auto payment       = Money{100.0};
     constexpr auto desiredAmount = payment / price;
-    auto           entry         = Entry<EMarket::Goods>{AgentID{42}, price, supply};
-    auto           request       = Request<EMarket::Goods>{payment, entry};
+    auto           entry         = Entry{AgentID{42}, price, supply};
+    auto           request       = Request{payment, entry};
 
     SUBCASE("tradeAmountはデフォルトで0を返す") {
         CHECK(request.takeoutTradeAmount().value() == doctest::Approx(0.0));
@@ -98,8 +98,8 @@ TEST_CASE("Entryのテスト") {  // NOLINT
     constexpr auto id     = AgentID{42};
     constexpr auto price  = Price{10.0};
     constexpr auto supply = GoodsQuantity{100.0};
-    auto           market = Market<EMarket::Goods>{};
-    auto           entry  = Entry<EMarket::Goods>{id, price, supply};
+    auto           market = Market{};
+    auto           entry  = Entry{id, price, supply};
 
     SUBCASE("requestsはデフォルトで空") { CHECK(entry.requests().empty()); }
 
@@ -117,7 +117,7 @@ TEST_CASE("Entryのテスト") {  // NOLINT
 }
 
 TEST_CASE("Marketのテスト") {  // NOLINT
-    auto market = Market<EMarket::Goods>{};
+    auto market = Market{};
 
     SUBCASE("pickしてもデフォルトはnull") {
         auto       rng  = RandomGenerator{{}};

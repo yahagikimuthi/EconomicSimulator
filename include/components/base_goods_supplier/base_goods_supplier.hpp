@@ -11,14 +11,10 @@
 #include "values/goods.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
-#include "world/common.hpp"
 
 namespace abm::base_goods::supplier {
 
-template <EMarket SupplyGoodsT>
-class BaseGoodsSupplier final {
-    using MarketT = Market<SupplyGoodsT>;
-
+class BaseGoodsSupplier {
   public:
     explicit BaseGoodsSupplier(RandomGenerator& masterRng) noexcept
         : producingSystem_{masterRng}, tradingSystem_{masterRng} {
@@ -42,7 +38,7 @@ class BaseGoodsSupplier final {
         return salesForecast();
     }
 
-    void post(const AgentID id, MarketT& market) noexcept { tradingSystem_.post(id, market); }
+    void post(const AgentID id, Market& market) noexcept { tradingSystem_.post(id, market); }
 
     template <DepositFn F>
     void trade(F&& depositFn) noexcept {
@@ -85,14 +81,18 @@ class BaseGoodsSupplier final {
         mediator_.subscribeTradeResult(producingSystem_);
     }
 
-    ProducingSystem             producingSystem_;
-    TradingSystem<SupplyGoodsT> tradingSystem_;
-    Mediator                    mediator_;
-    CentralMemory               memory_;
+    ProducingSystem producingSystem_;
+    TradingSystem   tradingSystem_;
+    Mediator        mediator_;
+    CentralMemory   memory_;
 };
 }  // namespace abm::base_goods::supplier
 
 namespace abm {
-using CapitalSupplier = base_goods::supplier::BaseGoodsSupplier<EMarket::Capital>;
-using GoodsSupplier   = base_goods::supplier::BaseGoodsSupplier<EMarket::Goods>;
+class CapitalSupplier : public base_goods::supplier::BaseGoodsSupplier {
+    using BaseGoodsSupplier::BaseGoodsSupplier;
+};
+class GoodsSupplier : public base_goods::supplier::BaseGoodsSupplier {
+    using BaseGoodsSupplier::BaseGoodsSupplier;
+};
 }  // namespace abm

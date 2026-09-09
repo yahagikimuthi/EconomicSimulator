@@ -6,14 +6,9 @@
 #include "components/common.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
-#include "world/common.hpp"
 
 namespace abm::base_goods::supplier {
-
-template <EMarket SupplyGoodsT>
 class TradingSystem final {
-    using MarketT = Market<SupplyGoodsT>;
-
   public:
     explicit TradingSystem(RandomGenerator& masterRng) noexcept
         : planner_{masterRng}, trader_{masterRng} {}
@@ -32,7 +27,7 @@ class TradingSystem final {
         plan_.emplace(plan);
     }
 
-    void post(const AgentID id, MarketT& market) noexcept {
+    void post(const AgentID id, Market& market) noexcept {
         assert(plan_);
         trader_.post(id, *plan_, market);
     }
@@ -51,6 +46,6 @@ class TradingSystem final {
   private:
     std::optional<TradePlan> plan_;
     TradePlanner             planner_;
-    Trader<SupplyGoodsT>     trader_;
+    Trader                   trader_;
 };
 }  // namespace abm::base_goods::supplier

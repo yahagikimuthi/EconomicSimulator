@@ -13,21 +13,15 @@
 #include "values/common.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
-#include "world/common.hpp"
 
 namespace abm::base_goods::supplier {
 
-template <EMarket SupplyGoodsT>
 class Trader final {
-    using MarketT  = Market<SupplyGoodsT>;
-    using RequestT = Request<SupplyGoodsT>;
-    using EntryT   = Entry<SupplyGoodsT>;
-
   public:
     explicit Trader(RandomGenerator& masterRng) noexcept
         : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
 
-    void post(const AgentID id, const TradePlan& plan, MarketT& market) noexcept {
+    void post(const AgentID id, const TradePlan& plan, Market& market) noexcept {
         assert(plan.supply.isZeroOrMore());
         if (plan.supply.isZero()) return;
         myEntry_ = market.entry(id, plan.price, plan.supply);
@@ -61,7 +55,7 @@ class Trader final {
     [[nodiscard]] auto calcTotalDemand() const noexcept -> GoodsQuantity {
         const auto requests = myEntry_->requests();
         return std::ranges::fold_left(
-            requests | std::views::transform([&](const RequestT& req) noexcept -> GoodsQuantity {
+            requests | std::views::transform([&](const Request& req) noexcept -> GoodsQuantity {
                 return req.payment / myEntry_->price;
             }),
             GoodsQuantity{0.0},
@@ -90,8 +84,8 @@ class Trader final {
 
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
 
-    [[nodiscard]] auto packRequest() noexcept -> std::span<Ref<RequestT>> {
-        static thread_local auto refs = std::vector<Ref<RequestT>>{};
+    [[nodiscard]] auto packRequest() noexcept -> std::span<Ref<Request>> {
+        static thread_local auto refs = std::vector<Ref<Request>>{};
         refs.clear();
         auto requests = myEntry_->requests();
         refs.reserve(requests.size());
@@ -108,7 +102,7 @@ class Trader final {
     }
 
     Ledger                  ledger_;
-    std::optional<EntryT&>  myEntry_{std::nullopt};
+    std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
 };
 }  // namespace abm::base_goods::supplier
