@@ -50,17 +50,18 @@ class Producer final {
         return std::max(out, GoodsQuantity{0.0});
     }
 
-    [[nodiscard]] auto calcDesiredEmploy(
-        const HeadCount employee, const GoodsQuantity targetProduct
-    ) const noexcept -> HeadCount {
+    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee, const GoodsQuantity targetSupply)
+        const noexcept -> HeadCount {
+        assert(targetSupply.isZeroOrMore());
         const auto avgEmployeePower = avgWorkerPower(employee);
         const auto capital          = std::max(capital_.value(), global_setting::epsilon);
         const auto bottom =
-            targetProduct / (baseProductPower_ * std::pow(capital, capitalDistributionRate_));
+            targetSupply / (baseProductPower_ * std::pow(capital, capitalDistributionRate_));
         const auto desiredLaborPower = std::pow(bottom.value(), 1.0 - capitalDistributionRate_);
 
         const auto out = desiredLaborPower / avgEmployeePower;
 
+        assert(not std::isnan(out));
         return HeadCount{out} - employee;
     }
 
@@ -89,7 +90,7 @@ class ProducingSystem final {
     [[nodiscard]] auto calcDesiredEmploy(
         const GoodsQuantity requiresSupply, const HeadCount employee
     ) const noexcept -> HeadCount {
-        return producer_.calcDesiredEmploy(employee, requiresSupply - inventory_);
+        return producer_.calcDesiredEmploy(employee, requiresSupply);
     }
 
     [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply

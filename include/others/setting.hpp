@@ -40,8 +40,8 @@ inline constexpr auto metricDataOutputPath       = "../outputs/metrics.h5"sv;
 
 namespace abm::global_setting::agent_count {
 inline constexpr auto goodsFirm   = 2;
-inline constexpr auto capitalFirm = 0;
-inline constexpr auto hhold       = 10;
+inline constexpr auto capitalFirm = 10;
+inline constexpr auto hhold       = 100;
 }  // namespace abm::global_setting::agent_count
 
 namespace abm::global_setting::save_name {

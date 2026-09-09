@@ -1,6 +1,9 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
+#include <functional>
+#include <print>
 #include <ranges>
 #include <vector>
 
@@ -18,6 +21,16 @@
 
 namespace abm {
 class Engine final {
+    [[nodiscard]] static auto calcSumAssert(const auto& agents) noexcept -> double {
+        return std::ranges::fold_left(
+            agents | std::views::transform([](const auto& agent) noexcept -> double {
+                return agent.finance.asset().value();
+            }),
+            0.0,
+            std::plus{}
+        );
+    }
+
   public:
     [[nodiscard]] explicit Engine(const int endStep)
         : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endMonth_{endStep} {
@@ -43,6 +56,7 @@ class Engine final {
             runCapital();
             runGoods();
             runEndMonth();
+            std::println("{}", calcSumAsset());
         }
     }
 
@@ -183,6 +197,10 @@ class Engine final {
         for (auto& hhold : hholds_) {
             labor::work(hhold.finance, hhold.labor);
         }
+    }
+
+    [[nodiscard]] auto calcSumAsset() noexcept -> double {
+        return calcSumAssert(capitalFirms_) + calcSumAssert(goodsFirms_) + calcSumAssert(hholds_);
     }
 
     [[nodiscard]] static constexpr auto generateSeed() noexcept -> PCG32Seed {
