@@ -44,10 +44,10 @@ class Logger final {
         create(name::postedWages, dropBox.labor.postedWages);
         create(name::employments, dropBox.labor.employments);
         create(name::sumWages, dropBox.labor.wages);
-        create(name::prices, dropBox.capital.prices);
-        create(name::supplies, dropBox.capital.supplies);
-        create(name::markups, dropBox.capital.markups);
-        create(name::inventories, dropBox.capital.inventories);
+        create(name::prices, dropBox.goods.prices);
+        create(name::supplies, dropBox.goods.supplies);
+        create(name::markups, dropBox.goods.markups);
+        create(name::inventories, dropBox.goods.inventories);
         create(name::householdAssets, dropBox.finance.hholdAssets);
         create(name::wages, dropBox.labor.wages);
     }
