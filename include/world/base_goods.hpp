@@ -2,11 +2,13 @@
 
 #include <tbb/concurrent_queue.h>
 #include <tbb/concurrent_vector.h>
+#include <algorithm>
 #include <atomic>
 #include <optional>
 #include <ranges>
 #include <utility>
 
+#include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -110,7 +112,8 @@ class Entry final {
     const auto actualPay = tradeAmount * entry_.price;
     remainPaid_ -= actualPay;
     assert(payment.isZeroOrMore());
-    assert(remainPaid_.isZeroOrMore());
+    assert(remainPaid_.value() + global_setting::epsilon > 0);
+    remainPaid_ = std::max(remainPaid_, Money{0.0});
     return actualPay;
 }
 
