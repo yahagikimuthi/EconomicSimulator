@@ -62,9 +62,7 @@ class CentralMemory final {
         if (result.sales.isPositive()) lastSales_ = result.sales;
     }
 
-    template <typename T>
-        requires(std::same_as<T, GoodsDropBox> or std::same_as<T, CapitalDropBox>)
-    void logging(T& dropBox) noexcept {
+    void logging(BaseGoodsDropBox auto& dropBox) noexcept {
         if (pricePlan_) dropBox.prices.add(*pricePlan_);
         if (markupPlan_) dropBox.markups.add(*markupPlan_);
         if (supplyPlan_) dropBox.supplies.add(*supplyPlan_);

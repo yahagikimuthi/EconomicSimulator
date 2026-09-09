@@ -29,7 +29,7 @@ class Vec final {
 
     void reserve(const std::size_t n) noexcept { vec_.reserve(n); }
 
-    auto get() const noexcept -> const std::vector<double>& { return vec_; }
+    [[nodiscard]] auto get() const noexcept -> const std::vector<double>& { return vec_; }
 
   private:
     std::vector<double> vec_;
@@ -95,9 +95,13 @@ struct CensusDropBox final {
 }  // namespace abm::drop_box
 
 namespace abm {
+
 using FinanceDropBox = drop_box::FinanceDropBox;
 using LaborDropBox   = drop_box::LaborDropBox;
 using CapitalDropBox = drop_box::CapitalDropBox;
 using GoodsDropBox   = drop_box::GoodsDropBox;
 using CensusDropBox  = drop_box::CensusDropBox;
+
+template <typename T>
+concept BaseGoodsDropBox = std::derived_from<T, drop_box::BaseGoodsDropBox>;
 }  // namespace abm

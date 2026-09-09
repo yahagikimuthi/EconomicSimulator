@@ -11,6 +11,7 @@
 #include "values/goods.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
 
@@ -67,6 +68,11 @@ class BaseGoodsSupplier {
 
     [[nodiscard]] auto salesForecast() const noexcept -> Budget {
         return static_cast<Budget>(memory_.lastSales());
+    }
+
+    void logging(BaseGoodsDropBox auto& dropBox) noexcept {
+        producingSystem_.logging(dropBox);
+        memory_.logging(dropBox);
     }
 
   private:
