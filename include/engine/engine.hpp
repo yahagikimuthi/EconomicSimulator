@@ -7,6 +7,7 @@
 #include <ranges>
 #include <vector>
 
+#include "components/government.hpp"
 #include "engine/agents.hpp"
 #include "engine/logger.hpp"
 #include "others/setting.hpp"
@@ -247,6 +248,7 @@ class Engine final {
     std::vector<CapitalFirm> capitalFirms_;
     std::vector<GoodsFirm>   goodsFirms_;
     std::vector<HHold>       hholds_;
+    Government               government_;
 
     LaborMarket   laborMarket_;
     CapitalMarket capitalMarket_;
