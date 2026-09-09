@@ -1,9 +1,9 @@
 #pragma once
 
-#include <tbb/concurrent_queue.h>
 #include <tbb/concurrent_vector.h>
 #include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <optional>
 #include <ranges>
 #include <utility>

@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cassert>
+#include <utility>
+
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
 #include "components/base_goods_supplier/trader.hpp"

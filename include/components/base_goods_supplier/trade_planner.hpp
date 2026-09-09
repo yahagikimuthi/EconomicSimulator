@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <limits>
 
 #include "components/base_goods_supplier/common.hpp"

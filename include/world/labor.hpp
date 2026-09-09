@@ -1,6 +1,7 @@
 #pragma once
 
 #include <tbb/concurrent_vector.h>
+#include <cassert>
 #include <cstddef>
 #include <deque>
 #include <functional>

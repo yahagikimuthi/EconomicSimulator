@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/offer_planner.hpp"
 #include "components/labor_demander/wage_planner.hpp"

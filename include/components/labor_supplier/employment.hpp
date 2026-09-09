@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <optional>
 
 #include "components/common.hpp"

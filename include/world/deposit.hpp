@@ -1,8 +1,8 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 
-#include "others/util.hpp"
 #include "values/common.hpp"
 
 namespace abm {

@@ -1,8 +1,7 @@
 #pragma once
 
+#include <cassert>
 #include <compare>
-
-#include "others/util.hpp"
 
 namespace abm::value_object {
 template <typename T>

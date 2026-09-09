@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include "components/finance/others_finance.hpp"
 #include "others/setting.hpp"
 #include "values/common.hpp"
