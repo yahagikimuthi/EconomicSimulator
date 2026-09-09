@@ -10,10 +10,9 @@
 #include "values/goods.hpp"
 
 namespace abm {
-
 template <typename F>
-concept AfterTaxCalculatorFn = requires(F f, const Money profit) {
-    { f(profit) } -> std::same_as<Money>;
+concept PayTaxFn = requires(F f, Money preTaxAmount) {
+    { f(preTaxAmount) } -> std::same_as<Money>;
 };
 
 template <typename F>
