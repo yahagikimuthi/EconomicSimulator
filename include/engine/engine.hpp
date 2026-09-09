@@ -130,24 +130,22 @@ class Engine final {
             entry(firm.id, firm.capitalSupplier, capitalMarket_);
         }
 
-        for (const auto _ : std::views::indices(setting::repeatTransactionCnt)) {
-            for (auto& firm : capitalFirms_) {
-                request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-            }
-            for (auto& firm : goodsFirms_) {
-                request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-            }
+        for (auto& firm : capitalFirms_) {
+            request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
+        }
+        for (auto& firm : goodsFirms_) {
+            request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
+        }
 
-            for (auto& firm : capitalFirms_) {
-                trade(firm.finance, firm.capitalSupplier);
-            }
+        for (auto& firm : capitalFirms_) {
+            trade(firm.finance, firm.capitalSupplier);
+        }
 
-            for (auto& firm : capitalFirms_) {
-                afterTrade(firm.finance, firm.capitalDemander, firm.capitalSupplier);
-            }
-            for (auto& firm : goodsFirms_) {
-                afterTrade(firm.finance, firm.capitalDemander, firm.goodsSupplier);
-            }
+        for (auto& firm : capitalFirms_) {
+            afterTrade(firm.finance, firm.capitalDemander, firm.capitalSupplier);
+        }
+        for (auto& firm : goodsFirms_) {
+            afterTrade(firm.finance, firm.capitalDemander, firm.goodsSupplier);
         }
 
         for (auto& firm : capitalFirms_) {
@@ -163,18 +161,16 @@ class Engine final {
             entry(firm.id, firm.goodsSupplier, goodsMarket_);
         }
 
-        for (const auto _ : std::views::indices(setting::repeatTransactionCnt)) {
-            for (auto& hhold : hholds_) {
-                request(hhold.id, hhold.finance, hhold.goods, goodsMarket_);
-            }
+        for (auto& hhold : hholds_) {
+            request(hhold.id, hhold.finance, hhold.goods, goodsMarket_);
+        }
 
-            for (auto& firm : goodsFirms_) {
-                trade(firm.finance, firm.goodsSupplier);
-            }
+        for (auto& firm : goodsFirms_) {
+            trade(firm.finance, firm.goodsSupplier);
+        }
 
-            for (auto& hhold : hholds_) {
-                afterTrade(hhold.finance, hhold.goods);
-            }
+        for (auto& hhold : hholds_) {
+            afterTrade(hhold.finance, hhold.goods);
         }
 
         for (auto& firm : goodsFirms_) {
