@@ -167,6 +167,6 @@ using Market  = base_goods::Market;
 }  // namespace abm::goods
 
 namespace abm {
-using GoodsMarket   = base_goods::Market;
-using CapitalMarket = base_goods::Market;
+using GoodsMarket   = goods::Market;
+using CapitalMarket = goods::Market;
 }  // namespace abm
