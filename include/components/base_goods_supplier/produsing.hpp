@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cmath>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/employ_planner.hpp"
@@ -16,19 +17,22 @@ class Producer final {
   public:
     explicit Producer(RandomGenerator& masterRng) noexcept
         : baseProductPower_{masterRng.random(setting::productPower)},
-          capitalEfficiency_{masterRng.random(setting::capitalEfficiency)},
-          capitalDepreciationRate_{masterRng.random(setting::capitalDepreciationRate)} {}
+          capitalDepreciationRate_{masterRng.random(setting::capitalDepreciationRate)},
+          capitalDistributionRate_{masterRng.random(setting::capitalDistributionRate)} {}
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.takeout();
         assert(workerInput.isZeroOrMore());
+        lastWorkerInput_ = workerInput;
 
-        const auto capitalEquipInput = capital_ * capitalEfficiency_;
+        const auto capitalInput = capital_;
         assert(capital_.isZeroOrMore());
         capital_ *= (1.0 - capitalDepreciationRate_);
 
-        const auto input = baseProductPower_ * std::min(workerInput, capitalEquipInput);
-        return input;
+        const auto input = baseProductPower_ *
+                           std::pow(capitalInput.value(), capitalDistributionRate_) *
+                           std::pow(workerInput.value(), 1.0 - capitalDistributionRate_);
+        return GoodsQuantity{input};
     }
 
     void addProducingEquip(const GoodsQuantity capital) noexcept {
@@ -40,19 +44,22 @@ class Producer final {
 
     [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return std::max(
-            (requiresSupply / (baseProductPower_ * capitalEfficiency_)) - capital_,
-            GoodsQuantity{0.0}
-        );
+        const auto bottom =
+            requiresSupply / (baseProductPower_ *
+                              std::pow(lastWorkerInput_.value(), 1.0 - capitalDistributionRate_));
+        const auto demand = std::pow(bottom.value(), 1.0 / capitalDistributionRate_);
+        const auto out    = GoodsQuantity{demand} - capital_;
+        return std::max(out, GoodsQuantity{0.0});
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
 
   private:
     Workspace     workspace_;
+    GoodsQuantity lastWorkerInput_{0.0};
     const double  baseProductPower_;
-    const double  capitalEfficiency_;
     const double  capitalDepreciationRate_;
+    const double  capitalDistributionRate_;
     GoodsQuantity capital_{0.0};
 };
 

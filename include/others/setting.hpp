@@ -80,15 +80,16 @@ inline constexpr RandomParameter lastDemand     = UniformParameter{.min = 10.0, 
 inline constexpr RandomParameter demandForecast = UniformParameter{.min = 10.0, .limit = 100.0};
 inline constexpr RandomParameter demandForecastAdjustVol =
     UniformParameter{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter lastSupply        = UniformParameter{.min = 10.0, .limit = 20.0};
-inline constexpr RandomParameter lastSalesAmount   = UniformParameter{.min = 10.0, .limit = 20.0};
-inline constexpr RandomParameter desiredEmploy     = UniformParameter{.min = 10, .limit = 20};
-inline constexpr RandomParameter lastMarkup        = UniformParameter{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter markupAdjustVol   = UniformParameter{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter priceAdjustVol    = UniformParameter{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter targetInvRatio    = UniformParameter{.min = 0.1, .limit = 0.2};
-inline constexpr RandomParameter productPower      = UniformParameter{.min = 0.01, .limit = 2.0};
-inline constexpr RandomParameter capitalEfficiency = UniformParameter{.min = 1.0, .limit = 10.0};
+inline constexpr RandomParameter lastSupply      = UniformParameter{.min = 10.0, .limit = 20.0};
+inline constexpr RandomParameter lastSalesAmount = UniformParameter{.min = 10.0, .limit = 20.0};
+inline constexpr RandomParameter desiredEmploy   = UniformParameter{.min = 10, .limit = 20};
+inline constexpr RandomParameter lastMarkup      = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter markupAdjustVol = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter priceAdjustVol  = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter targetInvRatio  = UniformParameter{.min = 0.1, .limit = 0.2};
+inline constexpr RandomParameter productPower    = UniformParameter{.min = 0.01, .limit = 2.0};
+inline constexpr RandomParameter capitalDistributionRate =
+    UniformParameter{.min = 0.1, .limit = 0.9};
 inline constexpr RandomParameter capitalDepreciationRate =
     UniformParameter{.min = 0.1, .limit = 0.2};
 inline constexpr RandomParameter inventory = UniformParameter{.min = 10.0, .limit = 100.0};
