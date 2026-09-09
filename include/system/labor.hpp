@@ -6,12 +6,11 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor {
-inline void request(const AgentID id, LaborDemander& demander, Market& market) noexcept {
-    demander.postRequest(id, market);
+inline void adjustWorkforce(const AgentID id, LaborDemander& demander, Market& market) noexcept {
+    demander.adjustWorkforce(id, market);
 }
 
 inline void entry(const AgentID id, LaborSupplier& supplier, Market& market) noexcept {

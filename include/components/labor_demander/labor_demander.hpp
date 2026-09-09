@@ -120,15 +120,16 @@ class LaborDemander final {
         recruitSystem_.revisePlan(recruitBudget, mediator_);
     }
 
-    void postRequest(const AgentID id, Market& market) noexcept { recruitSystem_.post(id, market); }
+    void adjustWorkforce(const AgentID id, Market& market) noexcept {
+        recruitSystem_.post(id, market);
+        humanResource_.layOffs();
+    }
 
     void offer() noexcept { recruitSystem_.offer(); }
 
     void endRecruiting(base_goods::Workspace& workspace) noexcept {
         recruitSystem_.endRecruiting(humanResource_.makeAddRosterFn(workspace), mediator_);
     };
-
-    void layOffs() noexcept { humanResource_.layOffs(); }
 
     template <TryWithdrawFn F>
     void payWage(F&& withdrawFn) noexcept {
