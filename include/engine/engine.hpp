@@ -174,6 +174,10 @@ class Engine final {
         }
 
         capitalMarket_.clear();
+
+        for (auto& firm : capitalFirms_) {
+            logging(dropBox_.capital, firm.capitalSupplier);
+        }
     }
 
     void runGoods() noexcept {
@@ -195,6 +199,10 @@ class Engine final {
         }
 
         goodsMarket_.clear();
+
+        for (auto& firm : goodsFirms_) {
+            logging(dropBox_.goods, firm.goodsSupplier);
+        }
     }
 
     void runEndMonth() noexcept {

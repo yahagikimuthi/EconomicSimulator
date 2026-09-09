@@ -6,6 +6,7 @@
 #include "components/goods_demander.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::goods {
 inline void entry(const AgentID id, GoodsSupplier& supplier, Market& market) noexcept {
@@ -24,5 +25,9 @@ inline void trade(FirmFinance& finance, GoodsSupplier& supplier) noexcept {
 
 inline void afterTrade(HHoldFinance& finance, GoodsDemander& demander) noexcept {
     demander.afterTrade(finance.makeDepositFn());
+}
+
+inline void logging(GoodsDropBox& dropBox, GoodsSupplier& supplier) noexcept {
+    supplier.logging(dropBox);
 }
 }  // namespace abm::goods

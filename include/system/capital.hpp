@@ -5,6 +5,7 @@
 #include "components/finance/firm_finance.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::capital {
 inline void entry(const AgentID id, CapitalSupplier& supplier, Market& market) noexcept {
@@ -39,5 +40,9 @@ inline void afterTrade(
         finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost),
         goodsSupplier.makeAddCapitalFn()
     );
+}
+
+inline void logging(CapitalDropBox& dropBox, CapitalSupplier& supplier) noexcept {
+    supplier.logging(dropBox);
 }
 }  // namespace abm::capital
