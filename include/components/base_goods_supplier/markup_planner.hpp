@@ -16,30 +16,32 @@ namespace abm::base_goods::supplier {
 class MarkupPlannerMemory final {
   public:
     explicit MarkupPlannerMemory(RandomGenerator& masterRng) noexcept
-        : supply_{GoodsQuantity{masterRng.random(setting::lastSupply)}},
+        : supplyPlan_{GoodsQuantity{masterRng.random(setting::lastSupply)}},
           salesAmount_{GoodsQuantity{masterRng.random(setting::lastSalesAmount)}} {}
     [[nodiscard]] auto lastSupply() const noexcept -> std::optional<GoodsQuantity> {
-        return supply_.log();
+        return supplyPlan_.log();
     }
     [[nodiscard]] auto lastSalesAmount() const noexcept -> std::optional<GoodsQuantity> {
         return salesAmount_.log();
     }
 
-    void listenTradeResult(const TradeResult& result) noexcept {
-        assert(result.soldAmount.isZeroOrMore());
-        if (result.soldAmount.isPositive()) salesAmount_.next(result.soldAmount);
-    }
-
     void listenTradePlan(const TradePlan& plan) noexcept {
         assert(plan.supply.isZeroOrMore());
-        if (salesAmount_.wasSetNext()) supply_.next(plan.supply);
+        if (plan.supply.isPositive()) supplyPlan_.next(plan.supply);
     }
 
-    void clearLog() noexcept { supply_.clearLog(), salesAmount_.clearLog(); }
-    void reset() noexcept { supply_.reset(), salesAmount_.reset(); }
+    void listenTradeResult(const TradeResult& result) noexcept {
+        assert(result.soldAmount.isZeroOrMore());
+        if (supplyPlan_.wasSetNext()) salesAmount_.next(result.soldAmount);
+        assert(supplyPlan_.wasSetNext() == salesAmount_.wasSetNext());
+        supplyPlan_.reset();
+        salesAmount_.reset();
+    }
+
+    void clearLog() noexcept { supplyPlan_.clearLog(), salesAmount_.clearLog(); }
 
   private:
-    Memory<GoodsQuantity> supply_;
+    Memory<GoodsQuantity> supplyPlan_;
     Memory<GoodsQuantity> salesAmount_;
 };
 
@@ -47,7 +49,7 @@ class MarkupPlanner final {
   public:
     explicit MarkupPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          cache_{MarkupRate{masterRng.random(setting::lastMarkup)}},
+          cache_{masterRng.random(setting::lastMarkup)},
           rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::markupAdjustVol)} {}
 
@@ -61,14 +63,9 @@ class MarkupPlanner final {
 
         const auto next = calcNextMarkup(targetIvRatio);
         memory_.clearLog();
-        if (not next) return cache_.cache();
-        cache_.next(*next);
+        if (not next) return cache_;
+        cache_ = *next;
         return *next;
-    }
-
-    void reset() noexcept {
-        memory_.reset();
-        cache_.reset();
     }
 
   private:
@@ -87,7 +84,7 @@ class MarkupPlanner final {
 
     [[nodiscard]] auto calcNextMarkup(const bool isSold) const noexcept -> MarkupRate {
         const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
-        const auto nextMarkup = cache_.cache() + MarkupRate{(isSold ? alpha : -alpha)};
+        const auto nextMarkup = cache_ + MarkupRate{(isSold ? alpha : -alpha)};
         return guard(nextMarkup);
     }
 
@@ -96,7 +93,7 @@ class MarkupPlanner final {
     }
 
     MarkupPlannerMemory     memory_;
-    Cache<MarkupRate>       cache_;
+    MarkupRate              cache_;
     mutable RandomGenerator rng_;
     const double            adjustVol_;
 };

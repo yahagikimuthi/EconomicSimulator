@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <optional>
 #include <ranges>
 #include <span>
@@ -7,8 +8,6 @@
 #include <vector>
 
 #include "components/base_goods_supplier/common.hpp"
-#include "components/base_goods_supplier/ledger.hpp"
-#include "components/common.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -25,31 +24,31 @@ class Trader final {
         assert(plan.supply.isZeroOrMore());
         if (plan.supply.isZero()) return;
         myEntry_ = market.entry(id, plan.price, plan.supply);
-        ledger_.makeNewPage(plan.supply);
     }
 
-    template <DepositFn F>
-    [[nodiscard]] auto trade(F&& depositFn) noexcept -> TradeResult {
-        if (not isPosting()) return publishTradeResult();
+    [[nodiscard]] auto trade() noexcept -> TradeResult {
+        if (not isPosting()) return makeDefaultResult();
         const auto demand = calcTotalDemand();
-        if (demand.isZero()) return publishTradeResult();
-        const auto tradeAmount    = ledger_.tradableAmount(demand);
-        const auto isExcessDemand = ledger_.isExcessDemand(demand);
-        isExcessDemand ? performRationedTrade(std::forward<F>(depositFn))
-                       : performFullTrade(std::forward<F>(depositFn));
-        ledger_.readResult({.price = myEntry_->price, .demand = demand, .salesAmount = tradeAmount}
-        );
-        return publishTradeResult();
-    }
+        if (demand.isZero()) return makeDefaultResult(myEntry_->supply);
 
-    void reset() noexcept {
+        const auto isExcessDemand = demand > myEntry_->supply;
+        const auto result =
+            isExcessDemand ? performRationedTrade(demand) : performFullTrade(demand);
+
         myEntry_.reset();
-        ledger_.reset();
+        return result;
     }
 
   private:
-    [[nodiscard]] auto publishTradeResult() const noexcept -> TradeResult {
-        return ledger_.publishResult();
+    [[nodiscard]] static auto makeDefaultResult(
+        const GoodsQuantity supply = GoodsQuantity{0.0}
+    ) noexcept -> TradeResult {
+        return {
+            .soldAmount   = GoodsQuantity{0.0},
+            .unsoldAmount = supply,
+            .totalDemand  = GoodsQuantity{0.0},
+            .sales        = Money{0.0}
+        };
     }
 
     [[nodiscard]] auto calcTotalDemand() const noexcept -> GoodsQuantity {
@@ -63,23 +62,29 @@ class Trader final {
         );
     }
 
-    void performRationedTrade(DepositFn auto&& depositFn) noexcept {
+    [[nodiscard]] auto performRationedTrade(const GoodsQuantity demand) noexcept -> TradeResult {
         auto requests = packRequest();
         rng_.shuffle(requests);
 
-        auto remainAmount = ledger_.inventory();
+        auto remainAmount = myEntry_->supply;
+        auto totalSales   = Money{0.0};
         for (auto reqRef : requests) {
             auto&      req       = reqRef.get();
             const auto reqAmount = req.payment / myEntry_->price;
             if (remainAmount <= reqAmount) {
-                const auto sales = req.trade(remainAmount);
-                depositFn(sales);
-                return;
+                totalSales += req.trade(remainAmount);
+                return {
+                    .soldAmount   = myEntry_->supply,
+                    .unsoldAmount = GoodsQuantity{0.0},
+                    .totalDemand  = demand,
+                    .sales        = totalSales
+                };
             }
-            const auto sales = req.trade(reqAmount);
-            depositFn(sales);
+            totalSales += req.trade(reqAmount);
             remainAmount -= reqAmount;
         }
+        assert(false);
+        std::unreachable();
     }
 
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
@@ -93,15 +98,20 @@ class Trader final {
         return refs;
     }
 
-    void performFullTrade(DepositFn auto&& depositFn) noexcept {
+    [[nodiscard]] auto performFullTrade(const GoodsQuantity demand) noexcept -> TradeResult {
+        auto sumSales = Money{0.0};
         for (auto& request : myEntry_->requests()) {
             const auto tradeAmount = request.payment / myEntry_->price;
-            const auto sales       = request.trade(tradeAmount);
-            depositFn(sales);
+            sumSales += request.trade(tradeAmount);
         }
+        return {
+            .soldAmount   = demand,
+            .unsoldAmount = myEntry_->supply - demand,
+            .totalDemand  = demand,
+            .sales        = sumSales
+        };
     }
 
-    Ledger                  ledger_;
     std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
 };

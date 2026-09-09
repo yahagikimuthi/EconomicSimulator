@@ -56,10 +56,10 @@ class DemandForecastManagerMemory final {
         return totalDemand_.log();
     }
     void clearLog() noexcept { totalDemand_.clearLog(); }
-    void reset() noexcept { totalDemand_.reset(); }
     void listenTradeResult(const TradeResult& result) noexcept {
         assert(result.totalDemand.isZeroOrMore());
         totalDemand_.next(result.totalDemand);
+        totalDemand_.reset();
     }
 
   private:
@@ -70,7 +70,7 @@ class DemandForecastManager final {
   public:
     explicit DemandForecastManager(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
-          cache_{GoodsQuantity{masterRng.random(setting::demandForecast)}},
+          cache_{masterRng.random(setting::demandForecast)},
           adjustment_{masterRng.random(setting::demandForecastAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
@@ -79,23 +79,18 @@ class DemandForecastManager final {
     [[nodiscard]] auto plan() noexcept -> GoodsQuantity {
         const auto next = calcNext();
         memory_.clearLog();
-        if (not next) return cache_.cache();
-        cache_.next(*next);
+        if (not next) return cache_;
+        cache_ = *next;
 
         assert(next->isZeroOrMore());
         return *next;
-    }
-
-    void reset() noexcept {
-        memory_.reset();
-        cache_.reset();
     }
 
   private:
     [[nodiscard]] auto calcNext() const noexcept -> std::optional<GoodsQuantity> {
         const auto lastTotalDemand = memory_.lastTotalDemand();
         if (not lastTotalDemand) return std::nullopt;
-        const auto lastForecast = cache_.cache();
+        const auto lastForecast = cache_;
         const auto out          = lastForecast + (adjustment_ * (*lastTotalDemand - lastForecast));
         return guard(out);
     }
@@ -105,7 +100,7 @@ class DemandForecastManager final {
     }
 
     DemandForecastManagerMemory memory_;
-    Cache<GoodsQuantity>        cache_;
+    GoodsQuantity               cache_;
     const double                adjustment_;
 };
 
@@ -134,11 +129,6 @@ class TradePlanner final {
     [[nodiscard]] auto requiresSupply() noexcept -> GoodsQuantity {
         const auto demandForecast = demandForecast_.plan();
         return demandForecast / (1.0 - targetInvRatio_);
-    }
-
-    void reset() noexcept {
-        markupPlanner_.reset();
-        demandForecast_.reset();
     }
 
   private:

@@ -43,7 +43,6 @@ class BaseGoodsSupplier {
     template <DepositFn F>
     void trade(F&& depositFn) noexcept {
         tradingSystem_.trade(std::forward<F>(depositFn), mediator_);
-        reset();
     }
 
     [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
@@ -71,8 +70,6 @@ class BaseGoodsSupplier {
     }
 
   private:
-    void reset() noexcept { tradingSystem_.reset(); }
-
     void setMediator() noexcept {
         tradingSystem_.acceptMediator(mediator_);
         mediator_.subscribeMarkupPlan(memory_);
