@@ -38,7 +38,7 @@ inline void payWage(FirmFinance& finance, LaborDemander& demander) noexcept {
     demander.payWage(finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
 }
 
-inline void work(HHoldFinance& finance, LaborSupplier& supplier, const Date& today) noexcept {
-    supplier.work(finance.makeDepositFn(), today);
+inline void work(HHoldFinance& finance, LaborSupplier& supplier) noexcept {
+    supplier.work(finance.makeDepositFn());
 }
 }  // namespace abm::labor

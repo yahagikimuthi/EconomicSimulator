@@ -51,8 +51,8 @@ class LaborSupplier final {
     }
 
     template <DepositFn F>
-    void work(F&& depositFn, const Date& today) noexcept {
-        employment_.work(std::forward<F>(depositFn), today);
+    void work(F&& depositFn) noexcept {
+        employment_.work(std::forward<F>(depositFn));
     }
 
     [[nodiscard]] auto wage() const noexcept -> Budget {

@@ -34,14 +34,14 @@ class Employment final {
     }
 
     template <DepositFn F>
-    void work(F&& depositFn, const Date today) noexcept {
+    void work(F&& depositFn) noexcept {
         if (not isEmployed()) return;
         std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         if (not rosterEntry_->isOccupied()) {
             rosterEntry_.reset();
             return;
         }
-        rosterEntry_->addInput(productPower_, today.day());
+        rosterEntry_->addInput(productPower_);
     }
 
     [[nodiscard]] auto makeIsAlignedRequestFn() noexcept -> IsAlignedFn auto {

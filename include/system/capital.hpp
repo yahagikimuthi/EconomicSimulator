@@ -27,5 +27,5 @@ inline void afterTrade(FirmFinance& finance, CapitalDemander& demander) noexcept
     demander.afterTrade(finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost));
 }
 
-inline void afterTrade(CapitalSupplier& supplier) noexcept { supplier.endTrading(); }
+inline void endTrading(CapitalSupplier& supplier) noexcept { supplier.endTrading(); }
 }  // namespace abm::capital

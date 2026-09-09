@@ -13,17 +13,14 @@
 
 #include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/date.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
 
 namespace abm::labor {
 class RosterEntry;
 struct CompanyBoard final {
-    explicit CompanyBoard(const AgentID Id, const Day WorkDay) noexcept
-        : firmId{Id}, workDay{WorkDay} {}
+    explicit CompanyBoard(const AgentID Id) noexcept : firmId{Id} {}
     const AgentID firmId;
-    const Day     workDay;
 };
 
 class Roster;
@@ -49,9 +46,9 @@ class RosterEntry final {
     auto operator=(RosterEntry&&) noexcept -> RosterEntry&      = delete;
     ~RosterEntry() noexcept                                     = default;
 
-    void addInput(const double productPower, const Day today) noexcept {
+    void addInput(const double productPower) noexcept {
         assert(isOccupied_);
-        if (today == companyBoard_.workDay) workspace_.addInput(productPower);
+        workspace_.addInput(productPower);
     }
     void resign() noexcept;
     void payWage(const Money payment) noexcept {

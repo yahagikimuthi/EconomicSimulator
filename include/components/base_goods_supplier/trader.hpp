@@ -52,7 +52,6 @@ class Trader final {
     }
 
     void reset() noexcept {
-        if (not myEntry_) myEntry_->disable();
         myEntry_.reset();
         ledger_.reset();
     }

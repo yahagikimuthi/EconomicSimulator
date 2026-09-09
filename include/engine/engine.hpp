@@ -21,7 +21,7 @@ namespace abm {
 class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int endStep)
-        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endingDay_{endStep} {
+        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endStep_{endStep} {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
@@ -35,7 +35,7 @@ class Engine final {
     }
 
     void run() noexcept {
-        for (; today_ < endingDay_; ++today_) {
+        for (const auto _ : std::views::indices(endStep_)) {
             runPlanning();
             runLabor();
             runCapital();
@@ -104,7 +104,7 @@ class Engine final {
         }
 
         for (auto& hhold : hholds_) {
-            work(hhold.finance, hhold.labor, today_);
+            work(hhold.finance, hhold.labor);
         }
     }
 
@@ -134,6 +134,10 @@ class Engine final {
             }
         }
 
+        for (auto& firm : capitalFirms_) {
+            endTrading(firm.capitalSupplier);
+        }
+
         capitalMarket_.clear();
     }
 
@@ -157,6 +161,10 @@ class Engine final {
             }
         }
 
+        for (auto& firm : goodsFirms_) {
+            endTrading(firm.goodsSupplier);
+        }
+
         goodsMarket_.clear();
     }
 
@@ -175,8 +183,7 @@ class Engine final {
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    const Date endingDay_;
-    Date       today_{1};
+    const int endStep_;
 
     Logger logger_;
 
