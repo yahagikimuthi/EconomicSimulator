@@ -11,7 +11,7 @@
 #include "values/common.hpp"
 
 namespace abm::planning {
-inline void plan(
+inline void planJanuary(
     FirmFinance& finance, LaborDemander& labor, CapitalDemander& capital, GoodsSupplier& goods
 ) noexcept {
     const auto laborReq = [&]() noexcept -> Budget {
@@ -39,7 +39,7 @@ inline void plan(
     }
 }
 
-inline void plan(
+inline void planJanuary(
     FirmFinance&     finance,
     LaborDemander&   labor,
     CapitalDemander& capitalDemander,
@@ -70,10 +70,55 @@ inline void plan(
     }
 }
 
-inline void plan(HHoldFinance& finance, GoodsDemander& goods) noexcept {
+inline void planJanuary(HHoldFinance& finance, GoodsDemander& goods) noexcept {
     const auto purchasePlan = goods.requestBudget(finance.asset());
     assert(purchasePlan.isZeroOrMore());
     const auto budget = goods.requestBudget(purchasePlan);
     goods.revisePlan(budget);
+}
+
+inline void planStandard(
+    FirmFinance&     finance,
+    LaborDemander&   labor,
+    CapitalDemander& capitalDemander,
+    CapitalSupplier& capitalSupplier
+) noexcept {
+    const auto laborCost  = labor.calcMonthlyCost();
+    const auto salesPlan  = capitalSupplier.planAndExpectSales(labor.calcMonthlyCost());
+    const auto capitalReq = capitalDemander.planBudget(capitalSupplier.requiresCapital());
+
+    const auto total = laborCost + capitalReq - salesPlan;
+    if (total.isZeroOrLess()) {
+        capitalDemander.revisePlan(capitalReq);
+    } else {
+        const auto budget = finance.claimBudget(total) + salesPlan;
+        assert(budget <= laborCost + capitalReq);
+
+        const auto capitalBudget = std::max(budget - laborCost, Budget{0.0});
+        capitalDemander.revisePlan(capitalBudget);
+    }
+}
+
+inline void planStandard(
+    FirmFinance& finance, LaborDemander& labor, CapitalDemander& capital, GoodsSupplier& goods
+) noexcept {
+    const auto laborCost  = labor.calcMonthlyCost();
+    const auto salesPlan  = goods.planAndExpectSales(labor.calcMonthlyCost());
+    const auto capitalReq = capital.planBudget(goods.requiresCapital());
+
+    const auto total = laborCost + capitalReq - salesPlan;
+    if (total.isZeroOrLess()) {
+        capital.revisePlan(capitalReq);
+    } else {
+        const auto budget = finance.claimBudget(total) + salesPlan;
+        assert(budget <= laborCost + capitalReq);
+
+        const auto capitalBudget = std::max(budget - laborCost, Budget{0.0});
+        capital.revisePlan(capitalBudget);
+    }
+}
+
+inline void planStandard(HHoldFinance& finance, GoodsDemander& goods) noexcept {
+    planJanuary(finance, goods);
 }
 }  // namespace abm::planning

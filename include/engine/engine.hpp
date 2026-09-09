@@ -12,7 +12,6 @@
 #include "system/goods.hpp"
 #include "system/labor.hpp"
 #include "system/planning.hpp"
-#include "values/date.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
 #include "world/labor.hpp"
@@ -36,7 +35,7 @@ class Engine final {
 
     void run() noexcept {
         for (const auto _ : std::views::indices(endStep_)) {
-            runPlanning();
+            runJanuaryPlanning();
             runLabor();
             runCapital();
             runGoods();
@@ -44,17 +43,41 @@ class Engine final {
     }
 
   private:
-    void runPlanning() noexcept {
+    void runJanuaryPlanning() noexcept {
         using namespace planning;
 
         for (auto& firm : capitalFirms_) {
-            plan(firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier);
+            planJanuary(
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
+            );
         }
+
         for (auto& firm : goodsFirms_) {
-            plan(firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier);
+            planJanuary(firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier);
         }
+
         for (auto& hhold : hholds_) {
-            plan(hhold.finance, hhold.goods);
+            planJanuary(hhold.finance, hhold.goods);
+        }
+    }
+
+    void runStandardPlanning() noexcept {
+        using namespace planning;
+
+        for (auto& firm : capitalFirms_) {
+            planStandard(
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.capitalSupplier
+            );
+        }
+
+        for (auto& firm : goodsFirms_) {
+            planStandard(
+                firm.finance, firm.laborDemander, firm.capitalDemander, firm.goodsSupplier
+            );
+        }
+
+        for (auto& hhold : hholds_) {
+            planStandard(hhold.finance, hhold.goods);
         }
     }
 
