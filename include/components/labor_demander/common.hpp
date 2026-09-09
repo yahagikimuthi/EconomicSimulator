@@ -53,25 +53,23 @@ class CentralMemory final {
 
     void logging(LaborDropBox& dropBox) noexcept {
         if (employPlan_) {
-            assert(employPlan_->isZeroOrMore());
+            assert(employPlan_->isPositive());
             dropBox.postedEmployments.add(*employPlan_);
             employPlan_.reset();
         }
         if (wagePlan_) {
-            assert(wagePlan_->isZeroOrMore());
+            assert(wagePlan_->isPositive());
             dropBox.postedWages.add(*wagePlan_);
             wagePlan_.reset();
         }
     }
 
-    void listenEmployPlan(const HeadCount employPlan) noexcept {
-        assert(employPlan.isZeroOrMore());
-        employPlan_ = employPlan;
-    }
-
     void listenRecruitPlan(const RecruitPlan& plan) noexcept {
         assert(plan.wage.isZeroOrMore());
-        wagePlan_ = plan.wage;
+        if (plan.wage.isPositive()) wagePlan_ = plan.wage;
+
+        assert(plan.employ.isZeroOrMore());
+        if (plan.employ.isPositive()) employPlan_ = plan.employ;
     }
 
   private:
