@@ -52,7 +52,7 @@ class Producer final {
 
     [[nodiscard]] auto calcDesiredEmploy(
         const HeadCount employee, const GoodsQuantity targetProduct
-    ) noexcept -> HeadCount {
+    ) const noexcept -> HeadCount {
         const auto avgEmployeePower  = avgWorkerPower(employee);
         const auto bottom            = targetProduct / (baseProductPower_ *
                                              std::pow(capital_.value(), capitalDistributionRate_));
@@ -87,7 +87,7 @@ class ProducingSystem final {
 
     [[nodiscard]] auto calcDesiredEmploy(
         const GoodsQuantity requiresSupply, const HeadCount employee
-    ) noexcept -> HeadCount {
+    ) const noexcept -> HeadCount {
         return producer_.calcDesiredEmploy(employee, requiresSupply - inventory_);
     }
 
