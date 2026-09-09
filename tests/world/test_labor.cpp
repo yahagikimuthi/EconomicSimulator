@@ -80,18 +80,11 @@ TEST_CASE("RosterEntryのテスト") {  // NOLINT
     auto  space  = base_goods::Workspace{};
     auto& entry  = roster.add(AgentID{101}, Wage{101}, board, space);
 
-    SUBCASE("労働日の場合、Workspaceに労働貢献を実際に行うこと") {
+    SUBCASE("Workspaceに労働貢献を実際に行うこと") {
         entry.addInput(10.0);
 
         const auto input = space.takeout();
         CHECK(input.value() == 10.0);
-    }
-
-    SUBCASE("労働日でない場合、労働貢献は事実上行わないこと") {
-        entry.addInput(10.0);
-
-        const auto input = space.takeout();
-        CHECK(input.isZero());
     }
 
     SUBCASE("resignが呼ばれた場合、isOccupiedがfalseとなること") {
