@@ -49,6 +49,8 @@ TEST_CASE("Employmentのテスト") {  // NOLINT
     }
 
     SUBCASE("雇用されている場合") {
+        employment.startWorking(rosterEntry);
+
         CHECK(employment.isEmployed());
         CHECK(employment.wage().value() == doctest::Approx(15));
 
