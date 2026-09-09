@@ -103,10 +103,10 @@ class Engine final {
         using namespace labor;
 
         for (auto& firm : capitalFirms_) {
-            request(firm.id, firm.laborDemander, laborMarket_);
+            adjustWorkforce(firm.id, firm.laborDemander, laborMarket_);
         }
         for (auto& firm : goodsFirms_) {
-            request(firm.id, firm.laborDemander, laborMarket_);
+            adjustWorkforce(firm.id, firm.laborDemander, laborMarket_);
         }
 
         for (auto& hhold : hholds_) {
