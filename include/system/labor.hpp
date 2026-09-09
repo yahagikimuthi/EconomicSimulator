@@ -46,9 +46,7 @@ inline void payWage(
 ) noexcept {
     demander.payWage([&](const Wage wage) -> Money {
         const auto afterTax = government.payIncomeTax(static_cast<Money>(wage));
-        const auto withdraw = finance.tryWithdraw(
-            static_cast<Budget>(afterTax), FirmFinance::AccountItem::PersonalCost
-        );
+        const auto withdraw = finance.tryWithdraw(static_cast<Budget>(afterTax));
         assert(withdraw.isZeroOrMore());
         return withdraw;
     });

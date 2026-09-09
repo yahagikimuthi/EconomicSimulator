@@ -16,7 +16,7 @@ TEST_CASE("企業財コンポーネントのテスト") {  // NOLINT
         constexpr auto deposit     = Money{100.0};
         const auto     beforeAsset = finance.asset();
 
-        auto depositFn = finance.makeDepositFn(FirmFinance::AccountItem::Sales);
+        auto depositFn = finance.makeDepositFn();
         depositFn(deposit);
 
         CHECK(finance.asset().value() == doctest::Approx(beforeAsset.value() + deposit.value()));
@@ -25,8 +25,7 @@ TEST_CASE("企業財コンポーネントのテスト") {  // NOLINT
     SUBCASE("出金した分、資産が減っていること") {
         const auto beforeAsset = finance.asset();
 
-        const auto result =
-            finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost)(Budget{50.0});
+        const auto result = finance.makeWithdrawFn()(Budget{50.0});
 
         CHECK(finance.asset().value() == doctest::Approx(beforeAsset.value() - result.value()));
     }

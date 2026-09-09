@@ -12,16 +12,6 @@
 
 namespace abm::finance {
 class FirmFinance final {
-    struct PL final {
-        void reset() noexcept { sales = capitalGoodsCost = depreciation = taxes = Money{0.0}; }
-
-        Money sales{0.0};
-        Money personalCost{0.0};
-        Money capitalGoodsCost{0.0};
-        Money depreciation{0.0};
-        Money taxes{0.0};
-    };
-
   public:
     explicit FirmFinance(const AgentID id, RandomGenerator& masterRng) noexcept
         : bankAccount_{id},
@@ -30,15 +20,14 @@ class FirmFinance final {
 
     enum class AccountItem : std::uint8_t { Sales, PersonalCost, CapitalGoodsCost };
 
-    [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> TryWithdrawFn auto {
-        return [&, item] [[nodiscard]] (const Budget withdraw) noexcept -> Money {
-            return tryWithdraw(withdraw, item);
+    [[nodiscard]] auto makeWithdrawFn() noexcept -> TryWithdrawFn auto {
+        return [&] [[nodiscard]] (const Budget withdraw) noexcept -> Money {
+            return tryWithdraw(withdraw);
         };
     }
 
-    [[nodiscard]] auto makeDepositFn(const AccountItem item) noexcept -> DepositFn auto {
-        return
-            [&, item](const Money depositAmount) noexcept -> void { deposit(depositAmount, item); };
+    [[nodiscard]] auto makeDepositFn() noexcept -> DepositFn auto {
+        return [&](const Money depositAmount) noexcept -> void { deposit(depositAmount); };
     }
 
     [[nodiscard]] static auto claimBudget(const Budget claim) noexcept -> Budget {
@@ -50,10 +39,8 @@ class FirmFinance final {
         return static_cast<Budget>(cash_) + bankAccount_.balance();
     }
 
-    [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw, const AccountItem item) noexcept
-        -> Money {
+    [[nodiscard]] auto tryWithdraw(const Budget tryingWithdraw) noexcept -> Money {
         assert(tryingWithdraw.isZeroOrMore());
-        assert(item != AccountItem::Sales);
 
         const auto sub = Money{tryingWithdraw.value()};
         if (currentCashRatio() > cashRatio_) {
@@ -61,7 +48,6 @@ class FirmFinance final {
             assert(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
-            postToPlFromMinus(withdraw + cashOut, item);
             return withdraw + cashOut;
         }
         const auto cashOut = std::min(cash_, sub);
@@ -70,14 +56,12 @@ class FirmFinance final {
         const auto withdraw    = bankAccount_.withdraw(rest);
         const auto moreCashOut = rest - withdraw;
         cash_ -= moreCashOut;
-        postToPlFromMinus(cashOut + withdraw + moreCashOut, item);
         return cashOut + withdraw + moreCashOut;
     }
 
-    void deposit(const Money add, const AccountItem item) noexcept {
+    void deposit(const Money add) noexcept {
         assert(add.isZeroOrMore());
 
-        postToPlFromPlus(add, item);
         if (currentCashRatio() > cashRatio_)
             bankAccount_.deposit(add);
         else
@@ -90,39 +74,9 @@ class FirmFinance final {
         return static_cast<Budget>(cash_) / asset();
     }
 
-    void postToPlFromPlus(const Money money, const AccountItem item) noexcept {
-        assert(money.isZeroOrMore());
-        switch (item) {
-            case AccountItem::Sales:
-                pl_.sales += money;
-                break;
-            case AccountItem::PersonalCost:
-                pl_.personalCost -= money;
-                break;
-            case AccountItem::CapitalGoodsCost:
-                pl_.capitalGoodsCost -= money;
-                break;
-        }
-    }
-
-    void postToPlFromMinus(const Money money, const AccountItem item) noexcept {
-        assert(money.isZeroOrMore());
-        switch (item) {
-            case AccountItem::Sales:
-                pl_.sales -= money;
-                break;
-            case AccountItem::PersonalCost:
-                pl_.personalCost += money;
-                break;
-            case AccountItem::CapitalGoodsCost:
-                pl_.capitalGoodsCost += money;
-                break;
-        }
-    }
-
-    PL           pl_;
     BankAccount  bankAccount_;
     Money        cash_;
+    Money        netIncome_{0.0};
     const double cashRatio_;
 };
 }  // namespace abm::finance

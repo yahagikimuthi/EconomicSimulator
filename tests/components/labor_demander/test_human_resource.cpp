@@ -126,7 +126,9 @@ TEST_CASE("HumanResourceのテスト") {  // NOLINT
     SUBCASE("payWageはいかなる場合もsumWage分だけ予算を支払う") {
         auto rng        = makeRng();
         auto finance    = FirmFinance{AgentID{42}, rng};
-        auto withdrawFn = finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost);
+        auto withdrawFn = [&](const Wage wage) noexcept -> Money {
+            return finance.tryWithdraw(static_cast<Budget>(wage));
+        };
 
         const auto beforeAsset = finance.asset();
 

@@ -16,9 +16,7 @@ inline void entry(const AgentID id, CapitalSupplier& supplier, Market& market) n
 inline void request(
     const AgentID id, FirmFinance& finance, CapitalDemander& demander, Market& market
 ) noexcept {
-    demander.request(
-        id, finance.makeWithdrawFn(FirmFinance::AccountItem::CapitalGoodsCost), market
-    );
+    demander.request(id, finance.makeWithdrawFn(), market);
 }
 
 inline void trade(
@@ -26,26 +24,20 @@ inline void trade(
 ) noexcept {
     supplier.trade([&](const Money sales) noexcept -> void {
         const auto afterTax = government.paySalesTax(sales);
-        finance.deposit(afterTax, FirmFinance::AccountItem::Sales);
+        finance.deposit(afterTax);
     });
 }
 
 inline void afterTrade(
     FirmFinance& finance, CapitalDemander& demander, CapitalSupplier& capitalSupplier
 ) noexcept {
-    demander.afterTrade(
-        finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost),
-        capitalSupplier.makeAddCapitalFn()
-    );
+    demander.afterTrade(finance.makeDepositFn(), capitalSupplier.makeAddCapitalFn());
 }
 
 inline void afterTrade(
     FirmFinance& finance, CapitalDemander& demander, GoodsSupplier& goodsSupplier
 ) noexcept {
-    demander.afterTrade(
-        finance.makeDepositFn(FirmFinance::AccountItem::CapitalGoodsCost),
-        goodsSupplier.makeAddCapitalFn()
-    );
+    demander.afterTrade(finance.makeDepositFn(), goodsSupplier.makeAddCapitalFn());
 }
 
 inline void logging(CapitalDropBox& dropBox, CapitalSupplier& supplier) noexcept {

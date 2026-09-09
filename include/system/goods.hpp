@@ -23,7 +23,7 @@ inline void request(
 inline void trade(FirmFinance& finance, GoodsSupplier& supplier, Government& government) noexcept {
     supplier.trade([&](const Money sales) noexcept -> void {
         const auto afterTax = government.paySalesTax(sales);
-        finance.deposit(afterTax, FirmFinance::AccountItem::Sales);
+        finance.deposit(afterTax);
     });
 }
 
