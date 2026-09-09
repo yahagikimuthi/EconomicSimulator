@@ -28,13 +28,7 @@ class FirmFinance final {
           cash_{masterRng.random(setting::firmInitialAsset)},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    enum class AccountItem : std::uint8_t {
-        Sales,
-        PersonalCost,
-        CapitalGoodsCost,
-        Depreciation,
-        Taxes
-    };
+    enum class AccountItem : std::uint8_t { Sales, PersonalCost, CapitalGoodsCost };
 
     [[nodiscard]] auto makeWithdrawFn(const AccountItem item) noexcept -> TryWithdrawFn auto {
         return [&, item] [[nodiscard]] (const Budget withdraw) noexcept -> Money {
@@ -108,12 +102,6 @@ class FirmFinance final {
             case AccountItem::CapitalGoodsCost:
                 pl_.capitalGoodsCost -= money;
                 break;
-            case AccountItem::Depreciation:
-                pl_.depreciation -= money;
-                break;
-            case AccountItem::Taxes:
-                pl_.taxes -= money;
-                break;
         }
     }
 
@@ -128,12 +116,6 @@ class FirmFinance final {
                 break;
             case AccountItem::CapitalGoodsCost:
                 pl_.capitalGoodsCost += money;
-                break;
-            case AccountItem::Depreciation:
-                pl_.depreciation += money;
-                break;
-            case AccountItem::Taxes:
-                pl_.taxes += money;
                 break;
         }
     }
