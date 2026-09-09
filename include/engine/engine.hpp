@@ -136,6 +136,17 @@ class Engine final {
         }
 
         laborMarket_.clear();
+
+        for (auto& firm : capitalFirms_) {
+            logging(dropBox_.labor, firm.laborDemander);
+        }
+        for (auto& firm : goodsFirms_) {
+            logging(dropBox_.labor, firm.laborDemander);
+        }
+
+        for (auto& hhold : hholds_) {
+            logging(dropBox_.labor, hhold.labor);
+        }
     }
 
     void runCapital() noexcept {

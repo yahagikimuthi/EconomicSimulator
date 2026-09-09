@@ -6,6 +6,7 @@
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
 #include "values/common.hpp"
+#include "world/drop_box.hpp"
 #include "world/labor.hpp"
 
 namespace abm::labor {
@@ -30,6 +31,14 @@ inline void endRecruiting(LaborDemander& demander, GoodsSupplier& goodsSupplier)
 }
 
 inline void recordRosterEntry(LaborSupplier& supplier) noexcept { supplier.recordRosterEntry(); }
+
+inline void logging(LaborDropBox& dropBox, LaborDemander& demander) noexcept {
+    demander.logging(dropBox);
+}
+
+inline void logging(LaborDropBox& dropBox, LaborSupplier& supplier) noexcept {
+    supplier.logging(dropBox);
+}
 
 inline void payWage(FirmFinance& finance, LaborDemander& demander) noexcept {
     demander.payWage(finance.makeWithdrawFn(FirmFinance::AccountItem::PersonalCost));
