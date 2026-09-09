@@ -9,6 +9,7 @@
 #include "values/goods.hpp"
 #include "values/labor.hpp"
 #include "world/base_goods.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
 class Producer final {
@@ -115,6 +116,8 @@ class ProducingSystem final {
     void listenTradeResult(const TradeResult& result) noexcept {
         inventory_ += result.unsoldAmount;
     }
+
+    void logging(BaseGoodsDropBox auto& dropBox) noexcept { dropBox.inventories.add(inventory_); }
 
   private:
     Producer      producer_;
