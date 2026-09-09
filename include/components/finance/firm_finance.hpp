@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <cstdint>
+#include <utility>
 
 #include "components/common.hpp"
 #include "others/setting.hpp"
@@ -48,6 +49,8 @@ class FirmFinance final {
             assert(withdraw <= sub);
             const auto cashOut = sub - withdraw;
             cash_ -= cashOut;
+
+            netIncomeBeforeTax_ -= withdraw + cashOut;
             return withdraw + cashOut;
         }
         const auto cashOut = std::min(cash_, sub);
@@ -56,6 +59,8 @@ class FirmFinance final {
         const auto withdraw    = bankAccount_.withdraw(rest);
         const auto moreCashOut = rest - withdraw;
         cash_ -= moreCashOut;
+
+        netIncomeBeforeTax_ -= cashOut + withdraw + moreCashOut;
         return cashOut + withdraw + moreCashOut;
     }
 
@@ -66,6 +71,15 @@ class FirmFinance final {
             bankAccount_.deposit(add);
         else
             cash_ += add;
+
+        netIncomeBeforeTax_ += add;
+    }
+
+    template <PayTaxFn F>
+    void finalizeAccounts(F&& payCorporateTaxFn) noexcept {
+        const auto netIncome = std::forward<F>(payCorporateTaxFn)(netIncomeBeforeTax_);
+        const auto paid      = netIncomeBeforeTax_ - netIncome;
+        nothing(tryWithdraw(static_cast<Budget>(paid)));
     }
 
   private:
@@ -76,7 +90,7 @@ class FirmFinance final {
 
     BankAccount  bankAccount_;
     Money        cash_;
-    Money        netIncome_{0.0};
+    Money        netIncomeBeforeTax_{0.0};
     const double cashRatio_;
 };
 }  // namespace abm::finance
