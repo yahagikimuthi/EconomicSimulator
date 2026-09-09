@@ -56,9 +56,9 @@ class HumanResource final {
         layOffsPlan_.reset();
     }
 
-    void payWage(TryWithdrawFn auto&& withdrawFn) noexcept {
+    void payWage(TryPayWageFn auto&& payWageFn) noexcept {
         for (auto& entry : roster_.validEntries()) {
-            entry.payWage(withdrawFn(static_cast<Budget>(entry.wage)));
+            entry.payWage(payWageFn(entry.wage));
         }
     }
 

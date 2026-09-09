@@ -126,9 +126,9 @@ class LaborDemander final {
         recruitSystem_.endRecruiting(humanResource_.makeAddRosterFn(workspace), mediator_);
     };
 
-    template <TryWithdrawFn F>
-    void payWage(F&& withdrawFn) noexcept {
-        humanResource_.payWage(std::forward<F>(withdrawFn));
+    template <TryPayWageFn F>
+    void payWage(F&& payWageFn) noexcept {
+        humanResource_.payWage(std::forward<F>(payWageFn));
     }
 
     [[nodiscard]] auto calcMonthlyCost() const noexcept -> Budget {
