@@ -1,7 +1,6 @@
 #pragma once
 
 #include "components/base_goods_supplier/common.hpp"
-#include "components/base_goods_supplier/employ_planner.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
 #include "components/base_goods_supplier/produsing.hpp"
 #include "components/base_goods_supplier/trade_planner.hpp"
@@ -10,7 +9,7 @@
 
 namespace abm::base_goods::supplier::mediator {
 class Mediator final {
-    using TradePlanListener  = Listener<EmployPlannerMemory, MarkupPlannerMemory, CentralMemory>;
+    using TradePlanListener  = Listener<MarkupPlannerMemory, CentralMemory>;
     using MarkupPlanListener = Listener<CentralMemory>;
     using TradeResultListener =
         Listener<DemandForecastManagerMemory, MarkupPlannerMemory, ProducingSystem, CentralMemory>;

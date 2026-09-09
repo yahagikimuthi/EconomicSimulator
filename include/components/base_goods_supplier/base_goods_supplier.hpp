@@ -79,13 +79,9 @@ class BaseGoodsSupplier final {
     }
 
   private:
-    void reset() noexcept {
-        tradingSystem_.reset();
-        producingSystem_.reset();
-    }
+    void reset() noexcept { tradingSystem_.reset(); }
 
     void setMediator() noexcept {
-        producingSystem_.acceptMediator(mediator_);
         tradingSystem_.acceptMediator(mediator_);
         mediator_.subscribeMarkupPlan(memory_);
         mediator_.subscribeTradePlan(memory_);
