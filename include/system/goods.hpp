@@ -25,6 +25,4 @@ inline void trade(FirmFinance& finance, GoodsSupplier& supplier) noexcept {
 inline void afterTrade(HHoldFinance& finance, GoodsDemander& demander) noexcept {
     demander.afterTrade(finance.makeDepositFn());
 }
-
-inline void endTrading(GoodsSupplier& supplier) noexcept { supplier.endTrading(); }
 }  // namespace abm::goods

@@ -148,10 +148,6 @@ class Engine final {
             afterTrade(firm.finance, firm.capitalDemander, firm.goodsSupplier);
         }
 
-        for (auto& firm : capitalFirms_) {
-            endTrading(firm.capitalSupplier);
-        }
-
         capitalMarket_.clear();
     }
 
@@ -171,10 +167,6 @@ class Engine final {
 
         for (auto& hhold : hholds_) {
             afterTrade(hhold.finance, hhold.goods);
-        }
-
-        for (auto& firm : goodsFirms_) {
-            endTrading(firm.goodsSupplier);
         }
 
         goodsMarket_.clear();

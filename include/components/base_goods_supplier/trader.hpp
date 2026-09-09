@@ -35,20 +35,17 @@ class Trader final {
     }
 
     template <DepositFn F>
-    void trade(F&& depositFn) noexcept {
-        if (not isPosting()) return;
+    [[nodiscard]] auto trade(F&& depositFn) noexcept -> TradeResult {
+        if (not isPosting()) return publishTradeResult();
         const auto demand = calcTotalDemand();
-        if (demand.isZero()) return;
+        if (demand.isZero()) return publishTradeResult();
         const auto tradeAmount    = ledger_.tradableAmount(demand);
         const auto isExcessDemand = ledger_.isExcessDemand(demand);
         isExcessDemand ? performRationedTrade(std::forward<F>(depositFn))
                        : performFullTrade(std::forward<F>(depositFn));
         ledger_.readResult({.price = myEntry_->price, .demand = demand, .salesAmount = tradeAmount}
         );
-    }
-
-    [[nodiscard]] auto publishTradeResult() const noexcept -> TradeResult {
-        return ledger_.publishResult();
+        return publishTradeResult();
     }
 
     void reset() noexcept {
@@ -57,6 +54,10 @@ class Trader final {
     }
 
   private:
+    [[nodiscard]] auto publishTradeResult() const noexcept -> TradeResult {
+        return ledger_.publishResult();
+    }
+
     [[nodiscard]] auto calcTotalDemand() const noexcept -> GoodsQuantity {
         const auto requests = myEntry_->requests();
         return std::ranges::fold_left(

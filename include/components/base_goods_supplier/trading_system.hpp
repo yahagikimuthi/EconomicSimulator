@@ -38,12 +38,8 @@ class TradingSystem final {
     }
 
     template <DepositFn F>
-    void trade(F&& depositFn) noexcept {
-        trader_.trade(std::forward<F>(depositFn));
-    }
-
-    void endTrading(IMediator auto& mediator) noexcept {
-        const auto result = trader_.publishTradeResult();
+    void trade(F&& depositFn, IMediator auto& mediator) noexcept {
+        const auto result = trader_.trade(std::forward<F>(depositFn));
         mediator.publishTradeResult(result);
     }
 

@@ -40,6 +40,4 @@ inline void afterTrade(
         goodsSupplier.makeAddCapitalFn()
     );
 }
-
-inline void endTrading(CapitalSupplier& supplier) noexcept { supplier.endTrading(); }
 }  // namespace abm::capital

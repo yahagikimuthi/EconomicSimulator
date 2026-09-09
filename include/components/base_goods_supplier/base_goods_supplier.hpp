@@ -46,11 +46,7 @@ class BaseGoodsSupplier final {
 
     template <DepositFn F>
     void trade(F&& depositFn) noexcept {
-        tradingSystem_.trade(std::forward<F>(depositFn));
-    }
-
-    void endTrading() noexcept {
-        tradingSystem_.endTrading(mediator_);
+        tradingSystem_.trade(std::forward<F>(depositFn), mediator_);
         reset();
     }
 
