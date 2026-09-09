@@ -2,11 +2,10 @@
 
 #include <cassert>
 
+#include "components/common.hpp"
 #include "components/finance/others_finance.hpp"
 #include "others/setting.hpp"
-#include "others/util.hpp"
 #include "values/common.hpp"
-#include "values/labor.hpp"
 #include "values/others.hpp"
 
 namespace abm::government {
@@ -43,49 +42,42 @@ class CorporateTaxStrategy final : public FlatTaxStrategy {
 
 class Government final {
   public:
-    explicit Government(RandomGenerator& masterRng) noexcept
-        : finance_{masterRng},
-          incomeTaxStrategy_{TaxRate{setting::incomeTaxRate}},
+    explicit Government() noexcept
+        : incomeTaxStrategy_{TaxRate{setting::incomeTaxRate}},
           salesTaxStrategy_{TaxRate{setting::salesTaxRate}},
           corporateTaxStrategy_{TaxRate{setting::corporateTaxRate}} {}
 
-    [[nodiscard]] auto collectIncomeTax(const Money income) noexcept -> Money {
-        if (income <= Money{0.0}) return income;
-        const auto tax = incomeTaxStrategy_.calculate(income);
-        assert(tax <= income);
-        finance_.deposit(tax);
-        return income - tax;
+    [[nodiscard]] auto makePayIncomeTaxFn() noexcept -> PayTaxFn auto {
+        return [&](const Money income) noexcept -> Money {
+            if (income.isZeroOrLess()) return income;
+            const auto tax = incomeTaxStrategy_.calculate(income);
+            assert(tax <= income);
+            assert(tax.isZeroOrMore());
+            finance_.deposit(tax);
+            return income - tax;
+        };
     }
 
-    [[nodiscard]] auto collectSalesTax(const Money sales) noexcept -> Money {
-        if (sales <= Money{0.0}) return sales;
-        const auto tax = salesTaxStrategy_.calculate(sales);
-        assert(tax <= sales);
-        finance_.deposit(tax);
-        return sales - tax;
+    [[nodiscard]] auto makePaySalesTaxFn() noexcept -> PayTaxFn auto {
+        return [&](const Money sales) noexcept -> Money {
+            if (sales.isZeroOrLess()) return sales;
+            const auto tax = salesTaxStrategy_.calculate(sales);
+            assert(tax <= sales);
+            assert(tax.isZeroOrMore());
+            finance_.deposit(tax);
+            return sales - tax;
+        };
     }
 
-    [[nodiscard]] auto collectCorporateTax(const Money profit) noexcept -> Money {
-        if (profit <= Money{0.0}) return profit;
-        const auto tax = corporateTaxStrategy_.calculate(profit);
-        assert(tax <= profit);
-        finance_.deposit(tax);
-        return profit - tax;
-    }
-
-    [[nodiscard]] auto provideUnemploymentBenefit(const Wage wage) noexcept -> Money {
-        if (wage.isPositive()) return Money{0.0};
-        if (finance_.asset().isZeroOrLess()) return Money{0.0};
-        ++nextUnemploymentHHoldCnt_;
-        const auto cnt     = (lastUnemploymentHHoldCnt_ != 0) ? lastUnemploymentHHoldCnt_ : 1;
-        const auto provide = finance_.asset() / cnt;
-        const auto out     = finance_.tryWithdraw(provide);
-        return out;
-    }
-
-    void reset() noexcept {
-        lastUnemploymentHHoldCnt_ = nextUnemploymentHHoldCnt_;
-        nextUnemploymentHHoldCnt_ = 0;
+    [[nodiscard]] auto makePayCorporateTaxF() noexcept -> PayTaxFn auto {
+        return [&](const Money profit) noexcept -> Money {
+            if (profit.isZeroOrLess()) return profit;
+            const auto tax = corporateTaxStrategy_.calculate(profit);
+            assert(tax <= profit);
+            assert(tax.isZeroOrMore());
+            finance_.deposit(tax);
+            return profit - tax;
+        };
     }
 
     [[nodiscard]] auto asset() const noexcept -> Budget { return finance_.asset(); }
@@ -95,8 +87,6 @@ class Government final {
     IncomeTaxStrategy    incomeTaxStrategy_;
     SalesTaxStrategy     salesTaxStrategy_;
     CorporateTaxStrategy corporateTaxStrategy_;
-    int                  lastUnemploymentHHoldCnt_{};
-    int                  nextUnemploymentHHoldCnt_{};
 };
 }  // namespace abm::government
 
