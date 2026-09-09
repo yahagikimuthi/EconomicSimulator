@@ -2,6 +2,7 @@
 
 #include <concepts>
 #include <optional>
+#include <utility>
 #include <variant>
 
 #include "values/common.hpp"
@@ -31,7 +32,7 @@ class Memory final {
 
     void reset() noexcept {
         if (not next_) return;
-        log_ = next_, next_.reset();
+        log_ = std::exchange(next_, std::nullopt);
     }
     void clearLog() noexcept { log_.reset(); }
     void next(const T next) noexcept { next_ = next; }
