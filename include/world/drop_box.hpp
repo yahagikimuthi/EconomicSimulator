@@ -1,59 +1,103 @@
 #pragma once
 
+#include <concepts>
+#include <cstddef>
 #include <vector>
 
 #include "others/setting.hpp"
 
-namespace abm {
+namespace abm::drop_box {
 // 並列化する場合、tbb::concurrent_vectorにしなければならない
 // しかし、HighFiveと互換性がないため、連続メモリコンテナで要素の追加を安全に行いたい
 // 事前に容量を確保し、スレッドごとにインデックスを割り当てる方式を検討
-struct CensusDropBox final {
-    std::vector<double> firmAssets;
-    std::vector<double> postedEmployments;
-    std::vector<double> postedWages;
-    std::vector<double> employments;
-    std::vector<double> sumWages;
-    std::vector<double> prices;
-    std::vector<double> supplies;
-    std::vector<double> markups;
-    std::vector<double> inventories;
 
-    std::vector<double> hholdAssets;
-    std::vector<double> wages;
+class Vec final {
+  public:
+    explicit Vec() noexcept = default;
 
-    explicit CensusDropBox() noexcept {
-        namespace cnt       = global_setting::agent_count;
-        const auto firmCnt  = cnt::capitalFirm + cnt::goodsFirm;
-        const auto hholdCnt = cnt::hhold;
+    void clear() noexcept { vec_.clear(); }
 
-        firmAssets.reserve(firmCnt);
-        postedEmployments.reserve(firmCnt);
-        postedWages.reserve(firmCnt);
-        employments.reserve(firmCnt);
-        sumWages.reserve(firmCnt);
-        prices.reserve(firmCnt);
-        supplies.reserve(firmCnt);
-        markups.reserve(firmCnt);
-        inventories.reserve(firmCnt);
+    void add(const double add) noexcept { vec_.emplace_back(add); }
 
-        hholdAssets.reserve(hholdCnt);
-        wages.reserve(hholdCnt);
+    template <typename T>
+        requires requires(T t) {
+            { t.value() } -> std::same_as<double>;
+        }
+    void add(const T add) noexcept {
+        vec_.emplace_back(add.value());
     }
 
-    void clear() noexcept {
-        firmAssets.clear();
-        postedEmployments.clear();
-        postedWages.clear();
-        employments.clear();
-        sumWages.clear();
-        prices.clear();
-        supplies.clear();
-        markups.clear();
-        inventories.clear();
+    void reserve(const std::size_t n) noexcept { vec_.reserve(n); }
 
-        hholdAssets.clear();
-        wages.clear();
-    }
+    auto get() const noexcept -> const std::vector<double>& { return vec_; }
+
+  private:
+    std::vector<double> vec_;
 };
+
+struct FinanceDropBox final {
+    explicit FinanceDropBox() noexcept {
+        namespace cnt = global_setting::agent_count;
+        firmAssets.reserve(cnt::capitalFirm + cnt::goodsFirm);
+        hholdAssets.reserve(cnt::hhold);
+    }
+
+    Vec firmAssets;
+    Vec hholdAssets;
+};
+
+struct LaborDropBox final {
+    explicit LaborDropBox() noexcept {
+        namespace cnt       = global_setting::agent_count;
+        constexpr auto firm = cnt::capitalFirm + cnt::goodsFirm;
+        postedEmployments.reserve(firm);
+        postedWages.reserve(firm);
+        personalCosts.reserve(firm);
+        wages.reserve(cnt::hhold);
+    }
+
+    Vec postedEmployments;
+    Vec postedWages;
+    Vec employments;
+    Vec personalCosts;
+    Vec wages;
+};
+
+struct BaseGoodsDropBox {
+    explicit BaseGoodsDropBox(const std::size_t firm) noexcept {
+        prices.reserve(firm);
+        supplies.reserve(firm);
+        markups.reserve(firm);
+        inventories.reserve(firm);
+    }
+
+    Vec prices;
+    Vec supplies;
+    Vec markups;
+    Vec inventories;
+};
+
+struct CapitalDropBox final : BaseGoodsDropBox {
+    explicit CapitalDropBox() noexcept
+        : BaseGoodsDropBox(global_setting::agent_count::capitalFirm) {}
+};
+
+struct GoodsDropBox final : BaseGoodsDropBox {
+    explicit GoodsDropBox() noexcept : BaseGoodsDropBox(global_setting::agent_count::goodsFirm) {}
+};
+
+struct CensusDropBox final {
+    FinanceDropBox finance;
+    LaborDropBox   labor;
+    CapitalDropBox capital;
+    GoodsDropBox   goods;
+};
+}  // namespace abm::drop_box
+
+namespace abm {
+using FinanceDropBox = drop_box::FinanceDropBox;
+using LaborDropBox   = drop_box::LaborDropBox;
+using CapitalDropBox = drop_box::CapitalDropBox;
+using GoodsDropBox   = drop_box::GoodsDropBox;
+using CensusDropBox  = drop_box::CensusDropBox;
 }  // namespace abm

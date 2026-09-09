@@ -51,15 +51,15 @@ class CentralMemory final {
   public:
     explicit CentralMemory() noexcept = default;
 
-    void logging(CensusDropBox& dropBox) noexcept {
+    void logging(LaborDropBox& dropBox) noexcept {
         if (employPlan_) {
             assert(employPlan_->isZeroOrMore());
-            dropBox.postedEmployments.emplace_back(employPlan_->value());
+            dropBox.postedEmployments.add(*employPlan_);
             employPlan_.reset();
         }
         if (wagePlan_) {
             assert(wagePlan_->isZeroOrMore());
-            dropBox.postedWages.emplace_back(wagePlan_->value());
+            dropBox.postedWages.add(*wagePlan_);
             wagePlan_.reset();
         }
     }

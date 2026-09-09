@@ -5,7 +5,6 @@
 #include <highfive/H5File.hpp>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "others/setting.hpp"
 #include "world/drop_box.hpp"
@@ -36,21 +35,21 @@ class Logger final {
         auto group     = HighFive::Group{file_.createGroup(groupPath)};
 
         auto create =
-            [&group](std::string_view dataName, const std::vector<double>& data) noexcept -> void {
-            group.createDataSet(static_cast<std::string>(dataName), data);
+            [&group](std::string_view dataName, const drop_box::Vec& data) noexcept -> void {
+            group.createDataSet(static_cast<std::string>(dataName), data.get());
         };
 
-        create(name::firmAssets, dropBox.firmAssets);
-        create(name::postedEmployments, dropBox.postedEmployments);
-        create(name::postedWages, dropBox.postedWages);
-        create(name::employments, dropBox.employments);
-        create(name::sumWages, dropBox.sumWages);
-        create(name::prices, dropBox.prices);
-        create(name::supplies, dropBox.supplies);
-        create(name::markups, dropBox.markups);
-        create(name::inventories, dropBox.inventories);
-        create(name::householdAssets, dropBox.hholdAssets);
-        create(name::wages, dropBox.wages);
+        create(name::firmAssets, dropBox.finance.firmAssets);
+        create(name::postedEmployments, dropBox.labor.postedEmployments);
+        create(name::postedWages, dropBox.labor.postedWages);
+        create(name::employments, dropBox.labor.employments);
+        create(name::sumWages, dropBox.labor.wages);
+        create(name::prices, dropBox.capital.prices);
+        create(name::supplies, dropBox.capital.supplies);
+        create(name::markups, dropBox.capital.markups);
+        create(name::inventories, dropBox.capital.inventories);
+        create(name::householdAssets, dropBox.finance.hholdAssets);
+        create(name::wages, dropBox.labor.wages);
     }
 
   private:

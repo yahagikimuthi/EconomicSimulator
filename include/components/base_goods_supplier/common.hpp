@@ -62,10 +62,12 @@ class CentralMemory final {
         if (result.sales.isPositive()) lastSales_ = result.sales;
     }
 
-    void logging(CensusDropBox& dropBox) noexcept {
-        if (pricePlan_) dropBox.prices.emplace_back(pricePlan_->value());
-        if (markupPlan_) dropBox.markups.emplace_back(markupPlan_->value());
-        if (supplyPlan_) dropBox.supplies.emplace_back(supplyPlan_->value());
+    template <typename T>
+        requires(std::same_as<T, GoodsDropBox> or std::same_as<T, CapitalDropBox>)
+    void logging(T& dropBox) noexcept {
+        if (pricePlan_) dropBox.prices.add(*pricePlan_);
+        if (markupPlan_) dropBox.markups.add(*markupPlan_);
+        if (supplyPlan_) dropBox.supplies.add(*supplyPlan_);
         pricePlan_.reset();
         markupPlan_.reset();
         supplyPlan_.reset();
