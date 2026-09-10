@@ -69,7 +69,7 @@ class RandomGenerator final {
     }
 
     template <std::integral T>
-    [[nodiscard]] constexpr auto rand(const T min = 0.0, const T limit = 1.0) noexcept -> double {
+    [[nodiscard]] constexpr auto rand(const T min, const T limit) noexcept -> double {
         return rand<double>(min, limit);
     }
 
