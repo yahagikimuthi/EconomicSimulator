@@ -11,11 +11,12 @@
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "world/deposit.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::finance {
 template <typename F>
-concept SubsidyFn = requires(F f, Money netIncome) {
-    { f(netIncome) } -> std::same_as<Money>;
+concept SubsidyFn = requires(F f) {
+    { f() } -> std::same_as<Money>;
 };
 
 class FirmFinance final {
@@ -81,6 +82,11 @@ class FirmFinance final {
         netIncomeBeforeTax_ += add;
     }
 
+    void logging(FinanceDropBox& dropBox) noexcept {
+        dropBox.firmAssets.add(asset());
+        dropBox.netIncome.add(netIncomeBeforeTax_);
+    }
+
     template <PayTaxFn F1, SubsidyFn F2>
     void finalizeAccounts(F1&& payCorporateTaxFn, F2&& subsidyFn) noexcept {
         if (netIncomeBeforeTax_.isZero()) return;
@@ -90,7 +96,7 @@ class FirmFinance final {
             nothing(tryWithdraw(static_cast<Budget>(paid)));
             return;
         }
-        const auto subsidy = std::forward<F2>(subsidyFn)(-netIncomeBeforeTax_);
+        const auto subsidy = std::forward<F2>(subsidyFn)();
         deposit(subsidy);
     }
 

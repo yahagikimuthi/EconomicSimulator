@@ -54,6 +54,7 @@ struct FinanceDropBox final {
     }
 
     Vec firmAssets;
+    Vec netIncome;
     Vec hholdAssets;
 };
 
