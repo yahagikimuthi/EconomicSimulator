@@ -21,6 +21,12 @@ TEST_CASE("Rosterのテスト") {  // NOLINT
     auto board  = CompanyBoard{AgentID{42}};
     auto space  = base_goods::Workspace{};
 
+    SUBCASE("デフォルトの挙動テスト") {
+        CHECK(roster.employeeCnt().isZero());
+        CHECK(roster.rawEntries().empty());
+        CHECK(roster.sumWage().isZero());
+    }
+
     SUBCASE("addのみの場合、sumWageが機能することのテスト") {
         nothing(roster.add(AgentID{101}, Wage{101}, board, space));
         nothing(roster.add(AgentID{202}, Wage{202}, board, space));
