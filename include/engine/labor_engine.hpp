@@ -8,7 +8,7 @@
 #include "world/labor.hpp"
 
 namespace abm::engine {
-class LaborEngine {
+class LaborEngine final {
   public:
     explicit LaborEngine(LaborDropBox& dropBox) noexcept : dropBox_{dropBox} {}
 

@@ -9,7 +9,7 @@
 #include "world/drop_box.hpp"
 
 namespace abm::engine {
-class GoodsEngine {
+class GoodsEngine final {
   public:
     explicit GoodsEngine(GoodsDropBox& dropBox) noexcept : dropBox_{dropBox} {}
 
