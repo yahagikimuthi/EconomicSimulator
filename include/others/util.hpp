@@ -27,7 +27,7 @@ constexpr void nothing([[maybe_unused]] auto&&... _) noexcept {}
 
 template <typename F>
     requires requires(F f) {
-        { f() } noexcept -> std::same_as<void>;
+        { f() } noexcept;
     }
 class ScopeExit final {
   public:
@@ -44,7 +44,7 @@ class ScopeExit final {
 
 template <typename F>
     requires requires(F f) {
-        { f() } noexcept -> std::same_as<void>;
+        { f() } noexcept;
     }
 [[nodiscard]] auto makeScopeExit(F&& f) noexcept -> ScopeExit<F> {
     return ScopeExit<F>{std::forward<F>(f)};
