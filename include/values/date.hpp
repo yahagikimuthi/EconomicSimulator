@@ -3,7 +3,6 @@
 #include <compare>
 
 #include "others/setting.hpp"
-#include "others/util.hpp"
 #include "values/mixin.hpp"
 
 namespace abm {
@@ -14,7 +13,7 @@ class Day final : public value_object::BaseValueObject<int>,
 
   public:
     explicit constexpr Day(const int value) noexcept : BaseValueObject<int>(value) {
-        ASSERT(value > 0);
+        contract_assert(value > 0);
     }
 
     constexpr auto operator++() noexcept -> Day& {
@@ -30,7 +29,7 @@ class Month final : public value_object::BaseValueObject<int>,
 
   public:
     explicit constexpr Month(const int value) noexcept : BaseValueObject<int>(value) {
-        ASSERT(value > 0);
+        contract_assert(value > 0);
     }
 
     constexpr auto operator++() noexcept -> Month& {
@@ -46,7 +45,7 @@ class Year final : public value_object::BaseValueObject<int>,
 
   public:
     explicit constexpr Year(const int value) noexcept : BaseValueObject<int>(value) {
-        ASSERT(value > 0);
+        contract_assert(value > 0);
     }
 
     constexpr auto operator++() noexcept -> Year& {
@@ -65,7 +64,7 @@ class Date final {
   public:
     explicit constexpr Date(const int day) noexcept
         : Date([day]() constexpr noexcept -> Normalized {
-              ASSERT(day > 0);
+              contract_assert(day > 0);
 
               using namespace global_setting;
               constexpr auto dayInYear = dayInMonth * monthInYear;

@@ -20,12 +20,6 @@ struct Overloaded final : Ts... {
     using Ts::operator()...;
 };
 
-#ifdef __clang__
-#define ASSERT(...) assert(__VA_ARGS__)  // NOLINT
-#else
-#define ASSERT(...) contract_assert(__VA_ARGS__)
-#endif
-
 template <typename T>
 using Ref = std::reference_wrapper<T>;
 
