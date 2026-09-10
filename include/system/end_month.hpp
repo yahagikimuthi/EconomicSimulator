@@ -26,21 +26,21 @@ inline void workAndReceiveWage(HHoldFinance& finance, LaborSupplier& supplier) n
 inline void finalizeAccounts(FirmFinance& finance, Government& government) noexcept {
     finance.finalizeAccounts(
         [&](const Money profit) noexcept -> Money { return government.payCorporateTax(profit); },
-        [&](const Money profit) noexcept -> Money {
-            return government.subsideLossMakingCompany(profit);
-        }
+        [&]() noexcept -> Money { return government.subsideLossMakingCompany(); }
     );
 }
 
 inline void provideUnemploymentBenefit(
     HHoldFinance& finance, LaborSupplier& laborSupplier, Government& government
 ) noexcept {
-    const auto benefit = government.provideUnemploymentBenefit(laborSupplier.wage());
+    if (laborSupplier.wage().isPositive()) return;
+
+    const auto benefit = government.provideUnemploymentBenefit();
     finance.deposit(benefit);
 }
 
 inline void logging(FinanceDropBox& dropBox, FirmFinance& finance) noexcept {
-    dropBox.firmAssets.add(finance.asset());
+    finance.logging(dropBox);
 }
 
 inline void logging(FinanceDropBox& dropBox, HHoldFinance& finance) noexcept {
