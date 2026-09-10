@@ -26,6 +26,7 @@ class MarkupPlannerMemory final {
         return salesAmount_.log();
     }
 
+    // 供給量がゼロであるものは学習に悪影響であるからそもそも記憶しない
     void listenTradePlan(const TradePlan& plan) noexcept {
         assert(plan.supply.isZeroOrMore());
         if (plan.supply.isPositive()) supplyPlan_.next(plan.supply);
@@ -79,9 +80,8 @@ class MarkupPlanner final {
         assert(lastSupply->isZeroOrMore());
         assert(lastSalesAmount->isZeroOrMore());
 
-        const auto unsold     = *lastSupply - *lastSalesAmount;
-        const auto isSupplied = *lastSupply != GoodsQuantity{0.0};
-        const auto isSold     = isSupplied ? unsold / *lastSupply < targetInvRatio : true;
+        const auto unsold = *lastSupply - *lastSalesAmount;
+        const auto isSold = unsold / *lastSupply < targetInvRatio;
         return calcNextMarkup(isSold);
     }
 
