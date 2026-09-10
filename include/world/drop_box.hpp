@@ -45,11 +45,13 @@ struct FinanceDropBox final {
     explicit FinanceDropBox() noexcept {
         namespace cnt = global_setting::agent_count;
         firmAssets.reserve(cnt::capitalFirm + cnt::goodsFirm);
+        netIncome.reserve(cnt::capitalFirm + cnt::goodsFirm);
         hholdAssets.reserve(cnt::hhold);
     }
 
     void clear() noexcept {
         firmAssets.clear();
+        netIncome.clear();
         hholdAssets.clear();
     }
 
