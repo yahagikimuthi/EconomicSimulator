@@ -88,7 +88,7 @@ class GovernmentFinance final {
 
         assert(cash_.load() >= 0.0);
 
-        return sub;
+        return out;
     }
 
     void deposit(const Money add) noexcept {
