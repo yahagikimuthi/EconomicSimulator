@@ -18,20 +18,9 @@ namespace abm::base_goods::supplier {
 
 class BaseGoodsSupplier {
   public:
-    explicit BaseGoodsSupplier(RandomGenerator& masterRng) noexcept
-        : producingSystem_{masterRng}, tradingSystem_{masterRng} {
-        setMediator();
-    }
-    BaseGoodsSupplier(const BaseGoodsSupplier& other) noexcept
-        : producingSystem_{other.producingSystem_},
-          tradingSystem_{other.tradingSystem_},
-          memory_{other.memory_} {
-        setMediator();
-    }
     BaseGoodsSupplier(BaseGoodsSupplier&& other) noexcept                   = delete;
     auto operator=(const BaseGoodsSupplier&) noexcept -> BaseGoodsSupplier& = delete;
     auto operator=(BaseGoodsSupplier&&) noexcept -> BaseGoodsSupplier&      = delete;
-    ~BaseGoodsSupplier() noexcept                                           = default;
 
     [[nodiscard]] auto planAndExpectSales(const Budget totalCost) noexcept -> Budget {
         assert(totalCost.isZeroOrMore());
@@ -76,6 +65,19 @@ class BaseGoodsSupplier {
         memory_.logging(dropBox);
     }
 
+  protected:
+    explicit BaseGoodsSupplier(RandomGenerator& masterRng) noexcept
+        : producingSystem_{masterRng}, tradingSystem_{masterRng} {
+        setMediator();
+    }
+    BaseGoodsSupplier(const BaseGoodsSupplier& other) noexcept
+        : producingSystem_{other.producingSystem_},
+          tradingSystem_{other.tradingSystem_},
+          memory_{other.memory_} {
+        setMediator();
+    }
+    ~BaseGoodsSupplier() noexcept = default;
+
   private:
     void setMediator() noexcept {
         tradingSystem_.acceptMediator(mediator_);
@@ -94,9 +96,11 @@ class BaseGoodsSupplier {
 
 namespace abm {
 class CapitalSupplier : public base_goods::supplier::BaseGoodsSupplier {
-    using BaseGoodsSupplier::BaseGoodsSupplier;
+  public:
+    explicit CapitalSupplier(RandomGenerator& masterRng) noexcept : BaseGoodsSupplier(masterRng) {}
 };
 class GoodsSupplier : public base_goods::supplier::BaseGoodsSupplier {
-    using BaseGoodsSupplier::BaseGoodsSupplier;
+  public:
+    explicit GoodsSupplier(RandomGenerator& masterRng) noexcept : BaseGoodsSupplier(masterRng) {}
 };
 }  // namespace abm
