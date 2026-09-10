@@ -29,5 +29,48 @@ TEST_CASE("HHoldFinanceのテスト") {  // NOLINT
         CHECK(finance.asset().value() == doctest::Approx(beforeAsset.value() - result.value()));
     }
 }
+
+TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
+    auto rng     = makeRng();
+    auto finance = GovernmentFinance{};
+
+    SUBCASE("デフォルトで資産は0") { CHECK(finance.asset().isZero()); }
+
+    SUBCASE("預金した分、資産が増えていること") {
+        const auto deposit = rng.rand(1, 1000);
+        finance.deposit(Money{deposit});
+        CHECK(finance.asset().value() == doctest::Approx(deposit));
+    }
+
+    SUBCASE("出金額>資産のとき、資産が戻り値となり、残高が0となる") {
+        const auto deposit = 100.0;
+        finance.deposit(Money{deposit});
+
+        const auto withdraw = finance.tryWithdraw(Budget{150.0});
+
+        CHECK(withdraw.value() == doctest::Approx(100.0));
+        CHECK(finance.asset().value() == doctest::Approx(0.0));
+    }
+
+    SUBCASE("出金額==資産のとき、資産が戻り値となり、残高が0となる") {
+        const auto deposit = 100.0;
+        finance.deposit(Money{deposit});
+
+        const auto withdraw = finance.tryWithdraw(Budget{100.0});
+
+        CHECK(withdraw.value() == doctest::Approx(100.0));
+        CHECK(finance.asset().value() == doctest::Approx(0.0));
+    }
+
+    SUBCASE("出金額<資産のとき、出金額が戻り値となり、残高がその分引かれる") {
+        const auto deposit = 100.0;
+        finance.deposit(Money{deposit});
+
+        const auto withdraw = finance.tryWithdraw(Budget{80.0});
+
+        CHECK(withdraw.value() == doctest::Approx(80.0));
+        CHECK(finance.asset().value() == doctest::Approx(20.0));
+    }
+}
 }  // namespace
 }  // namespace abm
