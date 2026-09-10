@@ -23,16 +23,6 @@
 
 namespace abm {
 class Engine final {
-    [[nodiscard]] static auto calcSumAssert(const auto& agents) noexcept -> double {
-        return std::ranges::fold_left(
-            agents | std::views::transform([](const auto& agent) noexcept -> double {
-                return agent.finance.asset().value();
-            }),
-            0.0,
-            std::plus{}
-        );
-    }
-
   public:
     [[nodiscard]] explicit Engine(const int endStep)
         : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endMonth_{endStep} {
@@ -233,6 +223,16 @@ class Engine final {
         for (auto& hhold : hholds_) {
             provideUnemploymentBenefit(hhold.finance, hhold.labor, government_);
         }
+    }
+
+    [[nodiscard]] static auto calcSumAssert(const auto& agents) noexcept -> double {
+        return std::ranges::fold_left(
+            agents | std::views::transform([](const auto& agent) noexcept -> double {
+                return agent.finance.asset().value();
+            }),
+            0.0,
+            std::plus{}
+        );
     }
 
     [[nodiscard]] auto calcSumAsset() noexcept -> double {
