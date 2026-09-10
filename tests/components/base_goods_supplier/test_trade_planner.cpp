@@ -96,5 +96,94 @@ TEST_CASE("DemandForecastManagerMemoryのテスト") {  // NOLINT
         CHECK(demand.value() == 35.0);
     }
 }
+
+TEST_CASE("DemandForecastManagerのテスト") {  // NOLINT
+    auto rng      = makeRng();
+    auto mediator = Mediator{};
+    auto manager  = DemandForecastManager{rng};
+    manager.acceptMediator(mediator);
+
+    SUBCASE("供給量がゼロのとき、更新処理が行われない") {
+        const auto before = manager.plan();
+
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{0.0},
+             .unsoldAmount = GoodsQuantity{0.0},
+             .totalDemand  = GoodsQuantity{350.0},
+             .sales        = Money{10.0}}
+        );
+
+        const auto after = manager.plan();
+
+        CHECK(before.value() == after.value());
+    }
+
+    SUBCASE("何もしない場合、結果は同じ") {
+        const auto before = manager.plan();
+        const auto after  = manager.plan();
+
+        CHECK(before.value() == after.value());
+    }
+
+    SUBCASE("需要量が予想と変わらない場合、結果は同じ") {
+        const auto before = manager.plan();
+
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .unsoldAmount = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .totalDemand  = before,
+             .sales        = Money{rng.rand(1.0, 100.0)}}
+        );
+
+        const auto after = manager.plan();
+
+        CHECK(before.value() == after.value());
+    }
+
+    SUBCASE("需要量が予想より大きい場合、予測が上方修正") {
+        const auto before = manager.plan();
+
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .unsoldAmount = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .totalDemand  = before * 2,
+             .sales        = Money{rng.rand(1.0, 100.0)}}
+        );
+
+        const auto after = manager.plan();
+
+        CHECK(after.value() > before.value());
+    }
+
+    SUBCASE("需要量が予想未満の場合、予測が下方修正") {
+        const auto before = manager.plan();
+
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .unsoldAmount = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .totalDemand  = before / 2,
+             .sales        = Money{rng.rand(1.0, 100.0)}}
+        );
+
+        const auto after = manager.plan();
+
+        CHECK(after.value() < before.value());
+    }
+
+    SUBCASE("需要量がゼロの場合、予測が下方修正") {
+        const auto before = manager.plan();
+
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .unsoldAmount = GoodsQuantity{rng.rand(1.0, 100.0)},
+             .totalDemand  = GoodsQuantity{0.0},
+             .sales        = Money{rng.rand(1.0, 100.0)}}
+        );
+
+        const auto after = manager.plan();
+
+        CHECK(after.value() < before.value());
+    }
+}
 }  // namespace
 }  // namespace abm::base_goods::supplier
