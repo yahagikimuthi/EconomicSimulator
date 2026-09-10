@@ -2,6 +2,7 @@
 
 #include "doctest.h"
 #include "others/util.hpp"
+#include "tests/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
 
@@ -10,7 +11,7 @@ namespace {
 TEST_CASE("Workspaceのテスト") {  // NOLINT
     auto space = Workspace{};
 
-    SUBCASE("pickUpInputを呼び出した場合、inputが0になっていること") {
+    SUBCASE("takeoutを呼び出した場合、inputが0になっていること") {
         const auto input = 10.0;
         space.addInput(input);
 
@@ -118,10 +119,29 @@ TEST_CASE("Entryのテスト") {  // NOLINT
 TEST_CASE("Marketのテスト") {  // NOLINT
     auto market = Market{};
 
+    auto rng = makeRng();
+
     SUBCASE("pickしてもデフォルトはnull") {
-        auto       rng  = RandomGenerator{{}};
         const auto pick = market.pickEntry(AgentID{42}, 100, rng);
         CHECK(not pick.has_value());
+    }
+
+    SUBCASE("同じIDのエントリーは出さない") {
+        nothing(market.entry(
+            AgentID{101}, Price{rng.rand(1, 100)}, GoodsQuantity{rng.rand(10.0, 1000.0)}
+        ));
+        nothing(market.entry(
+            AgentID{202}, Price{rng.rand(1, 100)}, GoodsQuantity{rng.rand(10.0, 1000.0)}
+        ));
+        nothing(market.entry(
+            AgentID{303}, Price{rng.rand(1, 100)}, GoodsQuantity{rng.rand(10.0, 1000.0)}
+        ));
+        nothing(market.entry(
+            AgentID{404}, Price{rng.rand(1, 100)}, GoodsQuantity{rng.rand(10.0, 1000.0)}
+        ));
+
+        const auto pick = market.pickEntry(AgentID{202}, 1, rng);
+        if (pick) CHECK(pick->id.value() != 202);
     }
 }
 }  // namespace
