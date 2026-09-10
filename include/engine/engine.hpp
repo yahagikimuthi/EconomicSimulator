@@ -10,14 +10,13 @@
 #include "components/government.hpp"
 #include "engine/agents.hpp"
 #include "engine/capital_engine.hpp"
+#include "engine/end_month_engine.hpp"
 #include "engine/goods_engine.hpp"
 #include "engine/labor_engine.hpp"
 #include "engine/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "system/end_month.hpp"
 #include "system/planning.hpp"
-#include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
 
 namespace abm::engine {
@@ -29,7 +28,8 @@ class Engine final {
           endMonth_{endStep},
           laborEngine_{dropBox_.labor},
           capitalEngine_{dropBox_.capital},
-          goodsEngine_{dropBox_.goods} {
+          goodsEngine_{dropBox_.goods},
+          endMonthEngine_{dropBox_.finance} {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
@@ -51,7 +51,7 @@ class Engine final {
                 runStandardPlanning();
             capitalEngine_.run(capitalFirms_, goodsFirms_, government_);
             goodsEngine_.run(goodsFirms_, hholds_, government_);
-            runEndMonth();
+            endMonthEngine_.run(capitalFirms_, goodsFirms_, hholds_, government_, dropBox_);
             logger_.save(dropBox_, month);
             dropBox_.clear();
 
@@ -98,31 +98,6 @@ class Engine final {
         }
     }
 
-    void runEndMonth() noexcept {
-        using namespace end_month;
-        for (auto& firm : capitalFirms_) {
-            payWage(firm.finance, firm.laborDemander, government_);
-        }
-        for (auto& firm : goodsFirms_) {
-            payWage(firm.finance, firm.laborDemander, government_);
-        }
-
-        for (auto& hhold : hholds_) {
-            workAndReceiveWage(hhold.finance, hhold.labor);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            finalizeAccounts(firm.finance, government_);
-        }
-        for (auto& firm : goodsFirms_) {
-            finalizeAccounts(firm.finance, government_);
-        }
-
-        for (auto& hhold : hholds_) {
-            provideUnemploymentBenefit(hhold.finance, hhold.labor, government_);
-        }
-    }
-
     [[nodiscard]] static auto calcSumAssert(const auto& agents) noexcept -> double {
         return std::ranges::fold_left(
             agents | std::views::transform([](const auto& agent) noexcept -> double {
@@ -161,12 +136,11 @@ class Engine final {
     std::vector<HHold>       hholds_;
     Government               government_;
 
-    CensusDropBox dropBox_;
-    LaborEngine   laborEngine_;
-    CapitalEngine capitalEngine_;
-    GoodsEngine   goodsEngine_;
-    CapitalMarket capitalMarket_;
-    GoodsMarket   goodsMarket_;
+    CensusDropBox  dropBox_;
+    LaborEngine    laborEngine_;
+    CapitalEngine  capitalEngine_;
+    GoodsEngine    goodsEngine_;
+    EndMonthEngine endMonthEngine_;
 };
 }  // namespace abm::engine
 
