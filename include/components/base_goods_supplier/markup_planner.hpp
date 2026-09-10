@@ -71,7 +71,7 @@ class MarkupPlanner final {
     }
 
   private:
-    // isSold = (前期供給 - 前期売上) / 前回供給 < 定数
+    // isSold = (前期供給 - 前期売上) / 前回供給 <= 定数
     [[nodiscard]] auto calcNextMarkup(const double targetInvRatio
     ) const noexcept -> std::optional<MarkupRate> {
         const auto lastSupply      = memory_.lastSupply();
@@ -81,7 +81,7 @@ class MarkupPlanner final {
         assert(lastSalesAmount->isZeroOrMore());
 
         const auto unsold = *lastSupply - *lastSalesAmount;
-        const auto isSold = unsold / *lastSupply < targetInvRatio;
+        const auto isSold = unsold / *lastSupply <= targetInvRatio;
         return calcNextMarkup(isSold);
     }
 
