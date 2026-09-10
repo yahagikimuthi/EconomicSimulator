@@ -58,10 +58,16 @@ class DemandForecastManagerMemory final {
     [[nodiscard]] auto lastTotalDemand() const noexcept -> std::optional<GoodsQuantity> {
         return totalDemand_.log();
     }
+
     void clearLog() noexcept { totalDemand_.clearLog(); }
+
     void listenTradeResult(const TradeResult& result) noexcept {
         assert(result.totalDemand.isZeroOrMore());
-        totalDemand_.next(result.totalDemand);
+        assert(result.soldAmount.isZeroOrMore());
+        assert(result.unsoldAmount.isZeroOrMore());
+
+        if ((result.soldAmount + result.unsoldAmount).isPositive())
+            totalDemand_.next(result.totalDemand);
         totalDemand_.reset();
     }
 
@@ -79,6 +85,7 @@ class DemandForecastManager final {
     void acceptMediator(IMediator auto& mediator) noexcept {
         mediator.subscribeTradeResult(memory_);
     }
+
     [[nodiscard]] auto plan() noexcept -> GoodsQuantity {
         const auto next = calcNext();
         memory_.clearLog();
