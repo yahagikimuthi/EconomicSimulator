@@ -60,9 +60,7 @@ class Employment final {
         };
     }
 
-    void logging(LaborDropBox& dropBox) noexcept {
-        if (isEmployed()) dropBox.wages.add(rosterEntry_->wage);
-    }
+    void logging(LaborDropBox& dropBox) const noexcept { dropBox.wages.add(wage()); }
 
   private:
     void resign() noexcept {
