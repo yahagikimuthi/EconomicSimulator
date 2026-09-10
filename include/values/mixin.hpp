@@ -2,12 +2,16 @@
 
 #include <cassert>
 #include <compare>
+#include <type_traits>
 
 namespace abm::value_object {
 template <typename T>
+    requires std::is_floating_point_v<T> or std::is_integral_v<T>
 struct BaseValueObject {
   public:
     [[nodiscard]] constexpr auto value() const noexcept -> T { return value_; }
+
+    explicit operator double() const noexcept { return value_; }
 
   protected:
     explicit constexpr BaseValueObject(const T value) noexcept : value_{value} {}

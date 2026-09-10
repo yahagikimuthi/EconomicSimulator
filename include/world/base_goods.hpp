@@ -134,16 +134,17 @@ class Market final {
         if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
 
         auto       betterEntry = std::optional<Entry&>{std::nullopt};
-        const auto totalSupply = totalSupply_.load();
+        const auto totalSupply = GoodsQuantity{totalSupply_.load()};
         for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
                 entries_,
                 totalSupply,
-                [](const Entry& e) noexcept -> double { return e.supply.value(); }
+                [](const Entry& e) noexcept -> GoodsQuantity { return e.supply; }
             );
             if (sample.id == id) continue;
             if (not betterEntry or sample.price < betterEntry->price) betterEntry = sample;
         }
+
         return betterEntry;
     }
 
