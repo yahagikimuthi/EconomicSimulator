@@ -73,6 +73,10 @@ class Government final {
         return profit - tax;
     }
 
+    [[nodiscard]] auto provideUnemploymentBenefit(const Wage wage) noexcept -> Money;
+
+    [[nodiscard]] auto subsideLossMakingCompany(const Money profit) noexcept -> Money;
+
     [[nodiscard]] auto asset() const noexcept -> Budget { return finance_.asset(); }
 
   private:
