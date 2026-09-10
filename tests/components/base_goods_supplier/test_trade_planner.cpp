@@ -1,5 +1,6 @@
 #include "components/base_goods_supplier/trade_planner.hpp"
 
+#include "components/base_goods_supplier/mediator.hpp"
 #include "doctest.h"
 #include "tests/util.hpp"
 #include "values/common.hpp"
@@ -58,6 +59,41 @@ TEST_CASE("PricePlannerのテスト（乱数の関係で1%未満だが失敗す�
 
         CHECK(out.isPositive());
         CHECK(out.value() <= 1e-6);
+    }
+}
+
+TEST_CASE("DemandForecastManagerMemoryのテスト") {  // NOLINT
+    auto rng      = makeRng();
+    auto mediator = Mediator{};
+    auto memory   = DemandForecastManagerMemory{rng};
+    mediator.subscribeTradeResult(memory);
+
+    SUBCASE("供給量がゼロの場合、更新処理が行われない") {
+        const auto before = memory.lastTotalDemand().value();
+
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{0.0},
+             .unsoldAmount = GoodsQuantity{0.0},
+             .totalDemand  = GoodsQuantity{10.0},
+             .sales        = Money{100.0}}
+        );
+
+        const auto after = memory.lastTotalDemand().value();
+
+        CHECK(before.value() == after.value());
+    }
+
+    SUBCASE("供給量が正の場合、更新される") {
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{10.0},
+             .unsoldAmount = GoodsQuantity{10.0},
+             .totalDemand  = GoodsQuantity{35.0},
+             .sales        = Money{100.0}}
+        );
+
+        const auto demand = memory.lastTotalDemand().value();
+
+        CHECK(demand.value() == 35.0);
     }
 }
 }  // namespace
