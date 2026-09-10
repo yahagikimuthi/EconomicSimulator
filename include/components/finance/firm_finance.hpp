@@ -89,6 +89,8 @@ class FirmFinance final {
 
     template <PayTaxFn F1, SubsidyFn F2>
     void finalizeAccounts(F1&& payCorporateTaxFn, F2&& subsidyFn) noexcept {
+        auto _ = makeScopeExit([&]() noexcept -> void { netIncomeBeforeTax_ = Money{0.0}; });
+
         if (netIncomeBeforeTax_.isZero()) return;
         if (netIncomeBeforeTax_.isPositive()) {
             const auto netIncome = std::forward<F1>(payCorporateTaxFn)(netIncomeBeforeTax_);
