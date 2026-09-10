@@ -48,4 +48,67 @@ TEST_CASE("MarkupPlannerMemoryのテスト") {  // NOLINT
         CHECK(lastSalesAmount.value() == 10.0);
     }
 }
+
+TEST_CASE("MarkupPlannerのテスト") {  // NOLINT
+    auto rng      = makeRng();
+    auto mediator = Mediator{};
+    auto planner  = MarkupPlanner{rng};
+    planner.acceptMediator(mediator);
+    const auto targetInvRatio = 0.1;
+
+    SUBCASE("mediateしない場合、1回目と2回目の結果が同じであること") {
+        const auto before = planner.plan(targetInvRatio);
+        const auto after  = planner.plan(targetInvRatio);
+
+        CHECK(before.value() == after.value());
+    }
+
+    SUBCASE("在庫/供給が目標在庫率と等しい場合、マークアップ率を上げる") {
+        const auto before = planner.plan(targetInvRatio);
+
+        mediator.publishTradePlan({.price = Price{10.0}, .supply = GoodsQuantity{100.0}});
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{90},
+             .unsoldAmount = GoodsQuantity{10},
+             .totalDemand  = GoodsQuantity{90},
+             .sales        = Money{900}}
+        );
+
+        const auto after = planner.plan(targetInvRatio);
+
+        CHECK(after.value() > before.value());
+    }
+
+    SUBCASE("在庫/供給が目標在庫率より大きい場合、マークアップ率を下げる") {
+        const auto before = planner.plan(targetInvRatio);
+
+        mediator.publishTradePlan({.price = Price{10.0}, .supply = GoodsQuantity{100.0}});
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{80},
+             .unsoldAmount = GoodsQuantity{20},
+             .totalDemand  = GoodsQuantity{80},
+             .sales        = Money{800}}
+        );
+
+        const auto after = planner.plan(targetInvRatio);
+
+        CHECK(after.value() < before.value());
+    }
+
+    SUBCASE("在庫/供給が目標在庫率より小さい場合、マークアップ率を上げる") {
+        const auto before = planner.plan(targetInvRatio);
+
+        mediator.publishTradePlan({.price = Price{10.0}, .supply = GoodsQuantity{100.0}});
+        mediator.publishTradeResult(
+            {.soldAmount   = GoodsQuantity{90},
+             .unsoldAmount = GoodsQuantity{10},
+             .totalDemand  = GoodsQuantity{90},
+             .sales        = Money{900}}
+        );
+
+        const auto after = planner.plan(targetInvRatio);
+
+        CHECK(after.value() > before.value());
+    }
+}
 }  // namespace abm::base_goods::supplier
