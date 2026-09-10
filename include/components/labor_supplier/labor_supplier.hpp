@@ -53,6 +53,8 @@ class LaborSupplier final {
 
     void logging(LaborDropBox& dropBox) noexcept { employment_.logging(dropBox); }
 
+    [[nodiscard]] auto wage() const noexcept -> Wage { return employment_.wage(); }
+
   private:
     [[nodiscard]] auto shouldSearch() const noexcept -> bool {
         if (not employment_.isEmployed()) return true;
