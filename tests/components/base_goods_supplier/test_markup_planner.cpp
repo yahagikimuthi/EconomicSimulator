@@ -6,6 +6,7 @@
 #include "values/goods.hpp"
 
 namespace abm::base_goods::supplier {
+namespace {
 TEST_CASE("MarkupPlannerMemoryのテスト") {  // NOLINT
     auto rng      = makeRng();
     auto mediator = Mediator{};
@@ -111,4 +112,5 @@ TEST_CASE("MarkupPlannerのテスト") {  // NOLINT
         CHECK(after.value() > before.value());
     }
 }
+}  // namespace
 }  // namespace abm::base_goods::supplier
