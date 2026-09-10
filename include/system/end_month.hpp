@@ -5,6 +5,7 @@
 #include "components/government.hpp"
 #include "components/labor_demander/labor_demander.hpp"
 #include "components/labor_supplier/labor_supplier.hpp"
+#include "world/drop_box.hpp"
 
 namespace abm::end_month {
 inline void payWage(
@@ -36,5 +37,13 @@ inline void provideUnemploymentBenefit(
 ) noexcept {
     const auto benefit = government.provideUnemploymentBenefit(laborSupplier.wage());
     finance.deposit(benefit);
+}
+
+inline void logging(FinanceDropBox& dropBox, FirmFinance& finance) noexcept {
+    dropBox.firmAssets.add(finance.asset());
+}
+
+inline void logging(FinanceDropBox& dropBox, HHoldFinance& finance) noexcept {
+    dropBox.hholdAssets.add(finance.asset());
 }
 }  // namespace abm::end_month
