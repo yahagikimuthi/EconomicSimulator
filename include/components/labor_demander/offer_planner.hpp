@@ -34,6 +34,8 @@ class OfferPlannerMemory final {
     void listenRecruitResult(const RecruitResult& result) noexcept {
         assert(result.employ.isZeroOrMore());
         if (employPlan_.wasSetNext()) employResult_.next(result.employ);
+
+        assert(employResult_.wasSetNext() == employPlan_.wasSetNext());
         employResult_.reset();
         employPlan_.reset();
     }

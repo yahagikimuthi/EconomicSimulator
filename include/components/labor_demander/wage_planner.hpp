@@ -31,6 +31,7 @@ class WagePlannerMemory final {
     void listenRecruitResult(const RecruitResult& result) noexcept {
         assert(result.applicants.isZeroOrMore());
         if (employPlan_.wasSetNext()) applicants_.next(result.applicants);
+        assert(employPlan_.wasSetNext() == applicants_.wasSetNext());
         employPlan_.reset();
         applicants_.reset();
     }
