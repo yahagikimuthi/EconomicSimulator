@@ -13,24 +13,26 @@ class CapitalEngine final {
   public:
     explicit CapitalEngine(CapitalDropBox& dropBox) noexcept : dropBox_{dropBox} {}
 
-    void run(std::span<CapitalFirm> capital, std::span<GoodsFirm> goods, Government& gov) noexcept {
+    void run(
+        std::span<CapitalFirm> capitals, std::span<GoodsFirm> goods, Government& gov
+    ) noexcept {
         using namespace capital;
-        for (auto& firm : capital) {
+        for (auto& firm : capitals) {
             entry(firm.id, firm.capitalSupplier, market_);
         }
 
-        for (auto& firm : capital) {
+        for (auto& firm : capitals) {
             request(firm.id, firm.finance, firm.capitalDemander, market_);
         }
         for (auto& firm : goods) {
             request(firm.id, firm.finance, firm.capitalDemander, market_);
         }
 
-        for (auto& firm : capital) {
+        for (auto& firm : capitals) {
             trade(firm.finance, firm.capitalSupplier, gov);
         }
 
-        for (auto& firm : capital) {
+        for (auto& firm : capitals) {
             afterTrade(firm.finance, firm.capitalDemander, firm.capitalSupplier);
         }
         for (auto& firm : goods) {
@@ -39,7 +41,7 @@ class CapitalEngine final {
 
         market_.clear();
 
-        for (auto& firm : capital) {
+        for (auto& firm : capitals) {
             logging(dropBox_, firm.capitalSupplier);
         }
     }

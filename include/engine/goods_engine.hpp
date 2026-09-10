@@ -14,11 +14,11 @@ class GoodsEngine final {
     explicit GoodsEngine(GoodsDropBox& dropBox) noexcept : dropBox_{dropBox} {}
 
     void run(
-        std::span<GoodsFirm> goodsFirm, std::span<HHold> hholds, Government& government
+        std::span<GoodsFirm> goodsFirms, std::span<HHold> hholds, Government& government
     ) noexcept {
         using namespace goods;
 
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             entry(firm.id, firm.goodsSupplier, market_);
         }
 
@@ -26,7 +26,7 @@ class GoodsEngine final {
             request(hhold.id, hhold.finance, hhold.goods, market_);
         }
 
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             trade(firm.finance, firm.goodsSupplier, government);
         }
 
@@ -36,7 +36,7 @@ class GoodsEngine final {
 
         market_.clear();
 
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             logging(dropBox_, firm.goodsSupplier);
         }
     }

@@ -13,13 +13,15 @@ class LaborEngine final {
     explicit LaborEngine(LaborDropBox& dropBox) noexcept : dropBox_{dropBox} {}
 
     void run(
-        std::span<CapitalFirm> capitalFirm, std::span<GoodsFirm> goodsFirm, std::span<HHold> hholds
+        std::span<CapitalFirm> capitalFirms,
+        std::span<GoodsFirm>   goodsFirms,
+        std::span<HHold>       hholds
     ) noexcept {
         using namespace labor;
-        for (auto& firm : capitalFirm) {
+        for (auto& firm : capitalFirms) {
             adjustWorkforce(firm.id, firm.laborDemander, market_);
         }
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             adjustWorkforce(firm.id, firm.laborDemander, market_);
         }
 
@@ -27,10 +29,10 @@ class LaborEngine final {
             entry(hhold.id, hhold.labor, market_);
         }
 
-        for (auto& firm : capitalFirm) {
+        for (auto& firm : capitalFirms) {
             offer(firm.laborDemander);
         }
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             offer(firm.laborDemander);
         }
 
@@ -38,10 +40,10 @@ class LaborEngine final {
             accept(hhold.labor);
         }
 
-        for (auto& firm : capitalFirm) {
+        for (auto& firm : capitalFirms) {
             endRecruiting(firm.laborDemander, firm.capitalSupplier);
         }
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             endRecruiting(firm.laborDemander, firm.goodsSupplier);
         }
 
@@ -49,11 +51,11 @@ class LaborEngine final {
             recordRosterEntry(hhold.labor);
         }
 
-        for (auto& firm : capitalFirm) {
+        for (auto& firm : capitalFirms) {
             logging(dropBox_, firm.laborDemander);
         }
 
-        for (auto& firm : goodsFirm) {
+        for (auto& firm : goodsFirms) {
             logging(dropBox_, firm.laborDemander);
         }
 
