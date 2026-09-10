@@ -9,13 +9,13 @@
 
 #include "components/government.hpp"
 #include "engine/agents.hpp"
+#include "engine/goods_engine.hpp"
 #include "engine/labor_engine.hpp"
 #include "engine/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "system/capital.hpp"
 #include "system/end_month.hpp"
-#include "system/goods.hpp"
 #include "system/planning.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
@@ -27,7 +27,8 @@ class Engine final {
         : seed_{generateSeed()},
           rng_{{seed_.state, seed_.stream}},
           endMonth_{endStep},
-          laborEngine_{dropBox_.labor} {
+          laborEngine_{dropBox_.labor},
+          goodsEngine_{dropBox_.goods} {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
@@ -48,7 +49,7 @@ class Engine final {
             } else
                 runStandardPlanning();
             runCapital();
-            runGoods();
+            goodsEngine_.run(goodsFirms_, hholds_, government_);
             runEndMonth();
             logger_.save(dropBox_, month);
             dropBox_.clear();
@@ -127,31 +128,6 @@ class Engine final {
         }
     }
 
-    void runGoods() noexcept {
-        using namespace goods;
-        for (auto& firm : goodsFirms_) {
-            entry(firm.id, firm.goodsSupplier, goodsMarket_);
-        }
-
-        for (auto& hhold : hholds_) {
-            request(hhold.id, hhold.finance, hhold.goods, goodsMarket_);
-        }
-
-        for (auto& firm : goodsFirms_) {
-            trade(firm.finance, firm.goodsSupplier, government_);
-        }
-
-        for (auto& hhold : hholds_) {
-            afterTrade(hhold.finance, hhold.goods);
-        }
-
-        goodsMarket_.clear();
-
-        for (auto& firm : goodsFirms_) {
-            logging(dropBox_.goods, firm.goodsSupplier);
-        }
-    }
-
     void runEndMonth() noexcept {
         using namespace end_month;
         for (auto& firm : capitalFirms_) {
@@ -217,6 +193,7 @@ class Engine final {
 
     CensusDropBox dropBox_;
     LaborEngine   laborEngine_;
+    GoodsEngine   goodsEngine_;
     CapitalMarket capitalMarket_;
     GoodsMarket   goodsMarket_;
 };
