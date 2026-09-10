@@ -143,6 +143,18 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         const auto pick = market.pickEntry(AgentID{202}, 1, rng);
         if (pick) CHECK(pick->id.value() != 202);
     }
+
+    SUBCASE("エントリーとその戻り値についてID,価格,量が恒等であること") {
+        const auto id     = AgentID{rng.randInt(0, 1000)};
+        const auto price  = Price{rng.rand(1, 1000)};
+        const auto supply = GoodsQuantity{rng.rand(1, 1000)};
+
+        const auto& entry = market.entry(id, price, supply);
+
+        CHECK(entry.id == id);
+        CHECK(entry.price == price);
+        CHECK(entry.supply == supply);
+    }
 }
 }  // namespace
 }  // namespace abm::base_goods
