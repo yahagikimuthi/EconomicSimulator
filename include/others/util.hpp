@@ -25,6 +25,31 @@ using Ref = std::reference_wrapper<T>;
 
 constexpr void nothing([[maybe_unused]] auto&&... _) noexcept {}
 
+template <typename F>
+    requires requires(F f) {
+        { f() } noexcept -> std::same_as<void>;
+    }
+class ScopeExit final {
+  public:
+    explicit ScopeExit(F f) noexcept : f_{f} {}
+    ScopeExit(const ScopeExit&) noexcept                    = default;
+    ScopeExit(ScopeExit&&) noexcept                         = default;
+    auto operator=(const ScopeExit&) noexcept -> ScopeExit& = default;
+    auto operator=(ScopeExit&&) noexcept -> ScopeExit&      = default;
+    ~ScopeExit() noexcept { std::invoke(f_); }
+
+  private:
+    F f_;
+};
+
+template <typename F>
+    requires requires(F f) {
+        { f() } noexcept -> std::same_as<void>;
+    }
+[[nodiscard]] auto makeScopeExit(F&& f) noexcept -> ScopeExit<F> {
+    return ScopeExit<F>{std::forward<F>(f)};
+}
+
 struct PCG32Seed final {
     const std::uint64_t state;
     const std::uint64_t stream;
