@@ -87,7 +87,7 @@ class MarkupPlanner final {
 
     [[nodiscard]] auto calcNextMarkup(const bool isSold) const noexcept -> MarkupRate {
         const auto alpha      = std::abs(rng_.randNormal(0.0, adjustVol_));
-        const auto nextMarkup = cache_ + MarkupRate{(isSold ? alpha : -alpha)};
+        const auto nextMarkup = cache_ * (isSold ? 1.0 + alpha : 1.0 - alpha);
         return guard(nextMarkup);
     }
 
