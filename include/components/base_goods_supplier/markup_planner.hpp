@@ -77,6 +77,8 @@ class MarkupPlanner final {
         const auto lastSalesAmount = memory_.lastSalesAmount();
         if (not lastSupply or not lastSalesAmount) return std::nullopt;
         assert(lastSupply->isZeroOrMore());
+        assert(lastSalesAmount->isZeroOrMore());
+
         const auto inventory  = *lastSupply - *lastSalesAmount;
         const auto isSupplied = *lastSupply != GoodsQuantity{0.0};
         const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio : true;
