@@ -9,12 +9,12 @@
 
 #include "components/government.hpp"
 #include "engine/agents.hpp"
+#include "engine/capital_engine.hpp"
 #include "engine/goods_engine.hpp"
 #include "engine/labor_engine.hpp"
 #include "engine/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
-#include "system/capital.hpp"
 #include "system/end_month.hpp"
 #include "system/planning.hpp"
 #include "world/base_goods.hpp"
@@ -28,6 +28,7 @@ class Engine final {
           rng_{{seed_.state, seed_.stream}},
           endMonth_{endStep},
           laborEngine_{dropBox_.labor},
+          capitalEngine_{dropBox_.capital},
           goodsEngine_{dropBox_.goods} {
         namespace cnt = global_setting::agent_count;
 
@@ -48,7 +49,7 @@ class Engine final {
                 laborEngine_.run(capitalFirms_, goodsFirms_, hholds_);
             } else
                 runStandardPlanning();
-            runCapital();
+            capitalEngine_.run(capitalFirms_, goodsFirms_, government_);
             goodsEngine_.run(goodsFirms_, hholds_, government_);
             runEndMonth();
             logger_.save(dropBox_, month);
@@ -94,37 +95,6 @@ class Engine final {
 
         for (auto& hhold : hholds_) {
             planStandard(hhold.finance, hhold.goods);
-        }
-    }
-
-    void runCapital() noexcept {
-        using namespace capital;
-        for (auto& firm : capitalFirms_) {
-            entry(firm.id, firm.capitalSupplier, capitalMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-        }
-        for (auto& firm : goodsFirms_) {
-            request(firm.id, firm.finance, firm.capitalDemander, capitalMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            trade(firm.finance, firm.capitalSupplier, government_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            afterTrade(firm.finance, firm.capitalDemander, firm.capitalSupplier);
-        }
-        for (auto& firm : goodsFirms_) {
-            afterTrade(firm.finance, firm.capitalDemander, firm.goodsSupplier);
-        }
-
-        capitalMarket_.clear();
-
-        for (auto& firm : capitalFirms_) {
-            logging(dropBox_.capital, firm.capitalSupplier);
         }
     }
 
@@ -193,6 +163,7 @@ class Engine final {
 
     CensusDropBox dropBox_;
     LaborEngine   laborEngine_;
+    CapitalEngine capitalEngine_;
     GoodsEngine   goodsEngine_;
     CapitalMarket capitalMarket_;
     GoodsMarket   goodsMarket_;
