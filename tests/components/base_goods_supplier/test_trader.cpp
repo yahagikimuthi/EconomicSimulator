@@ -40,8 +40,8 @@ TEST_CASE("Traderのテスト") {  // NOLINT
     }
 
     SUBCASE("供給量が正のとき") {
-        const auto price  = Price{rng.rand(1.0, 100.0)};
-        const auto supply = GoodsQuantity{rng.rand(1.0, 100.0)};
+        const auto price  = Price{100};
+        const auto supply = GoodsQuantity{1000};
 
         trader.post(id, {.price = price, .supply = supply}, market);
 
