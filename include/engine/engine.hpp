@@ -13,6 +13,7 @@
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "system/capital.hpp"
+#include "system/end_month.hpp"
 #include "system/goods.hpp"
 #include "system/labor.hpp"
 #include "system/planning.hpp"
@@ -210,15 +211,27 @@ class Engine final {
     }
 
     void runEndMonth() noexcept {
+        using namespace end_month;
         for (auto& firm : capitalFirms_) {
-            labor::payWage(firm.finance, firm.laborDemander, government_);
+            payWage(firm.finance, firm.laborDemander, government_);
         }
         for (auto& firm : goodsFirms_) {
-            labor::payWage(firm.finance, firm.laborDemander, government_);
+            payWage(firm.finance, firm.laborDemander, government_);
         }
 
         for (auto& hhold : hholds_) {
-            labor::work(hhold.finance, hhold.labor);
+            workAndReceiveWage(hhold.finance, hhold.labor);
+        }
+
+        for (auto& firm : capitalFirms_) {
+            finalizeAccounts(firm.finance, government_);
+        }
+        for (auto& firm : goodsFirms_) {
+            finalizeAccounts(firm.finance, government_);
+        }
+
+        for (auto& hhold : hholds_) {
+            provideUnemploymentBenefit(hhold.finance, hhold.labor, government_);
         }
     }
 
