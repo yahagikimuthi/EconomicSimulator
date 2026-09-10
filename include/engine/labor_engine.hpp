@@ -10,13 +10,10 @@
 namespace abm::engine {
 class LaborEngine {
   public:
-    explicit LaborEngine() noexcept = default;
+    explicit LaborEngine(LaborDropBox& dropBox) noexcept : dropBox_{dropBox} {}
 
     void run(
-        std::span<CapitalFirm> capitalFirm,
-        std::span<GoodsFirm>   goodsFirm,
-        std::span<HHold>       hholds,
-        LaborDropBox&          dropBox
+        std::span<CapitalFirm> capitalFirm, std::span<GoodsFirm> goodsFirm, std::span<HHold> hholds
     ) noexcept {
         using namespace labor;
         for (auto& firm : capitalFirm) {
@@ -53,21 +50,22 @@ class LaborEngine {
         }
 
         for (auto& firm : capitalFirm) {
-            logging(dropBox, firm.laborDemander);
+            logging(dropBox_, firm.laborDemander);
         }
 
         for (auto& firm : goodsFirm) {
-            logging(dropBox, firm.laborDemander);
+            logging(dropBox_, firm.laborDemander);
         }
 
         for (auto& hhold : hholds) {
-            logging(dropBox, hhold.labor);
+            logging(dropBox_, hhold.labor);
         }
 
         market_.clear();
     }
 
   private:
-    LaborMarket market_;
+    LaborMarket   market_;
+    LaborDropBox& dropBox_;
 };
 }  // namespace abm::engine

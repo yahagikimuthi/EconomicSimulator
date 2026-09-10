@@ -24,7 +24,10 @@ namespace abm::engine {
 class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int endStep)
-        : seed_{generateSeed()}, rng_{{seed_.state, seed_.stream}}, endMonth_{endStep} {
+        : seed_{generateSeed()},
+          rng_{{seed_.state, seed_.stream}},
+          endMonth_{endStep},
+          laborEngine_{dropBox_.labor} {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
@@ -41,7 +44,7 @@ class Engine final {
         for (const auto month : std::views::indices(endMonth_)) {
             if (month % global_setting::monthInYear == 0) {
                 runJanuaryPlanning();
-                laborEngine_.run(capitalFirms_, goodsFirms_, hholds_, dropBox_.labor);
+                laborEngine_.run(capitalFirms_, goodsFirms_, hholds_);
             } else
                 runStandardPlanning();
             runCapital();
@@ -212,10 +215,10 @@ class Engine final {
     std::vector<HHold>       hholds_;
     Government               government_;
 
+    CensusDropBox dropBox_;
     LaborEngine   laborEngine_;
     CapitalMarket capitalMarket_;
     GoodsMarket   goodsMarket_;
-    CensusDropBox dropBox_;
 };
 }  // namespace abm::engine
 
