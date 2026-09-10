@@ -17,6 +17,8 @@ class PricePlanner final {
     explicit PricePlanner(RandomGenerator& masterRng) noexcept
         : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
           adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
+    explicit PricePlanner(const RandomGenerator rng, const double adjustVol) noexcept
+        : rng_{rng}, adjustVol_{adjustVol} {}
 
     [[nodiscard]] auto plan(
         const GoodsQuantity supply, const MarkupRate markup, const Budget totalCost
