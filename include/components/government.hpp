@@ -46,7 +46,7 @@ enum class TaxType : std::uint8_t { Income, Sales, Corporate };
 
 class TaxStrategies {
   public:
-    explicit TaxStrategies();
+    explicit TaxStrategies() noexcept = default;
 
     [[nodiscard]] auto calc(const Money in, const TaxType type) noexcept -> Money {
         assert(in.isZeroOrMore());
