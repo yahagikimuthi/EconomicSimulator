@@ -86,8 +86,6 @@ class GovernmentFinance final {
         const auto out = Money{std::min(sub.value(), cash_.load())};
         cash_.fetch_sub(out.value());  // TODO 処理系が対応する場合store_subに
 
-        const auto moreOut = sub - out;
-        cash_.fetch_sub(moreOut.value());
         return sub;
     }
 
