@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <concepts>
 #include <cstdint>
 #include <utility>
 
@@ -12,6 +13,11 @@
 #include "world/deposit.hpp"
 
 namespace abm::finance {
+template <typename F>
+concept SubsidyFn = requires(F f, Money netIncome) {
+    { f(netIncome) } -> std::same_as<Money>;
+};
+
 class FirmFinance final {
   public:
     explicit FirmFinance(const AgentID id, RandomGenerator& masterRng) noexcept
@@ -75,11 +81,17 @@ class FirmFinance final {
         netIncomeBeforeTax_ += add;
     }
 
-    template <PayTaxFn F>
-    void finalizeAccounts(F&& payCorporateTaxFn) noexcept {
-        const auto netIncome = std::forward<F>(payCorporateTaxFn)(netIncomeBeforeTax_);
-        const auto paid      = netIncomeBeforeTax_ - netIncome;
-        nothing(tryWithdraw(static_cast<Budget>(paid)));
+    template <PayTaxFn F1, SubsidyFn F2>
+    void finalizeAccounts(F1&& payCorporateTaxFn, F2&& subsidyFn) noexcept {
+        if (netIncomeBeforeTax_.isZero()) return;
+        if (netIncomeBeforeTax_.isPositive()) {
+            const auto netIncome = std::forward<F1>(payCorporateTaxFn)(netIncomeBeforeTax_);
+            const auto paid      = netIncomeBeforeTax_ - netIncome;
+            nothing(tryWithdraw(static_cast<Budget>(paid)));
+            return;
+        }
+        const auto subsidy = std::forward<F2>(subsidyFn)(-netIncomeBeforeTax_);
+        deposit(subsidy);
     }
 
   private:
