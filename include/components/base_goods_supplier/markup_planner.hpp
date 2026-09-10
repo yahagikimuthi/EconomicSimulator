@@ -79,9 +79,9 @@ class MarkupPlanner final {
         assert(lastSupply->isZeroOrMore());
         assert(lastSalesAmount->isZeroOrMore());
 
-        const auto inventory  = *lastSupply - *lastSalesAmount;
+        const auto unsold     = *lastSupply - *lastSalesAmount;
         const auto isSupplied = *lastSupply != GoodsQuantity{0.0};
-        const auto isSold     = isSupplied ? inventory / *lastSupply < targetInvRatio : true;
+        const auto isSold     = isSupplied ? unsold / *lastSupply < targetInvRatio : true;
         return calcNextMarkup(isSold);
     }
 
