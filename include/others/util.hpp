@@ -81,11 +81,6 @@ class RandomGenerator final {
         return std::clamp(out, min, max);
     }
 
-    [[nodiscard]] constexpr auto rand(const int min, const int limit) noexcept -> int {
-        auto dist = std::uniform_int_distribution<int>{min, limit};
-        return dist(rng_);
-    }
-
     template <std::ranges::range Container, typename Proj = std::identity>
         requires requires(Container container, Proj proj) {
             { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
