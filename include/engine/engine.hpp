@@ -9,19 +9,18 @@
 
 #include "components/government.hpp"
 #include "engine/agents.hpp"
+#include "engine/labor_engine.hpp"
 #include "engine/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "system/capital.hpp"
 #include "system/end_month.hpp"
 #include "system/goods.hpp"
-#include "system/labor.hpp"
 #include "system/planning.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
-#include "world/labor.hpp"
 
-namespace abm {
+namespace abm::engine {
 class Engine final {
   public:
     [[nodiscard]] explicit Engine(const int endStep)
@@ -42,7 +41,7 @@ class Engine final {
         for (const auto month : std::views::indices(endMonth_)) {
             if (month % global_setting::monthInYear == 0) {
                 runJanuaryPlanning();
-                runLabor();
+                laborEngine_.run(capitalFirms_, goodsFirms_, hholds_, dropBox_.labor);
             } else
                 runStandardPlanning();
             runCapital();
@@ -91,56 +90,6 @@ class Engine final {
 
         for (auto& hhold : hholds_) {
             planStandard(hhold.finance, hhold.goods);
-        }
-    }
-
-    void runLabor() noexcept {
-        using namespace labor;
-
-        for (auto& firm : capitalFirms_) {
-            adjustWorkforce(firm.id, firm.laborDemander, laborMarket_);
-        }
-        for (auto& firm : goodsFirms_) {
-            adjustWorkforce(firm.id, firm.laborDemander, laborMarket_);
-        }
-
-        for (auto& hhold : hholds_) {
-            entry(hhold.id, hhold.labor, laborMarket_);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            offer(firm.laborDemander);
-        }
-        for (auto& firm : goodsFirms_) {
-            offer(firm.laborDemander);
-        }
-
-        for (auto& hhold : hholds_) {
-            accept(hhold.labor);
-        }
-
-        for (auto& firm : capitalFirms_) {
-            endRecruiting(firm.laborDemander, firm.capitalSupplier);
-        }
-        for (auto& firm : goodsFirms_) {
-            endRecruiting(firm.laborDemander, firm.goodsSupplier);
-        }
-
-        for (auto& hhold : hholds_) {
-            recordRosterEntry(hhold.labor);
-        }
-
-        laborMarket_.clear();
-
-        for (auto& firm : capitalFirms_) {
-            logging(dropBox_.labor, firm.laborDemander);
-        }
-        for (auto& firm : goodsFirms_) {
-            logging(dropBox_.labor, firm.laborDemander);
-        }
-
-        for (auto& hhold : hholds_) {
-            logging(dropBox_.labor, hhold.labor);
         }
     }
 
@@ -263,9 +212,13 @@ class Engine final {
     std::vector<HHold>       hholds_;
     Government               government_;
 
-    LaborMarket   laborMarket_;
+    LaborEngine   laborEngine_;
     CapitalMarket capitalMarket_;
     GoodsMarket   goodsMarket_;
     CensusDropBox dropBox_;
 };
-}  // namespace abm
+}  // namespace abm::engine
+
+namespace abm {
+using Engine = engine::Engine;
+}
