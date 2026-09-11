@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <limits>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "others/setting.hpp"
@@ -108,7 +109,7 @@ class WorkerManager final {
     }
 
     Workspace     workspace_;
-    GoodsQuantity lastProduce_{1.0};
+    GoodsQuantity lastProduce_{std::numeric_limits<double>::epsilon()};
     const double  distributionRate_;
 };
 
