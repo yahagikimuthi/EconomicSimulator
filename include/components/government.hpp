@@ -44,7 +44,7 @@ class CorporateTaxStrategy final : public FlatTaxStrategy {
 
 enum class TaxType : std::uint8_t { Income, Sales, Corporate };
 
-class TaxStrategies {
+class TaxStrategies final {
   public:
     explicit TaxStrategies() noexcept = default;
 
