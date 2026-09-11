@@ -17,6 +17,9 @@ class CapitalManager final {
   public:
     explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
         : depreciationRate_{depreciationRate}, distributionRate_{distributionRate} {}
+    explicit CapitalManager(RandomGenerator& masterRng) noexcept
+        : depreciationRate_{masterRng.random(setting::capitalDepreciationRate)},
+          distributionRate_{masterRng.random(setting::capitalDistributionRate)} {}
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto produce = calcProduceAmount();
