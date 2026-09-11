@@ -2,6 +2,7 @@
 
 #include "components/finance/others_finance.hpp"
 #include "doctest.h"
+#include "others/util.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -104,6 +105,55 @@ TEST_CASE("Traderのテスト") {  // NOLINT
 
             CHECK(finalAsset.value() == secondBeforeAsset.value());
         }
+    }
+}
+
+TEST_CASE("GoodsDemanderのテスト") {  // NOLINT
+    auto rng      = makeRng();
+    auto demander = GoodsDemander{rng};
+    auto finance  = HHoldFinance{AgentID{42}, rng};
+    finance.deposit(Money{1000});
+    auto market = Market{};
+
+    SUBCASE("資産が同じであれば概算要求は等しい") {
+        const auto before = demander.requestBudget(Budget{100});
+        const auto after  = demander.requestBudget(Budget{100});
+
+        CHECK(after.value() == before.value());
+    }
+
+    SUBCASE("資産が大きければ概算要求は増加") {
+        const auto before = demander.requestBudget(Budget{100});
+        const auto after  = demander.requestBudget(Budget{150});
+
+        CHECK(after.value() > before.value());
+    }
+
+    SUBCASE("資産が少なければ概算要求が減少") {
+        const auto before = demander.requestBudget(Budget{100});
+        const auto after  = demander.requestBudget(Budget{25});
+
+        CHECK(after.value() < before.value());
+    }
+
+    SUBCASE("資産がゼロであれば概算要求はゼロ") {
+        const auto request = demander.requestBudget(Budget{0});
+        CHECK(request.isZero());
+    }
+
+    SUBCASE("予算が修正されていることのテスト") {
+        nothing(demander.requestBudget(Budget{10000}));
+
+        demander.revisePlan(Budget{10});
+
+        auto& entry = market.entry(AgentID{101}, Price{10}, GoodsQuantity{1000.0});
+
+        demander.request(AgentID{42}, finance.makeWithdrawFn(), market);
+
+        CHECK(entry.requests().size() == 1UZ);
+        auto& req = entry.requests().front();
+
+        CHECK(req.payment.value() == 10);
     }
 }
 }  // namespace
