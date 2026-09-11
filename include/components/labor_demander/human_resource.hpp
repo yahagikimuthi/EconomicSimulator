@@ -17,6 +17,8 @@ class HumanResource final {
     explicit HumanResource(const AgentID id) noexcept : companyBoard_{id} {}
 
     [[nodiscard]] auto planAndRequestBudget(const HeadCount layOffsCnt) noexcept -> Budget {
+        assert(layOffsCnt.isZeroOrMore());
+
         const auto layOffsPlan = std::min(employeeCnt(), layOffsCnt);
         layOffsPlan_           = layOffsPlan;
         const auto wageSum     = sumWage();
