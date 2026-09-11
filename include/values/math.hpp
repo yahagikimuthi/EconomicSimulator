@@ -7,7 +7,7 @@ namespace abm::value_object {
 template <typename T>
 concept ComputableObject = requires(T t) {
     { t.value() } -> std::same_as<double>;
-};
+} and std::is_constructible_v<T, double>;
 }  // namespace abm::value_object
 
 namespace abm {
