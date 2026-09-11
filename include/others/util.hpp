@@ -80,17 +80,17 @@ class RandomGenerator final {
         return std::clamp(out, min, max);
     }
 
-    template <std::ranges::input_range Container, typename Proj = std::identity>
-        requires requires(Container container, Proj proj) {
+    template <std::ranges::input_range Range, typename Proj = std::identity>
+        requires requires(Range container, Proj proj) {
             { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
         }
     [[nodiscard]] auto discreteDistribution(
-        Container&& container, const double total, Proj&& proj = {}
+        Range&& container, const double total, Proj&& proj = {}
     ) noexcept -> decltype(auto) {
         assert(total > 0.0);
         const auto target     = rand(0.0, total);
         auto       currentCnt = 0.0;
-        for (auto& elem : std::forward<Container>(container)) {
+        for (auto& elem : std::forward<Range>(container)) {
             currentCnt += std::invoke(proj, elem);
             if (currentCnt >= target) return elem;
         }
@@ -98,10 +98,10 @@ class RandomGenerator final {
         std::unreachable();
     }
 
-    template <std::ranges::random_access_range Container>
-        requires requires(Container& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
-    void shuffle(Container&& c) noexcept {
-        std::ranges::shuffle(std::forward<Container>(c), rng_);
+    template <std::ranges::random_access_range Range>
+        requires requires(Range& c, pcg32& rng) { std::ranges::shuffle(c, rng); }
+    void shuffle(Range&& c) noexcept {
+        std::ranges::shuffle(std::forward<Range>(c), rng_);
     }
 
     template <std::ranges::input_range Range, std::weakly_incrementable Out, std::integral N>
