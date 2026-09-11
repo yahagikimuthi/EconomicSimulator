@@ -4,7 +4,6 @@
 #include <cassert>
 #include <optional>
 
-#include "components/common.hpp"
 #include "components/labor_demander/common.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
