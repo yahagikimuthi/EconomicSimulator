@@ -59,52 +59,38 @@ class RandomGenerator final {
   public:
     explicit constexpr RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
 
-    template <IsCastable<double> T = double>
-        requires std::is_constructible_v<T, double> and (not std::is_integral_v<T>)
-    [[nodiscard]] constexpr auto rand(const T min = 0.0, const T limit = 1.0) noexcept -> T {
-        auto dist = std::uniform_real_distribution<double>{
-            static_cast<double>(min), static_cast<double>(limit)
-        };
-        return T{static_cast<double>(dist(rng_))};
+    [[nodiscard]] constexpr auto rand(const double min = 0.0, const double limit = 1.0) noexcept
+        -> double {
+        auto dist = std::uniform_real_distribution<double>{min, limit};
+        return dist(rng_);
     }
 
-    template <std::integral T>
-    [[nodiscard]] constexpr auto rand(const T min, const T limit) noexcept -> double {
-        return rand<double>(min, limit);
+    [[nodiscard]] constexpr auto randInt(const int min, const int max) noexcept -> int {
+        auto dist = std::uniform_int_distribution<int>{min, max};
+        return dist(rng_);
     }
 
-    template <IsCastable<int> T>
-        requires std::is_constructible_v<T, int>
-    [[nodiscard]] constexpr auto randInt(const T min, const T max) noexcept -> T {
-        auto dist =
-            std::uniform_int_distribution<int>{static_cast<int>(min), static_cast<int>(max)};
-        return T{dist(rng_)};
-    }
-
-    template <IsCastable<double> T = double>
-        requires std::is_constructible_v<T, double>
     [[nodiscard]] constexpr auto randNormal(
-        const T      mean = T{0.0},
+        const double mean = 0.0,
         const double div  = 1.0,
         const double min  = -std::numeric_limits<double>::infinity(),
         const double max  = std::numeric_limits<double>::infinity()
     ) noexcept -> double {
         auto       dist = std::normal_distribution<double>{static_cast<double>(mean), div};
         const auto out  = dist(rng_);
-        return T{std::clamp(out, min, max)};
+        return std::clamp(out, min, max);
     }
 
-    template <std::ranges::range Container, IsCastable<double> T, typename Proj = std::identity>
+    template <std::ranges::range Container, typename Proj = std::identity>
         requires requires(Container container, Proj proj) {
-            { std::invoke(proj, *container.begin()) } -> IsCastable<T>;
-        } and std::totally_ordered<T> and std::is_constructible_v<T, double> and
-                     requires(T t) { t += t; }
+            { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
+        }
     [[nodiscard]] auto discreteDistribution(
-        Container&& container, const T total, Proj&& proj = {}
+        Container&& container, const double total, Proj&& proj = {}
     ) noexcept -> decltype(auto) {
-        assert(total > T{0.0});
-        const auto target     = rand<T>(T{0}, total);
-        auto       currentCnt = T{0.0};
+        assert(total > 0.0);
+        const auto target     = rand(0.0, total);
+        auto       currentCnt = 0.0;
         for (auto& elem : std::forward<Container>(container)) {
             currentCnt += std::invoke(proj, elem);
             if (currentCnt >= target) return elem;
