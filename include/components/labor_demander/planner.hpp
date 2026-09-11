@@ -13,8 +13,8 @@ namespace abm::labor::demander::planner {
 class EmployPlanner final {
   public:
     explicit EmployPlanner() = delete("静的関数のみなのでインスタンス化は想定しない");
-    [[nodiscard]] static auto plan(const HeadCount desiredEmploy) noexcept -> HeadCount {
-        return desiredEmploy;
+    [[nodiscard]] static auto plan(const HeadCount requiresRecruit) noexcept -> HeadCount {
+        return requiresRecruit;
     }
 };
 
