@@ -178,7 +178,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
             GoodsQuantity{std::numeric_limits<double>::max()}
         );
 
-        auto entry = market.pickEntry(AgentID{-1}, 3, rng);
+        const auto entry = market.pickEntry(AgentID{-1}, 3, rng);
 
         CHECK(entry.has_value());
         CHECK(&targetEntry == &*entry);
