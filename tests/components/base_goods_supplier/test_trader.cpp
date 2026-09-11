@@ -40,8 +40,8 @@ TEST_CASE("Traderのテスト") {  // NOLINT
     }
 
     SUBCASE("供給量が正のとき") {
-        constexpr auto price  = Price{100};
-        constexpr auto supply = GoodsQuantity{1000};
+        constexpr auto price  = Price{10};
+        constexpr auto supply = GoodsQuantity{100};
 
         trader.post(id, {.price = price, .supply = supply}, market);
 
@@ -63,6 +63,44 @@ TEST_CASE("Traderのテスト") {  // NOLINT
             CHECK(result.unsoldAmount.value() == supply.value());
             CHECK(result.totalDemand.isZero());
             CHECK(result.sales.isZero());
+        }
+
+        constexpr auto calcPayment = [price](double amount) constexpr noexcept -> Money {
+            return price * GoodsQuantity{amount};
+        };
+
+        SUBCASE("供給量と同じリクエストを受けた場合、正しい結果を返す") {
+            auto& req1 = entry.request(calcPayment(30));
+            auto& req2 = entry.request(calcPayment(70));
+
+            const auto result = trader.trade();
+
+            CHECK(result.soldAmount.value() == 100.0);
+            CHECK(result.unsoldAmount.value() == 0.0);
+            CHECK(result.totalDemand.value() == 100.0);
+            CHECK(result.sales.value() == 1000.0);
+
+            CHECK(req1.takeoutTradeAmount().value() == 30.0);
+            CHECK(req1.takeoutRemainPaid().value() == 0.0);
+            CHECK(req2.takeoutTradeAmount().value() == 70.0);
+            CHECK(req2.takeoutRemainPaid().value() == 0.0);
+        }
+
+        SUBCASE("供給量より小さいリクエストを受けた場合、正しい結果を返す") {
+            auto& req1 = entry.request(calcPayment(40));
+            auto& req2 = entry.request(calcPayment(30));
+
+            const auto result = trader.trade();
+
+            CHECK(result.soldAmount.value() == 70.0);
+            CHECK(result.unsoldAmount.value() == 30.0);
+            CHECK(result.totalDemand.value() == 70.0);
+            CHECK(result.sales.value() == 700.0);
+
+            CHECK(req1.takeoutTradeAmount().value() == 40.0);
+            CHECK(req1.takeoutRemainPaid().value() == 0.0);
+            CHECK(req2.takeoutTradeAmount().value() == 30.0);
+            CHECK(req2.takeoutRemainPaid().value() == 0.0);
         }
     }
 }
