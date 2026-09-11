@@ -113,6 +113,8 @@ class WorkerManager final {
     const double  distributionRate_;
 };
 
+// TODO 各Managerの生産量/計画量がゼロの場合にゼロ除算が発生する恐れがある
+// TODO また、maxによるキャップは不利であるから1を足すなどの処理が望ましいと思われる
 class Producer final {
   public:
     explicit Producer(RandomGenerator& masterRng) noexcept
