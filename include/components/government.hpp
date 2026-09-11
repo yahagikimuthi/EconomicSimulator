@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdint>
 #include <utility>
 
 #include "components/finance/others_finance.hpp"
