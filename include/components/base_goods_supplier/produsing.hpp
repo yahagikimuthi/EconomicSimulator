@@ -37,7 +37,10 @@ class CapitalManager final {
         return std::max(GoodsQuantity{0.0}, desiredCapital - capital_);
     }
 
-    void addCapital(const GoodsQuantity add) noexcept { capital_ += add; }
+    void addCapital(const GoodsQuantity add) noexcept {
+        assert(add.isZeroOrMore());
+        capital_ += add;
+    }
 
   private:
     [[nodiscard]] auto calcProduceAmount() const noexcept -> GoodsQuantity {
