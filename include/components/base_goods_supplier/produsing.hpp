@@ -16,10 +16,16 @@ namespace abm::base_goods::supplier::producing {
 class CapitalManager final {
   public:
     explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
-        : depreciationRate_{depreciationRate}, distributionRate_{distributionRate} {}
+        : depreciationRate_{depreciationRate}, distributionRate_{distributionRate} {
+        assert(0.0 < distributionRate_ and distributionRate_ < 1.0);
+        assert(0.0 < depreciationRate_ and depreciationRate_ < 1.0);
+    }
     explicit CapitalManager(RandomGenerator& masterRng) noexcept
         : depreciationRate_{masterRng.random(setting::capitalDepreciationRate)},
-          distributionRate_{masterRng.random(setting::capitalDistributionRate)} {}
+          distributionRate_{masterRng.random(setting::capitalDistributionRate)} {
+        assert(0.0 < distributionRate_ and distributionRate_ < 1.0);
+        assert(0.0 < depreciationRate_ and depreciationRate_ < 1.0);
+    }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto produce = calcProduceAmount();
@@ -58,7 +64,13 @@ class CapitalManager final {
 class WorkerManager final {
   public:
     explicit WorkerManager(const double distributionRate) noexcept
-        : distributionRate_{distributionRate} {}
+        : distributionRate_{distributionRate} {
+        assert(0.0 < distributionRate_ and distributionRate_ < 1.0);
+    }
+    explicit WorkerManager(RandomGenerator& masterRng) noexcept
+        : distributionRate_{1.0 - masterRng.random(setting::capitalDistributionRate)} {
+        assert(0.0 < distributionRate_ and distributionRate_ < 1.0);
+    }
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.takeout();
