@@ -43,12 +43,11 @@ class HumanResource final {
 
     void layOffs() noexcept {
         assert(layOffsPlan_);
-        const auto layOffsCnt = layOffsPlan_;
-        assert(layOffsCnt->isZeroOrMore());
+        assert(layOffsPlan_->isZeroOrMore());
 
         auto currentLayOffs = HeadCount{0.0};
         for (auto& entry : roster_.rawEntries()) {
-            if (currentLayOffs >= layOffsCnt) break;
+            if (currentLayOffs >= *layOffsPlan_) break;
             if (not entry.isOccupied()) continue;
             entry.resign();
             ++currentLayOffs;
