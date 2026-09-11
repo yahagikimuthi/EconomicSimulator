@@ -13,8 +13,6 @@
 #include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
-// TODO produceは0を返すことを許可。代わりにProducerがそれを調整すること
-// TODO CapitalMやWorkerMがゼロを返した場合、Producerはそれにmax(0,)を適用することを期待
 class CapitalManager final {
   public:
     explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
@@ -40,15 +38,10 @@ class CapitalManager final {
 
   private:
     [[nodiscard]] auto calcProduceAmount() const noexcept -> GoodsQuantity {
-        const auto capital = adjustedCapital();
-        const auto out     = pow(capital, distributionRate_);
+        assert(capital_.isZeroOrMore());
+        const auto out = pow(capital_, distributionRate_);
         assert(out.isZeroOrMore());
         return out;
-    }
-
-    [[nodiscard]] auto adjustedCapital() const noexcept -> GoodsQuantity {
-        assert(capital_.isZeroOrMore());
-        return std::max(GoodsQuantity{1.0}, capital_);
     }
 
     const double  depreciationRate_;
@@ -85,12 +78,15 @@ class WorkerManager final {
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
 
   private:
+    // ゼロを返しません
     [[nodiscard]] auto calcAvgWorkerPower(const HeadCount employee
     ) const noexcept -> GoodsQuantity {
         assert(lastProduce_.isPositive());
         if (employee.isZero()) return GoodsQuantity{1.0};
         const auto sumWorkerPower = pow(lastProduce_, 1.0 / distributionRate_);
-        return sumWorkerPower / employee.value();
+        const auto out            = sumWorkerPower / employee.value();
+        assert(out.isPositive());
+        return out;
     }
 
     Workspace     workspace_;
@@ -104,10 +100,13 @@ class Producer final {
         : Producer(masterRng, masterRng.random(setting::capitalDistributionRate)) {}
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
-        const auto out = capital_.produce().value() * worker_.produce();
-        assert(out.isZeroOrMore());
+        const auto capitalInput = capital_.produce();
+        const auto workerInput  = worker_.produce();
+        const auto totalInput   = productPower_ * std::max(1.0, capitalInput.value()) * workerInput;
 
-        return productPower_ * out;
+        assert(totalInput.isZeroOrMore());
+
+        return totalInput;
     }
 
     [[nodiscard]] auto desiredEmploy(const HeadCount employee, const GoodsQuantity requiresSupply)
