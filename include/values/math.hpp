@@ -19,8 +19,3 @@ template <value_object::ComputableObject T>
     return T{std::pow(x.value(), y)};
 }
 }  // namespace abm::value_object
-
-namespace abm {
-using value_object::ceil;
-using value_object::pow;
-}  // namespace abm
