@@ -40,19 +40,19 @@ class BaseGoodsSupplier {
         assert(employee.isZeroOrMore());
 
         const auto targetSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredEmploy(targetSupply, employee);
+        return producingSystem_.desiredEmploy(targetSupply, employee);
     }
 
     [[nodiscard]] auto requiresCapital() noexcept -> GoodsQuantity {
         const auto requiresSupply = tradingSystem_.requiresSupply();
-        return producingSystem_.calcDesiredCapital(requiresSupply);
+        return producingSystem_.desiredCapital(requiresSupply);
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producingSystem_.workspace(); }
 
     [[nodiscard]] auto makeAddCapitalFn() noexcept -> AddGoodsFn auto {
         return [&](const GoodsQuantity capital) noexcept -> void {
-            producingSystem_.addProducingEquip(capital);
+            producingSystem_.addCapital(capital);
         };
     }
 

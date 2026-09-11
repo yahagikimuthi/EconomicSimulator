@@ -2,84 +2,141 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cmath>
 
 #include "components/base_goods_supplier/common.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 #include "values/labor.hpp"
+#include "values/math.hpp"
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
-class Producer final {
+class CapitalManager final {
   public:
-    explicit Producer(RandomGenerator& masterRng) noexcept
-        : baseProductPower_{masterRng.random(setting::productPower)},
-          capitalDepreciationRate_{masterRng.random(setting::capitalDepreciationRate)},
-          capitalDistributionRate_{masterRng.random(setting::capitalDistributionRate)} {}
+    explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
+        : depreciationRate_{depreciationRate}, distributionRate_{distributionRate} {}
+
+    [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
+        const auto produce = calcProduceAmount();
+        capital_ *= (1.0 - depreciationRate_);
+        return produce;
+    }
+
+    [[nodiscard]] auto nextProducePlan() const noexcept -> GoodsQuantity {
+        return calcProduceAmount();
+    }
+
+    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply
+    ) const noexcept -> GoodsQuantity {
+        const auto desiredCapital = pow(requiresSupply, 1.0 / distributionRate_);
+        return std::max(GoodsQuantity{0.0}, desiredCapital - capital_);
+    }
+
+    void addCapital(const GoodsQuantity add) noexcept { capital_ += add; }
+
+  private:
+    [[nodiscard]] auto calcProduceAmount() const noexcept -> GoodsQuantity {
+        const auto capital = adjustedCapital();
+        const auto out     = pow(capital, distributionRate_);
+        assert(out.isZeroOrMore());
+        return out;
+    }
+
+    [[nodiscard]] auto adjustedCapital() const noexcept -> GoodsQuantity {
+        assert(capital_.isZeroOrMore());
+        return std::max(GoodsQuantity{1.0}, capital_);
+    }
+
+    const double  depreciationRate_;
+    const double  distributionRate_;
+    GoodsQuantity capital_{0.0};
+};
+
+class WorkerManager final {
+  public:
+    explicit WorkerManager(const double distributionRate) noexcept
+        : distributionRate_{distributionRate} {}
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.takeout();
-        assert(workerInput.isZeroOrMore());
-        if (not workerInput.isZero()) lastWorkerInput_ = workerInput;
+        const auto out         = pow(workerInput, distributionRate_);
+        assert(out.isZeroOrMore());
 
-        const auto capitalInput = capital_;
-        assert(capital_.isZeroOrMore());
-        capital_ *= (1.0 - capitalDepreciationRate_);
-
-        const auto input = baseProductPower_ *
-                           std::pow(capitalInput.value(), capitalDistributionRate_) *
-                           std::pow(workerInput.value(), 1.0 - capitalDistributionRate_);
-        return GoodsQuantity{input};
+        if (out.isPositive()) lastProduce_ = out;
+        return out;
     }
 
-    void addProducingEquip(const GoodsQuantity capital) noexcept {
-        assert(capital.isZeroOrMore());
-        capital_ += capital;
-    }
+    [[nodiscard]] auto nextProducePlan() const noexcept -> GoodsQuantity { return lastProduce_; }
 
-    [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresProduct
-    ) const noexcept -> GoodsQuantity {
-        const auto bottom =
-            requiresProduct / (baseProductPower_ *
-                               std::pow(lastWorkerInput_.value(), 1.0 - capitalDistributionRate_));
-        const auto demand = std::pow(bottom.value(), 1.0 / capitalDistributionRate_);
-        const auto out    = GoodsQuantity{demand} - capital_;
-        return std::max(out, GoodsQuantity{0.0});
-    }
-
-    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee, const GoodsQuantity targetSupply)
+    [[nodiscard]] auto desiredEmploy(const HeadCount employee, const GoodsQuantity requiresAmount)
         const noexcept -> HeadCount {
-        assert(targetSupply.isZeroOrMore());
-        const auto avgEmployeePower = avgWorkerPower(employee);
-        const auto capital          = std::max(capital_.value(), global_setting::epsilon);
-        const auto bottom =
-            targetSupply / (baseProductPower_ * std::pow(capital, capitalDistributionRate_));
-        const auto desiredLaborPower = std::pow(bottom.value(), 1.0 - capitalDistributionRate_);
+        assert(requiresAmount.isZeroOrMore());
 
-        const auto out = desiredLaborPower / avgEmployeePower;
-
-        assert(not std::isnan(out));
-        return HeadCount{out} - employee;
+        const auto requiresSumWorkerPower = pow(requiresAmount, 1.0 / distributionRate_);
+        const auto avgProductPower        = calcAvgWorkerPower(employee);
+        const auto out = (requiresSumWorkerPower / avgProductPower) - employee.value();
+        return HeadCount{out};
     }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return workspace_; }
 
   private:
-    [[nodiscard]] auto avgWorkerPower(const HeadCount employee) const noexcept -> double {
-        assert(not lastWorkerInput_.isZero());
-        if (employee.isZero()) return 1.0;
-        return employee.value() / lastWorkerInput_.value();
+    [[nodiscard]] auto calcAvgWorkerPower(const HeadCount employee
+    ) const noexcept -> GoodsQuantity {
+        assert(lastProduce_.isPositive());
+        if (employee.isZero()) return GoodsQuantity{1.0};
+        const auto sumWorkerPower = pow(lastProduce_, 1.0 / distributionRate_);
+        return sumWorkerPower / employee.value();
     }
 
     Workspace     workspace_;
-    GoodsQuantity lastWorkerInput_{1.0};
-    const double  baseProductPower_;
-    const double  capitalDepreciationRate_;
-    const double  capitalDistributionRate_;
-    GoodsQuantity capital_{0.0};
+    GoodsQuantity lastProduce_{1.0};
+    const double  distributionRate_;
+};
+
+class Producer final {
+  public:
+    explicit Producer(RandomGenerator& masterRng) noexcept
+        : Producer(masterRng, masterRng.random(setting::capitalDistributionRate)) {}
+
+    [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
+        const auto out = capital_.produce() + worker_.produce();
+        assert(out.isZeroOrMore());
+
+        return productPower_ * out;
+    }
+
+    [[nodiscard]] auto desiredEmploy(const HeadCount employee, const GoodsQuantity requiresSupply)
+        const noexcept -> HeadCount {
+        assert(requiresSupply.isZeroOrMore());
+        const auto capitalSupply  = capital_.nextProducePlan();
+        const auto requiresWorker = requiresSupply / (productPower_ * capitalSupply);
+        return worker_.desiredEmploy(employee, GoodsQuantity{requiresWorker});
+    }
+
+    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply
+    ) const noexcept -> GoodsQuantity {
+        assert(requiresSupply.isZeroOrMore());
+        const auto workerSupply    = worker_.nextProducePlan();
+        const auto requiresCapital = requiresSupply / (productPower_ * workerSupply);
+        return capital_.desiredCapital(GoodsQuantity{requiresCapital});
+    }
+
+    [[nodiscard]] auto workspace() noexcept -> Workspace& { return worker_.workspace(); }
+
+    void addCapital(const GoodsQuantity add) noexcept { capital_.addCapital(add); }
+
+  private:
+    Producer(RandomGenerator& masterRng, const double capitalDistributionRate) noexcept
+        : capital_{masterRng.random(setting::capitalDepreciationRate), capitalDistributionRate},
+          worker_{1.0 - capitalDistributionRate},
+          productPower_{masterRng.random(setting::productPower)} {}
+
+    CapitalManager capital_;
+    WorkerManager  worker_;
+    const double   productPower_;
 };
 
 class ProducingSystem final {
@@ -87,20 +144,17 @@ class ProducingSystem final {
     explicit ProducingSystem(RandomGenerator& masterRng) noexcept
         : producer_{masterRng}, inventory_{masterRng.random(setting::inventory)} {}
 
-    [[nodiscard]] auto calcDesiredEmploy(
-        const GoodsQuantity requiresSupply, const HeadCount employee
-    ) const noexcept -> HeadCount {
-        return producer_.calcDesiredEmploy(employee, requiresSupply);
+    [[nodiscard]] auto desiredEmploy(const GoodsQuantity requiresSupply, const HeadCount employee)
+        const noexcept -> HeadCount {
+        return producer_.desiredEmploy(employee, requiresSupply);
     }
 
-    [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresSupply
+    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply
     ) const noexcept -> GoodsQuantity {
-        return producer_.calcDesiredCapital(requiresSupply);
+        return producer_.desiredCapital(requiresSupply);
     }
 
-    void addProducingEquip(const GoodsQuantity capital) noexcept {
-        producer_.addProducingEquip(capital);
-    }
+    void addCapital(const GoodsQuantity capital) noexcept { producer_.addCapital(capital); }
 
     [[nodiscard]] auto workspace() noexcept -> Workspace& { return producer_.workspace(); }
 
