@@ -26,8 +26,8 @@ using Ref = std::reference_wrapper<T>;
 
 constexpr void nothing([[maybe_unused]] auto&&... _) noexcept {}
 
-template <typename From, typename To>
-concept IsCastable = requires(From from) { static_cast<To>(from); };
+template <typename T>
+concept Numeric = std::is_floating_point_v<T> or std::is_integral_v<T>;
 
 template <typename F>
     requires std::is_invocable_v<F>

@@ -2,11 +2,11 @@
 
 #include <cassert>
 #include <compare>
-#include <type_traits>
+
+#include "others/util.hpp"
 
 namespace abm::value_object {
-template <typename T>
-    requires std::is_floating_point_v<T> or std::is_integral_v<T>
+template <Numeric T>
 struct BaseValueObject {
   public:
     [[nodiscard]] constexpr auto value() const noexcept -> T { return value_; }
