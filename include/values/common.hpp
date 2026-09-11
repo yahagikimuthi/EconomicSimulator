@@ -2,14 +2,14 @@
 
 #include "values/mixin.hpp"
 
-namespace abm {
+namespace abm::value_object {
 class Wage;
 class Budget;
-class Money final : public value_object::BaseValueObject<double>,
-                    value_object::CompareMixin<Money>,
-                    value_object::AddMixin<Money>,
-                    value_object::ScholarMixin<Money>,
-                    public value_object::SignMixin {
+class Money final : public BaseValueObject<double>,
+                    CompareMixin<Money>,
+                    AddMixin<Money>,
+                    ScholarMixin<Money>,
+                    public SignMixin {
     friend struct AddMixin<Money>;
     friend struct ScholarMixin<Money>;
 
@@ -20,11 +20,11 @@ class Money final : public value_object::BaseValueObject<double>,
     explicit constexpr operator Budget() const noexcept;
 };
 
-class Budget final : public value_object::BaseValueObject<double>,
-                     value_object::CompareMixin<Budget>,
-                     value_object::AddMixin<Budget>,
-                     value_object::ScholarMixin<Budget>,
-                     public value_object::SignMixin {
+class Budget final : public BaseValueObject<double>,
+                     CompareMixin<Budget>,
+                     AddMixin<Budget>,
+                     ScholarMixin<Budget>,
+                     public SignMixin {
     friend struct AddMixin<Budget>;
     friend struct ScholarMixin<Budget>;
 
@@ -36,9 +36,14 @@ class Budget final : public value_object::BaseValueObject<double>,
 
 constexpr Money::operator Budget() const noexcept { return Budget{value_}; }
 
-class AgentID final : public value_object::BaseValueObject<int>,
-                      public value_object::CompareMixin<AgentID> {
+class AgentID final : public BaseValueObject<int>, public CompareMixin<AgentID> {
   public:
     explicit constexpr AgentID(const int value) noexcept : BaseValueObject<int>(value) {}
 };
+}  // namespace abm::value_object
+
+namespace abm {
+using Money   = value_object::Money;
+using Budget  = value_object::Budget;
+using AgentID = value_object::AgentID;
 }  // namespace abm

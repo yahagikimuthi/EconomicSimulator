@@ -5,12 +5,12 @@
 #include "values/common.hpp"
 #include "values/mixin.hpp"
 
-namespace abm {
-class TaxRate final : public value_object::BaseValueObject<double>,
-                      value_object::CompareMixin<TaxRate>,
-                      value_object::AddMixin<TaxRate>,
-                      value_object::ScholarMixin<TaxRate>,
-                      public value_object::SignMixin {
+namespace abm::value_object {
+class TaxRate final : public BaseValueObject<double>,
+                      CompareMixin<TaxRate>,
+                      AddMixin<TaxRate>,
+                      ScholarMixin<TaxRate>,
+                      public SignMixin {
     friend struct AddMixin<TaxRate>;
     friend struct ScholarMixin<TaxRate>;
 
@@ -27,4 +27,8 @@ class TaxRate final : public value_object::BaseValueObject<double>,
 [[nodiscard]] constexpr auto operator*(TaxRate lhs, Money rhs) noexcept -> Money {
     return rhs * lhs;
 }
-}  // namespace abm
+}  // namespace abm::value_object
+
+namespace abm {
+using TaxRate = value_object::TaxRate;
+}

@@ -5,10 +5,8 @@
 #include "others/setting.hpp"
 #include "values/mixin.hpp"
 
-namespace abm {
-class Day final : public value_object::BaseValueObject<int>,
-                  value_object::CompareMixin<Day>,
-                  value_object::AddMixin<Day> {
+namespace abm::value_object {
+class Day final : public BaseValueObject<int>, CompareMixin<Day>, AddMixin<Day> {
     friend struct AddMixin<Day>;
 
   public:
@@ -22,9 +20,7 @@ class Day final : public value_object::BaseValueObject<int>,
     }
 };
 
-class Month final : public value_object::BaseValueObject<int>,
-                    value_object::CompareMixin<Month>,
-                    value_object::AddMixin<Month> {
+class Month final : public BaseValueObject<int>, CompareMixin<Month>, AddMixin<Month> {
     friend struct AddMixin<Month>;
 
   public:
@@ -38,9 +34,7 @@ class Month final : public value_object::BaseValueObject<int>,
     }
 };
 
-class Year final : public value_object::BaseValueObject<int>,
-                   value_object::CompareMixin<Year>,
-                   value_object::AddMixin<Year> {
+class Year final : public BaseValueObject<int>, CompareMixin<Year>, AddMixin<Year> {
     friend struct AddMixin<Year>;
 
   public:
@@ -109,4 +103,11 @@ class Date final {
     Month month_;
     Day   day_;
 };
+}  // namespace abm::value_object
+
+namespace abm {
+using Day   = value_object::Day;
+using Month = value_object::Month;
+using Year  = value_object::Year;
+using Date  = value_object::Date;
 }  // namespace abm

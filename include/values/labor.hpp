@@ -5,12 +5,12 @@
 #include "values/common.hpp"
 #include "values/mixin.hpp"
 
-namespace abm {
-class Wage final : public value_object::BaseValueObject<double>,
-                   value_object::CompareMixin<Wage>,
-                   value_object::AddMixin<Wage>,
-                   value_object::ScholarMixin<Wage>,
-                   public value_object::SignMixin {
+namespace abm::value_object {
+class Wage final : public BaseValueObject<double>,
+                   CompareMixin<Wage>,
+                   AddMixin<Wage>,
+                   ScholarMixin<Wage>,
+                   public SignMixin {
     friend struct AddMixin<Wage>;
     friend struct ScholarMixin<Wage>;
 
@@ -22,11 +22,11 @@ class Wage final : public value_object::BaseValueObject<double>,
 
 constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
 
-class HeadCount final : public value_object::BaseValueObject<double>,
-                        value_object::CompareMixin<HeadCount>,
-                        value_object::AddMixin<HeadCount>,
-                        value_object::ScholarMixin<HeadCount>,
-                        public value_object::SignMixin {
+class HeadCount final : public BaseValueObject<double>,
+                        CompareMixin<HeadCount>,
+                        AddMixin<HeadCount>,
+                        ScholarMixin<HeadCount>,
+                        public SignMixin {
     friend struct AddMixin<HeadCount>;
     friend struct ScholarMixin<HeadCount>;
 
@@ -61,11 +61,11 @@ class HeadCount final : public value_object::BaseValueObject<double>,
     return Wage{lhs.value() / rhs.value()};
 }
 
-class OfferRate final : public value_object::BaseValueObject<double>,
-                        public value_object::CompareMixin<OfferRate>,
-                        value_object::AddMixin<OfferRate>,
-                        value_object::ScholarMixin<OfferRate>,
-                        public value_object::SignMixin {
+class OfferRate final : public BaseValueObject<double>,
+                        public CompareMixin<OfferRate>,
+                        AddMixin<OfferRate>,
+                        ScholarMixin<OfferRate>,
+                        public SignMixin {
     friend struct AddMixin<OfferRate>;
     friend struct ScholarMixin<OfferRate>;
 
@@ -79,4 +79,10 @@ class OfferRate final : public value_object::BaseValueObject<double>,
 [[nodiscard]] constexpr auto operator*(OfferRate lhs, HeadCount rhs) noexcept -> HeadCount {
     return rhs * lhs;
 }
+}  // namespace abm::value_object
+
+namespace abm {
+using HeadCount = value_object::HeadCount;
+using Wage      = value_object::Wage;
+using OfferRate = value_object::OfferRate;
 }  // namespace abm
