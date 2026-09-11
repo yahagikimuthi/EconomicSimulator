@@ -35,9 +35,8 @@ class Trader final {
         if (not myRequest_) return;
         const auto remain = myRequest_->takeoutRemainPaid();
         std::forward<F>(depositFn)(remain);
+        myRequest_.reset();
     }
-
-    void reset() noexcept { myRequest_.reset(); }
 
   private:
     RandomGenerator         rng_;
@@ -66,23 +65,18 @@ class GoodsDemander final {
         assert(budget_);
         if (budget_->isZeroOrLess()) return;
         trader_.request(id, *budget_, std::forward<F>(withdrawFn), market);
+        budget_.reset();
     }
 
     template <DepositFn F>
     void afterTrade(F&& depositFn) noexcept {
         trader_.afterTrade(std::forward<F>(depositFn));
-        reset();
     }
 
   private:
-    void reset() noexcept {
-        trader_.reset();
-        budget_.reset();
-    }
-
     Trader                trader_;
     const double          mpc_;
-    std::optional<Budget> budget_;
+    std::optional<Budget> budget_{std::nullopt};
 };
 }  // namespace abm::goods::demander
 
