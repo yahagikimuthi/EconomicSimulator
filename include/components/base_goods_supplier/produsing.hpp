@@ -40,8 +40,6 @@ class Producer final {
         capital_ += capital;
     }
 
-    [[nodiscard]] auto baseProductPower() const noexcept -> double { return baseProductPower_; }
-
     [[nodiscard]] auto calcDesiredCapital(const GoodsQuantity requiresProduct
     ) const noexcept -> GoodsQuantity {
         const auto bottom =
