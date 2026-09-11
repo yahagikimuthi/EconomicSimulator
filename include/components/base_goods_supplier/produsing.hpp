@@ -13,6 +13,8 @@
 #include "world/drop_box.hpp"
 
 namespace abm::base_goods::supplier {
+// TODO produceは0を返すことを許可。代わりにProducerがそれを調整すること
+// TODO CapitalMやWorkerMがゼロを返した場合、Producerはそれにmax(0,)を適用することを期待
 class CapitalManager final {
   public:
     explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
@@ -102,7 +104,7 @@ class Producer final {
         : Producer(masterRng, masterRng.random(setting::capitalDistributionRate)) {}
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
-        const auto out = capital_.produce() + worker_.produce();
+        const auto out = capital_.produce().value() * worker_.produce();
         assert(out.isZeroOrMore());
 
         return productPower_ * out;
