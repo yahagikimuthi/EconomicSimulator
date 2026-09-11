@@ -102,7 +102,9 @@ class Government final {
             dropBox.finance.netIncome.get(),
             [](const double netIncome) -> bool { return netIncome <= 0.0; }
         );
-        providePlan_ = finance_.asset() / static_cast<double>(unemployment + redCompanies);
+        const auto aligned = static_cast<double>(unemployment + redCompanies);
+        if (aligned > 0.0)
+            providePlan_ = finance_.asset() / static_cast<double>(unemployment + redCompanies);
     }
 
     [[nodiscard]] auto provideUnemploymentBenefit() noexcept -> Money {
