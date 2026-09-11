@@ -2,6 +2,7 @@
 
 #include "doctest.h"
 #include "tests/util.hpp"
+#include "values/common.hpp"
 #include "values/goods.hpp"
 #include "world/base_goods.hpp"
 
