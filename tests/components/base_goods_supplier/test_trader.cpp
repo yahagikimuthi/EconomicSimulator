@@ -102,6 +102,20 @@ TEST_CASE("Traderのテスト") {  // NOLINT
             CHECK(req2.takeoutTradeAmount().value() == 30.0);
             CHECK(req2.takeoutRemainPaid().value() == 0.0);
         }
+
+        SUBCASE("供給量より大きいリクエストを受けた場合、正しい結果を返す") {
+            auto& req = entry.request(calcPayment(150.0));
+
+            const auto result = trader.trade();
+
+            CHECK(result.soldAmount.value() == 100.0);
+            CHECK(result.unsoldAmount.value() == 0.0);
+            CHECK(result.totalDemand.value() == 150.0);
+            CHECK(result.sales.value() == 1000.0);
+
+            CHECK(req.takeoutTradeAmount().value() == 100.0);
+            CHECK(req.takeoutRemainPaid().value() == 500.0);
+        }
     }
 }
 }  // namespace
