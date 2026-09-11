@@ -1,7 +1,13 @@
 #include "components/finance/others_finance.hpp"
 
+#include <algorithm>
+#include <array>
+#include <execution>
+#include <functional>
+
 #include "doctest.h"
 #include "tests/util.hpp"
+#include "values/common.hpp"
 
 namespace abm {
 namespace {
@@ -70,6 +76,29 @@ TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
 
         CHECK(withdraw.value() == doctest::Approx(80.0));
         CHECK(finance.asset().value() == doctest::Approx(20.0));
+    }
+
+    SUBCASE("並列で資産の追加を行うことが可能") {
+        const auto depositArr = std::array<double, 5>{
+            rng.rand(10.0, 1000.0),
+            rng.rand(10.0, 1000.0),
+            rng.rand(10.0, 1000.0),
+            rng.rand(10.0, 1000.0),
+            rng.rand(10.0, 1000.0)
+        };
+
+        const auto sum = std::ranges::fold_left(depositArr, 0.0, std::plus{});
+
+        std::for_each(
+            std::execution::par,
+            depositArr.begin(),
+            depositArr.end(),
+            [&](double amount) -> void { finance.deposit(Money{amount}); }
+        );
+
+        const auto before = finance.asset();
+
+        CHECK(before.value() == doctest::Approx(sum));
     }
 }
 }  // namespace
