@@ -6,11 +6,11 @@
 #include "values/mixin.hpp"
 
 namespace abm {
-class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
-                                 value_object::CompareMixin<Wage>,
-                                 value_object::AddMixin<Wage>,
-                                 value_object::ScholarMixin<Wage>,
-                                 public value_object::SignMixin {
+class Wage final : public value_object::BaseValueObject<double>,
+                   value_object::CompareMixin<Wage>,
+                   value_object::AddMixin<Wage>,
+                   value_object::ScholarMixin<Wage>,
+                   public value_object::SignMixin {
     friend struct AddMixin<Wage>;
     friend struct ScholarMixin<Wage>;
 
@@ -22,11 +22,11 @@ class [[nodiscard]] Wage final : public value_object::BaseValueObject<double>,
 
 constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
 
-class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<double>,
-                                      value_object::CompareMixin<HeadCount>,
-                                      value_object::AddMixin<HeadCount>,
-                                      value_object::ScholarMixin<HeadCount>,
-                                      public value_object::SignMixin {
+class HeadCount final : public value_object::BaseValueObject<double>,
+                        value_object::CompareMixin<HeadCount>,
+                        value_object::AddMixin<HeadCount>,
+                        value_object::ScholarMixin<HeadCount>,
+                        public value_object::SignMixin {
     friend struct AddMixin<HeadCount>;
     friend struct ScholarMixin<HeadCount>;
 
@@ -61,11 +61,11 @@ class [[nodiscard]] HeadCount final : public value_object::BaseValueObject<doubl
     return Wage{lhs.value() / rhs.value()};
 }
 
-class OfferRate : public value_object::BaseValueObject<double>,
-                  public value_object::CompareMixin<OfferRate>,
-                  value_object::AddMixin<OfferRate>,
-                  value_object::ScholarMixin<OfferRate>,
-                  public value_object::SignMixin {
+class OfferRate final : public value_object::BaseValueObject<double>,
+                        public value_object::CompareMixin<OfferRate>,
+                        value_object::AddMixin<OfferRate>,
+                        value_object::ScholarMixin<OfferRate>,
+                        public value_object::SignMixin {
     friend struct AddMixin<OfferRate>;
     friend struct ScholarMixin<OfferRate>;
 
