@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <functional>
 #include <optional>
 #include <ranges>
 #include <utility>
@@ -135,6 +136,18 @@ class Market final {
 
         auto       betterEntry = std::optional<Entry&>{std::nullopt};
         const auto totalSupply = totalSupply_.load();
+
+        assert(
+            totalSupply ==
+            std::ranges::fold_left(
+                entries_ | std::views::transform([](const Entry& e) noexcept -> double {
+                    return e.supply.value();
+                }),
+                0.0,
+                std::plus{}
+            )
+        );
+
         for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
                 entries_,
