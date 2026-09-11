@@ -21,9 +21,7 @@ class MyEntries final {
   public:
     explicit MyEntries() noexcept = default;
     [[nodiscard]] auto takeOfferedEntry() noexcept -> auto {
-        return entries_ |
-               std::views::transform([](Ref<Entry> ref) noexcept -> Entry& { return ref.get(); }) |
-               std::views::filter([](Entry& e) noexcept -> bool { return e.isOffer(); });
+        return entries_ | std::views::filter(&Entry::isOffer);
     }
 
     void add(Entry& entry) noexcept { entries_.unchecked_emplace_back(std::ref(entry)); }
