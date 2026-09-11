@@ -57,20 +57,19 @@ struct PCG32Seed final {
 
 class RandomGenerator final {
   public:
-    explicit constexpr RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
+    explicit RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
 
-    [[nodiscard]] constexpr auto rand(const double min = 0.0, const double limit = 1.0) noexcept
-        -> double {
+    [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) noexcept -> double {
         auto dist = std::uniform_real_distribution<double>{min, limit};
         return dist(rng_);
     }
 
-    [[nodiscard]] constexpr auto randInt(const int min, const int max) noexcept -> int {
+    [[nodiscard]] auto randInt(const int min, const int max) noexcept -> int {
         auto dist = std::uniform_int_distribution<int>{min, max};
         return dist(rng_);
     }
 
-    [[nodiscard]] constexpr auto randNormal(
+    [[nodiscard]] auto randNormal(
         const double mean = 0.0,
         const double div  = 1.0,
         const double min  = -std::numeric_limits<double>::infinity(),
@@ -113,11 +112,11 @@ class RandomGenerator final {
         std::ranges::sample(std::forward<Range>(r), out, static_cast<int>(n), rng_);
     }
 
-    [[nodiscard]] constexpr auto makeUint64() noexcept -> std::uint64_t {
+    [[nodiscard]] auto makeUint64() noexcept -> std::uint64_t {
         return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
     }
 
-    [[nodiscard]] constexpr auto random(const RandomParameter& param) noexcept -> double {
+    [[nodiscard]] auto random(const RandomParameter& param) noexcept -> double {
         return param.visit(Overloaded{
             [&](const UniformParameter<int>& uniformParam) noexcept -> double {
                 return randInt(uniformParam.min, uniformParam.limit);
