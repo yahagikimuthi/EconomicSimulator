@@ -163,22 +163,25 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         "、乱数の関係で1%未満ではあるが失敗する可能性がある。"
     ) {
         nothing(market.entry(
-            AgentID{1},
+            AgentID{rng.randInt(1, 1000)},
             Price{rng.rand(1, 1000)},
             GoodsQuantity{std::numeric_limits<double>::epsilon()}
         ));
         nothing(market.entry(
-            AgentID{2},
+            AgentID{rng.randInt(1, 1000)},
             Price{rng.rand(1, 1000)},
             GoodsQuantity{std::numeric_limits<double>::epsilon()}
         ));
-        nothing(market.entry(
-            AgentID{3}, Price{rng.rand(1, 1000)}, GoodsQuantity{std::numeric_limits<double>::max()}
-        ));
+        const auto& targetEntry = market.entry(
+            AgentID{rng.randInt(1, 1000)},
+            Price{rng.rand(1, 1000)},
+            GoodsQuantity{std::numeric_limits<double>::max()}
+        );
 
         auto entry = market.pickEntry(AgentID{-1}, 3, rng);
 
-        CHECK(entry->id.value() == 3);
+        CHECK(entry.has_value());
+        CHECK(&targetEntry == &*entry);
     }
 }
 }  // namespace
