@@ -11,8 +11,6 @@ struct BaseValueObject {
   public:
     [[nodiscard]] constexpr auto value() const noexcept -> T { return value_; }
 
-    explicit operator double() const noexcept { return value_; }
-
   protected:
     explicit constexpr BaseValueObject(const T value) noexcept : value_{value} {}
 
