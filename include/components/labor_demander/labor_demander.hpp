@@ -5,7 +5,6 @@
 #include <limits>
 #include <utility>
 
-#include "components/common.hpp"
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/human_resource.hpp"
 #include "components/labor_demander/mediator.hpp"
