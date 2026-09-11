@@ -17,12 +17,12 @@ inline void planJanuary(
 ) noexcept {
     const auto laborReq = [&]() noexcept -> Budget {
         const auto employee = labor.employeeCnt();
-        const auto adjust   = goods.calcDesiredEmploy(employee);
+        const auto adjust   = goods.desiredEmploy(employee);
         const auto sales    = goods.salesForecast();
         return labor.requestAnnualBudget(adjust, sales);
     }();
     const auto salesPlan  = goods.planAndExpectSales(labor.calcMonthlyCost());
-    const auto capitalReq = capital.planBudget(goods.requiresCapital());
+    const auto capitalReq = capital.planBudget(goods.desiredCapital());
 
     const auto total = laborReq + capitalReq - salesPlan;
     if (total.isZeroOrLess()) {
@@ -48,12 +48,12 @@ inline void planJanuary(
 ) noexcept {
     const auto laborReq = [&]() noexcept -> Budget {
         const auto employee = labor.employeeCnt();
-        const auto adjust   = capitalSupplier.calcDesiredEmploy(employee);
+        const auto adjust   = capitalSupplier.desiredEmploy(employee);
         const auto sales    = capitalSupplier.salesForecast();
         return labor.requestAnnualBudget(adjust, sales);
     }();
     const auto salesPlan  = capitalSupplier.planAndExpectSales(labor.calcMonthlyCost());
-    const auto capitalReq = capitalDemander.planBudget(capitalSupplier.requiresCapital());
+    const auto capitalReq = capitalDemander.planBudget(capitalSupplier.desiredCapital());
 
     const auto total = laborReq + capitalReq - salesPlan;
     if (total.isZeroOrLess()) {
@@ -86,7 +86,7 @@ inline void planStandard(
 ) noexcept {
     const auto laborCost  = labor.calcMonthlyCost();
     const auto salesPlan  = capitalSupplier.planAndExpectSales(labor.calcMonthlyCost());
-    const auto capitalReq = capitalDemander.planBudget(capitalSupplier.requiresCapital());
+    const auto capitalReq = capitalDemander.planBudget(capitalSupplier.desiredCapital());
 
     const auto total = laborCost + capitalReq - salesPlan;
     if (total.isZeroOrLess()) {
@@ -105,7 +105,7 @@ inline void planStandard(
 ) noexcept {
     const auto laborCost  = labor.calcMonthlyCost();
     const auto salesPlan  = goods.planAndExpectSales(labor.calcMonthlyCost());
-    const auto capitalReq = capital.planBudget(goods.requiresCapital());
+    const auto capitalReq = capital.planBudget(goods.desiredCapital());
 
     const auto total = laborCost + capitalReq - salesPlan;
     if (total.isZeroOrLess()) {

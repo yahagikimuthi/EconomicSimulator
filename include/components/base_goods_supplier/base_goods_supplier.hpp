@@ -36,14 +36,14 @@ class BaseGoodsSupplier {
         tradingSystem_.trade(std::forward<F>(depositFn), mediator_);
     }
 
-    [[nodiscard]] auto calcDesiredEmploy(const HeadCount employee) noexcept -> HeadCount {
+    [[nodiscard]] auto desiredEmploy(const HeadCount employee) noexcept -> HeadCount {
         assert(employee.isZeroOrMore());
 
         const auto targetSupply = tradingSystem_.requiresSupply();
         return producingSystem_.desiredEmploy(targetSupply, employee);
     }
 
-    [[nodiscard]] auto requiresCapital() noexcept -> GoodsQuantity {
+    [[nodiscard]] auto desiredCapital() noexcept -> GoodsQuantity {
         const auto requiresSupply = tradingSystem_.requiresSupply();
         return producingSystem_.desiredCapital(requiresSupply);
     }

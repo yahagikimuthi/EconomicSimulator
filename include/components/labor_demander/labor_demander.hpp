@@ -25,9 +25,9 @@ class RecruitSystem final {
     void acceptMediator(IMediator auto& mediator) noexcept { planner_.acceptMediator(mediator); }
 
     [[nodiscard]] auto requestBudget(
-        const HeadCount desiredEmploy, const Money salesPerWorker
+        const HeadCount requiresRecruit, const Money salesPerWorker
     ) noexcept -> Budget {
-        const auto plan = planner_.plan(desiredEmploy, salesPerWorker);
+        const auto plan = planner_.plan(requiresRecruit, salesPerWorker);
         plan_.emplace(plan);
         requestedBudget_ = static_cast<Budget>(plan.employ * plan.wage);
         return *requestedBudget_;
@@ -92,16 +92,17 @@ class LaborDemander final {
     ~LaborDemander() noexcept                                       = default;
 
     [[nodiscard]] auto requestAnnualBudget(
-        const HeadCount adjust, const Budget salesForecast
+        const HeadCount desiredEmploy, const Budget salesForecast
     ) noexcept -> Budget {
         const auto employee       = employeeCnt();
+        const auto adjust         = desiredEmploy - employee;
         const auto isEmploying    = not employee.isZero();
         const auto salesPerWorker = isEmploying ? salesForecast.value() / employee.value()
                                                 : std::numeric_limits<double>::infinity();
         const auto recruitSystemBudget =
             recruitSystem_.requestBudget(std::max(adjust, HeadCount{0.0}), Money{salesPerWorker});
         const auto hrBudget =
-            humanResource_.planAndRequestBudget(-std::min(adjust, HeadCount{0.0}));
+            humanResource_.planAndRequestBudget(std::max(-adjust, HeadCount{0.0}));
         return recruitSystemBudget + hrBudget;
     }
 

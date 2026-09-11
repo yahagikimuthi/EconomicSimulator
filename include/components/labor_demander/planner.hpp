@@ -28,13 +28,13 @@ class RecruitPlanner final {
         offerPlanner_.acceptMediator(mediator);
     }
 
-    [[nodiscard]] auto plan(const HeadCount desiredEmploy, const Money salesPerWorker) noexcept
+    [[nodiscard]] auto plan(const HeadCount requiresRecruit, const Money salesPerWorker) noexcept
         -> RecruitPlan {
-        assert(desiredEmploy.isZeroOrMore());
+        assert(requiresRecruit.isZeroOrMore());
         assert(salesPerWorker.isZeroOrMore());
 
         const auto wage   = wagePlanner_.plan(salesPerWorker);
-        const auto employ = EmployPlanner::plan(desiredEmploy);
+        const auto employ = EmployPlanner::plan(requiresRecruit);
         const auto offer  = offerPlanner_.plan(employ);
         const auto plan   = RecruitPlan{.wage = wage, .employ = employ, .offer = offer};
 

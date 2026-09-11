@@ -71,7 +71,7 @@ class WorkerManager final {
 
         const auto requiresSumWorkerPower = pow(requiresAmount, 1.0 / distributionRate_);
         const auto avgProductPower        = calcAvgWorkerPower(employee);
-        const auto out = (requiresSumWorkerPower / avgProductPower) - employee.value();
+        const auto out                    = requiresSumWorkerPower / avgProductPower;
         return HeadCount{out};
     }
 
