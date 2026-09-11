@@ -1,5 +1,7 @@
 #include "world/base_goods.hpp"
 
+#include <limits>
+
 #include "doctest.h"
 #include "others/util.hpp"
 #include "tests/util.hpp"
@@ -154,6 +156,29 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         CHECK(entry.id == id);
         CHECK(entry.price == price);
         CHECK(entry.supply == supply);
+    }
+
+    SUBCASE(
+        "十分に供給量が小さいものと、大きいものが存在する場合、必ず大きいものがピックされる。ただし"
+        "、乱数の関係で1%未満ではあるが失敗する可能性がある。"
+    ) {
+        nothing(market.entry(
+            AgentID{1},
+            Price{rng.rand(1, 1000)},
+            GoodsQuantity{std::numeric_limits<double>::epsilon()}
+        ));
+        nothing(market.entry(
+            AgentID{2},
+            Price{rng.rand(1, 1000)},
+            GoodsQuantity{std::numeric_limits<double>::epsilon()}
+        ));
+        nothing(market.entry(
+            AgentID{3}, Price{rng.rand(1, 1000)}, GoodsQuantity{std::numeric_limits<double>::max()}
+        ));
+
+        auto entry = market.pickEntry(AgentID{-1}, 3, rng);
+
+        CHECK(entry->id.value() == 3);
     }
 }
 }  // namespace
