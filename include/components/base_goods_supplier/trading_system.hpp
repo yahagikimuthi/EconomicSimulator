@@ -33,6 +33,7 @@ class TradingSystem final {
     void post(const AgentID id, Market& market) noexcept {
         assert(plan_);
         trader_.post(id, *plan_, market);
+        plan_.reset();
     }
 
     template <DepositFn F>

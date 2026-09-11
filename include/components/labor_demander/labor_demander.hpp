@@ -55,6 +55,7 @@ class RecruitSystem final {
     void post(const AgentID id, Market& market) noexcept {
         assert(plan_);
         recruiter_.post(id, *plan_, market);
+        plan_.reset();
     }
 
     void offer() noexcept { recruiter_.offer(); }
