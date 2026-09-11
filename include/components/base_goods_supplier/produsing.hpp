@@ -12,7 +12,7 @@
 #include "world/base_goods.hpp"
 #include "world/drop_box.hpp"
 
-namespace abm::base_goods::supplier {
+namespace abm::base_goods::supplier::producing {
 class CapitalManager final {
   public:
     explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
@@ -177,4 +177,8 @@ class ProducingSystem final {
     Producer      producer_;
     GoodsQuantity inventory_;
 };
-}  // namespace abm::base_goods::supplier
+}  // namespace abm::base_goods::supplier::producing
+
+namespace abm::base_goods::supplier {
+using ProducingSystem = producing::ProducingSystem;
+}
