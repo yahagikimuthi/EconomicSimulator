@@ -33,7 +33,7 @@ template <typename F>
     requires std::is_invocable_v<F>
 class ScopeExit final {
   public:
-    explicit ScopeExit(F f) noexcept : f_{f} {}
+    explicit ScopeExit(F f) noexcept : f_{std::move(f)} {}
     ScopeExit(const ScopeExit&) noexcept                    = default;
     ScopeExit(ScopeExit&&) noexcept                         = default;
     auto operator=(const ScopeExit&) noexcept -> ScopeExit& = default;
