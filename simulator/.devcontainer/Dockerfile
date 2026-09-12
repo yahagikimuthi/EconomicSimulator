@@ -55,4 +55,4 @@ RUN if [ ! -d "$VCPKG_ROOT" ]; then \
     $VCPKG_ROOT/bootstrap-vcpkg.sh -disableMetrics
 
 # 5. vcpkg でライブラリをインストール
-RUN vcpkg install tbb entt highfive
+RUN vcpkg install tbb entt

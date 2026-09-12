@@ -13,7 +13,6 @@
 #include "engine/end_month_engine.hpp"
 #include "engine/goods_engine.hpp"
 #include "engine/labor_engine.hpp"
-#include "engine/logger.hpp"
 #include "others/setting.hpp"
 #include "others/util.hpp"
 #include "system/planning.hpp"
@@ -52,7 +51,6 @@ class Engine final {
             capitalEngine_.run(capitalFirms_, goodsFirms_, government_);
             goodsEngine_.run(goodsFirms_, hholds_, government_);
             endMonthEngine_.run(capitalFirms_, goodsFirms_, hholds_, government_, dropBox_);
-            logger_.save(dropBox_, month);
             dropBox_.clear();
 
             std::println("{}", calcSumAsset());
@@ -128,8 +126,6 @@ class Engine final {
     RandomGenerator rng_;
 
     const int endMonth_;
-
-    Logger logger_;
 
     std::vector<CapitalFirm> capitalFirms_;
     std::vector<GoodsFirm>   goodsFirms_;
