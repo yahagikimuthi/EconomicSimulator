@@ -2,16 +2,16 @@ services:
   # C++
   simulator-cpp:
     build:
-      context: ./simulator/.devcontainer
+      context: ./simulator
     volumes:
-      - ./simulator:/app
-      - /app/build
+      - ${LOCAL_WORKSPACE_FOLDER:-./}/simulator:/app
+    working_dir: /app
     tty: true
 
   # Go
   backend-go:
     build:
-      context: ./backend/.devcontainer
+      context: ./backend
     ports:
       - "8080:8080"
     volumes:
@@ -22,7 +22,7 @@ services:
   # フロントエンド
   frontend:
     build:
-      context: ./frontend/.devcontainer
+      context: ./frontend
     ports:
       - "5173:5173"
     volumes:
