@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "doctest.h"
+#include "others/util.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
 
@@ -99,6 +100,31 @@ TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
         const auto before = finance.asset();
 
         CHECK(before.value() == doctest::Approx(sum));
+    }
+
+    SUBCASE("並列で資産の引き出しを行うことが可能") {
+        const auto withdrawArr = std::array<double, 5>{
+            rng.rand(10.0, 100.0),
+            rng.rand(10.0, 100.0),
+            rng.rand(10.0, 100.0),
+            rng.rand(10.0, 100.0),
+            rng.rand(10.0, 100.0)
+        };
+
+        const auto sum = std::ranges::fold_left(withdrawArr, 0.0, std::plus{});
+
+        finance.deposit(Money{5000});
+
+        std::for_each(
+            std::execution::par,
+            withdrawArr.begin(),
+            withdrawArr.end(),
+            [&](double amount) -> void { nothing(finance.tryWithdraw(Budget{amount})); }
+        );
+
+        const auto before = finance.asset();
+
+        CHECK(before.value() == doctest::Approx(5000 - sum));
     }
 }
 }  // namespace
