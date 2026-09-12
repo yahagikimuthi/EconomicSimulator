@@ -28,13 +28,20 @@ class CapitalDemander final {
           } {}
 
     [[nodiscard]] auto planBudget(const GoodsQuantity desiredAmount) noexcept -> Budget {
+        assert(log_.tradeAmount.isPositive());
+
         const auto avgPrice = log_.purchase / log_.tradeAmount;
         purchaseAmountPlan_ = desiredAmount;
         budget_             = static_cast<Budget>(avgPrice * desiredAmount);
+        assert(budget_->isZeroOrMore());
         return *budget_;
     }
 
-    void revisePlan(const Budget budget) noexcept { budget_ = budget; }
+    void revisePlan(const Budget budget) noexcept {
+        assert(budget_);
+        assert(budget.isZeroOrMore());
+        budget_ = budget;
+    }
 
     template <TryWithdrawFn F>
     void request(
