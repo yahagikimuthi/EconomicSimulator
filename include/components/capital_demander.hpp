@@ -15,8 +15,8 @@
 namespace abm::capital::demander {
 
 struct Log final {
-    const Money         purchase{std::numeric_limits<double>::epsilon()};
-    const GoodsQuantity tradeAmount{std::numeric_limits<double>::infinity()};
+    Money         purchase{std::numeric_limits<double>::epsilon()};
+    GoodsQuantity tradeAmount{std::numeric_limits<double>::infinity()};
 };
 
 class CapitalDemander final {
@@ -64,6 +64,8 @@ class CapitalDemander final {
         std::forward<F1>(depositFn)(remain);
         const auto capital = myRequest_->takeoutTradeAmount();
         std::forward<F2>(addCapitalFn)(capital);
+        if (capital.isPositive())
+            log_ = {.purchase = myRequest_->payment - remain, .tradeAmount = capital};
     }
 
   private:
