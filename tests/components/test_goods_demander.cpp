@@ -90,7 +90,7 @@ TEST_CASE("Traderのテスト") {  // NOLINT
 
             const auto finalAsset = finance.asset();
 
-            CHECK(finalAsset.value() - afterAsset.value() == 90);
+            CHECK(finalAsset.value() - afterAsset.value() == doctest::Approx(90));
         }
 
         SUBCASE("取引後、再度、afterTradeを呼び出しても資産が変わらないこと") {
