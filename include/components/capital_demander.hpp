@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <limits>
 #include <optional>
 
 #include "components/common.hpp"
@@ -15,14 +14,18 @@
 namespace abm::capital::demander {
 
 struct Log final {
-    Money         purchase{std::numeric_limits<double>::epsilon()};
-    GoodsQuantity tradeAmount{std::numeric_limits<double>::infinity()};
+    Money         purchase;
+    GoodsQuantity tradeAmount;
 };
 
 class CapitalDemander final {
   public:
     explicit CapitalDemander(RandomGenerator& masterRng) noexcept
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
+          log_{
+              .purchase    = Money{masterRng.random(setting::lastPurchase)},
+              .tradeAmount = GoodsQuantity{masterRng.random(setting::lastTradeAmount)}
+          } {}
 
     [[nodiscard]] auto planBudget(const GoodsQuantity desiredAmount) noexcept -> Budget {
         const auto avgPrice = log_.purchase / log_.tradeAmount;

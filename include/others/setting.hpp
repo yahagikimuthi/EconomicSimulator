@@ -101,7 +101,9 @@ inline constexpr RandomParameter mpc            = UniformParameter{.min = 0.5, .
 }  // namespace abm::goods::demander::setting
 
 namespace abm::capital::demander::setting {
-inline constexpr auto goodsSampleCnt = 2;
+inline constexpr RandomParameter lastPurchase    = UniformParameter{.min = 10.0, .limit = 100.0};
+inline constexpr RandomParameter lastTradeAmount = UniformParameter{.min = 10.0, .limit = 100.0};
+inline constexpr auto            goodsSampleCnt  = 2;
 }  // namespace abm::capital::demander::setting
 
 namespace abm::government::setting {
