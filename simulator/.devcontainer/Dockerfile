@@ -1,5 +1,7 @@
 FROM ubuntu:24.04
 
+WORKDIR /app
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 1. 必要なパッケージおよび vcpkg の依存ツールを一括インストール
