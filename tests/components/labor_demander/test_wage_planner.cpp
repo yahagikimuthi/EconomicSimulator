@@ -77,7 +77,7 @@ TEST_CASE("WagePlannerのテスト") {  // NOLINT
 
         const auto second = planner.plan(infMoney);
 
-        CHECK(second.value() > doctest::Approx(first.value()));
+        CHECK(second.value() > first.value());
     }
 
     SUBCASE("応募者数 = 雇用計画の場合、賃金が変わらないこと") {
