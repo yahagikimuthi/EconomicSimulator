@@ -77,6 +77,7 @@ class CapitalDemander final {
         std::forward<F2>(addCapitalFn)(capital);
         if (capital.isPositive())
             log_ = {.purchase = myRequest_->payment - remain, .tradeAmount = capital};
+        myRequest_.reset();
     }
 
   private:
