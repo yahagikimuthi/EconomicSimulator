@@ -150,7 +150,7 @@ TEST_CASE("CapitalDemanderのテスト") {  // NOLINT
 
             CHECK(pay.value() == 100.0);
 
-            CHECK(finance.asset().value() == initAsset.value() - pay.value());
+            CHECK(finance.asset().value() == doctest::Approx(initAsset.value() - pay.value()));
             CHECK(reader.capital);
             CHECK(reader.capital->value() == 10);
 
