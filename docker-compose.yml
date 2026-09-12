@@ -1,6 +1,6 @@
 services:
   # C++
-  cpp:
+  simulator-cpp:
     build:
       context: ./simulator/.devcontainer
     volumes:
@@ -9,7 +9,7 @@ services:
     tty: true
 
   # Go
-  go:
+  backend-go:
     build:
       context: ./backend/.devcontainer
     ports:
@@ -17,7 +17,7 @@ services:
     volumes:
       - ./backend:/app
     depends_on:
-      - cpp
+      - simulator-cpp
 
   # フロントエンド
   frontend:

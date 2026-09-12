@@ -11,17 +11,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     ninja-build \
     gdb \
+    gpg \
     lldb \
-    python3 \
-    python3-pip \
     clang-format \
     git \
     curl \
+    ca-certificates \
     openssh-client \
     ca-certificates \
     tar \
     unzip \
     zip \
+    wget \
     pkg-config \
     && add-apt-repository ppa:ubuntu-toolchain-r/test -y \
     && apt-get update && apt-get install -y --no-install-recommends \
@@ -34,18 +35,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 100 \
  && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-16 100
 
-# 3. Pythonパッケージと CMake (3.30以上) のインストール
-RUN pip install --no-cache-dir --break-system-packages \
-    "cmake>=3.30.0" \
-    h5py \
-    numpy \
-    pandas \
-    matplotlib \
-    seaborn \
-    scipy \
-    pyarrow
+# 3. Kitware の GPG キーとリポジトリを追加 (Ubuntu 24.04: noble)
+RUN wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null \
+    && echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | tee /etc/apt/sources.list.d/kitware.list >/dev/null
 
-# 4. vcpkg のインストールとビルド
+# 4. 最新の CMake をインストール
+RUN apt-get update && apt-get install -y cmake
+
+# 5. vcpkg のインストールとビルド
 ENV VCPKG_ROOT=/usr/local/vcpkg
 ENV PATH="${VCPKG_ROOT}:${PATH}"
 
@@ -54,5 +51,5 @@ RUN if [ ! -d "$VCPKG_ROOT" ]; then \
     fi && \
     $VCPKG_ROOT/bootstrap-vcpkg.sh -disableMetrics
 
-# 5. vcpkg でライブラリをインストール
+# 6. vcpkg でライブラリをインストール
 RUN vcpkg install tbb entt
