@@ -45,6 +45,7 @@ class CapitalDemander final {
     ) noexcept {
         assert(budget_);
         assert(purchaseAmountPlan_);
+        assert(budget_->isPositive());
 
         const auto budget       = *budget_;
         const auto purchasePlan = *purchaseAmountPlan_;
@@ -73,7 +74,7 @@ class CapitalDemander final {
 
   private:
     RandomGenerator              rng_;
-    Log                          log_;  // TODO ログ更新処理追加
+    Log                          log_;
     std::optional<GoodsQuantity> purchaseAmountPlan_{std::nullopt};
     std::optional<Budget>        budget_{std::nullopt};
     std::optional<Request&>      myRequest_{std::nullopt};
