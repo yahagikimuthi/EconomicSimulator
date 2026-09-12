@@ -1,5 +1,5 @@
 */build
-.vscode
+*/.vscode
 */.clang-format
 */.clangd
 */.compile_commands.json
