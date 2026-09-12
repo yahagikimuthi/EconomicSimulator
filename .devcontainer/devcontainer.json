@@ -11,18 +11,6 @@
     },
     "customizations": {
         "vscode": {
-            "settings": {
-                "clangd.arguments": [
-                    "--compile-commands-dir=${workspaceFolder}/simulator/build",
-                    "--background-index",
-                    "--clang-tidy",
-                    "--header-insertion=iwyu"
-                ],
-                "[cpp]": {
-                    "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
-                    "editor.formatOnSave": true
-                }
-            },
             "extensions": [
                 "xaver.clang-format",
                 "llvm-vs-code-extensions.vscode-clangd",
