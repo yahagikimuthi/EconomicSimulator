@@ -44,7 +44,7 @@ class Listener final {
     }
 
     template <typename F>
-        requires(std::is_invocable_v<F, Ts> and ...)
+        requires(std::is_invocable_v<F, Ts&> and ...)
     void notice(F&& methodCaller) noexcept {
         auto callFunc = [&](auto& listener) noexcept -> void {
             if (listener) methodCaller(*listener);
