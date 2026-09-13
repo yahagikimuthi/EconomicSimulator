@@ -38,8 +38,8 @@ class Listener final {
     template <typename T>
         requires(std::is_same_v<T, Ts> or ...)
     void add(T& t) noexcept {
-        assert(not std::get<T*>(listeners_));  // 再セットは禁止
-        std::get<T*>(listeners_) = t;
+        assert(std::get<T*>(listeners_) != nullptr);  // 再セットは禁止
+        std::get<T*>(listeners_) = &t;
     }
 
     template <typename F>

@@ -4,7 +4,7 @@
     "features": {
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
     },
-    "onCreateCommand": "sudo apt-get update && sudo apt-get install -y libtbb-dev g++-16 libstdc++-16-dev",
+    "onCreateCommand": "sudo apt-get update && sudo apt-get install -y libtbb-dev",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
     "containerEnv": {

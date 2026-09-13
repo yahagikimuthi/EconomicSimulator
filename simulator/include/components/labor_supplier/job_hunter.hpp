@@ -69,7 +69,7 @@ class JobHunter final {
     [[nodiscard]] auto takeOfferedEntry() noexcept -> Entry* {
         auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);
         if (offered.empty()) return nullptr;
-        return &offered.front();
+        return &offered.front().get();
     }
 
     [[nodiscard]] auto pickAndSortJobs(const AgentID id, Market& market) noexcept

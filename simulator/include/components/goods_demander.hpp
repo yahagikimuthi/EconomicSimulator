@@ -27,7 +27,7 @@ class Trader final {
         auto* pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto withdraw = std::forward<F>(withdrawFn)(budget);
-        myRequest_          = pickedEntry->request(withdraw);
+        myRequest_          = &pickedEntry->request(withdraw);
     }
 
     template <DepositFn F>

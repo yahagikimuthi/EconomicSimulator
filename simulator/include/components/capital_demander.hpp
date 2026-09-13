@@ -60,12 +60,12 @@ class CapitalDemander final {
         budget_.reset();
         purchaseAmountPlan_.reset();
 
-        const auto* pickedEntry = market.pickEntry(id, sampleCnt, rng_);
+        auto* const pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto payment =
             std::min(static_cast<Budget>(purchasePlan * pickedEntry->price), budget);
         const auto withdraw = std::forward<F>(withdrawFn)(payment);
-        if (withdraw.isPositive()) myRequest_ = pickedEntry->request(withdraw);
+        if (withdraw.isPositive()) myRequest_ = &pickedEntry->request(withdraw);
     }
 
     template <DepositFn F1, AddGoodsFn F2>
