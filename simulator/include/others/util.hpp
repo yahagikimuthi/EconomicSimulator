@@ -12,6 +12,7 @@
 #include <ranges>
 #include <type_traits>
 #include <utility>
+#include <variant>
 
 #include "others/setting.hpp"
 
@@ -117,19 +118,22 @@ class RandomGenerator final {
     }
 
     [[nodiscard]] auto random(const RandomParameter& param) noexcept -> double {
-        return param.visit(Overloaded{
-            [&](const UniformParameter<int>& uniformParam) noexcept -> double {
-                return randInt(uniformParam.min, uniformParam.limit);
+        return std::visit(
+            Overloaded{
+                [&](const UniformParameter<int>& uniformParam) noexcept -> double {
+                    return randInt(uniformParam.min, uniformParam.limit);
+                },
+                [&](const UniformParameter<double>& uniformParam) noexcept -> double {
+                    return rand(uniformParam.min, uniformParam.limit);
+                },
+                [&](const NormalParameter& normalParam) noexcept -> double {
+                    return randNormal(
+                        normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
+                    );
+                }
             },
-            [&](const UniformParameter<double>& uniformParam) noexcept -> double {
-                return rand(uniformParam.min, uniformParam.limit);
-            },
-            [&](const NormalParameter& normalParam) noexcept -> double {
-                return randNormal(
-                    normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
-                );
-            }
-        });
+            param
+        );
     }
 
   private:

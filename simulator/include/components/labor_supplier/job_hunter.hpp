@@ -3,11 +3,10 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
-#include <inplace_vector>
-#include <optional>
 #include <ranges>
 #include <span>
 #include <utility>
+#include <vector>
 
 #include "components/labor_supplier/common.hpp"
 #include "others/setting.hpp"
@@ -21,14 +20,14 @@ class MyEntries final {
   public:
     explicit MyEntries() noexcept = default;
     [[nodiscard]] auto takeOfferedEntry() noexcept -> auto {
-        return entries_ | std::views::filter(&Entry::isOffer);
+        return entries_ | std::views::filter([](Entry& e) noexcept -> bool { return e.isOffer(); });
     }
 
-    void add(Entry& entry) noexcept { entries_.unchecked_emplace_back(std::ref(entry)); }
+    void add(Entry& entry) noexcept { entries_.emplace_back(std::ref(entry)); }
     void clear() noexcept { entries_.clear(); }
 
   private:
-    std::inplace_vector<Ref<Entry>, JobEntryCnt> entries_;
+    std::vector<Ref<Entry>> entries_;
 };
 
 template <
@@ -61,23 +60,23 @@ class JobHunter final {
         acceptedEntry_ = offeredEntry;
     }
 
-    [[nodiscard]] auto takeoutResult() noexcept -> std::optional<Entry&> {
+    [[nodiscard]] auto takeoutResult() noexcept -> Entry* {
         myEntries_.clear();
-        return std::exchange(acceptedEntry_, std::nullopt);
+        return std::exchange(acceptedEntry_, nullptr);
     }
 
   private:
-    [[nodiscard]] auto takeOfferedEntry() noexcept -> std::optional<Entry&> {
+    [[nodiscard]] auto takeOfferedEntry() noexcept -> Entry* {
         auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);
-        if (offered.empty()) return std::nullopt;
-        return offered.front();
+        if (offered.empty()) return nullptr;
+        return &offered.front();
     }
 
     [[nodiscard]] auto pickAndSortJobs(const AgentID id, Market& market) noexcept
         -> std::span<Ref<Request>> {
-        static thread_local auto sampleRequest = std::inplace_vector<Ref<Request>, JobSampleCnt>{};
+        static thread_local auto sampleRequest = std::vector<Ref<Request>>{};
         sampleRequest.clear();
-        market.pickRequest(id, sampleRequest, rng_);
+        market.pickRequest(id, sampleRequest, JobSampleCnt, rng_);
         sortSample(sampleRequest);
         return sampleRequest;
     }
@@ -94,6 +93,6 @@ class JobHunter final {
 
     MyEntries<JobSampleCnt> myEntries_;
     RandomGenerator         rng_;
-    std::optional<Entry&>   acceptedEntry_{std::nullopt};
+    Entry*                  acceptedEntry_{nullptr};
 };
 }  // namespace abm::labor::supplier

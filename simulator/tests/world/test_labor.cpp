@@ -2,10 +2,10 @@
 
 #include <algorithm>
 #include <array>
-#include <inplace_vector>
 #include <ranges>
 #include <span>
 #include <utility>
+#include <vector>
 
 #include "doctest.h"
 #include "others/util.hpp"
@@ -121,11 +121,11 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         std::pair{AgentID{202}, Wage{202}},
         std::pair{AgentID{303}, Wage{303}}
     };
-    auto out = std::inplace_vector<Ref<Request>, 3UZ>{};
+    auto out = std::vector<Ref<Request>>{};
     auto rng = makeRng();
 
     SUBCASE("何もしない場合、outは空") {
-        market.pickRequest(AgentID{42}, out, rng);
+        market.pickRequest(AgentID{42}, out, 3UZ, rng);
         CHECK(out.empty());
     }
 
@@ -137,7 +137,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         CHECK(req.firmID.value() == id);
         CHECK(req.wage.value() == doctest::Approx(wage));
 
-        market.pickRequest(AgentID{-1}, out, rng);
+        market.pickRequest(AgentID{-1}, out, 3UZ, rng);
 
         CHECK(out.size() == 1UZ);
         const auto& sample = out[0].get();
@@ -148,7 +148,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
     SUBCASE("requestの数が引き出す数以下の場合、すべてをピックする") {
         for (auto [id, wage] : requests) nothing(market.request(id, wage));
 
-        market.pickRequest(AgentID{42}, out, rng);
+        market.pickRequest(AgentID{42}, out, 3UZ, rng);
 
         const auto sumID = std::ranges::fold_left(
             out | std::views::transform(&Request::firmID) | std::views::transform(&AgentID::value),
@@ -162,7 +162,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
     SUBCASE("IDが重複している場合、それは除かれる") {
         for (auto [id, wage] : requests) nothing(market.request(id, wage));
 
-        market.pickRequest(AgentID{101}, out, rng);
+        market.pickRequest(AgentID{101}, out, 3UZ, rng);
 
         const auto sumID = std::ranges::fold_left(
             out | std::views::transform(&Request::firmID) | std::views::transform(&AgentID::value),
@@ -176,20 +176,22 @@ TEST_CASE("Marketのテスト") {  // NOLINT
     SUBCASE("引き出す数以下の場合でもID重複は排除される") {
         for (auto [id, wage] : std::span{requests.begin(), 2}) nothing(market.request(id, wage));
 
-        market.pickRequest(AgentID{101}, out, rng);
+        market.pickRequest(AgentID{101}, out, 3UZ, rng);
 
         CHECK(out.size() < 2UZ);
-        CHECK(std::ranges::all_of(
-            out | std::views::transform(&Request::firmID),
-            [](const AgentID firmId) noexcept -> bool { return firmId != AgentID{101}; }
-        ));
+        CHECK(
+            std::ranges::all_of(
+                out | std::views::transform(&Request::firmID),
+                [](const AgentID firmId) noexcept -> bool { return firmId != AgentID{101}; }
+            )
+        );
     }
 
     SUBCASE("clear呼び出しの場合、空が返る") {
         for (auto [id, wage] : requests) nothing(market.request(id, wage));
         market.clear();
 
-        market.pickRequest(AgentID{42}, out, rng);
+        market.pickRequest(AgentID{42}, out, 3UZ, rng);
 
         CHECK(out.empty());
     }
@@ -209,7 +211,7 @@ TEST_CASE("Requestのテスト") {  // NOLINT
 
         const auto entryIds = request.entries() | std::views::transform(&Entry::entrantId) |
                               std::views::transform(&AgentID::value);
-        const auto sumIds = std::ranges::fold_left(entryIds, 0.0, std::plus{});
+        const auto sumIds   = std::ranges::fold_left(entryIds, 0.0, std::plus{});
         CHECK(sumIds == 606);
     }
 }

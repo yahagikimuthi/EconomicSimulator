@@ -72,7 +72,8 @@ TEST_CASE("Requestのテスト") {  // NOLINT
         CHECK(request.takeoutRemainPaid().isZero());
     }
 
-    SUBCASE("需要量分、tradeを行った場合、売上及び取引量が正しく計算され、支払い残額が0であること"
+    SUBCASE(
+        "需要量分、tradeを行った場合、売上及び取引量が正しく計算され、支払い残額が0であること"
     ) {
         const auto sales = request.trade(desiredAmount);
 
@@ -124,8 +125,8 @@ TEST_CASE("Marketのテスト") {  // NOLINT
     auto rng = makeRng();
 
     SUBCASE("pickしてもデフォルトはnull") {
-        const auto pick = market.pickEntry(AgentID{42}, 100, rng);
-        CHECK(not pick.has_value());
+        const auto* pick = market.pickEntry(AgentID{42}, 100, rng);
+        CHECK(pick == nullptr);
     }
 
     SUBCASE("同じIDのエントリーは出さない") {
@@ -142,8 +143,8 @@ TEST_CASE("Marketのテスト") {  // NOLINT
             AgentID{404}, Price{rng.rand(1, 100)}, GoodsQuantity{rng.rand(10.0, 1000.0)}
         ));
 
-        const auto pick = market.pickEntry(AgentID{202}, 1, rng);
-        if (pick) CHECK(pick->id.value() != 202);
+        const auto* pick = market.pickEntry(AgentID{202}, 1, rng);
+        if (pick != nullptr) CHECK(pick->id.value() != 202);
     }
 
     SUBCASE("エントリーとその戻り値についてID,価格,量が恒等であること") {
@@ -178,10 +179,10 @@ TEST_CASE("Marketのテスト") {  // NOLINT
             GoodsQuantity{std::numeric_limits<double>::max()}
         );
 
-        const auto entry = market.pickEntry(AgentID{-1}, 3, rng);
+        const auto* entry = market.pickEntry(AgentID{-1}, 3, rng);
 
-        CHECK(entry.has_value());
-        CHECK(&targetEntry == &*entry);
+        CHECK(entry != nullptr);
+        CHECK(&targetEntry == entry);
     }
 }
 }  // namespace

@@ -5,7 +5,6 @@
 #include <atomic>
 #include <cassert>
 #include <functional>
-#include <optional>
 #include <ranges>
 #include <utility>
 
@@ -129,12 +128,11 @@ class Market final {
         return *entries_.emplace_back(id, price, supply);
     }
 
-    auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
-        -> std::optional<Entry&> {
-        if (entries_.empty()) return std::nullopt;
-        if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
+    auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept -> Entry* {
+        if (entries_.empty()) return nullptr;
+        if (entries_.size() == 1UZ and entries_[0].id == id) return nullptr;
 
-        auto       betterEntry = std::optional<Entry&>{std::nullopt};
+        auto*      betterEntry = static_cast<Entry*>(nullptr);
         const auto totalSupply = totalSupply_.load();
 
         assert(
@@ -148,14 +146,14 @@ class Market final {
             )
         );
 
-        for (const auto _ : std::views::indices(sampleCnt)) {
+        for (const auto _ : std::views::iota(0, sampleCnt)) {
             auto& sample = rng.discreteDistribution(
-                entries_,
-                totalSupply,
-                [](const Entry& e) noexcept -> double { return e.supply.value(); }
+                entries_, totalSupply, [](const Entry& e) noexcept -> double {
+                    return e.supply.value();
+                }
             );
             if (sample.id == id) continue;
-            if (not betterEntry or sample.price < betterEntry->price) betterEntry = sample;
+            if (betterEntry == nullptr or sample.price < betterEntry->price) betterEntry = &sample;
         }
 
         return betterEntry;

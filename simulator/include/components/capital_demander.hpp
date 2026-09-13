@@ -60,7 +60,7 @@ class CapitalDemander final {
         budget_.reset();
         purchaseAmountPlan_.reset();
 
-        const auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
+        const auto* pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto payment =
             std::min(static_cast<Budget>(purchasePlan * pickedEntry->price), budget);
@@ -77,7 +77,7 @@ class CapitalDemander final {
         std::forward<F2>(addCapitalFn)(capital);
         if (capital.isPositive())
             log_ = {.purchase = myRequest_->payment - remain, .tradeAmount = capital};
-        myRequest_.reset();
+        myRequest_ = nullptr;
     }
 
   private:
@@ -85,7 +85,7 @@ class CapitalDemander final {
     Log                          log_;
     std::optional<GoodsQuantity> purchaseAmountPlan_{std::nullopt};
     std::optional<Budget>        budget_{std::nullopt};
-    std::optional<Request&>      myRequest_{std::nullopt};
+    Request*                     myRequest_{nullptr};
 };
 }  // namespace abm::capital::demander
 

@@ -1,6 +1,6 @@
 #include "components/labor_demander/recruiter.hpp"
 
-#include <inplace_vector>
+#include <vector>
 
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/human_resource.hpp"
@@ -18,7 +18,7 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
     auto recruiter = Recruiter{};
     auto market    = Market{};
     auto rng       = makeRng();
-    auto out       = std::inplace_vector<Ref<Request>, 1UZ>{};
+    auto out       = std::vector<Ref<Request>>{};
     auto hr        = HumanResource{AgentID{42}};
     auto space     = base_goods::Workspace{};
 
@@ -28,7 +28,7 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
         recruiter.post(AgentID{42}, plan, market);
 
         SUBCASE("Marketにポストしない") {
-            market.pickRequest(AgentID{101}, out, rng);
+            market.pickRequest(AgentID{101}, out, 3UZ, rng);
 
             CHECK(out.empty());
         }
@@ -49,7 +49,7 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
         constexpr auto plan =
             RecruitPlan{.wage = Wage{10.0}, .employ = HeadCount{1.0}, .offer = HeadCount{3.0}};
         recruiter.post(AgentID{42}, plan, market);
-        market.pickRequest(AgentID{101}, out, rng);
+        market.pickRequest(AgentID{101}, out, 3UZ, rng);
         CHECK(out.size() == 1UZ);
         auto& request = out[0].get();
         CHECK(request.firmID == AgentID{42});

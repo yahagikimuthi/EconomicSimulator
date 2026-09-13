@@ -5,10 +5,8 @@
 #include <cstddef>
 #include <deque>
 #include <functional>
-#include <inplace_vector>
 #include <iterator>
 #include <memory>
-#include <optional>
 #include <ranges>
 #include <utility>
 
@@ -169,7 +167,7 @@ class Entry final {
     void setRoster(RosterEntry& rosterEntry) noexcept {
         assert(isAccept_);
         assert(not rosterEntry_);
-        rosterEntry_ = rosterEntry;
+        rosterEntry_ = &rosterEntry;
     }
 
     [[nodiscard]] auto isOffer() const noexcept -> bool { return isOffer_; }
@@ -177,17 +175,17 @@ class Entry final {
     [[nodiscard]] auto takeoutRosterEntry() noexcept -> RosterEntry& {
         assert(isAccept_);
         assert(rosterEntry_);
-        auto& out = *rosterEntry_;
-        rosterEntry_.reset();
+        auto& out    = *rosterEntry_;
+        rosterEntry_ = nullptr;
         return out;
     }
 
     const Request& request;
 
   private:
-    std::optional<RosterEntry&> rosterEntry_{std::nullopt};
-    bool                        isOffer_{false};
-    bool                        isAccept_{false};
+    RosterEntry* rosterEntry_{nullptr};
+    bool         isOffer_{false};
+    bool         isAccept_{false};
 };
 
 class Request final {
@@ -219,12 +217,14 @@ class Market final {
         return *requests_.emplace_back(id, wage);
     }
 
-    template <std::size_t N>
     void pickRequest(
-        const AgentID requestorId, std::inplace_vector<Ref<Request>, N>& out, RandomGenerator& rng
+        const AgentID              requestorId,
+        std::vector<Ref<Request>>& out,
+        const std::size_t          jobSampleCnt,
+        RandomGenerator&           rng
     ) noexcept {
         assert(out.empty());
-        if (out.max_size() >= requests_.size())
+        if (jobSampleCnt >= requests_.size())
             packAllRequest(requestorId, out);
         else
             packPartRequest(requestorId, out, rng);
@@ -233,16 +233,14 @@ class Market final {
     void clear() noexcept { requests_.clear(); }
 
   private:
-    template <std::size_t N>
-    void packAllRequest(const AgentID id, std::inplace_vector<Ref<Request>, N>& out) {
+    void packAllRequest(const AgentID id, std::vector<Ref<Request>>& out) {
         for (auto& req : requests_) {
-            if (req.firmID != id) out.unchecked_emplace_back(std::ref(req));
+            if (req.firmID != id) out.emplace_back(std::ref(req));
         }
     }
 
-    template <std::size_t N>
     void packPartRequest(
-        const AgentID id, std::inplace_vector<Ref<Request>, N>& out, RandomGenerator& rng
+        const AgentID id, std::vector<Ref<Request>>& out, RandomGenerator& rng
     ) noexcept {
         rng.sample(
             requests_ | std::views::filter([id](const Request& req) noexcept -> bool {

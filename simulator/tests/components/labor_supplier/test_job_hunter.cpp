@@ -27,7 +27,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
             id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
         );
         hunter.accept();
-        const auto result = hunter.takeoutResult();
+        const auto* result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -40,7 +40,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         );
 
         hunter.accept();
-        const auto result = hunter.takeoutResult();
+        const auto* result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -58,7 +58,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
         hunter.accept();
 
-        const auto result = hunter.takeoutResult();
+        const auto* result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -76,7 +76,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
         hunter.accept();
 
-        const auto result = hunter.takeoutResult();
+        const auto* result = hunter.takeoutResult();
 
         CHECK(not result);
     }
@@ -119,7 +119,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         SUBCASE("全てにオファーされなかった場合、結果は空") {
             hunter.accept();
 
-            const auto result = hunter.takeoutResult();
+            const auto* result = hunter.takeoutResult();
 
             CHECK(not result);
         }
@@ -131,11 +131,11 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
             hunter.accept();
 
-            const auto result = hunter.takeoutResult();
+            const auto* result = hunter.takeoutResult();
 
             CHECK(result);
             CHECK(result->isAccept());
-            CHECK(&req3.entries().front() == &*result);
+            CHECK(&req3.entries().front() == result);
         }
 
         SUBCASE("一部のみオファーされた場合も同様に受諾") {
@@ -144,13 +144,13 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
             hunter.accept();
 
-            const auto result = hunter.takeoutResult();
+            const auto* result = hunter.takeoutResult();
 
             CHECK(req2.entries().front().isAccept());
 
             CHECK(result);
             CHECK(result->isAccept());
-            CHECK(&req2.entries().front() == &*result);
+            CHECK(&req2.entries().front() == result);
         }
 
         SUBCASE("takeoutした場合、何もしなければ空を出す") {
@@ -165,7 +165,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
             );
             hunter.accept();
 
-            const auto result = hunter.takeoutResult();
+            const auto* result = hunter.takeoutResult();
             CHECK(not result);
         }
 
@@ -198,8 +198,8 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
             hunter.accept();
 
-            const auto result = hunter.takeoutResult();
-            CHECK(&req5.entries().front() == &*result);
+            const auto* result = hunter.takeoutResult();
+            CHECK(&req5.entries().front() == result);
         }
     }
 }
