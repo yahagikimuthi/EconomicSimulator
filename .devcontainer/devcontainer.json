@@ -1,12 +1,9 @@
 {
-    "name": "EconomicSimulator Environment",
+    "name": "EconomicSimulator DevContainer",
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
     "features": {
         "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
     },
-    "onCreateCommand": "sudo apt-get update && sudo apt-get install -y libtbb-dev",
-    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/${localWorkspaceFolderBasename},type=bind",
     "containerEnv": {
         "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
     },
@@ -16,7 +13,9 @@
                 "xaver.clang-format",
                 "llvm-vs-code-extensions.vscode-clangd",
                 "oderwat.indent-rainbow",
-                "christian-kohler.path-intellisense"
+                "christian-kohler.path-intellisense",
+                "ms-azuretools.vscode-docker",
+                "streetsidesoftware.code-spell-checker"
             ]
         }
     }

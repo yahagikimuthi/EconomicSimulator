@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <concepts>
+#include <optional>
 #include <tuple>
 #include <type_traits>
 
@@ -38,8 +39,8 @@ class Listener final {
     template <typename T>
         requires(std::is_same_v<T, Ts> or ...)
     void add(T& t) noexcept {
-        assert(std::get<T*>(listeners_) != nullptr);  // 再セットは禁止
-        std::get<T*>(listeners_) = &t;
+        assert(not std::get<std::optional<T&>>(listeners_));  // 再セットは禁止
+        std::get<std::optional<T&>>(listeners_) = t;
     }
 
     template <typename F>
@@ -54,6 +55,6 @@ class Listener final {
     }
 
   private:
-    std::tuple<Ts*...> listeners_{};
+    std::tuple<std::optional<Ts&>...> listeners_{};
 };
 }  // namespace abm

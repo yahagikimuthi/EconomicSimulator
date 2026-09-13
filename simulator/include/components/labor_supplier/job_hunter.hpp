@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <ranges>
 #include <span>
 #include <utility>
@@ -54,22 +55,22 @@ class JobHunter final {
     }
 
     void accept() noexcept {
-        const auto offeredEntry = takeOfferedEntry();
+        auto offeredEntry = takeOfferedEntry();
         if (not offeredEntry) return;
         offeredEntry->accept();
         acceptedEntry_ = offeredEntry;
     }
 
-    [[nodiscard]] auto takeoutResult() noexcept -> Entry* {
+    [[nodiscard]] auto takeoutResult() noexcept -> std::optional<Entry&> {
         myEntries_.clear();
-        return std::exchange(acceptedEntry_, nullptr);
+        return std::exchange(acceptedEntry_, std::nullopt);
     }
 
   private:
-    [[nodiscard]] auto takeOfferedEntry() noexcept -> Entry* {
+    [[nodiscard]] auto takeOfferedEntry() noexcept -> std::optional<Entry&> {
         auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);
-        if (offered.empty()) return nullptr;
-        return &offered.front().get();
+        if (offered.empty()) return std::nullopt;
+        return offered.front().get();
     }
 
     [[nodiscard]] auto pickAndSortJobs(const AgentID id, Market& market) noexcept
@@ -93,6 +94,6 @@ class JobHunter final {
 
     MyEntries<JobSampleCnt> myEntries_;
     RandomGenerator         rng_;
-    Entry*                  acceptedEntry_{nullptr};
+    std::optional<Entry&>   acceptedEntry_{std::nullopt};
 };
 }  // namespace abm::labor::supplier

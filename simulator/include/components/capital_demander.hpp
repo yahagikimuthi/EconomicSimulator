@@ -60,12 +60,12 @@ class CapitalDemander final {
         budget_.reset();
         purchaseAmountPlan_.reset();
 
-        auto* const pickedEntry = market.pickEntry(id, sampleCnt, rng_);
+        auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto payment =
             std::min(static_cast<Budget>(purchasePlan * pickedEntry->price), budget);
         const auto withdraw = std::forward<F>(withdrawFn)(payment);
-        if (withdraw.isPositive()) myRequest_ = &pickedEntry->request(withdraw);
+        if (withdraw.isPositive()) myRequest_ = pickedEntry->request(withdraw);
     }
 
     template <DepositFn F1, AddGoodsFn F2>
@@ -77,7 +77,7 @@ class CapitalDemander final {
         std::forward<F2>(addCapitalFn)(capital);
         if (capital.isPositive())
             log_ = {.purchase = myRequest_->payment - remain, .tradeAmount = capital};
-        myRequest_ = nullptr;
+        myRequest_.reset();
     }
 
   private:
@@ -85,7 +85,7 @@ class CapitalDemander final {
     Log                          log_;
     std::optional<GoodsQuantity> purchaseAmountPlan_{std::nullopt};
     std::optional<Budget>        budget_{std::nullopt};
-    Request*                     myRequest_{nullptr};
+    std::optional<Request&>      myRequest_{std::nullopt};
 };
 }  // namespace abm::capital::demander
 

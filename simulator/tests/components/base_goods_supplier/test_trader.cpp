@@ -29,8 +29,8 @@ TEST_CASE("Traderのテスト") {  // NOLINT
             id, {.price = Price{rng.rand(1.0, 100.0)}, .supply = GoodsQuantity{0.0}}, market
         );
 
-        const auto* entry = market.pickEntry(AgentID{-1}, 1, rng);
-        CHECK(entry == nullptr);
+        const auto entry = market.pickEntry(AgentID{-1}, 1, rng);
+        CHECK(not entry);
 
         const auto result = trader.trade();
 
@@ -46,7 +46,7 @@ TEST_CASE("Traderのテスト") {  // NOLINT
 
         trader.post(id, {.price = price, .supply = supply}, market);
 
-        auto* const pick = market.pickEntry(AgentID{-1}, 1, rng);
+        auto pick = market.pickEntry(AgentID{-1}, 1, rng);
 
         CHECK(pick);
         auto& entry = *pick;

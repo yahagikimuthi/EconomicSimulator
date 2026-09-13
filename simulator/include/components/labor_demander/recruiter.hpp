@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstddef>
 #include <functional>
+#include <optional>
 #include <ranges>
 #include <vector>
 
@@ -83,7 +84,7 @@ class Recruiter final {
         assert(plan.wage.isZeroOrMore());
         if (not shouldPost(plan)) return;
         ledger_.makeNewPage(plan.offer);
-        myRequest_ = &laborMarket.request(id, plan.wage);
+        myRequest_ = laborMarket.request(id, plan.wage);
     }
 
     void offer() noexcept {
@@ -106,13 +107,13 @@ class Recruiter final {
     }
 
     void reset() noexcept {
-        myRequest_ = nullptr;
+        myRequest_.has_value();
         ledger_.reset();
         offerApplicants_.clear();
     }
 
   private:
-    [[nodiscard]] auto isPosting() const noexcept -> bool { return myRequest_ != nullptr; }
+    [[nodiscard]] auto isPosting() const noexcept -> bool { return myRequest_.has_value(); }
 
     void offerAll() noexcept {
         auto entries = myRequest_->entries();
@@ -172,9 +173,9 @@ class Recruiter final {
         return entryBox;
     }
 
-    Request*        myRequest_{nullptr};
-    Ledger          ledger_;
-    OfferApplicants offerApplicants_;
+    std::optional<Request&> myRequest_{std::nullopt};
+    Ledger                  ledger_;
+    OfferApplicants         offerApplicants_;
 };
 }  // namespace abm::labor::demander::recruiter
 

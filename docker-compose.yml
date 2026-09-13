@@ -1,21 +1,23 @@
 services:
-  # C++
+  # C++ シミュレータ
   simulator-cpp:
     build:
       context: ./simulator
     volumes:
-      - ${LOCAL_WORKSPACE_FOLDER:-./}/simulator:/app
+      # ${LOCAL_WORKSPACE_FOLDER} は DevContainer 起動時にホスト側の絶対パスに展開されます
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/simulator:/app
     working_dir: /app
     tty: true
 
-  # Go
+  # Go バックエンド
   backend-go:
     build:
       context: ./backend
     ports:
       - "8080:8080"
     volumes:
-      - ./backend:/app
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/backend:/app
+    working_dir: /app
     depends_on:
       - simulator-cpp
 
@@ -26,7 +28,8 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/frontend:/app
       - /app/node_modules
+    working_dir: /app
     environment:
       - WATCHPACK_POLLING=true

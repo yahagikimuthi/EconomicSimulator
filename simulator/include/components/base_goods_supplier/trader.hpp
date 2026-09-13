@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <optional>
 #include <ranges>
 #include <span>
 #include <utility>
@@ -23,7 +24,7 @@ class Trader final {
     void post(const AgentID id, const TradePlan& plan, Market& market) noexcept {
         assert(plan.supply.isZeroOrMore());
         if (plan.supply.isZero()) return;
-        myEntry_ = &market.entry(id, plan.price, plan.supply);
+        myEntry_ = market.entry(id, plan.price, plan.supply);
     }
 
     [[nodiscard]] auto trade() noexcept -> TradeResult {
@@ -35,7 +36,7 @@ class Trader final {
         const auto result =
             isExcessDemand ? performRationedTrade(demand) : performFullTrade(demand);
 
-        myEntry_ = nullptr;
+        myEntry_.reset();
         return result;
     }
 
@@ -87,7 +88,7 @@ class Trader final {
         std::unreachable();
     }
 
-    [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_ != nullptr; }
+    [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
 
     [[nodiscard]] auto packRequest() noexcept -> std::span<Ref<Request>> {
         static thread_local auto refs = std::vector<Ref<Request>>{};
@@ -112,7 +113,7 @@ class Trader final {
         };
     }
 
-    Entry*                  myEntry_{nullptr};
+    std::optional<Entry&>   myEntry_{std::nullopt};
     mutable RandomGenerator rng_;
 };
 }  // namespace abm::base_goods::supplier

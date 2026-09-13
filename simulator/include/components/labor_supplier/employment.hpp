@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <optional>
 
 #include "components/common.hpp"
 #include "components/labor_supplier/common.hpp"
@@ -16,7 +17,7 @@ class Employment final {
     explicit Employment(RandomGenerator& masterRng) noexcept
         : productPower_{masterRng.random(setting::productPower)} {}
 
-    [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_ != nullptr; }
+    [[nodiscard]] auto isEmployed() const noexcept -> bool { return rosterEntry_.has_value(); }
 
     void startWorking(RosterEntry& rosterEntry) noexcept {
         if (isEmployed()) {
@@ -24,11 +25,11 @@ class Employment final {
             assert(rosterEntry_->wage <= rosterEntry.wage);
         }
         resign();
-        rosterEntry_ = &rosterEntry;
+        rosterEntry_ = rosterEntry;
     }
 
     [[nodiscard]] auto wage() const noexcept -> Wage {
-        if (rosterEntry_ == nullptr) return Wage{0.0};
+        if (not rosterEntry_) return Wage{0.0};
         return rosterEntry_->wage;
     }
 
@@ -37,7 +38,7 @@ class Employment final {
         if (not isEmployed()) return;
         std::forward<F>(depositFn)(rosterEntry_->takeoutPaidWage());
         if (not rosterEntry_->isOccupied()) {
-            rosterEntry_ = nullptr;
+            rosterEntry_.reset();
             return;
         }
         rosterEntry_->addInput(productPower_);
@@ -66,10 +67,10 @@ class Employment final {
     void resign() noexcept {
         if (not isEmployed()) return;
         rosterEntry_->resign();
-        rosterEntry_ = nullptr;
+        rosterEntry_.reset();
     }
 
-    RosterEntry* rosterEntry_{nullptr};
-    const double productPower_;
+    std::optional<RosterEntry&> rosterEntry_{std::nullopt};
+    const double                productPower_;
 };
 }  // namespace abm::labor::supplier

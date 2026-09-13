@@ -7,6 +7,7 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+#include <optional>
 #include <ranges>
 #include <utility>
 
@@ -167,7 +168,7 @@ class Entry final {
     void setRoster(RosterEntry& rosterEntry) noexcept {
         assert(isAccept_);
         assert(not rosterEntry_);
-        rosterEntry_ = &rosterEntry;
+        rosterEntry_ = rosterEntry;
     }
 
     [[nodiscard]] auto isOffer() const noexcept -> bool { return isOffer_; }
@@ -175,17 +176,17 @@ class Entry final {
     [[nodiscard]] auto takeoutRosterEntry() noexcept -> RosterEntry& {
         assert(isAccept_);
         assert(rosterEntry_);
-        auto& out    = *rosterEntry_;
-        rosterEntry_ = nullptr;
+        auto& out = *rosterEntry_;
+        rosterEntry_.reset();
         return out;
     }
 
     const Request& request;
 
   private:
-    RosterEntry* rosterEntry_{nullptr};
-    bool         isOffer_{false};
-    bool         isAccept_{false};
+    std::optional<RosterEntry&> rosterEntry_{std::nullopt};
+    bool                        isOffer_{false};
+    bool                        isAccept_{false};
 };
 
 class Request final {

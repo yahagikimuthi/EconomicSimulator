@@ -24,10 +24,10 @@ class Trader final {
         Market&       market,
         const int     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
-        auto* pickedEntry = market.pickEntry(id, sampleCnt, rng_);
+        auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
         const auto withdraw = std::forward<F>(withdrawFn)(budget);
-        myRequest_          = &pickedEntry->request(withdraw);
+        myRequest_          = pickedEntry->request(withdraw);
     }
 
     template <DepositFn F>
@@ -35,12 +35,12 @@ class Trader final {
         if (not myRequest_) return;
         const auto remain = myRequest_->takeoutRemainPaid();
         std::forward<F>(depositFn)(remain);
-        myRequest_ = nullptr;
+        myRequest_.reset();
     }
 
   private:
-    RandomGenerator rng_;
-    Request*        myRequest_{nullptr};
+    RandomGenerator         rng_;
+    std::optional<Request&> myRequest_{std::nullopt};
 };
 
 class GoodsDemander final {

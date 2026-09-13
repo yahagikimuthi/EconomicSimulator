@@ -42,7 +42,7 @@ class LaborSupplier final {
     void accept() noexcept { jobHunter_.accept(); }
 
     void recordRosterEntry() noexcept {
-        const auto acceptedEntry = jobHunter_.takeoutResult();
+        auto acceptedEntry = jobHunter_.takeoutResult();
         if (acceptedEntry) employment_.startWorking(acceptedEntry->takeoutRosterEntry());
     }
 
