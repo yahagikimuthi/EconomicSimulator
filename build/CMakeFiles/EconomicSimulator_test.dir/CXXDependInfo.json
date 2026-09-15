@@ -1,0 +1,57 @@
+{
+	"bmi-installation" : null,
+	"compiler-frontend-variant" : "GNU",
+	"compiler-id" : "GNU",
+	"compiler-simulate-id" : "",
+	"config" : "Debug",
+	"cxx-modules" : {},
+	"database-info" : null,
+	"dir-cur-bld" : "/workspaces/EconomicSimulator/build",
+	"dir-cur-src" : "/workspaces/EconomicSimulator",
+	"dir-top-bld" : "/workspaces/EconomicSimulator/build",
+	"dir-top-src" : "/workspaces/EconomicSimulator",
+	"exports" : [],
+	"forward-modules-from-target-dirs" : [],
+	"include-dirs" : 
+	[
+		"/workspaces/EconomicSimulator",
+		"/workspaces/EconomicSimulator/include",
+		"/workspaces/EconomicSimulator/src",
+		"_deps/pcg_cpp-src/include",
+		"/usr/local/vcpkg/installed/x64-linux/include"
+	],
+	"language" : "CXX",
+	"linked-target-dirs" : 
+	[
+		"/workspaces/EconomicSimulator/build/CMakeFiles/EconomicSimulator_lib.dir"
+	],
+	"module-dir" : "/workspaces/EconomicSimulator/build/CMakeFiles/EconomicSimulator_test.dir",
+	"sources" : 
+	{
+		"CMakeFiles/EconomicSimulator_test.dir/tests/components/labor_demander/test_hr_manager.cpp.o" : 
+		{
+			"language" : "CXX",
+			"source" : "/workspaces/EconomicSimulator/tests/components/labor_demander/test_hr_manager.cpp"
+		},
+		"CMakeFiles/EconomicSimulator_test.dir/tests/components/labor_demander/test_labor_demander.cpp.o" : 
+		{
+			"language" : "CXX",
+			"source" : "/workspaces/EconomicSimulator/tests/components/labor_demander/test_labor_demander.cpp"
+		},
+		"CMakeFiles/EconomicSimulator_test.dir/tests/components/labor_demander/test_planner.cpp.o" : 
+		{
+			"language" : "CXX",
+			"source" : "/workspaces/EconomicSimulator/tests/components/labor_demander/test_planner.cpp"
+		},
+		"CMakeFiles/EconomicSimulator_test.dir/tests/components/labor_demander/test_recruiter.cpp.o" : 
+		{
+			"language" : "CXX",
+			"source" : "/workspaces/EconomicSimulator/tests/components/labor_demander/test_recruiter.cpp"
+		},
+		"CMakeFiles/EconomicSimulator_test.dir/tests/test_main.cpp.o" : 
+		{
+			"language" : "CXX",
+			"source" : "/workspaces/EconomicSimulator/tests/test_main.cpp"
+		}
+	}
+}

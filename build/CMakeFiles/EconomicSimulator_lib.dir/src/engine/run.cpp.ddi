@@ -1,0 +1,11 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/EconomicSimulator_lib.dir/src/engine/run.cpp.o",
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}

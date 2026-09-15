@@ -1,0 +1,17 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/EconomicSimulator_lib.dir/include/config.cppm.o",
+"provides": [
+{
+"logical-name": "config",
+"is-interface": true
+}
+],
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}

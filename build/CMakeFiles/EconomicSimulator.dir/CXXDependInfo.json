@@ -1,0 +1,36 @@
+{
+	"bmi-installation" : null,
+	"compiler-frontend-variant" : "GNU",
+	"compiler-id" : "GNU",
+	"compiler-simulate-id" : "",
+	"config" : "Debug",
+	"cxx-modules" : {},
+	"database-info" : null,
+	"dir-cur-bld" : "/workspaces/EconomicSimulator/build",
+	"dir-cur-src" : "/workspaces/EconomicSimulator",
+	"dir-top-bld" : "/workspaces/EconomicSimulator/build",
+	"dir-top-src" : "/workspaces/EconomicSimulator",
+	"exports" : [],
+	"forward-modules-from-target-dirs" : [],
+	"include-dirs" : 
+	[
+		"/workspaces/EconomicSimulator/include",
+		"/workspaces/EconomicSimulator/src",
+		"_deps/pcg_cpp-src/include",
+		"/usr/local/vcpkg/installed/x64-linux/include"
+	],
+	"language" : "CXX",
+	"linked-target-dirs" : 
+	[
+		"/workspaces/EconomicSimulator/build/CMakeFiles/EconomicSimulator_lib.dir"
+	],
+	"module-dir" : "/workspaces/EconomicSimulator/build/CMakeFiles/EconomicSimulator.dir",
+	"sources" : 
+	{
+		"CMakeFiles/EconomicSimulator.dir/src/app_main.cpp.o" : 
+		{
+			"language" : "CXX",
+			"source" : "/workspaces/EconomicSimulator/src/app_main.cpp"
+		}
+	}
+}

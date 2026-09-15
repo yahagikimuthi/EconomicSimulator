@@ -1,0 +1,11 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/EconomicSimulator_test.dir/src/components/labor_demander/hr_manager.cpp.o",
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}

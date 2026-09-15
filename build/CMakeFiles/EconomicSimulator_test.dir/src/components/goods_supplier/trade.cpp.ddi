@@ -1,0 +1,11 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/EconomicSimulator_test.dir/src/components/goods_supplier/trade.cpp.o",
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}

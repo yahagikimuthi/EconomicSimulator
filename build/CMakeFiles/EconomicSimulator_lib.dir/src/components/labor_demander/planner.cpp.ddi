@@ -1,0 +1,11 @@
+{
+"rules": [
+{
+"primary-output": "CMakeFiles/EconomicSimulator_lib.dir/src/components/labor_demander/planner.cpp.o",
+"requires": [
+]
+}
+],
+"version": 0,
+"revision": 0
+}
