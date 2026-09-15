@@ -16,7 +16,8 @@
                 "christian-kohler.path-intellisense",
                 "ms-azuretools.vscode-docker",
                 "streetsidesoftware.code-spell-checker",
-                "PKief.material-icon-theme"
+                "PKief.material-icon-theme",
+                "fabiospampinato.vscode-highlight"
             ]
         }
     }
