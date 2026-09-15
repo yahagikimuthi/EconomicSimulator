@@ -1,6 +1,8 @@
-*/build
+*/build/
 .vscode/
 */.clang-format
 *.clangd
 */.compile_commands.json
 */outputs/
+.git/
+.VSCodeCounter/

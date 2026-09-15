@@ -4,7 +4,7 @@ services:
     build:
       context: ./simulator
     volumes:
-      # ${LOCAL_WORKSPACE_FOLDER} は DevContainer 起動時にホスト側の絶対パスに展開されます
+      # ${LOCAL_WORKSPACE_FOLDER} は DevContainer 起動時にホスト側の絶対パスに展開される
       - ${LOCAL_WORKSPACE_FOLDER:-.}/simulator:/app
     working_dir: /app
     tty: true

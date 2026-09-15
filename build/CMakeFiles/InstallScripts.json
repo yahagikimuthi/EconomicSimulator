@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/workspaces/EconomicSimulator/build/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
