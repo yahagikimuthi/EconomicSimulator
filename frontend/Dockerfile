@@ -1,9 +1,9 @@
-FROM node:20-alpine
+FROM node:22-slim
 
 WORKDIR /app
 
-# Viteのデフォルト開発ポート
+RUN npm install -g pnpm
+
 EXPOSE 5173
 
-# ホストOSからの接続を許可して開発サーバーを起動
-CMD ["sh", "-c", "npm install && npm run dev -- --host"]
+CMD ["tail", "-f", "/dev/null"]
