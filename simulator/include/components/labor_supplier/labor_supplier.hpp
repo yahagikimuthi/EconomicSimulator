@@ -62,7 +62,7 @@ class LaborSupplier final {
         return false;
     }
 
-    JobHunter<>           jobHunter_;
+    JobHunter             jobHunter_;
     Employment            employment_;
     LikelihoodChangingJob likelihoodChangingJob_;
 };

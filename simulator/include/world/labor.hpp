@@ -2,7 +2,6 @@
 
 #include <tbb/concurrent_vector.h>
 #include <cassert>
-#include <cstddef>
 #include <deque>
 #include <functional>
 #include <iterator>
@@ -221,11 +220,11 @@ class Market final {
     void pickRequest(
         const AgentID              requestorId,
         std::vector<Ref<Request>>& out,
-        const std::size_t          jobSampleCnt,
+        const int                  jobSampleCnt,
         RandomGenerator&           rng
     ) noexcept {
         assert(out.empty());
-        if (jobSampleCnt >= requests_.size())
+        if (std::cmp_greater_equal(jobSampleCnt, requests_.size()))
             packAllRequest(requestorId, out);
         else
             packPartRequest(requestorId, out, rng);

@@ -14,7 +14,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
     constexpr auto id = AgentID{42};
 
     auto                   rng         = makeRng();
-    auto                   hunter      = JobHunter<10000, 1000>{rng};
+    auto                   hunter      = JobHunter{rng};
     auto                   employment  = Employment{rng};
     auto                   board       = CompanyBoard{AgentID{101}};
     auto                   space       = base_goods::Workspace{};
@@ -89,7 +89,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         auto& req3 = market.request(AgentID{303}, Wage{100});
 
         hunter.entry(
-            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market, 10, 10
         );
 
         CHECK(req1.entries().empty());
@@ -104,7 +104,7 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
         auto& req2 = market.request(AgentID{203}, Wage{202});
 
         hunter.entry(
-            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+            id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market, 10, 10
         );
 
         SUBCASE("エントリーを受けている") {
@@ -184,7 +184,12 @@ TEST_CASE("JobHunterのテスト") {  // NOLINT
 
             employment.startWorking(rosterEntry);
             hunter.entry(
-                id, employment.makeIsAlignedRequestFn(), employment.makeEntrySheetFn(id), market
+                id,
+                employment.makeIsAlignedRequestFn(),
+                employment.makeEntrySheetFn(id),
+                market,
+                10,
+                10
             );
 
             CHECK(req4.entries().empty());

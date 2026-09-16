@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cstddef>
 #include <functional>
 #include <optional>
 #include <ranges>
@@ -16,12 +15,14 @@
 
 namespace abm::labor::supplier {
 
-template <std::size_t JobEntryCnt>
 class MyEntries final {
   public:
     explicit MyEntries() noexcept = default;
-    [[nodiscard]] auto takeOfferedEntry() noexcept -> auto {
-        return entries_ | std::views::filter([](Entry& e) noexcept -> bool { return e.isOffer(); });
+
+    [[nodiscard]] auto takeFirstOfferedEntry() noexcept -> std::optional<Entry&> {
+        auto out = std::ranges::find_if(entries_, &Entry::isOffer);
+        if (out == entries_.end()) return std::nullopt;
+        return out->get();
     }
 
     void add(Entry& entry) noexcept { entries_.emplace_back(std::ref(entry)); }
@@ -31,9 +32,6 @@ class MyEntries final {
     std::vector<Ref<Entry>> entries_;
 };
 
-template <
-    std::size_t JobSampleCnt = setting::jobSampleCnt,
-    std::size_t JobEntryCnt  = setting::jobEntryCnt>
 class JobHunter final {
   public:
     explicit JobHunter(RandomGenerator& masterRng) noexcept
@@ -43,19 +41,21 @@ class JobHunter final {
         const AgentID           id,
         IsAlignedFn auto&&      isAligned,
         MakeEntrySheetFn auto&& makeEntrySheet,
-        Market&                 market
+        Market&                 market,
+        const int               sampleCnt = setting::jobSampleCnt,
+        const int               entryCnt  = setting::jobEntryCnt
     ) noexcept {
-        auto alignedRequests = pickAndSortJobs(id, market) |
+        auto alignedRequests = pickAndSortJobs(id, sampleCnt, entryCnt, market) |
                                std::views::filter([&](const Request& req) noexcept -> bool {
                                    return isAligned(req);
                                }) |
-                               std::views::take(JobEntryCnt);
+                               std::views::take(entryCnt);
         if (alignedRequests.empty()) return;
         for (auto& request : alignedRequests) myEntries_.add(makeEntrySheet(request));
     }
 
     void accept() noexcept {
-        auto offeredEntry = takeOfferedEntry();
+        auto offeredEntry = myEntries_.takeFirstOfferedEntry();
         if (not offeredEntry) return;
         offeredEntry->accept();
         acceptedEntry_ = offeredEntry;
@@ -67,33 +67,28 @@ class JobHunter final {
     }
 
   private:
-    [[nodiscard]] auto takeOfferedEntry() noexcept -> std::optional<Entry&> {
-        auto offered = myEntries_.takeOfferedEntry() | std::views::take(1);
-        if (offered.empty()) return std::nullopt;
-        return offered.front().get();
-    }
-
-    [[nodiscard]] auto pickAndSortJobs(const AgentID id, Market& market) noexcept
-        -> std::span<Ref<Request>> {
+    [[nodiscard]] auto pickAndSortJobs(
+        const AgentID id, const int sampleCnt, const int entryCnt, Market& market
+    ) noexcept -> std::span<Ref<Request>> {
         static thread_local auto sampleRequest = std::vector<Ref<Request>>{};
         sampleRequest.clear();
-        market.pickRequest(id, sampleRequest, JobSampleCnt, rng_);
-        sortSample(sampleRequest);
+        market.pickRequest(id, sampleRequest, sampleCnt, rng_);
+        sortSample(sampleRequest, entryCnt);
         return sampleRequest;
     }
 
-    static void sortSample(std::span<Ref<Request>> sortRequests) noexcept {
-        const auto k = std::min(JobEntryCnt, sortRequests.size());
+    static void sortSample(std::span<Ref<Request>> sortRequests, const int entryCnt) noexcept {
+        const auto k = std::min(entryCnt, static_cast<int>(sortRequests.size()));
         std::ranges::partial_sort(
             sortRequests,
-            sortRequests.begin() + static_cast<int>(k),
+            sortRequests.begin() + k,
             std::ranges::greater{},
             [](const Ref<Request> requestRef) noexcept -> Wage { return requestRef.get().wage; }
         );
     }
 
-    MyEntries<JobSampleCnt> myEntries_;
-    RandomGenerator         rng_;
-    std::optional<Entry&>   acceptedEntry_{std::nullopt};
+    MyEntries             myEntries_;
+    RandomGenerator       rng_;
+    std::optional<Entry&> acceptedEntry_{std::nullopt};
 };
 }  // namespace abm::labor::supplier

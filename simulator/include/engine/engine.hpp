@@ -31,17 +31,17 @@ class Engine final {
         namespace cnt = global_setting::agent_count;
 
         capitalFirms_.reserve(cnt::capitalFirm);
-        for (const auto _ : std::views::iota(0, cnt::capitalFirm)) capitalFirms_.emplace_back(rng_);
+        for (const auto _ : std::views::indices(cnt::capitalFirm)) capitalFirms_.emplace_back(rng_);
 
         goodsFirms_.reserve(cnt::goodsFirm);
-        for (const auto _ : std::views::iota(0, cnt::goodsFirm)) goodsFirms_.emplace_back(rng_);
+        for (const auto _ : std::views::indices(cnt::goodsFirm)) goodsFirms_.emplace_back(rng_);
 
         hholds_.reserve(cnt::hhold);
-        for (const auto _ : std::views::iota(0, cnt::hhold)) hholds_.emplace_back(rng_);
+        for (const auto _ : std::views::indices(cnt::hhold)) hholds_.emplace_back(rng_);
     }
 
     void run() noexcept {
-        for (const auto month : std::views::iota(0, endMonth_)) {
+        for (const auto month : std::views::indices(endMonth_)) {
             if (month % global_setting::monthInYear == 0) {
                 runJanuaryPlanning();
                 laborEngine_.run(capitalFirms_, goodsFirms_, hholds_);

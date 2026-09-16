@@ -148,7 +148,7 @@ class Market final {
             )
         );
 
-        for (const auto _ : std::views::iota(0, sampleCnt)) {
+        for (const auto _ : std::views::indices(sampleCnt)) {
             auto& sample = rng.discreteDistribution(
                 entries_,
                 totalSupply,
