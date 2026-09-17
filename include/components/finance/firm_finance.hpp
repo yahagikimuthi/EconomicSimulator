@@ -89,7 +89,7 @@ class FirmFinance final {
 
     template <PayTaxFn F1, SubsidyFn F2>
     void finalizeAccounts(F1&& payCorporateTaxFn, F2&& subsidyFn) noexcept {
-        auto _ = scopeExit([&]() noexcept -> void { netIncomeBeforeTax_ = Money{0.0}; });
+        auto _ = ScopeExit{[&]() noexcept -> void { netIncomeBeforeTax_ = Money{0.0}; }};
 
         if (netIncomeBeforeTax_.isZero()) return;
         if (netIncomeBeforeTax_.isPositive()) {

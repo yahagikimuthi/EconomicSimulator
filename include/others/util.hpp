@@ -30,26 +30,21 @@ template <typename T>
 concept Numeric = std::is_floating_point_v<T> or std::is_integral_v<T>;
 
 template <std::invocable<> F>
-class scopeExit_t final {
+class ScopeExit final {
   public:
-    [[nodiscard("RAIIオブジェクトであるため代入してください")]] explicit constexpr scopeExit_t(F f
+    [[nodiscard("RAIIオブジェクトであるため代入してください")]] explicit constexpr ScopeExit(
+        F f
     ) noexcept
         : f_{std::move(f)} {}
-    scopeExit_t(const scopeExit_t&) noexcept                    = default;
-    scopeExit_t(scopeExit_t&&) noexcept                         = default;
-    auto operator=(const scopeExit_t&) noexcept -> scopeExit_t& = default;
-    auto operator=(scopeExit_t&&) noexcept -> scopeExit_t&      = default;
-    ~scopeExit_t() noexcept { std::invoke(f_); }
+    ScopeExit(const ScopeExit&) noexcept                    = delete;
+    ScopeExit(ScopeExit&&) noexcept                         = delete;
+    auto operator=(const ScopeExit&) noexcept -> ScopeExit& = delete;
+    auto operator=(ScopeExit&&) noexcept -> ScopeExit&      = delete;
+    ~ScopeExit() noexcept { std::invoke(f_); }
 
   private:
     F f_;
 };
-
-template <std::invocable<> F>
-[[nodiscard("RAIIオブジェクトであるため代入してください")]] [[gnu::always_inline]] constexpr auto
-scopeExit(F&& f) noexcept -> scopeExit_t<F> {
-    return scopeExit_t{std::forward<F>(f)};
-}
 
 template <typename G>
     requires requires(G rng) {
@@ -126,19 +121,21 @@ class RandomGenerator final {
     }
 
     [[nodiscard]] auto random(const RandomParameter& param) noexcept -> f64 {
-        return param.visit(Overloaded{
-            [&](const UniformParameter<i32>& uniformParam) noexcept -> f64 {
-                return randInt(uniformParam.min, uniformParam.limit);
-            },
-            [&](const UniformParameter<f64>& uniformParam) noexcept -> f64 {
-                return rand(uniformParam.min, uniformParam.limit);
-            },
-            [&](const NormalParameter& normalParam) noexcept -> f64 {
-                return randNormal(
-                    normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
-                );
+        return param.visit(
+            Overloaded{
+                [&](const UniformParameter<i32>& uniformParam) noexcept -> f64 {
+                    return randInt(uniformParam.min, uniformParam.limit);
+                },
+                [&](const UniformParameter<f64>& uniformParam) noexcept -> f64 {
+                    return rand(uniformParam.min, uniformParam.limit);
+                },
+                [&](const NormalParameter& normalParam) noexcept -> f64 {
+                    return randNormal(
+                        normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
+                    );
+                }
             }
-        });
+        );
     }
 
   private:

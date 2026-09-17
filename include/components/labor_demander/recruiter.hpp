@@ -97,7 +97,7 @@ class Recruiter final {
     }
 
     [[nodiscard]] auto endRecruiting(AddRosterFn auto&& addRoster) noexcept -> RecruitResult {
-        auto _ = scopeExit([&]() -> void { reset(); });
+        auto _ = ScopeExit{[&]() -> void { reset(); }};
         if (not isPosting()) return {.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();

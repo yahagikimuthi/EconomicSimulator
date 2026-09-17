@@ -9,7 +9,7 @@ TEST_CASE("ScopeExitのテスト") {  // NOLINT
     {
         CHECK(x == 10);
 
-        auto _ = scopeExit([&x]() noexcept -> void { x = 0; });
+        auto _ = ScopeExit{[&x]() noexcept -> void { x = 0; }};
 
         CHECK(x == 10);
     }
