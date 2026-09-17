@@ -39,8 +39,8 @@ class CapitalManager final {
         return calcProduceAmount();
     }
 
-    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply
-    ) const noexcept -> GoodsQuantity {
+    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply) const noexcept
+        -> GoodsQuantity {
         const auto desiredCapital = pow(requiresSupply, 1.0 / distributionRate_);
         return std::max(GoodsQuantity{0.0}, desiredCapital - capital_);
     }
@@ -55,7 +55,7 @@ class CapitalManager final {
         assert(capital_.isZeroOrMore());
         const auto out = pow(capital_, distributionRate_);
         assert(out.isZeroOrMore());
-        return out;
+        return out + GoodsQuantity{1.0};
     }
 
     const f64     depreciationRate_;
@@ -76,17 +76,17 @@ class WorkerManager final {
 
     [[nodiscard]] auto produce() noexcept -> GoodsQuantity {
         const auto workerInput = workspace_.takeout();
-        const auto out         = pow(workerInput, distributionRate_);
-        assert(out.isZeroOrMore());
-
-        if (out.isPositive()) lastProduce_ = out;
+        const auto out         = pow(workerInput, distributionRate_) + GoodsQuantity{1.0};
+        assert(out.isPositive());
+        lastProduce_ = out;
         return out;
     }
 
     [[nodiscard]] auto nextProducePlan() const noexcept -> GoodsQuantity { return lastProduce_; }
 
-    [[nodiscard]] auto desiredEmploy(const HeadCount employee, const GoodsQuantity requiresAmount)
-        const noexcept -> HeadCount {
+    [[nodiscard]] auto desiredEmploy(
+        const HeadCount employee, const GoodsQuantity requiresAmount
+    ) const noexcept -> HeadCount {
         assert(requiresAmount.isZeroOrMore());
 
         const auto requiresSumWorkerPower = pow(requiresAmount, 1.0 / distributionRate_);
@@ -99,8 +99,8 @@ class WorkerManager final {
 
   private:
     // ゼロを返しません
-    [[nodiscard]] auto calcAvgWorkerPower(const HeadCount employee
-    ) const noexcept -> GoodsQuantity {
+    [[nodiscard]] auto calcAvgWorkerPower(const HeadCount employee) const noexcept
+        -> GoodsQuantity {
         assert(lastProduce_.isPositive());
         if (employee.isZero()) return GoodsQuantity{1.0};
         const auto sumWorkerPower = pow(lastProduce_, 1.0 / distributionRate_);
@@ -131,16 +131,17 @@ class Producer final {
         return totalInput;
     }
 
-    [[nodiscard]] auto desiredEmploy(const HeadCount employee, const GoodsQuantity requiresSupply)
-        const noexcept -> HeadCount {
+    [[nodiscard]] auto desiredEmploy(
+        const HeadCount employee, const GoodsQuantity requiresSupply
+    ) const noexcept -> HeadCount {
         assert(requiresSupply.isZeroOrMore());
         const auto capitalSupply  = capital_.nextProducePlan();
         const auto requiresWorker = requiresSupply / (productPower_ * capitalSupply);
         return worker_.desiredEmploy(employee, GoodsQuantity{requiresWorker});
     }
 
-    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply
-    ) const noexcept -> GoodsQuantity {
+    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply) const noexcept
+        -> GoodsQuantity {
         assert(requiresSupply.isZeroOrMore());
         const auto workerSupply    = worker_.nextProducePlan();
         const auto requiresCapital = requiresSupply / (productPower_ * workerSupply);
@@ -169,13 +170,14 @@ class ProducingSystem final {
 
     void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradeResult(*this); }
 
-    [[nodiscard]] auto desiredEmploy(const GoodsQuantity requiresSupply, const HeadCount employee)
-        const noexcept -> HeadCount {
+    [[nodiscard]] auto desiredEmploy(
+        const GoodsQuantity requiresSupply, const HeadCount employee
+    ) const noexcept -> HeadCount {
         return producer_.desiredEmploy(employee, requiresSupply);
     }
 
-    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply
-    ) const noexcept -> GoodsQuantity {
+    [[nodiscard]] auto desiredCapital(const GoodsQuantity requiresSupply) const noexcept
+        -> GoodsQuantity {
         return producer_.desiredCapital(requiresSupply);
     }
 
