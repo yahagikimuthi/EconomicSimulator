@@ -1,12 +1,6 @@
 {
     "name": "EconomicSimulator DevContainer",
-    "image": "mcr.microsoft.com/devcontainers/base:ubuntu-24.04",
-    "features": {
-        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
-    },
-    "containerEnv": {
-        "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
-    },
+    "dockerFile": "Dockerfile",
     "customizations": {
         "vscode": {
             "extensions": [
