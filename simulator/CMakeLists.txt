@@ -23,6 +23,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pcg_cpp)
 
+include(FetchContent)
+FetchContent_Declare(
+    Crow
+    GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
+    GIT_TAG        v1.2.0
+)
+set(FETCHCONTENT_QUIET OFF)
+FetchContent_MakeAvailable(Crow)
+
 # --- ソースファイルの取得 ---
 file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp")
@@ -71,17 +80,27 @@ target_include_directories(EconomicSimulator_lib INTERFACE
 
 target_link_libraries(EconomicSimulator_lib INTERFACE
     TBB::tbb
-    project_warnings
 )
 
 # メイン実行ファイル ターゲット
 add_executable(EconomicSimulator)
 target_sources(EconomicSimulator PRIVATE ${MAIN_SOURCES})
-target_link_libraries(EconomicSimulator PRIVATE EconomicSimulator_lib)
+target_link_libraries(EconomicSimulator PRIVATE
+    EconomicSimulator_lib
+    project_warnings
+    Crow::Crow
+)
+
+target_include_directories(EconomicSimulator SYSTEM PRIVATE ${crow_SOURCE_DIR}/include)
 
 # テスト用 ターゲット
 add_executable(EconomicSimulator_test)
 target_sources(EconomicSimulator_test PRIVATE ${TEST_SOURCES})
-target_link_libraries(EconomicSimulator_test PRIVATE EconomicSimulator_lib)
+target_link_libraries(EconomicSimulator_test PRIVATE
+    EconomicSimulator_lib
+    project_warnings
+    Crow::Crow
+)
+target_include_directories(EconomicSimulator_test SYSTEM PRIVATE ${crow_SOURCE_DIR}/include)
 
 add_test(NAME UnitTests COMMAND EconomicSimulator_test)

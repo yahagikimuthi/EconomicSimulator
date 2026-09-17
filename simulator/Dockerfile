@@ -20,11 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     pkg-config \
     libtbb-dev \
+    libasio-dev \
     && add-apt-repository ppa:ubuntu-toolchain-r/test -y \
     && apt-get update && apt-get install -y --no-install-recommends \
     gcc-16 \
     g++-16 \
-    ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -44,11 +44,6 @@ RUN git clone https://github.com/skypjack/entt.git /tmp/entt \
     && cmake -S /tmp/entt -B /tmp/entt/build \
     && cmake --install /tmp/entt/build \
     && rm -rf /tmp/entt
-
-WORKDIR /opt
-RUN git clone https://github.com/emscripten-core/emsdk.git
-WORKDIR /opt/emsdk
-RUN ./emsdk install latest && ./emsdk activate latest
 
 WORKDIR /app
 

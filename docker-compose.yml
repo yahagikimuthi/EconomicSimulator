@@ -3,9 +3,11 @@ services:
   simulator-cpp:
     build:
       context: ./simulator
+    ports:
+      - "18080:18080"
     volumes:
       - ${LOCAL_WORKSPACE_FOLDER:-.}/simulator:/app
-      - ${LOCAL_WORKSPACE_FOLDER:-.}/frontend/src/wasm:/app/build_wasm/out
+      - ${LOCAL_WORKSPACE_FOLDER:-.}:/workspace:delegated
     working_dir: /app
     tty: true
     cap_add:
