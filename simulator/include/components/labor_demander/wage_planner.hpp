@@ -8,6 +8,7 @@
 
 #include "components/labor_demander/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/labor.hpp"
 
@@ -53,7 +54,7 @@ class WagePlanner final {
     explicit WagePlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{Wage{masterRng.random(setting::lastWage)}},
-          rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
+          rng_{masterRng.construct()},
           adjustVol_{masterRng.random(setting::wageAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
@@ -65,7 +66,7 @@ class WagePlanner final {
         assert(salesPerWorker.isZeroOrMore());
         const auto next = [&]() noexcept -> std::optional<Wage> {
             if (salesPerWorker <= Money{global_setting::epsilon})
-                return calcWage(Money{std::numeric_limits<double>::infinity()});
+                return calcWage(Money{std::numeric_limits<f64>::infinity()});
             return calcWage(salesPerWorker);
         }();
         memory_.clearLog();
@@ -84,7 +85,7 @@ class WagePlanner final {
         assert(not lastEmployPlan->isZero());
 
         const auto alpha     = std::abs(rng_.randNormal(0.0, adjustVol_, -1.0, 1.0));
-        const auto raiseRate = [=]() noexcept -> double {
+        const auto raiseRate = [=]() noexcept -> f64 {
             const auto excess = *lastApplicants - *lastEmployPlan;
             if (excess.isPositive()) return 1.0 - alpha;
             if (excess.isZero()) return 1.0;
@@ -96,12 +97,12 @@ class WagePlanner final {
     }
 
     [[nodiscard]] static auto wageGuard(const Wage wage) noexcept -> Wage {
-        return std::max(wage, Wage{std::numeric_limits<double>::epsilon()});
+        return std::max(wage, Wage{std::numeric_limits<f64>::epsilon()});
     }
 
     WagePlannerMemory       memory_;
     Wage                    cache_;
     mutable RandomGenerator rng_;
-    const double            adjustVol_;
+    const f64               adjustVol_;
 };
 }  // namespace abm::labor::demander::planner

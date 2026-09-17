@@ -7,56 +7,49 @@
 #include "components/common.hpp"
 #include "values/goods.hpp"
 
-namespace abm::base_goods::supplier::mediator {
+namespace abm::base_goods::supplier {
 class Mediator final {
-    using TradePlanListener  = Listener<MarkupPlannerMemory, CentralMemory>;
-    using MarkupPlanListener = Listener<CentralMemory>;
-    using TradeResultListener =
-        Listener<DemandForecastManagerMemory, MarkupPlannerMemory, ProducingSystem, CentralMemory>;
+    using PlanListener   = Listener<CentralMemory, MarkupPlannerMemory>;
+    using MarkupListener = Listener<CentralMemory>;
+    using ResultListener =
+        Listener<CentralMemory, ProducingSystem, MarkupPlannerMemory, DemandForecastManagerMemory>;
 
   public:
     explicit Mediator() noexcept = default;
 
-    template <typename T>
-    void subscribeTradePlan(T& t) noexcept {
-        tradePlanListeners_.add(t);
+    void subscribeTradePlan(IsListenerOrMono<PlanListener> auto& listener) noexcept {
+        tradePlanListeners_.add(listener);
     }
 
-    template <typename T>
-    void subscribeMarkupPlan(T& t) noexcept {
-        markupPlanListeners_.add(t);
+    void subscribeMarkupPlan(IsListenerOrMono<MarkupListener> auto& listener) noexcept {
+        markupPlanListeners_.add(listener);
     }
 
-    template <typename T>
-    void subscribeTradeResult(T& t) noexcept {
-        tradeResultListeners_.add(t);
+    void subscribeTradeResult(IsListenerOrMono<ResultListener> auto& listener) noexcept {
+        tradeResultListeners_.add(listener);
     }
 
     void publishTradePlan(const TradePlan& plan) noexcept {
-        tradePlanListeners_.notice([&](auto&& listener) noexcept -> void {
+        tradePlanListeners_.notify([&](auto& listener) noexcept -> void {
             listener.listenTradePlan(plan);
         });
     }
 
     void publishMarkupPlan(const MarkupRate markupPlan) noexcept {
-        markupPlanListeners_.notice([markupPlan](auto&& listener) noexcept -> void {
+        markupPlanListeners_.notify([markupPlan](auto& listener) noexcept -> void {
             listener.listenMarkupPlan(markupPlan);
         });
     }
 
     void publishTradeResult(const TradeResult& result) noexcept {
-        tradeResultListeners_.notice([&](auto&& listener) noexcept -> void {
+        tradeResultListeners_.notify([&](auto& listener) noexcept -> void {
             listener.listenTradeResult(result);
         });
     }
 
   private:
-    TradePlanListener   tradePlanListeners_;
-    MarkupPlanListener  markupPlanListeners_;
-    TradeResultListener tradeResultListeners_;
+    PlanListener   tradePlanListeners_;
+    MarkupListener markupPlanListeners_;
+    ResultListener tradeResultListeners_;
 };
-}  // namespace abm::base_goods::supplier::mediator
-
-namespace abm::base_goods::supplier {
-using Mediator = mediator::Mediator;
-}
+}  // namespace abm::base_goods::supplier

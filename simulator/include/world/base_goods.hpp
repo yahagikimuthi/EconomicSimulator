@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -29,7 +30,7 @@ class Workspace final {
     Workspace(Workspace&& other) noexcept              = delete;
     auto operator=(Workspace&&) noexcept -> Workspace& = delete;
 
-    void addInput(const double workerProductPower) noexcept {
+    void addInput(const f64 workerProductPower) noexcept {
         assert(workerProductPower > 0.0);
         totalInput_.fetch_add(workerProductPower);  // TODO 処理系が対応する場合store_addに変更
     }
@@ -40,7 +41,7 @@ class Workspace final {
     }
 
   private:
-    std::atomic<double> totalInput_;
+    std::atomic<f64> totalInput_;
 };
 
 class Entry;
@@ -129,7 +130,7 @@ class Market final {
         return *entries_.emplace_back(id, price, supply);
     }
 
-    auto pickEntry(const AgentID id, const int sampleCnt, RandomGenerator& rng) noexcept
+    auto pickEntry(const AgentID id, const i32 sampleCnt, RandomGenerator& rng) noexcept
         -> std::optional<Entry&> {
         if (entries_.empty()) return std::nullopt;
         if (entries_.size() == 1UZ and entries_[0].id == id) return std::nullopt;
@@ -140,7 +141,7 @@ class Market final {
         assert(
             totalSupply ==
             std::ranges::fold_left(
-                entries_ | std::views::transform([](const Entry& e) noexcept -> double {
+                entries_ | std::views::transform([](const Entry& e) noexcept -> f64 {
                     return e.supply.value();
                 }),
                 0.0,
@@ -152,7 +153,7 @@ class Market final {
             auto& sample = rng.discreteDistribution(
                 entries_,
                 totalSupply,
-                [](const Entry& e) noexcept -> double { return e.supply.value(); }
+                [](const Entry& e) noexcept -> f64 { return e.supply.value(); }
             );
             if (sample.id == id) continue;
             if (not betterEntry or sample.price < betterEntry->price) betterEntry = sample;
@@ -168,7 +169,7 @@ class Market final {
 
   private:
     tbb::concurrent_vector<Entry> entries_;
-    std::atomic<double>           totalSupply_;
+    std::atomic<f64>           totalSupply_;
 };
 }  // namespace abm::base_goods
 

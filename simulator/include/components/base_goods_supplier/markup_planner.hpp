@@ -7,6 +7,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 
@@ -52,7 +53,7 @@ class MarkupPlanner final {
     explicit MarkupPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           cache_{masterRng.random(setting::lastMarkup)},
-          rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
+          rng_{masterRng.construct()},
           adjustVol_{masterRng.random(setting::markupAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
@@ -60,7 +61,7 @@ class MarkupPlanner final {
         mediator.subscribeTradeResult(memory_);
     }
 
-    [[nodiscard]] auto plan(const double targetIvRatio) noexcept -> MarkupRate {
+    [[nodiscard]] auto plan(const f64 targetIvRatio) noexcept -> MarkupRate {
         assert(0.0 < targetIvRatio and targetIvRatio < 1.0);
 
         const auto next = calcNextMarkup(targetIvRatio);
@@ -72,7 +73,7 @@ class MarkupPlanner final {
 
   private:
     // isSold = (前期供給 - 前期売上) / 前回供給 <= 定数
-    [[nodiscard]] auto calcNextMarkup(const double targetInvRatio
+    [[nodiscard]] auto calcNextMarkup(const f64 targetInvRatio
     ) const noexcept -> std::optional<MarkupRate> {
         const auto lastSupply      = memory_.lastSupply();
         const auto lastSalesAmount = memory_.lastSalesAmount();
@@ -92,12 +93,12 @@ class MarkupPlanner final {
     }
 
     [[nodiscard]] static auto guard(const MarkupRate markup) noexcept -> MarkupRate {
-        return std::max(markup, MarkupRate{std::numeric_limits<double>::epsilon()});
+        return std::max(markup, MarkupRate{std::numeric_limits<f64>::epsilon()});
     }
 
     MarkupPlannerMemory     memory_;
     MarkupRate              cache_;
     mutable RandomGenerator rng_;
-    const double            adjustVol_;
+    const f64               adjustVol_;
 };
 }  // namespace abm::base_goods::supplier

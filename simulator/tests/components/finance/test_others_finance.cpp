@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "doctest.h"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
@@ -80,7 +81,7 @@ TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
     }
 
     SUBCASE("並列で資産の追加を行うことが可能") {
-        const auto depositArr = std::array<double, 5>{
+        const auto depositArr = std::array<f64, 5>{
             rng.rand(10.0, 1000.0),
             rng.rand(10.0, 1000.0),
             rng.rand(10.0, 1000.0),
@@ -94,7 +95,7 @@ TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
             std::execution::par,
             depositArr.begin(),
             depositArr.end(),
-            [&](double amount) -> void { finance.deposit(Money{amount}); }
+            [&](f64 amount) -> void { finance.deposit(Money{amount}); }
         );
 
         const auto before = finance.asset();
@@ -103,7 +104,7 @@ TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
     }
 
     SUBCASE("並列で資産の引き出しを行うことが可能") {
-        const auto withdrawArr = std::array<double, 5>{
+        const auto withdrawArr = std::array<f64, 5>{
             rng.rand(10.0, 100.0),
             rng.rand(10.0, 100.0),
             rng.rand(10.0, 100.0),
@@ -119,7 +120,7 @@ TEST_CASE("GovernmentFinanceのテスト") {  // NOLINT
             std::execution::par,
             withdrawArr.begin(),
             withdrawArr.end(),
-            [&](double amount) -> void { nothing(finance.tryWithdraw(Budget{amount})); }
+            [&](f64 amount) -> void { nothing(finance.tryWithdraw(Budget{amount})); }
         );
 
         const auto before = finance.asset();

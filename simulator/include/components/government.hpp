@@ -2,11 +2,11 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cstdint>
 #include <utility>
 
 #include "components/finance/others_finance.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "values/common.hpp"
 #include "values/others.hpp"
 #include "world/drop_box.hpp"
@@ -43,7 +43,7 @@ class CorporateTaxStrategy final : public FlatTaxStrategy {
         : FlatTaxStrategy::FlatTaxStrategy(TaxRate{setting::corporateTaxRate}) {}
 };
 
-enum class TaxType : std::uint8_t { Income, Sales, Corporate };
+enum class TaxType : u8 { Income, Sales, Corporate };
 
 class TaxStrategies final {
   public:
@@ -96,13 +96,13 @@ class Government final {
 
     void setBudget(CensusDropBox& dropBox) noexcept {
         const auto unemployment = std::ranges::count_if(
-            dropBox.labor.wages.get(), [](const double wage) -> bool { return wage == 0.0; }
+            dropBox.labor.wages.get(), [](const f64 wage) -> bool { return wage == 0.0; }
         );
-        const auto redCompanies = std::ranges::count_if(
-            dropBox.finance.netIncome.get(),
-            [](const double netIncome) -> bool { return netIncome <= 0.0; }
-        );
-        const auto aligned = static_cast<double>(unemployment + redCompanies);
+        const auto redCompanies =
+            std::ranges::count_if(dropBox.finance.netIncome.get(), [](const f64 netIncome) -> bool {
+                return netIncome <= 0.0;
+            });
+        const auto aligned = static_cast<f64>(unemployment + redCompanies);
         if (aligned > 0.0) providePlan_ = finance_.asset() / aligned;
     }
 

@@ -18,7 +18,7 @@ TEST_CASE("Recruiterのテスト") {  // NOLINT
     auto recruiter = Recruiter{};
     auto market    = Market{};
     auto rng       = makeRng();
-    auto out       = std::vector<Ref<Request>>{};
+    auto out       = std::vector<ref_w<Request>>{};
     auto hr        = HumanResource{AgentID{42}};
     auto space     = base_goods::Workspace{};
 

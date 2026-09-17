@@ -121,7 +121,7 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         std::pair{AgentID{202}, Wage{202}},
         std::pair{AgentID{303}, Wage{303}}
     };
-    auto out = std::vector<Ref<Request>>{};
+    auto out = std::vector<ref_w<Request>>{};
     auto rng = makeRng();
 
     SUBCASE("何もしない場合、outは空") {

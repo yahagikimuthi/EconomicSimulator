@@ -7,6 +7,7 @@
 #include "components/base_goods_supplier/common.hpp"
 #include "components/base_goods_supplier/markup_planner.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -15,9 +16,8 @@ namespace abm::base_goods::supplier {
 class PricePlanner final {
   public:
     explicit PricePlanner(RandomGenerator& masterRng) noexcept
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
-          adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
-    explicit PricePlanner(const RandomGenerator rng, const double adjustVol) noexcept
+        : rng_{masterRng.construct()}, adjustVol_{masterRng.random(setting::priceAdjustVol)} {}
+    explicit PricePlanner(const RandomGenerator rng, const f64 adjustVol) noexcept
         : rng_{rng}, adjustVol_{adjustVol} {}
 
     [[nodiscard]] auto plan(
@@ -42,11 +42,11 @@ class PricePlanner final {
     }
 
     [[nodiscard]] static auto guard(const Price price) noexcept -> Price {
-        return std::max(price, Price{std::numeric_limits<double>::epsilon()});
+        return std::max(price, Price{std::numeric_limits<f64>::epsilon()});
     }
 
     mutable RandomGenerator rng_;
-    const double            adjustVol_;
+    const f64               adjustVol_;
 };
 
 // 前回の取引結果中、需要量が必要
@@ -106,12 +106,12 @@ class DemandForecastManager final {
     }
 
     [[nodiscard]] static auto guard(const GoodsQuantity expect) noexcept -> GoodsQuantity {
-        return std::max(expect, GoodsQuantity{std::numeric_limits<double>::epsilon()});
+        return std::max(expect, GoodsQuantity{std::numeric_limits<f64>::epsilon()});
     }
 
     DemandForecastManagerMemory memory_;
     GoodsQuantity               cache_;
-    const double                adjustment_;
+    const f64                   adjustment_;
 };
 
 class TradePlanner final {
@@ -145,6 +145,6 @@ class TradePlanner final {
     MarkupPlanner         markupPlanner_;
     PricePlanner          pricePlanner_;
     DemandForecastManager demandForecast_;
-    const double          targetInvRatio_;
+    const f64             targetInvRatio_;
 };
 }  // namespace abm::base_goods::supplier

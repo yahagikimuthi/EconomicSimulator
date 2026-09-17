@@ -3,14 +3,15 @@
 #include <compare>
 
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "values/mixin.hpp"
 
 namespace abm::value_object {
-class Day final : public BaseValueObject<int>, CompareMixin<Day>, AddMixin<Day> {
+class Day final : public BaseValueObject<i32>, CompareMixin<Day>, AddMixin<Day> {
     friend struct AddMixin<Day>;
 
   public:
-    explicit constexpr Day(const int value) noexcept : BaseValueObject<int>(value) {
+    explicit constexpr Day(const i32 value) noexcept : BaseValueObject<i32>(value) {
         contract_assert(value > 0);
     }
 
@@ -20,11 +21,11 @@ class Day final : public BaseValueObject<int>, CompareMixin<Day>, AddMixin<Day> 
     }
 };
 
-class Month final : public BaseValueObject<int>, CompareMixin<Month>, AddMixin<Month> {
+class Month final : public BaseValueObject<i32>, CompareMixin<Month>, AddMixin<Month> {
     friend struct AddMixin<Month>;
 
   public:
-    explicit constexpr Month(const int value) noexcept : BaseValueObject<int>(value) {
+    explicit constexpr Month(const i32 value) noexcept : BaseValueObject<i32>(value) {
         contract_assert(value > 0);
     }
 
@@ -34,11 +35,11 @@ class Month final : public BaseValueObject<int>, CompareMixin<Month>, AddMixin<M
     }
 };
 
-class Year final : public BaseValueObject<int>, CompareMixin<Year>, AddMixin<Year> {
+class Year final : public BaseValueObject<i32>, CompareMixin<Year>, AddMixin<Year> {
     friend struct AddMixin<Year>;
 
   public:
-    explicit constexpr Year(const int value) noexcept : BaseValueObject<int>(value) {
+    explicit constexpr Year(const i32 value) noexcept : BaseValueObject<i32>(value) {
         contract_assert(value > 0);
     }
 
@@ -50,24 +51,24 @@ class Year final : public BaseValueObject<int>, CompareMixin<Year>, AddMixin<Yea
 
 class Date final {
     struct Normalized final {
-        const int year;
-        const int month;
-        const int day;
+        const i32 year;
+        const i32 month;
+        const i32 day;
     };
 
   public:
-    explicit constexpr Date(const int day) noexcept
+    explicit constexpr Date(const i32 day) noexcept
         : Date([day]() constexpr noexcept -> Normalized {
               contract_assert(day > 0);
 
               using namespace global_setting;
               constexpr auto dayInYear = dayInMonth * monthInYear;
 
-              const int dayIdx          = day - 1;
-              const int normalizedYear  = (dayIdx / dayInYear) + 1;
-              const int remainder       = dayIdx % dayInYear;
-              const int normalizedMonth = (remainder / dayInMonth) + 1;
-              const int normalizedDay   = (remainder % dayInMonth) + 1;
+              const i32 dayIdx          = day - 1;
+              const i32 normalizedYear  = (dayIdx / dayInYear) + 1;
+              const i32 remainder       = dayIdx % dayInYear;
+              const i32 normalizedMonth = (remainder / dayInMonth) + 1;
+              const i32 normalizedDay   = (remainder % dayInMonth) + 1;
 
               return {.year = normalizedYear, .month = normalizedMonth, .day = normalizedDay};
           }()) {}

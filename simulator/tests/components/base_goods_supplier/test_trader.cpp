@@ -1,6 +1,7 @@
 #include "components/base_goods_supplier/trader.hpp"
 
 #include "doctest.h"
+#include "others/type.hpp"
 #include "tests/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -66,7 +67,7 @@ TEST_CASE("Traderのテスト") {  // NOLINT
             CHECK(result.sales.isZero());
         }
 
-        constexpr auto calcPayment = [price](double amount) constexpr noexcept -> Money {
+        constexpr auto calcPayment = [price](f64 amount) constexpr noexcept -> Money {
             return price * GoodsQuantity{amount};
         };
 

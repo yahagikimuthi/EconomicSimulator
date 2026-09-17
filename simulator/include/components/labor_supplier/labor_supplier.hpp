@@ -7,6 +7,7 @@
 #include "components/labor_supplier/employment.hpp"
 #include "components/labor_supplier/job_hunter.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "world/drop_box.hpp"
 #include "world/labor.hpp"
@@ -15,14 +16,14 @@ namespace abm::labor::supplier {
 class LikelihoodChangingJob final {
   public:
     explicit LikelihoodChangingJob(RandomGenerator& masterRng) noexcept
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
+        : rng_{masterRng.construct()},
           threshold_{masterRng.random(setting::changingJobThreshold)} {}
 
     auto shouldChangingJobs() const noexcept -> bool { return threshold_ < rng_.rand(); }
 
   private:
     mutable RandomGenerator rng_;
-    const double            threshold_;
+    const f64               threshold_;
 };
 }  // namespace abm::labor::supplier
 

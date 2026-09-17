@@ -2,11 +2,12 @@
 
 #include <cassert>
 
+#include "others/type.hpp"
 #include "values/common.hpp"
 #include "values/mixin.hpp"
 
 namespace abm::value_object {
-class TaxRate final : public BaseValueObject<double>,
+class TaxRate final : public BaseValueObject<f64>,
                       CompareMixin<TaxRate>,
                       AddMixin<TaxRate>,
                       ScholarMixin<TaxRate>,
@@ -15,7 +16,7 @@ class TaxRate final : public BaseValueObject<double>,
     friend struct ScholarMixin<TaxRate>;
 
   public:
-    explicit constexpr TaxRate(const double value) noexcept : BaseValueObject<double>(value) {
+    explicit constexpr TaxRate(const f64 value) noexcept : BaseValueObject<f64>(value) {
         assert(0.0 <= value and value <= 1.0);
     }
 };

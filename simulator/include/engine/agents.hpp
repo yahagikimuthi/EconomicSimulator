@@ -19,7 +19,7 @@ struct Agent {
     explicit Agent() noexcept = default;
 
   private:
-    static inline constinit int agentCnt_{};
+    static inline constinit i32 agentCnt_{};
 };
 
 struct CapitalFirm final : Agent {

@@ -41,9 +41,7 @@ class Memory final {
     [[nodiscard]] auto log() const noexcept -> std::optional<T> { return log_; }
 
     void reset() noexcept {
-        if (not next_) return;
-        log_ = next_;
-        next_.reset();
+        if (next_) log_ = std::exchange(next_, std::nullopt);
     }
     void clearLog() noexcept { log_.reset(); }
     void next(const T next) noexcept { next_ = next; }
@@ -83,12 +81,12 @@ class CentralMemory final {
     std::optional<Wage>      wagePlan_{std::nullopt};
 };
 
-template <typename T, typename U = std::monostate>
+template <typename T>
 concept IMediator =
-    requires(T t, U& u, HeadCount employPlan, RecruitPlan plan, RecruitResult result) {
-        { t.publishRecruitPlan(plan) } -> std::same_as<void>;
-        { t.publishRecruitResult(result) } -> std::same_as<void>;
-        { t.subscribeRecruitPlan(u) } -> std::same_as<void>;
-        { t.subscribeRecruitResult(u) } -> std::same_as<void>;
+    requires(T mediator, std::monostate listener, RecruitPlan plan, RecruitResult result) {
+        { mediator.subscribeRecruitPlan(listener) } noexcept -> std::same_as<void>;
+        { mediator.subscribeRecruitResult(listener) } noexcept -> std::same_as<void>;
+        { mediator.publishRecruitPlan(plan) } noexcept -> std::same_as<void>;
+        { mediator.publishRecruitResult(result) } noexcept -> std::same_as<void>;
     };
 }  // namespace abm::labor::demander

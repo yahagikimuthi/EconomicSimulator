@@ -1,7 +1,5 @@
 FROM ubuntu:24.04
 
-WORKDIR /app
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 # 1. 基本ツールと PPA から GCC 16 を導入
@@ -26,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get update && apt-get install -y --no-install-recommends \
     gcc-16 \
     g++-16 \
+    ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -45,3 +44,12 @@ RUN git clone https://github.com/skypjack/entt.git /tmp/entt \
     && cmake -S /tmp/entt -B /tmp/entt/build \
     && cmake --install /tmp/entt/build \
     && rm -rf /tmp/entt
+
+WORKDIR /opt
+RUN git clone https://github.com/emscripten-core/emsdk.git
+WORKDIR /opt/emsdk
+RUN ./emsdk install latest && ./emsdk activate latest
+
+WORKDIR /app
+
+CMD ["tail", "-f", "/dev/null"]

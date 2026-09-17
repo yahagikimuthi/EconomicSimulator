@@ -6,6 +6,7 @@
 
 #include "components/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -21,7 +22,7 @@ struct Log final {
 class CapitalDemander final {
   public:
     explicit CapitalDemander(RandomGenerator& masterRng) noexcept
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}},
+        : rng_{masterRng.construct()},
           log_{
               .purchase    = Money{masterRng.random(setting::lastPurchase)},
               .tradeAmount = GoodsQuantity{masterRng.random(setting::lastTradeAmount)}
@@ -48,7 +49,7 @@ class CapitalDemander final {
         const AgentID id,
         F&&           withdrawFn,
         Market&       market,
-        const int     sampleCnt = setting::goodsSampleCnt
+        const i32     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         assert(budget_);
         assert(purchaseAmountPlan_);

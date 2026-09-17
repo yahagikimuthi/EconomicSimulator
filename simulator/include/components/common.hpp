@@ -5,6 +5,7 @@
 #include <optional>
 #include <tuple>
 #include <type_traits>
+#include <variant>
 
 #include "values/common.hpp"
 #include "values/goods.hpp"
@@ -29,6 +30,11 @@ template <typename F>
 concept AddGoodsFn = requires(F f, GoodsQuantity goods) {
     { f(goods) } -> std::same_as<void>;
 };
+}  // namespace abm
+
+namespace abm::listener {
+
+
 
 template <typename... Ts>
     requires(sizeof...(Ts) > 0UZ)
@@ -45,7 +51,7 @@ class Listener final {
 
     template <typename F>
         requires(std::is_invocable_v<F, Ts&> and ...)
-    void notice(F&& methodCaller) noexcept {
+    void notify(F&& methodCaller) noexcept {
         auto callFunc = [&](auto& listener) noexcept -> void {
             if (listener) methodCaller(*listener);
         };
@@ -57,4 +63,22 @@ class Listener final {
   private:
     std::tuple<std::optional<Ts&>...> listeners_{};
 };
+
+template <typename T, typename Listener>
+struct IsListenerImpl : std::false_type {};
+
+template <typename T, typename... Ts>
+struct IsListenerImpl<T, Listener<Ts...>> : std::bool_constant<(std::same_as<T, Ts> or ...)> {};
+
+template <typename T, typename Listener>
+concept IsListenerOrMonostate =
+    IsListenerImpl<T, Listener>::value or std::same_as<T, std::monostate>;
+}  // namespace abm::listener
+
+namespace abm {
+template <typename... Ts>
+using Listener = listener::Listener<Ts...>;
+
+template <typename T, typename Listener>
+concept IsListenerOrMono = listener::IsListenerOrMonostate<T, Listener>;
 }  // namespace abm

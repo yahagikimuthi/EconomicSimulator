@@ -8,6 +8,7 @@
 
 #include "components/labor_demander/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/labor.hpp"
 #include "values/math.hpp"
@@ -50,7 +51,7 @@ class OfferPlanner final {
     explicit OfferPlanner(RandomGenerator& masterRng) noexcept
         : memory_{masterRng},
           rateCache_{OfferRate{masterRng.random(setting::offerRate)}},
-          rng_{pcg32{masterRng.makeUint64(), masterRng.makeUint64()}},
+          rng_{masterRng.construct()},
           adjustVol_{masterRng.random(setting::offerRateAdjustVol)} {}
 
     void acceptMediator(IMediator auto& mediator) noexcept {
@@ -96,9 +97,7 @@ class OfferPlanner final {
         }();
         const auto next    = rateCache_ + add;
         const auto guarded = std::clamp(
-            next,
-            OfferRate{std::numeric_limits<double>::epsilon()},
-            OfferRate{laborSupplier.value()}
+            next, OfferRate{std::numeric_limits<f64>::epsilon()}, OfferRate{laborSupplier.value()}
         );
         return guarded;
     }
@@ -106,6 +105,6 @@ class OfferPlanner final {
     OfferPlannerMemory      memory_;
     OfferRate               rateCache_;
     mutable RandomGenerator rng_;
-    const double            adjustVol_;
+    const f64               adjustVol_;
 };
 }  // namespace abm::labor::demander::planner

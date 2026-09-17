@@ -6,6 +6,7 @@
 
 #include "components/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "world/base_goods.hpp"
@@ -13,8 +14,7 @@
 namespace abm::goods::demander {
 class Trader final {
   public:
-    explicit Trader(RandomGenerator& masterRng)
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+    explicit Trader(RandomGenerator& masterRng) : rng_{masterRng.construct()} {}
 
     template <TryWithdrawFn F>
     void request(
@@ -22,7 +22,7 @@ class Trader final {
         const Budget  budget,
         F&&           withdrawFn,
         Market&       market,
-        const int     sampleCnt = setting::goodsSampleCnt
+        const i32     sampleCnt = setting::goodsSampleCnt
     ) noexcept {
         auto pickedEntry = market.pickEntry(id, sampleCnt, rng_);
         if (not pickedEntry) return;
@@ -75,7 +75,7 @@ class GoodsDemander final {
 
   private:
     Trader                trader_;
-    const double          mpc_;
+    const f64             mpc_;
     std::optional<Budget> budget_{std::nullopt};
 };
 }  // namespace abm::goods::demander

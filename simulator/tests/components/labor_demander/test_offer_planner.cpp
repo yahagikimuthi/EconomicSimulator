@@ -5,6 +5,7 @@
 #include "components/labor_demander/common.hpp"
 #include "components/labor_demander/mediator.hpp"
 #include "doctest.h"
+#include "others/type.hpp"
 #include "tests/util.hpp"
 #include "values/labor.hpp"
 
@@ -54,7 +55,7 @@ TEST_CASE("OfferPlannerのテスト") {  // NOLINT
     auto planner  = OfferPlanner{rng};
     auto mediator = Mediator{};
     planner.acceptMediator(mediator);
-    constexpr auto laborSupplier = HeadCount{std::numeric_limits<double>::infinity()};
+    constexpr auto laborSupplier = HeadCount{std::numeric_limits<f64>::infinity()};
 
     SUBCASE("mediateしない場合、2回目と1回目のオファー数が同じであること") {
         constexpr auto employ = HeadCount{10.0};

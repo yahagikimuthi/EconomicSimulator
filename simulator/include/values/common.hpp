@@ -1,11 +1,12 @@
 #pragma once
 
+#include "others/type.hpp"
 #include "values/mixin.hpp"
 
 namespace abm::value_object {
 class Wage;
 class Budget;
-class Money final : public BaseValueObject<double>,
+class Money final : public BaseValueObject<f64>,
                     CompareMixin<Money>,
                     AddMixin<Money>,
                     ScholarMixin<Money>,
@@ -14,13 +15,13 @@ class Money final : public BaseValueObject<double>,
     friend struct ScholarMixin<Money>;
 
   public:
-    explicit constexpr Money(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr Money(const f64 value) noexcept : BaseValueObject<f64>(value) {}
 
     explicit constexpr operator Wage() const noexcept;
     explicit constexpr operator Budget() const noexcept;
 };
 
-class Budget final : public BaseValueObject<double>,
+class Budget final : public BaseValueObject<f64>,
                      CompareMixin<Budget>,
                      AddMixin<Budget>,
                      ScholarMixin<Budget>,
@@ -29,16 +30,16 @@ class Budget final : public BaseValueObject<double>,
     friend struct ScholarMixin<Budget>;
 
   public:
-    explicit constexpr Budget(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr Budget(const f64 value) noexcept : BaseValueObject<f64>(value) {}
 
     operator Money() const noexcept = delete("予算とお金は別物！取引には使えない！");
 };
 
 constexpr Money::operator Budget() const noexcept { return Budget{value_}; }
 
-class AgentID final : public BaseValueObject<int>, public CompareMixin<AgentID> {
+class AgentID final : public BaseValueObject<i32>, public CompareMixin<AgentID> {
   public:
-    explicit constexpr AgentID(const int value) noexcept : BaseValueObject<int>(value) {}
+    explicit constexpr AgentID(const i32 value) noexcept : BaseValueObject<i32>(value) {}
 };
 }  // namespace abm::value_object
 

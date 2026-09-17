@@ -1,13 +1,11 @@
 #pragma once
 
-#include <cstdint>
 #include <limits>
-#include <string_view>
 #include <variant>
 
-namespace abm {
-using namespace std::string_view_literals;
+#include "others/type.hpp"
 
+namespace abm {
 template <typename T>
 struct UniformParameter final {
     const T min;
@@ -15,27 +13,28 @@ struct UniformParameter final {
 };
 
 struct NormalParameter final {
-    const double mean{0.0};
-    const double dev{1.0};
-    const double min{-std::numeric_limits<double>::infinity()};
-    const double max{std::numeric_limits<double>::infinity()};
+    const f64 mean{0.0};
+    const f64 dev{1.0};
+    const f64 min{-std::numeric_limits<f64>::infinity()};
+    const f64 max{std::numeric_limits<f64>::infinity()};
 };
 
-using RandomParameter =
-    std::variant<UniformParameter<int>, UniformParameter<double>, NormalParameter>;
+using RandomParameter = std::variant<UniformParameter<i32>, UniformParameter<f64>, NormalParameter>;
+
+struct PCG32Seed final {
+    const u64 state;
+    const u64 stream;
+};
 }  // namespace abm
 
 namespace abm::global_setting {
 inline constexpr auto useRuntimeRandomSeed = false;
-inline constexpr auto fixedSeedState       = std::uint64_t{0x853c49e6748fea9bULL};
-inline constexpr auto fixedSeedStream      = std::uint64_t{0xda3e39cb94b95bdbULL};
+inline constexpr auto fixedSeedState       = u64{0x853c49e6748fea9bULL};
+inline constexpr auto fixedSeedStream      = u64{0xda3e39cb94b95bdbULL};
 
 inline constexpr auto dayInMonth  = 30;
 inline constexpr auto monthInYear = 12;
 inline constexpr auto epsilon     = 1e-9;
-
-inline constexpr auto simulationResultOutputPath = "../outputs/result.h5"sv;
-inline constexpr auto metricDataOutputPath       = "../outputs/metrics.h5"sv;
 }  // namespace abm::global_setting
 
 namespace abm::global_setting::agent_count {
@@ -43,20 +42,6 @@ inline constexpr auto goodsFirm   = 2;
 inline constexpr auto capitalFirm = 10;
 inline constexpr auto hhold       = 100;
 }  // namespace abm::global_setting::agent_count
-
-namespace abm::global_setting::save_name {
-inline constexpr auto firmAssets        = "firmAssets"sv;
-inline constexpr auto postedEmployments = "postedEmployments"sv;
-inline constexpr auto postedWages       = "postedWages"sv;
-inline constexpr auto employments       = "employments"sv;
-inline constexpr auto sumWages          = "sumWages"sv;
-inline constexpr auto prices            = "prices"sv;
-inline constexpr auto supplies          = "supplies"sv;
-inline constexpr auto markups           = "markups"sv;
-inline constexpr auto inventories       = "inventories"sv;
-inline constexpr auto householdAssets   = "householdAssets"sv;
-inline constexpr auto wages             = "wages"sv;
-}  // namespace abm::global_setting::save_name
 
 namespace abm::labor::demander::setting {
 inline constexpr RandomParameter lastApplicants     = UniformParameter{.min = 10, .limit = 20};
@@ -117,3 +102,11 @@ inline constexpr RandomParameter firmInitialAsset = UniformParameter{.min = 100.
 inline constexpr RandomParameter hholdInitialAsset = UniformParameter{.min = 10.0, .limit = 100.0};
 inline constexpr RandomParameter cashRatio         = UniformParameter{.min = 0.1, .limit = 1.0};
 }  // namespace abm::finance::setting
+
+namespace abm::config {
+struct Config final {
+    const int capitalFirm{5};
+    const int goodsFirm{2};
+    const int hhold{10};
+};
+};  // namespace abm::config

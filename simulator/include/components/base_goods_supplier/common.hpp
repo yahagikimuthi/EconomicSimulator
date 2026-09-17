@@ -32,8 +32,7 @@ class Memory final {
     [[nodiscard]] auto wasSetNext() const noexcept -> bool { return next_.has_value(); }
 
     void reset() noexcept {
-        if (not next_) return;
-        log_ = std::exchange(next_, std::nullopt);
+        if (next_) log_ = std::exchange(next_, std::nullopt);
     }
     void clearLog() noexcept { log_.reset(); }
     void next(const T next) noexcept { next_ = next; }
@@ -54,9 +53,9 @@ class CentralMemory final {
         supplyPlan_ = plan.supply;
     }
 
-    void listenMarkupPlan(const MarkupRate markup) noexcept {
-        assert(markup.isPositive());
-        markupPlan_ = markup;
+    void listenMarkupPlan(const MarkupRate rate) noexcept {
+        assert(rate.isPositive());
+        markupPlan_ = rate;
     }
 
     void listenTradeResult(const TradeResult& result) noexcept {
@@ -81,14 +80,15 @@ class CentralMemory final {
     Money                        lastSales_{0.0};
 };
 
-template <typename T, typename U = std::monostate>
-concept IMediator =
-    requires(T t, U u, const TradePlan& plan, MarkupRate markupPlan, const TradeResult& result) {
-        { t.publishTradePlan(plan) } -> std::same_as<void>;
-        { t.publishMarkupPlan(markupPlan) } -> std::same_as<void>;
-        { t.publishTradeResult(result) } -> std::same_as<void>;
-        { t.subscribeTradePlan(u) } -> std::same_as<void>;
-        { t.subscribeMarkupPlan(u) } -> std::same_as<void>;
-        { t.subscribeTradeResult(u) } -> std::same_as<void>;
-    };
+template <typename T>
+concept IMediator = requires(
+    T mediator, std::monostate listener, TradePlan plan, TradeResult result, MarkupRate markup
+) {
+    { mediator.subscribeTradePlan(listener) } noexcept -> std::same_as<void>;
+    { mediator.subscribeMarkupPlan(listener) } noexcept -> std::same_as<void>;
+    { mediator.subscribeTradeResult(listener) } noexcept -> std::same_as<void>;
+    { mediator.publishTradePlan(plan) } noexcept -> std::same_as<void>;
+    { mediator.publishMarkupPlan(markup) } noexcept -> std::same_as<void>;
+    { mediator.publishTradeResult(result) } noexcept -> std::same_as<void>;
+};
 }  // namespace abm::base_goods::supplier

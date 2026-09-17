@@ -3,11 +3,11 @@
 #include <algorithm>
 #include <cassert>
 #include <concepts>
-#include <cstdint>
 #include <utility>
 
 #include "components/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "world/deposit.hpp"
@@ -26,7 +26,7 @@ class FirmFinance final {
           cash_{masterRng.random(setting::firmInitialAsset)},
           cashRatio_{masterRng.random(setting::cashRatio)} {}
 
-    enum class AccountItem : std::uint8_t { Sales, PersonalCost, CapitalGoodsCost };
+    enum class AccountItem : u8 { Sales, PersonalCost, CapitalGoodsCost };
 
     [[nodiscard]] auto makeWithdrawFn() noexcept -> TryWithdrawFn auto {
         return [&] [[nodiscard]] (const Budget withdraw) noexcept -> Money {
@@ -89,7 +89,7 @@ class FirmFinance final {
 
     template <PayTaxFn F1, SubsidyFn F2>
     void finalizeAccounts(F1&& payCorporateTaxFn, F2&& subsidyFn) noexcept {
-        auto _ = makeScopeExit([&]() noexcept -> void { netIncomeBeforeTax_ = Money{0.0}; });
+        auto _ = scopeExit([&]() noexcept -> void { netIncomeBeforeTax_ = Money{0.0}; });
 
         if (netIncomeBeforeTax_.isZero()) return;
         if (netIncomeBeforeTax_.isPositive()) {
@@ -103,15 +103,15 @@ class FirmFinance final {
     }
 
   private:
-    [[nodiscard]] auto currentCashRatio() const noexcept -> double {
+    [[nodiscard]] auto currentCashRatio() const noexcept -> f64 {
         if (asset().isZero()) return 0.0;
         return static_cast<Budget>(cash_) / asset();
     }
 
-    BankAccount  bankAccount_;
-    Money        cash_;
-    Money        netIncomeBeforeTax_{0.0};
-    const double cashRatio_;
+    BankAccount bankAccount_;
+    Money       cash_;
+    Money       netIncomeBeforeTax_{0.0};
+    const f64   cashRatio_;
 };
 }  // namespace abm::finance
 

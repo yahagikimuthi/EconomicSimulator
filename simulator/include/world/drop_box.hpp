@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "others/setting.hpp"
+#include "others/type.hpp"
 
 namespace abm::drop_box {
 // 並列化する場合、tbb::concurrent_vectorにしなければならない
@@ -19,14 +20,14 @@ class Vec final {
 
     void clear() noexcept { vec_.clear(); }
 
-    void add(const double add) noexcept {
+    void add(const f64 add) noexcept {
         assert(not std::isnan(add));
         vec_.emplace_back(add);
     }
 
     template <typename T>
         requires requires(T t) {
-            { t.value() } -> std::same_as<double>;
+            { t.value() } -> std::same_as<f64>;
         }
     void add(const T add) noexcept {
         assert(not std::isnan(add.value()));
@@ -35,10 +36,10 @@ class Vec final {
 
     void reserve(const std::size_t n) noexcept { vec_.reserve(n); }
 
-    [[nodiscard]] auto get() const noexcept -> const std::vector<double>& { return vec_; }
+    [[nodiscard]] auto get() const noexcept -> const std::vector<f64>& { return vec_; }
 
   private:
-    std::vector<double> vec_;
+    std::vector<f64> vec_;
 };
 
 struct FinanceDropBox final {

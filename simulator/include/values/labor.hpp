@@ -2,11 +2,12 @@
 
 #include <cassert>
 
+#include "others/type.hpp"
 #include "values/common.hpp"
 #include "values/mixin.hpp"
 
 namespace abm::value_object {
-class Wage final : public BaseValueObject<double>,
+class Wage final : public BaseValueObject<f64>,
                    CompareMixin<Wage>,
                    AddMixin<Wage>,
                    ScholarMixin<Wage>,
@@ -15,14 +16,14 @@ class Wage final : public BaseValueObject<double>,
     friend struct ScholarMixin<Wage>;
 
   public:
-    explicit constexpr Wage(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr Wage(const f64 value) noexcept : BaseValueObject<f64>(value) {}
     explicit constexpr operator Money() const noexcept { return Money{value_}; }
     explicit constexpr operator Budget() const noexcept { return Budget{value_}; }
 };
 
 constexpr Money::operator Wage() const noexcept { return Wage{value_}; }
 
-class HeadCount final : public BaseValueObject<double>,
+class HeadCount final : public BaseValueObject<f64>,
                         CompareMixin<HeadCount>,
                         AddMixin<HeadCount>,
                         ScholarMixin<HeadCount>,
@@ -31,11 +32,11 @@ class HeadCount final : public BaseValueObject<double>,
     friend struct ScholarMixin<HeadCount>;
 
   public:
-    explicit constexpr HeadCount(const double value) noexcept : BaseValueObject<double>(value) {}
-    explicit constexpr HeadCount(const int value) noexcept
-        : BaseValueObject<double>(static_cast<double>(value)) {}
+    explicit constexpr HeadCount(const f64 value) noexcept : BaseValueObject<f64>(value) {}
+    explicit constexpr HeadCount(const i32 value) noexcept
+        : BaseValueObject<f64>(static_cast<f64>(value)) {}
     explicit constexpr HeadCount(const std::size_t value) noexcept
-        : BaseValueObject<double>(static_cast<double>(value)) {}
+        : BaseValueObject<f64>(static_cast<f64>(value)) {}
 
     constexpr auto operator++() noexcept -> HeadCount& {
         ++value_;
@@ -61,7 +62,7 @@ class HeadCount final : public BaseValueObject<double>,
     return Wage{lhs.value() / rhs.value()};
 }
 
-class OfferRate final : public BaseValueObject<double>,
+class OfferRate final : public BaseValueObject<f64>,
                         public CompareMixin<OfferRate>,
                         AddMixin<OfferRate>,
                         ScholarMixin<OfferRate>,
@@ -70,7 +71,7 @@ class OfferRate final : public BaseValueObject<double>,
     friend struct ScholarMixin<OfferRate>;
 
   public:
-    explicit constexpr OfferRate(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr OfferRate(const f64 value) noexcept : BaseValueObject<f64>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(HeadCount lhs, OfferRate rhs) noexcept -> HeadCount {

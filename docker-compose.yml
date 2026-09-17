@@ -5,8 +5,13 @@ services:
       context: ./simulator
     volumes:
       - ${LOCAL_WORKSPACE_FOLDER:-.}/simulator:/app
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/frontend/src/wasm:/app/build_wasm/out
     working_dir: /app
     tty: true
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
 
   # フロントエンド
   frontend:

@@ -10,6 +10,7 @@
 
 #include "components/labor_supplier/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "world/labor.hpp"
 
@@ -29,21 +30,20 @@ class MyEntries final {
     void clear() noexcept { entries_.clear(); }
 
   private:
-    std::vector<Ref<Entry>> entries_;
+    std::vector<ref_w<Entry>> entries_;
 };
 
 class JobHunter final {
   public:
-    explicit JobHunter(RandomGenerator& masterRng) noexcept
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+    explicit JobHunter(RandomGenerator& masterRng) noexcept : rng_{masterRng.construct()} {}
 
     void entry(
         const AgentID           id,
         IsAlignedFn auto&&      isAligned,
         MakeEntrySheetFn auto&& makeEntrySheet,
         Market&                 market,
-        const int               sampleCnt = setting::jobSampleCnt,
-        const int               entryCnt  = setting::jobEntryCnt
+        const i32               sampleCnt = setting::jobSampleCnt,
+        const i32               entryCnt  = setting::jobEntryCnt
     ) noexcept {
         auto alignedRequests = pickAndSortJobs(id, sampleCnt, entryCnt, market) |
                                std::views::filter([&](const Request& req) noexcept -> bool {
@@ -68,22 +68,22 @@ class JobHunter final {
 
   private:
     [[nodiscard]] auto pickAndSortJobs(
-        const AgentID id, const int sampleCnt, const int entryCnt, Market& market
-    ) noexcept -> std::span<Ref<Request>> {
-        static thread_local auto sampleRequest = std::vector<Ref<Request>>{};
+        const AgentID id, const i32 sampleCnt, const i32 entryCnt, Market& market
+    ) noexcept -> std::span<ref_w<Request>> {
+        static thread_local auto sampleRequest = std::vector<ref_w<Request>>{};
         sampleRequest.clear();
         market.pickRequest(id, sampleRequest, sampleCnt, rng_);
         sortSample(sampleRequest, entryCnt);
         return sampleRequest;
     }
 
-    static void sortSample(std::span<Ref<Request>> sortRequests, const int entryCnt) noexcept {
-        const auto k = std::min(entryCnt, static_cast<int>(sortRequests.size()));
+    static void sortSample(std::span<ref_w<Request>> sortRequests, const i32 entryCnt) noexcept {
+        const auto k = std::min(entryCnt, static_cast<i32>(sortRequests.size()));
         std::ranges::partial_sort(
             sortRequests,
             sortRequests.begin() + k,
             std::ranges::greater{},
-            [](const Ref<Request> requestRef) noexcept -> Wage { return requestRef.get().wage; }
+            [](const ref_w<Request> requestRef) noexcept -> Wage { return requestRef.get().wage; }
         );
     }
 

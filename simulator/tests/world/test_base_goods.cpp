@@ -1,3 +1,4 @@
+#include "others/type.hpp"
 #include "world/base_goods.hpp"
 
 #include <limits>
@@ -165,17 +166,17 @@ TEST_CASE("Marketのテスト") {  // NOLINT
         nothing(market.entry(
             AgentID{rng.randInt(1, 1000)},
             Price{rng.rand(1, 1000)},
-            GoodsQuantity{std::numeric_limits<double>::epsilon()}
+            GoodsQuantity{std::numeric_limits<f64>::epsilon()}
         ));
         nothing(market.entry(
             AgentID{rng.randInt(1, 1000)},
             Price{rng.rand(1, 1000)},
-            GoodsQuantity{std::numeric_limits<double>::epsilon()}
+            GoodsQuantity{std::numeric_limits<f64>::epsilon()}
         ));
         const auto& targetEntry = market.entry(
             AgentID{rng.randInt(1, 1000)},
             Price{rng.rand(1, 1000)},
-            GoodsQuantity{std::numeric_limits<double>::max()}
+            GoodsQuantity{std::numeric_limits<f64>::max()}
         );
 
         const auto entry = market.pickEntry(AgentID{-1}, 3, rng);

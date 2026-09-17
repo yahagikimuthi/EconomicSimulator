@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <cassert>
 #include <concepts>
-#include <cstdint>
 #include <functional>
 #include <iterator>
 #include <limits>
@@ -14,6 +13,7 @@
 #include <utility>
 
 #include "others/setting.hpp"
+#include "others/type.hpp"
 
 namespace abm {
 template <typename... Ts>
@@ -22,70 +22,83 @@ struct Overloaded final : Ts... {
 };
 
 template <typename T>
-using Ref = std::reference_wrapper<T>;
+using ref_w = std::reference_wrapper<T>;
 
 constexpr void nothing([[maybe_unused]] auto&&... _) noexcept {}
 
 template <typename T>
 concept Numeric = std::is_floating_point_v<T> or std::is_integral_v<T>;
 
-template <typename F>
-    requires std::is_invocable_v<F>
-class ScopeExit final {
+template <std::invocable<> F>
+class scopeExit_t final {
   public:
-    explicit ScopeExit(F f) noexcept : f_{std::move(f)} {}
-    ScopeExit(const ScopeExit&) noexcept                    = default;
-    ScopeExit(ScopeExit&&) noexcept                         = default;
-    auto operator=(const ScopeExit&) noexcept -> ScopeExit& = default;
-    auto operator=(ScopeExit&&) noexcept -> ScopeExit&      = default;
-    ~ScopeExit() noexcept { std::invoke(f_); }
+    [[nodiscard("RAIIオブジェクトであるため代入してください")]] explicit constexpr scopeExit_t(F f
+    ) noexcept
+        : f_{std::move(f)} {}
+    scopeExit_t(const scopeExit_t&) noexcept                    = default;
+    scopeExit_t(scopeExit_t&&) noexcept                         = default;
+    auto operator=(const scopeExit_t&) noexcept -> scopeExit_t& = default;
+    auto operator=(scopeExit_t&&) noexcept -> scopeExit_t&      = default;
+    ~scopeExit_t() noexcept { std::invoke(f_); }
 
   private:
     F f_;
 };
 
-template <typename F>
-    requires std::is_invocable_v<F>
-[[nodiscard]] auto makeScopeExit(F&& f) noexcept -> ScopeExit<F> {
-    return ScopeExit<F>{std::forward<F>(f)};
+template <std::invocable<> F>
+[[nodiscard("RAIIオブジェクトであるため代入してください")]] [[gnu::always_inline]] constexpr auto
+scopeExit(F&& f) noexcept -> scopeExit_t<F> {
+    return scopeExit_t{std::forward<F>(f)};
 }
 
-struct PCG32Seed final {
-    const std::uint64_t state;
-    const std::uint64_t stream;
-};
+template <typename G>
+    requires requires(G rng) {
+        { rng() } -> std::convertible_to<u64>;
+    }
+[[nodiscard]] auto makeUint64(G&& rng) noexcept {
+    return (static_cast<u64>(std::forward<G>(rng)()) << 32) | std::forward<G>(rng)();
+}
+
+namespace engine {
+class Engine;
+}
 
 class RandomGenerator final {
-  public:
-    explicit RandomGenerator(const pcg32 rng) noexcept : rng_{rng} {}
+    friend class engine::Engine;
+    friend inline auto makeRng() noexcept -> RandomGenerator;
 
-    [[nodiscard]] auto rand(const double min = 0.0, const double limit = 1.0) noexcept -> double {
-        auto dist = std::uniform_real_distribution<double>{min, limit};
+  public:
+    [[nodiscard]] auto construct() noexcept -> RandomGenerator {
+        return RandomGenerator{makeUint64(this->rng_), makeUint64(this->rng_)};
+    }
+
+    [[nodiscard]] auto rand(const f64 min = 0.0, const f64 limit = 1.0) noexcept -> f64 {
+        auto dist = std::uniform_real_distribution<f64>{min, limit};
         return dist(rng_);
     }
 
-    [[nodiscard]] auto randInt(const int min, const int max) noexcept -> int {
-        auto dist = std::uniform_int_distribution<int>{min, max};
+    [[nodiscard]] auto randInt(const i32 min, const i32 max) noexcept -> i32 {
+        auto dist = std::uniform_int_distribution<i32>{min, max};
         return dist(rng_);
     }
 
     [[nodiscard]] auto randNormal(
-        const double mean = 0.0,
-        const double div  = 1.0,
-        const double min  = -std::numeric_limits<double>::infinity(),
-        const double max  = std::numeric_limits<double>::infinity()
-    ) noexcept -> double {
-        auto       dist = std::normal_distribution<double>{mean, div};
+        const f64 mean = 0.0,
+        const f64 div  = 1.0,
+        const f64 min  = -std::numeric_limits<f64>::infinity(),
+        const f64 max  = std::numeric_limits<f64>::infinity()
+    ) noexcept -> f64 {
+        auto       dist = std::normal_distribution<f64>{mean, div};
         const auto out  = dist(rng_);
         return std::clamp(out, min, max);
     }
 
     template <std::ranges::input_range Range, typename Proj = std::identity>
         requires requires(Range container, Proj proj) {
-            { std::invoke(proj, *container.begin()) } -> std::same_as<double>;
+            { std::invoke(proj, *container.begin()) } -> std::same_as<f64>;
         }
     [[nodiscard]] auto discreteDistribution(
-        Range&& container, const double total, Proj&& proj = {}
+        Range&& container, const f64 total, Proj&& proj = {}
     ) noexcept -> decltype(auto) {
         assert(total > 0.0);
         const auto target     = rand(0.0, total);
@@ -109,22 +122,18 @@ class RandomGenerator final {
             std::ranges::sample(range, outIt, n, rng);
         }
     void sample(Range&& r, Out out, const N n) noexcept {
-        std::ranges::sample(std::forward<Range>(r), out, static_cast<int>(n), rng_);
+        std::ranges::sample(std::forward<Range>(r), out, static_cast<i32>(n), rng_);
     }
 
-    [[nodiscard]] auto makeUint64() noexcept -> std::uint64_t {
-        return (static_cast<std::uint64_t>(rng_()) << 32) | rng_();
-    }
-
-    [[nodiscard]] auto random(const RandomParameter& param) noexcept -> double {
+    [[nodiscard]] auto random(const RandomParameter& param) noexcept -> f64 {
         return param.visit(Overloaded{
-            [&](const UniformParameter<int>& uniformParam) noexcept -> double {
+            [&](const UniformParameter<i32>& uniformParam) noexcept -> f64 {
                 return randInt(uniformParam.min, uniformParam.limit);
             },
-            [&](const UniformParameter<double>& uniformParam) noexcept -> double {
+            [&](const UniformParameter<f64>& uniformParam) noexcept -> f64 {
                 return rand(uniformParam.min, uniformParam.limit);
             },
-            [&](const NormalParameter& normalParam) noexcept -> double {
+            [&](const NormalParameter& normalParam) noexcept -> f64 {
                 return randNormal(
                     normalParam.mean, normalParam.dev, normalParam.min, normalParam.max
                 );
@@ -133,6 +142,8 @@ class RandomGenerator final {
     }
 
   private:
+    explicit RandomGenerator(const u64 state, const u64 stream) noexcept : rng_{state, stream} {}
+
     pcg32 rng_;
 };
 }  // namespace abm

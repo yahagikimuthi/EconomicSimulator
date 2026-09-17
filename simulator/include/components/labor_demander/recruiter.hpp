@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "components/labor_demander/common.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
@@ -21,13 +22,14 @@ class OfferApplicants final {
     void add(Entry& entry) noexcept { applicants_.emplace_back(std::ref(entry)); }
     void clear() noexcept { applicants_.clear(); }
     auto offerAcceptedApplicants() noexcept -> auto {
-        return applicants_ |
-               std::views::transform([](Ref<Entry> ref) noexcept -> Entry& { return ref.get(); }) |
+        return applicants_ | std::views::transform([](ref_w<Entry> ref) noexcept -> Entry& {
+                   return ref.get();
+               }) |
                std::views::filter(&Entry::isAccept);
     }
 
   private:
-    std::vector<Ref<Entry>> applicants_;
+    std::vector<ref_w<Entry>> applicants_;
 };
 
 class Ledger final {
@@ -95,6 +97,7 @@ class Recruiter final {
     }
 
     [[nodiscard]] auto endRecruiting(AddRosterFn auto&& addRoster) noexcept -> RecruitResult {
+        auto _ = scopeExit([&]() -> void { reset(); });
         if (not isPosting()) return {.applicants = HeadCount{0.0}, .employ = HeadCount{0.0}};
         auto employCnt        = HeadCount{0.0};
         auto acceptApplicants = offerApplicants_.offerAcceptedApplicants();
@@ -104,12 +107,6 @@ class Recruiter final {
         }
         ledger_.addEmployCnt(employCnt);
         return ledger_.publishResult();
-    }
-
-    void reset() noexcept {
-        myRequest_.has_value();
-        ledger_.reset();
-        offerApplicants_.clear();
     }
 
   private:
@@ -140,9 +137,9 @@ class Recruiter final {
         ledger_.addApplicantsCnt(HeadCount{entries.size()});
     }
 
-    [[nodiscard]] auto packEntry() noexcept -> std::span<Ref<Entry>> {
+    [[nodiscard]] auto packEntry() noexcept -> std::span<ref_w<Entry>> {
         assert(myRequest_);
-        static thread_local auto refs = std::vector<Ref<Entry>>{};
+        static thread_local auto refs = std::vector<ref_w<Entry>>{};
         refs.clear();
         auto entries = myRequest_->entries();
         refs.reserve(entries.size());
@@ -150,25 +147,31 @@ class Recruiter final {
         return refs;
     }
 
+    void reset() noexcept {
+        myRequest_.has_value();
+        ledger_.reset();
+        offerApplicants_.clear();
+    }
+
     [[nodiscard]] static auto shouldPost(const RecruitPlan& plan) noexcept -> bool {
         return plan.offer.isPositive() and plan.employ.isPositive() and plan.wage.isPositive();
     }
 
     [[nodiscard]] static auto sortApplicants(
-        const HeadCount offer, const std::span<Ref<Entry>> entryBox
-    ) noexcept -> std::span<Ref<Entry>> {
+        const HeadCount offer, const std::span<ref_w<Entry>> entryBox
+    ) noexcept -> std::span<ref_w<Entry>> {
         assert(offer.isZeroOrMore());
 
-        const auto k      = std::min(entryBox.size(), static_cast<std::size_t>(offer.value()));
+        const auto k = std::min(static_cast<i32>(entryBox.size()), static_cast<i32>(offer.value()));
         const auto isOver = entryBox.size() > static_cast<std::size_t>(offer.value());
 
         if (not isOver) return entryBox;
 
         std::ranges::nth_element(
             entryBox,
-            entryBox.begin() + static_cast<int>(k),
+            entryBox.begin() + k,
             std::ranges::greater{},
-            [](const Ref<Entry> entryRef) noexcept -> double { return entryRef.get().productPower; }
+            [](const ref_w<Entry> entryRef) noexcept -> f64 { return entryRef.get().productPower; }
         );
         return entryBox;
     }

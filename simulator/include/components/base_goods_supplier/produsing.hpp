@@ -6,6 +6,7 @@
 
 #include "components/base_goods_supplier/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/goods.hpp"
 #include "values/labor.hpp"
@@ -16,7 +17,7 @@
 namespace abm::base_goods::supplier::producing {
 class CapitalManager final {
   public:
-    explicit CapitalManager(const double depreciationRate, const double distributionRate) noexcept
+    explicit CapitalManager(const f64 depreciationRate, const f64 distributionRate) noexcept
         : depreciationRate_{depreciationRate}, distributionRate_{distributionRate} {
         assert(0.0 < distributionRate_ and distributionRate_ < 1.0);
         assert(0.0 < depreciationRate_ and depreciationRate_ < 1.0);
@@ -57,14 +58,14 @@ class CapitalManager final {
         return out;
     }
 
-    const double  depreciationRate_;
-    const double  distributionRate_;
+    const f64     depreciationRate_;
+    const f64     distributionRate_;
     GoodsQuantity capital_{0.0};
 };
 
 class WorkerManager final {
   public:
-    explicit WorkerManager(const double distributionRate) noexcept
+    explicit WorkerManager(const f64 distributionRate) noexcept
         : distributionRate_{distributionRate} {
         assert(0.0 < distributionRate_ and distributionRate_ < 1.0);
     }
@@ -109,8 +110,8 @@ class WorkerManager final {
     }
 
     Workspace     workspace_;
-    GoodsQuantity lastProduce_{std::numeric_limits<double>::epsilon()};
-    const double  distributionRate_;
+    GoodsQuantity lastProduce_{std::numeric_limits<f64>::epsilon()};
+    const f64     distributionRate_;
 };
 
 // TODO 各Managerの生産量/計画量がゼロの場合にゼロ除算が発生する恐れがある
@@ -151,20 +152,22 @@ class Producer final {
     void addCapital(const GoodsQuantity add) noexcept { capital_.addCapital(add); }
 
   private:
-    Producer(RandomGenerator& masterRng, const double capitalDistributionRate) noexcept
+    Producer(RandomGenerator& masterRng, const f64 capitalDistributionRate) noexcept
         : capital_{masterRng.random(setting::capitalDepreciationRate), capitalDistributionRate},
           worker_{1.0 - capitalDistributionRate},
           productPower_{masterRng.random(setting::productPower)} {}
 
     CapitalManager capital_;
     WorkerManager  worker_;
-    const double   productPower_;
+    const f64      productPower_;
 };
 
 class ProducingSystem final {
   public:
     explicit ProducingSystem(RandomGenerator& masterRng) noexcept
         : producer_{masterRng}, inventory_{masterRng.random(setting::inventory)} {}
+
+    void acceptMediator(IMediator auto& mediator) noexcept { mediator.subscribeTradeResult(*this); }
 
     [[nodiscard]] auto desiredEmploy(const GoodsQuantity requiresSupply, const HeadCount employee)
         const noexcept -> HeadCount {

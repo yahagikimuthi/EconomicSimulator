@@ -6,6 +6,7 @@
 
 #include "components/common.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "world/deposit.hpp"
@@ -66,14 +67,14 @@ class HHoldFinance final {
     }
 
   private:
-    [[nodiscard]] auto currentCashRatio() const noexcept -> double {
+    [[nodiscard]] auto currentCashRatio() const noexcept -> f64 {
         if (asset().isZero()) return 0.0;
         return static_cast<Budget>(cash_) / asset();
     }
 
-    BankAccount  bankAccount_;
-    Money        cash_;
-    const double cashRatio_;
+    BankAccount bankAccount_;
+    Money       cash_;
+    const f64   cashRatio_;
 };
 
 class GovernmentFinance final {
@@ -101,7 +102,7 @@ class GovernmentFinance final {
     }
 
   private:
-    std::atomic<double> cash_{0.0};
+    std::atomic<f64> cash_{0.0};
 };
 }  // namespace abm::finance
 

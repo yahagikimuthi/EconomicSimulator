@@ -6,6 +6,7 @@
 #include "components/labor_demander/mediator.hpp"
 #include "doctest.h"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "tests/util.hpp"
 #include "values/labor.hpp"
 
@@ -65,7 +66,7 @@ TEST_CASE("WagePlannerのテスト") {  // NOLINT
     }
 
     SUBCASE("応募者数 < 雇用計画の場合、賃金が上がること") {
-        constexpr auto infMoney = Money{std::numeric_limits<double>::infinity()};
+        constexpr auto infMoney = Money{std::numeric_limits<f64>::infinity()};
         constexpr auto result =
             RecruitResult{.applicants = HeadCount{5.0}, .employ = HeadCount{5.0}};
         const auto first = planner.plan(infMoney);
@@ -81,7 +82,7 @@ TEST_CASE("WagePlannerのテスト") {  // NOLINT
     }
 
     SUBCASE("応募者数 = 雇用計画の場合、賃金が変わらないこと") {
-        constexpr auto infMoney = Money{std::numeric_limits<double>::infinity()};
+        constexpr auto infMoney = Money{std::numeric_limits<f64>::infinity()};
         constexpr auto result =
             RecruitResult{.applicants = HeadCount{10.0}, .employ = HeadCount{5.0}};
         const auto first = planner.plan(infMoney);
@@ -97,7 +98,7 @@ TEST_CASE("WagePlannerのテスト") {  // NOLINT
     }
 
     SUBCASE("応募者数 > 雇用計画の場合、賃金が下がること") {
-        constexpr auto infMoney = Money{std::numeric_limits<double>::infinity()};
+        constexpr auto infMoney = Money{std::numeric_limits<f64>::infinity()};
         constexpr auto result =
             RecruitResult{.applicants = HeadCount{20.0}, .employ = HeadCount{5.0}};
         const auto first = planner.plan(infMoney);

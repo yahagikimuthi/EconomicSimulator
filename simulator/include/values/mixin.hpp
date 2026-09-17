@@ -3,6 +3,7 @@
 #include <cassert>
 #include <compare>
 
+#include "others/type.hpp"
 #include "others/util.hpp"
 
 namespace abm::value_object {
@@ -63,27 +64,27 @@ template <typename Derived>
 struct ScholarMixin {
     friend Derived;
 
-    [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> double {
+    [[nodiscard]] friend constexpr auto operator/(Derived lhs, Derived rhs) noexcept -> f64 {
         assert(rhs.value_ != 0.0);
         return lhs.value_ / rhs.value_;
     }
-    friend constexpr auto operator*=(Derived& lhs, double rhs) noexcept -> Derived& {
+    friend constexpr auto operator*=(Derived& lhs, f64 rhs) noexcept -> Derived& {
         lhs.value_ *= rhs;
         return lhs;
     }
-    [[nodiscard]] friend constexpr auto operator*(Derived lhs, double rhs) noexcept -> Derived {
+    [[nodiscard]] friend constexpr auto operator*(Derived lhs, f64 rhs) noexcept -> Derived {
         lhs *= rhs;
         return lhs;
     }
-    [[nodiscard]] friend constexpr auto operator*(double lhs, Derived rhs) noexcept -> Derived {
+    [[nodiscard]] friend constexpr auto operator*(f64 lhs, Derived rhs) noexcept -> Derived {
         return rhs * lhs;
     }
-    friend constexpr auto operator/=(Derived& lhs, double rhs) noexcept -> Derived& {
+    friend constexpr auto operator/=(Derived& lhs, f64 rhs) noexcept -> Derived& {
         assert(rhs != 0.0);
         lhs.value_ /= rhs;
         return lhs;
     }
-    [[nodiscard]] friend constexpr auto operator/(Derived lhs, double rhs) noexcept -> Derived {
+    [[nodiscard]] friend constexpr auto operator/(Derived lhs, f64 rhs) noexcept -> Derived {
         assert(rhs != 0.0);
         lhs /= rhs;
         return lhs;

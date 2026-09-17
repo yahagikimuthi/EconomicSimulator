@@ -11,6 +11,7 @@
 #include "components/labor_demander/planner.hpp"
 #include "components/labor_demander/recruiter.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
@@ -33,7 +34,7 @@ class RecruitSystem final {
         return *requestedBudget_;
     }
 
-    void revisePlan(const Budget budget, IMediator auto& mediator) noexcept {
+    void revisePlan(const Budget budget, Mediator& mediator) noexcept {
         assert(requestedBudget_);
         assert(budget <= *requestedBudget_ + Budget{global_setting::epsilon});
         requestedBudget_.reset();
@@ -64,7 +65,6 @@ class RecruitSystem final {
         plan_.reset();
         const auto result = recruiter_.endRecruiting(std::forward<F>(addRoster));
         mediator.publishRecruitResult(result);
-        recruiter_.reset();
     }
 
   private:
@@ -98,7 +98,7 @@ class LaborDemander final {
         const auto adjust         = desiredEmploy - employee;
         const auto isEmploying    = not employee.isZero();
         const auto salesPerWorker = isEmploying ? salesForecast.value() / employee.value()
-                                                : std::numeric_limits<double>::infinity();
+                                                : std::numeric_limits<f64>::infinity();
         const auto recruitSystemBudget =
             recruitSystem_.requestBudget(std::max(adjust, HeadCount{0.0}), Money{salesPerWorker});
         const auto hrBudget =

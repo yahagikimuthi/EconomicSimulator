@@ -80,11 +80,11 @@ class BaseGoodsSupplier {
 
   private:
     void setMediator() noexcept {
+        producingSystem_.acceptMediator(mediator_);
         tradingSystem_.acceptMediator(mediator_);
         mediator_.subscribeMarkupPlan(memory_);
         mediator_.subscribeTradePlan(memory_);
         mediator_.subscribeTradeResult(memory_);
-        mediator_.subscribeTradeResult(producingSystem_);
     }
 
     ProducingSystem producingSystem_;

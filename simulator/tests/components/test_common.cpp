@@ -28,7 +28,7 @@ TEST_CASE("Listenerのテスト") {  // NOLINT
     listener.add(c1);
     listener.add(c2);
 
-    listener.notice([](auto& arg) noexcept -> void { arg.listen(Money{10.0}); });
+    listener.notify([](auto& arg) noexcept -> void { arg.listen(Money{10.0}); });
 
     CHECK(c1.money.value() == 10.0);
     CHECK(c2.money.value() == 10.0);

@@ -18,8 +18,7 @@ namespace abm::base_goods::supplier {
 
 class Trader final {
   public:
-    explicit Trader(RandomGenerator& masterRng) noexcept
-        : rng_{{masterRng.makeUint64(), masterRng.makeUint64()}} {}
+    explicit Trader(RandomGenerator& masterRng) noexcept : rng_{masterRng.construct()} {}
 
     void post(const AgentID id, const TradePlan& plan, Market& market) noexcept {
         assert(plan.supply.isZeroOrMore());
@@ -90,8 +89,8 @@ class Trader final {
 
     [[nodiscard]] auto isPosting() const noexcept -> bool { return myEntry_.has_value(); }
 
-    [[nodiscard]] auto packRequest() noexcept -> std::span<Ref<Request>> {
-        static thread_local auto refs = std::vector<Ref<Request>>{};
+    [[nodiscard]] auto packRequest() noexcept -> std::span<ref_w<Request>> {
+        static thread_local auto refs = std::vector<ref_w<Request>>{};
         refs.clear();
         auto requests = myEntry_->requests();
         refs.reserve(requests.size());

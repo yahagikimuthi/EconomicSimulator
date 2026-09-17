@@ -2,11 +2,12 @@
 
 #include <cassert>
 
+#include "others/type.hpp"
 #include "values/common.hpp"
 #include "values/mixin.hpp"
 
 namespace abm::value_object {
-class Price final : public BaseValueObject<double>,
+class Price final : public BaseValueObject<f64>,
                     CompareMixin<Price>,
                     AddMixin<Price>,
                     ScholarMixin<Price>,
@@ -15,12 +16,12 @@ class Price final : public BaseValueObject<double>,
     friend struct ScholarMixin<Price>;
 
   public:
-    [[nodiscard]] constexpr explicit Price(const double value) noexcept
-        : BaseValueObject<double>(value) {}
+    [[nodiscard]] constexpr explicit Price(const f64 value) noexcept
+        : BaseValueObject<f64>(value) {}
     explicit constexpr operator Money() const noexcept { return Money{value_}; }
 };
 
-class GoodsQuantity final : public BaseValueObject<double>,
+class GoodsQuantity final : public BaseValueObject<f64>,
                             CompareMixin<GoodsQuantity>,
                             AddMixin<GoodsQuantity>,
                             ScholarMixin<GoodsQuantity>,
@@ -29,8 +30,7 @@ class GoodsQuantity final : public BaseValueObject<double>,
     friend struct ScholarMixin<GoodsQuantity>;
 
   public:
-    explicit constexpr GoodsQuantity(const double value) noexcept
-        : BaseValueObject<double>(value) {}
+    explicit constexpr GoodsQuantity(const f64 value) noexcept : BaseValueObject<f64>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(Price lhs, GoodsQuantity rhs) noexcept -> Money {
@@ -48,7 +48,7 @@ class GoodsQuantity final : public BaseValueObject<double>,
     return Price{lhs.value() / rhs.value()};
 }
 
-class MarkupRate final : public BaseValueObject<double>,
+class MarkupRate final : public BaseValueObject<f64>,
                          CompareMixin<MarkupRate>,
                          AddMixin<MarkupRate>,
                          ScholarMixin<MarkupRate>,
@@ -57,7 +57,7 @@ class MarkupRate final : public BaseValueObject<double>,
     friend struct ScholarMixin<MarkupRate>;
 
   public:
-    explicit constexpr MarkupRate(const double value) noexcept : BaseValueObject<double>(value) {}
+    explicit constexpr MarkupRate(const f64 value) noexcept : BaseValueObject<f64>(value) {}
 };
 
 [[nodiscard]] constexpr auto operator*(Money lhs, MarkupRate rhs) noexcept -> Price {

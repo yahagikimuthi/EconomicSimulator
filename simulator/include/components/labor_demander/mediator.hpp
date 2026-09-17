@@ -7,37 +7,35 @@
 
 namespace abm::labor::demander {
 class Mediator final {
-    using RecruitPlanListener =
-        Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory, CentralMemory>;
-    using RecruitResultListener = Listener<planner::WagePlannerMemory, planner::OfferPlannerMemory>;
+    using PlanListener =
+        Listener<CentralMemory, planner::OfferPlannerMemory, planner::WagePlannerMemory>;
+    using ResultListener = Listener<planner::OfferPlannerMemory, planner::WagePlannerMemory>;
 
   public:
     explicit Mediator() noexcept = default;
 
-    template <typename T>
-    void subscribeRecruitPlan(T& t) noexcept {
-        recruitPlanListeners_.add(t);
+    void subscribeRecruitPlan(IsListenerOrMono<PlanListener> auto& listener) noexcept {
+        recruitPlanListeners_.add(listener);
     }
 
-    template <typename T>
-    void subscribeRecruitResult(T& t) noexcept {
-        recruitResultListeners_.add(t);
+    void subscribeRecruitResult(IsListenerOrMono<ResultListener> auto& listener) noexcept {
+        recruitResultListeners_.add(listener);
     }
 
     void publishRecruitPlan(const RecruitPlan& plan) noexcept {
-        recruitPlanListeners_.notice([&](auto&& listener) noexcept -> void {
+        recruitPlanListeners_.notify([&](auto& listener) noexcept -> void {
             listener.listenRecruitPlan(plan);
         });
     }
 
     void publishRecruitResult(const RecruitResult& result) noexcept {
-        recruitResultListeners_.notice([&](auto&& listener) noexcept -> void {
+        recruitResultListeners_.notify([&](auto& listener) noexcept -> void {
             listener.listenRecruitResult(result);
         });
     }
 
   private:
-    RecruitPlanListener   recruitPlanListeners_;
-    RecruitResultListener recruitResultListeners_;
+    PlanListener   recruitPlanListeners_;
+    ResultListener recruitResultListeners_;
 };
 }  // namespace abm::labor::demander

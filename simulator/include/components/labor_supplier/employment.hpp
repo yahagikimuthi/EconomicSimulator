@@ -5,6 +5,7 @@
 
 #include "components/common.hpp"
 #include "components/labor_supplier/common.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
@@ -71,6 +72,6 @@ class Employment final {
     }
 
     std::optional<RosterEntry&> rosterEntry_{std::nullopt};
-    const double                productPower_;
+    const f64                   productPower_;
 };
 }  // namespace abm::labor::supplier

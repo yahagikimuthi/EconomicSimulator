@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdint>
 #include <functional>
 #include <ranges>
 #include <vector>
@@ -13,6 +12,7 @@
 #include "engine/goods_engine.hpp"
 #include "engine/labor_engine.hpp"
 #include "others/setting.hpp"
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "system/planning.hpp"
 #include "world/drop_box.hpp"
@@ -20,9 +20,9 @@
 namespace abm::engine {
 class Engine final {
   public:
-    [[nodiscard]] explicit Engine(const int endStep)
+    [[nodiscard]] explicit Engine(const i32 endStep)
         : seed_{generateSeed()},
-          rng_{{seed_.state, seed_.stream}},
+          rng_{seed_.state, seed_.stream},
           endMonth_{endStep},
           laborEngine_{dropBox_.labor},
           capitalEngine_{dropBox_.capital},
@@ -93,9 +93,9 @@ class Engine final {
         }
     }
 
-    [[nodiscard]] static auto calcSumAssert(const auto& agents) noexcept -> double {
+    [[nodiscard]] static auto calcSumAssert(const auto& agents) noexcept -> f64 {
         return std::ranges::fold_left(
-            agents | std::views::transform([](const auto& agent) noexcept -> double {
+            agents | std::views::transform([](const auto& agent) noexcept -> f64 {
                 return agent.finance.asset().value();
             }),
             0.0,
@@ -103,7 +103,7 @@ class Engine final {
         );
     }
 
-    [[nodiscard]] auto calcSumAsset() noexcept -> double {
+    [[nodiscard]] auto calcSumAsset() noexcept -> f64 {
         return calcSumAssert(capitalFirms_) + calcSumAssert(goodsFirms_) + calcSumAssert(hholds_);
     }
 
@@ -114,15 +114,15 @@ class Engine final {
             };
         }
         auto       rd     = std::random_device{};
-        const auto state  = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
-        const auto stream = std::uint64_t{(static_cast<std::uint64_t>(rd()) << 32) | rd()};
+        const auto state  = makeUint64(rd);
+        const auto stream = makeUint64(rd);
         return {.state = state, .stream = stream};
     }
 
     const PCG32Seed seed_;
     RandomGenerator rng_;
 
-    const int endMonth_;
+    const i32 endMonth_;
 
     std::vector<CapitalFirm> capitalFirms_;
     std::vector<GoodsFirm>   goodsFirms_;

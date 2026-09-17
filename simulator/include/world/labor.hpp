@@ -10,6 +10,7 @@
 #include <ranges>
 #include <utility>
 
+#include "others/type.hpp"
 #include "others/util.hpp"
 #include "values/common.hpp"
 #include "values/labor.hpp"
@@ -45,7 +46,7 @@ class RosterEntry final {
     auto operator=(RosterEntry&&) noexcept -> RosterEntry&      = delete;
     ~RosterEntry() noexcept                                     = default;
 
-    void addInput(const double productPower) noexcept {
+    void addInput(const f64 productPower) noexcept {
         assert(isOccupied_);
         workspace_.addInput(productPower);
     }
@@ -124,9 +125,9 @@ class Roster final {
     [[nodiscard]] auto sumWage() const noexcept -> Wage { return sumWage_; }
 
   private:
-    std::deque<RosterEntry>                  entries_;
-    tbb::concurrent_vector<Ref<RosterEntry>> empties_;
-    Wage                                     sumWage_{0.0};
+    std::deque<RosterEntry>                    entries_;
+    tbb::concurrent_vector<ref_w<RosterEntry>> empties_;
+    Wage                                       sumWage_{0.0};
 };
 
 inline void RosterEntry::resign() noexcept {
@@ -138,7 +139,7 @@ inline void RosterEntry::resign() noexcept {
 class Request;
 class Entry final {
   public:
-    explicit Entry(const AgentID Id, const double power, const Request& req) noexcept
+    explicit Entry(const AgentID Id, const f64 power, const Request& req) noexcept
         : entrantId{Id}, productPower{power}, request{req} {
         assert(power > 0.0);
     }
@@ -153,7 +154,7 @@ class Entry final {
     ~Entry() noexcept                               = default;
 
     const AgentID entrantId;
-    const double  productPower;
+    const f64  productPower;
 
     void offer() noexcept {
         assert(not isOffer_);
@@ -193,7 +194,7 @@ class Request final {
     explicit Request(const AgentID Id, const Wage Wage) noexcept : firmID{Id}, wage{Wage} {
         assert(Wage.isPositive());
     }
-    [[nodiscard]] auto entry(const AgentID id, const double productPower) noexcept -> Entry& {
+    [[nodiscard]] auto entry(const AgentID id, const f64 productPower) noexcept -> Entry& {
         assert(productPower > 0.0);
         assert(id != firmID);
         return *entries_.emplace_back(id, productPower, *this);
@@ -218,10 +219,10 @@ class Market final {
     }
 
     void pickRequest(
-        const AgentID              requestorId,
-        std::vector<Ref<Request>>& out,
-        const int                  jobSampleCnt,
-        RandomGenerator&           rng
+        const AgentID                requestorId,
+        std::vector<ref_w<Request>>& out,
+        const i32                    jobSampleCnt,
+        RandomGenerator&             rng
     ) noexcept {
         assert(out.empty());
         if (std::cmp_greater_equal(jobSampleCnt, requests_.size()))
@@ -233,19 +234,19 @@ class Market final {
     void clear() noexcept { requests_.clear(); }
 
   private:
-    void packAllRequest(const AgentID id, std::vector<Ref<Request>>& out) {
+    void packAllRequest(const AgentID id, std::vector<ref_w<Request>>& out) {
         for (auto& req : requests_) {
             if (req.firmID != id) out.emplace_back(std::ref(req));
         }
     }
 
     void packPartRequest(
-        const AgentID id, std::vector<Ref<Request>>& out, RandomGenerator& rng
+        const AgentID id, std::vector<ref_w<Request>>& out, RandomGenerator& rng
     ) noexcept {
         rng.sample(
             requests_ | std::views::filter([id](const Request& req) noexcept -> bool {
                 return req.firmID == id;
-            }) | std::views::transform([](Request& req) noexcept -> Ref<Request> {
+            }) | std::views::transform([](Request& req) noexcept -> ref_w<Request> {
                 return std::ref(req);
             }),
             std::back_inserter(out),
