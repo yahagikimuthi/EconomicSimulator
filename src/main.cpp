@@ -1,3 +1,3 @@
 #include "abm.hpp"
 
-auto main() -> int { abm::run(400); }
+auto main() -> int { abm::run(1000); }

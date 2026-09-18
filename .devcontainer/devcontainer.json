@@ -12,8 +12,15 @@
                 "streetsidesoftware.code-spell-checker",
                 "PKief.material-icon-theme",
                 "fabiospampinato.vscode-highlight",
-                "ms-vscode.cmake-tools"
+                "ms-vscode.cmake-tools",
+                "llvm-vs-code-extensions.lldb-dap",
+                "vadimcn.vscode-lldb"
             ]
         }
-    }
+    },
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined"
+    ]
 }

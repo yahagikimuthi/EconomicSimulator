@@ -30,10 +30,10 @@ class CapitalDemander final {
 
     [[nodiscard]] auto planBudget(const GoodsQuantity desiredAmount) noexcept -> Budget {
         assert(log_.tradeAmount.isPositive());
+        assert(desiredAmount.isZeroOrMore());
 
-        const auto avgPrice = log_.purchase / log_.tradeAmount;
-        purchaseAmountPlan_ = desiredAmount;
-        budget_             = static_cast<Budget>(avgPrice * desiredAmount);
+        purchaseAmountPlan_ = std::min(desiredAmount, log_.tradeAmount * 2.0);
+        budget_ = static_cast<Budget>(desiredAmount * (log_.purchase / log_.tradeAmount));
         assert(budget_->isZeroOrMore());
         return *budget_;
     }
@@ -53,7 +53,7 @@ class CapitalDemander final {
     ) noexcept {
         assert(budget_);
         assert(purchaseAmountPlan_);
-        assert(budget_->isPositive());
+        assert(budget_->isZeroOrMore());
 
         const auto budget       = *budget_;
         const auto purchasePlan = *purchaseAmountPlan_;
@@ -76,8 +76,12 @@ class CapitalDemander final {
         std::forward<F1>(depositFn)(remain);
         const auto capital = myRequest_->takeoutTradeAmount();
         std::forward<F2>(addCapitalFn)(capital);
-        if (capital.isPositive())
-            log_ = {.purchase = myRequest_->payment - remain, .tradeAmount = capital};
+        if (capital.isPositive()) {
+            log_ = {
+                .purchase    = myRequest_->payment - remain + Money{global_setting::epsilon},
+                .tradeAmount = capital
+            };
+        }
         myRequest_.reset();
     }
 

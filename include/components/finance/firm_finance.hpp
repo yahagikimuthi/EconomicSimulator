@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <concepts>
 #include <utility>
 
@@ -44,6 +45,7 @@ class FirmFinance final {
     }
 
     [[nodiscard]] auto asset() const noexcept -> Budget {
+        assert(not std::isnan(cash_.value()));
         return static_cast<Budget>(cash_) + bankAccount_.balance();
     }
 

@@ -9,6 +9,7 @@
 #include "components/finance/others_finance.hpp"
 #include "components/goods_demander.hpp"
 #include "components/labor_demander/labor_demander.hpp"
+#include "others/setting.hpp"
 #include "values/common.hpp"
 
 namespace abm::planning {
@@ -93,7 +94,7 @@ inline void planStandard(
         capitalDemander.revisePlan(capitalReq);
     } else {
         const auto budget = finance.claimBudget(total) + salesPlan;
-        assert(budget <= laborCost + capitalReq);
+        assert(budget <= laborCost + capitalReq + Budget{global_setting::epsilon});
 
         const auto capitalBudget = std::max(budget - laborCost, Budget{0.0});
         capitalDemander.revisePlan(capitalBudget);

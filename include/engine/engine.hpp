@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <print>
 #include <ranges>
 #include <vector>
 
@@ -42,6 +43,7 @@ class Engine final {
 
     void run() noexcept {
         for (const auto month : std::views::indices(endMonth_)) {
+            std::println("{}", calcSumAsset());
             if (month % global_setting::monthInYear == 0) {
                 runJanuaryPlanning();
                 laborEngine_.run(capitalFirms_, goodsFirms_, hholds_);

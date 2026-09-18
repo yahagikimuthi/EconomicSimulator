@@ -116,7 +116,7 @@ class Entry final {
     assert(payment.isZeroOrMore());
     assert(remainPaid_.value() + global_setting::epsilon > 0);
     remainPaid_ = std::max(remainPaid_, Money{0.0});
-    return actualPay;
+    return std::max(actualPay, Money{global_setting::epsilon});
 }
 
 class Market final {
@@ -139,22 +139,20 @@ class Market final {
         const auto totalSupply = totalSupply_.load();
 
         assert(
-            totalSupply ==
-            std::ranges::fold_left(
-                entries_ | std::views::transform([](const Entry& e) noexcept -> f64 {
-                    return e.supply.value();
-                }),
-                0.0,
-                std::plus{}
-            )
+            totalSupply == std::ranges::fold_left(
+                               entries_ | std::views::transform([](const Entry& e) noexcept -> f64 {
+                                   return e.supply.value();
+                               }),
+                               0.0,
+                               std::plus{}
+                           )
         );
 
         for (const auto _ : std::views::indices(sampleCnt)) {
-            auto& sample = rng.discreteDistribution(
-                entries_,
-                totalSupply,
-                [](const Entry& e) noexcept -> f64 { return e.supply.value(); }
-            );
+            auto& sample =
+                rng.discreteDistribution(entries_, totalSupply, [](const Entry& e) noexcept -> f64 {
+                    return e.supply.value();
+                });
             if (sample.id == id) continue;
             if (not betterEntry or sample.price < betterEntry->price) betterEntry = sample;
         }
@@ -169,7 +167,7 @@ class Market final {
 
   private:
     tbb::concurrent_vector<Entry> entries_;
-    std::atomic<f64>           totalSupply_;
+    std::atomic<f64>              totalSupply_;
 };
 }  // namespace abm::base_goods
 
